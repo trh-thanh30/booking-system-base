@@ -1,0 +1,59 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.0.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm check-types
+      - run: pnpm build
+      - name: Notify Telegram
+        if: always()
+        env:
+          CI_TELEGRAM_BOT_TOKEN: ${{ secrets.CI_TELEGRAM_BOT_TOKEN }}
+          CI_TELEGRAM_CHAT_ID: ${{ secrets.CI_TELEGRAM_CHAT_ID }}
+          CI_COMMIT_MESSAGE: ${{ github.event.head_commit.message || github.event.pull_request.title || github.workflow }}
+        run: |
+          if [ -z "$CI_TELEGRAM_BOT_TOKEN" ] || [ -z "$CI_TELEGRAM_CHAT_ID" ]; then
+            echo "Telegram secrets are not configured. Skipping notification."
+            exit 0
+          fi
+
+          STATUS="${{ job.status }}"
+          if [ "$STATUS" = "failure" ]; then STATUS="failed"; fi
+          PASSED=0
+          FAILED=0
+          if [ "$STATUS" = "success" ]; then PASSED=1; fi
+          if [ "$STATUS" = "failed" ]; then FAILED=1; fi
+
+          pnpm notify:telegram \
+            --event ci \
+            --status "$STATUS" \
+            --mode text \
+            --project "${{ github.event.repository.name }}" \
+            --environment ci \
+            --branch "${{ github.ref_name }}" \
+            --repository "${{ github.repository }}" \
+            --commit "${{ github.sha }}" \
+            --message "$CI_COMMIT_MESSAGE" \
+            --author "${{ github.actor }}" \
+            --workflow "${{ github.workflow }}" \
+            --job verify \
+            --passed "$PASSED" \
+            --failed "$FAILED" \
+            --run-url "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"

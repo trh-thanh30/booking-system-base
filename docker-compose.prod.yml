@@ -1,0 +1,159 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: booking-db
+    restart: unless-stopped
+    env_file:
+      - path: .env.production
+        required: false
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-booking_base}
+      POSTGRES_USER: ${POSTGRES_USER:-booking_base_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-booking_base_password}
+    ports:
+      - "${PROD_DB_PORT:-5432}:5432"
+    volumes:
+      - booking_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: booking-redis
+    restart: unless-stopped
+    env_file:
+      - path: .env.production
+        required: false
+    command: redis-server --requirepass ${REDIS_PASSWORD:-booking_base_redis_password}
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-booking_base_redis_password}
+    ports:
+      - "${REDIS_DB_PORT:-6379}:6379"
+    volumes:
+      - booking_redis_data:/data
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "redis-cli -a \"$${REDIS_PASSWORD:-booking_base_redis_password}\" ping",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    image: ${API_IMAGE:-booking-api}:${IMAGE_TAG:-latest}
+    container_name: booking-api
+    restart: unless-stopped
+    init: true
+    stop_grace_period: 30s
+    env_file:
+      - path: .env.production
+        required: false
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      APP_ROLE: api
+      DB_HOST: db
+      DB_PORT: 5432
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      DATABASE_URL: postgresql://${DB_USER:-booking_base_user}:${DB_PASSWORD:-booking_base_password}@db:5432/${DB_NAME:-booking_base}?schema=${DB_SCHEMA:-public}
+      REDIS_URL: redis://:${REDIS_PASSWORD:-booking_base_redis_password}@redis:6379
+    ports:
+      - "${API_PORT:-3000}:3000"
+    volumes:
+      - booking_storage:/app/storage
+      - booking_logs:/app/logs
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "node -e \"require('http').get('http://127.0.0.1:3000/health/live', r => process.exit(r.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))\"",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+
+  worker:
+    image: ${API_IMAGE:-booking-api}:${IMAGE_TAG:-latest}
+    container_name: booking-worker
+    restart: unless-stopped
+    init: true
+    stop_grace_period: 30s
+    command: ["node", "dist/workers/email/worker.main.js"]
+    env_file:
+      - path: .env.production
+        required: false
+    environment:
+      NODE_ENV: production
+      APP_ROLE: worker
+      DB_HOST: db
+      DB_PORT: 5432
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      DATABASE_URL: postgresql://${DB_USER:-booking_base_user}:${DB_PASSWORD:-booking_base_password}@db:5432/${DB_NAME:-booking_base}?schema=${DB_SCHEMA:-public}
+      REDIS_URL: redis://:${REDIS_PASSWORD:-booking_base_redis_password}@redis:6379
+    volumes:
+      - booking_storage:/app/storage
+      - booking_logs:/app/logs
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  web:
+    image: ${WEB_IMAGE:-booking-web}:${IMAGE_TAG:-latest}
+    container_name: booking-web
+    restart: unless-stopped
+    init: true
+    stop_grace_period: 30s
+    env_file:
+      - path: .env.production
+        required: false
+    environment:
+      NODE_ENV: production
+      HOSTNAME: 0.0.0.0
+      PORT: 3001
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3000/api/v1}
+    ports:
+      - "${WEB_PORT:-3001}:3001"
+    depends_on:
+      api:
+        condition: service_healthy
+
+  admin:
+    image: ${ADMIN_IMAGE:-booking-admin}:${IMAGE_TAG:-latest}
+    container_name: booking-admin
+    restart: unless-stopped
+    init: true
+    stop_grace_period: 30s
+    env_file:
+      - path: .env.production
+        required: false
+    environment:
+      NODE_ENV: production
+      HOSTNAME: 0.0.0.0
+      PORT: 3002
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3000/api/v1}
+    ports:
+      - "${ADMIN_PORT:-3002}:3002"
+    depends_on:
+      api:
+        condition: service_healthy
+
+volumes:
+  booking_postgres_data:
+  booking_redis_data:
+  booking_storage:
+  booking_logs:
