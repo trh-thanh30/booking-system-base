@@ -14,6 +14,7 @@ export type TelegramJobSummary = {
   name: string;
   status: TelegramStatus;
   duration?: string;
+  url?: string;
   steps?: TelegramJobStep[];
 };
 

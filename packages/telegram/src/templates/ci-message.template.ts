@@ -32,7 +32,7 @@ function renderJobs(payload: CiCdNotificationPayload): string[] {
 
   for (const job of jobs) {
     lines.push(
-      `- ${statusSymbols[job.status]} <u>${escapeHtml(job.name)}</u> ${escapeHtml(job.duration ?? "N/A")} · ${renderJobStatus(job.status)}:`,
+      `- ${statusSymbols[job.status]} ${link(job.name, job.url)} ${escapeHtml(job.duration ?? "N/A")} · ${renderJobStatus(job.status)}:`,
     );
 
     if (job.steps?.length) {

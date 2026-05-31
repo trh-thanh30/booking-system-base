@@ -70,3 +70,39 @@ Dry-run writes:
 
 - `telegram-notification.preview.html`
 - `telegram-notification.preview.png`
+
+## GitHub Actions Job Details
+
+The CI workflow sends detailed GitHub Actions jobs and steps by passing `--jobs-json` to the Telegram CLI.
+
+The helper script lives at:
+
+```bash
+.github/scripts/collect-github-actions-jobs.mjs
+```
+
+It uses the GitHub Actions API for the current run and returns:
+
+- job name
+- job status
+- job duration
+- job URL
+- step names
+- step statuses
+- step durations
+- totals for success, failed, running, and cancelled jobs
+
+The workflow needs:
+
+```yaml
+permissions:
+  contents: read
+  actions: read
+```
+
+The notification job is intentionally separated from the verification job so Telegram can show both:
+
+- `Build & Type Check & Test & Lint`
+- `Send Webhook Notification`
+
+During the notification step, the second job may show as `IN PROGRESS`, which matches GitHub's live workflow state.
