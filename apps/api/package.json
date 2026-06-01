@@ -1,6 +1,6 @@
 {
   "name": "@repo/api",
-  "vereedion": "0.0.1",
+  "version": "0.0.1",
   "description": "",
   "author": "",
   "private": true,
@@ -25,7 +25,9 @@
     "start:worker:email": "pnpm --filter @repo/shared run build && dotenv -e ../../.env.development -- nest start worker:email --watch",
     "start:worker:email:prod": "cross-env NODE_ENV=production node dist/workers/email/worker.main.js",
     "start:worker:email:debug": "dotenv -e ../../.env.development -- nest start worker:email --debug --watch",
-    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
+    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\"",
+    "lint:fix": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
+    "lint:strict": "eslint \"{src,apps,libs,test}/**/*.ts\" --max-warnings 0",
     "check-types": "tsc --noEmit",
     "test": "pnpm --filter @repo/shared run build && cross-env NODE_ENV=test jest",
     "test:dev": "pnpm --filter @repo/shared run build && dotenv -e ../../.env.development -- cross-env NODE_ENV=development jest",

@@ -3,7 +3,7 @@ SHELL := /bin/sh
 DEV_COMPOSE := docker compose -f docker-compose.dev.yml
 PROD_COMPOSE := docker compose -f docker-compose.prod.yml
 
-.PHONY: help install dev dev-full build lint check-types typecheck test \
+.PHONY: help install dev dev-full build build-packages lint lint-packages check-types typecheck typecheck-packages test \
 	api web admin worker-dev worker-prod \
 	infra-dev-up infra-dev-down infra-dev-logs infra-dev-ps infra-dev-config \
 	infra-prod-up infra-prod-down infra-prod-logs infra-prod-ps infra-prod-config \
@@ -19,8 +19,11 @@ help:
 		'  make dev                  Run all dev tasks through Turborepo' \
 		'  make dev-full             Run api, web, and admin dev tasks' \
 		'  make build                Build the full monorepo' \
+		'  make build-packages       Build shared packages only' \
 		'  make lint                 Lint the full monorepo' \
+		'  make lint-packages        Lint shared packages only' \
 		'  make check-types          Typecheck the full monorepo' \
+		'  make typecheck-packages   Typecheck shared packages only' \
 		'  make test                 Run tests through Turborepo' \
 		'' \
 		'Infrastructure:' \
@@ -50,14 +53,23 @@ dev-full:
 build:
 	pnpm build
 
+build-packages:
+	pnpm build:packages
+
 lint:
 	pnpm lint
+
+lint-packages:
+	pnpm lint:packages
 
 check-types:
 	pnpm check-types
 
 typecheck:
 	pnpm typecheck
+
+typecheck-packages:
+	pnpm typecheck:packages
 
 test:
 	pnpm test

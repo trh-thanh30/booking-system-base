@@ -11,8 +11,8 @@ permissions:
   actions: read
 
 jobs:
-  verify:
-    name: Build & Type Check & Test & Lint
+  packages:
+    name: Packages
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -24,15 +24,70 @@ jobs:
           node-version: 20
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm lint
-      - run: pnpm check-types
-      - run: pnpm build
+      - run: pnpm lint:packages
+      - run: pnpm typecheck:packages
+      - run: pnpm build:packages
+
+  api:
+    name: API
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.0.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint:api
+      - run: pnpm typecheck:api
+      - run: pnpm test:api
+      - run: pnpm build:api
+
+  web:
+    name: Web
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.0.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint:web
+      - run: pnpm typecheck:web
+      - run: pnpm build:web
+
+  admin:
+    name: Admin
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.0.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint:admin
+      - run: pnpm typecheck:admin
+      - run: pnpm build:admin
 
   notify:
     name: Send Webhook Notification
     runs-on: ubuntu-latest
     needs:
-      - verify
+      - packages
+      - api
+      - web
+      - admin
     if: always()
     steps:
       - uses: actions/checkout@v4
@@ -50,6 +105,7 @@ jobs:
           CI_TELEGRAM_BOT_TOKEN: ${{ secrets.CI_TELEGRAM_BOT_TOKEN }}
           CI_TELEGRAM_CHAT_ID: ${{ secrets.CI_TELEGRAM_CHAT_ID }}
           CI_COMMIT_MESSAGE: ${{ github.event.head_commit.message || github.event.pull_request.title || github.workflow }}
+          CI_NEEDS_JSON: ${{ toJson(needs) }}
           GITHUB_TOKEN: ${{ github.token }}
         run: |
           if [ -z "$CI_TELEGRAM_BOT_TOKEN" ] || [ -z "$CI_TELEGRAM_CHAT_ID" ]; then
@@ -68,9 +124,7 @@ jobs:
           RUNNING="$(node -e "console.log(JSON.parse(require('fs').readFileSync(process.argv[1], 'utf8')).running)" "$JOB_TOTALS_PATH")"
           CANCELLED="$(node -e "console.log(JSON.parse(require('fs').readFileSync(process.argv[1], 'utf8')).cancelled)" "$JOB_TOTALS_PATH")"
 
-          STATUS="${{ needs.verify.result }}"
-          if [ "$STATUS" = "failure" ]; then STATUS="failed"; fi
-          if [ "$STATUS" = "skipped" ]; then STATUS="cancelled"; fi
+          STATUS="$(node -e "const needs = JSON.parse(process.env.CI_NEEDS_JSON); const results = Object.values(needs).map((job) => job.result); if (results.includes('failure')) console.log('failed'); else if (results.includes('cancelled') || results.includes('skipped')) console.log('cancelled'); else console.log('success');")"
 
           pnpm notify:telegram \
             --event ci \
@@ -84,7 +138,7 @@ jobs:
             --message "$CI_COMMIT_MESSAGE" \
             --author "${{ github.actor }}" \
             --workflow "${{ github.workflow }}" \
-            --job "Build & Type Check & Test & Lint" \
+            --job "Packages, API, Web, Admin" \
             --jobs-json "$JOBS_JSON" \
             --passed "$PASSED" \
             --failed "$FAILED" \

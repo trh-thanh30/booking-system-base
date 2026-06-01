@@ -216,16 +216,19 @@ URL cục bộ mặc định:
 
 ### Lệnh Chung
 
-| Lệnh               | Mô tả                                   |
-| :----------------- | :-------------------------------------- |
-| `pnpm install`     | Cài gói phụ thuộc cho toàn bộ workspace |
-| `pnpm dev`         | Chạy toàn bộ tác vụ `dev` qua Turbo     |
-| `pnpm dev:full`    | Chạy API, Web và Admin                  |
-| `pnpm build`       | Biên dịch toàn bộ monorepo              |
-| `pnpm lint`        | Kiểm tra lint toàn bộ monorepo          |
-| `pnpm check-types` | Kiểm tra TypeScript toàn bộ monorepo    |
-| `pnpm test`        | Chạy test qua Turbo                     |
-| `pnpm format`      | Format file bằng Prettier               |
+| Lệnh                      | Mô tả                                   |
+| :------------------------ | :-------------------------------------- |
+| `pnpm install`            | Cài gói phụ thuộc cho toàn bộ workspace |
+| `pnpm dev`                | Chạy toàn bộ tác vụ `dev` qua Turbo     |
+| `pnpm dev:full`           | Chạy API, Web và Admin                  |
+| `pnpm build`              | Biên dịch toàn bộ monorepo              |
+| `pnpm build:packages`     | Biên dịch các package dùng chung        |
+| `pnpm lint`               | Kiểm tra lint toàn bộ monorepo          |
+| `pnpm lint:packages`      | Kiểm tra lint các package dùng chung    |
+| `pnpm check-types`        | Kiểm tra TypeScript toàn bộ monorepo    |
+| `pnpm typecheck:packages` | Kiểm tra type các package dùng chung    |
+| `pnpm test`               | Chạy test qua Turbo                     |
+| `pnpm format`             | Format file bằng Prettier               |
 
 ### Lệnh Theo App
 
@@ -306,8 +309,11 @@ make help
 make install
 make dev-full
 make build
+make build-packages
 make lint
+make lint-packages
 make check-types
+make typecheck-packages
 make test
 make infra-dev-up
 make infra-prod-up
@@ -419,9 +425,9 @@ Xem thêm tại `docs/integrations/telegram.md`.
 
 Quy trình GitHub Actions hiện có:
 
-| Quy trình | Kích hoạt                       | Công việc                                                         |
-| :-------- | :------------------------------ | :---------------------------------------------------------------- |
-| `CI`      | Pull request và push vào `main` | cài gói phụ thuộc, lint, kiểm tra type, build, thông báo Telegram |
+| Quy trình | Kích hoạt                       | Công việc                                                                                  |
+| :-------- | :------------------------------ | :----------------------------------------------------------------------------------------- |
+| `CI`      | Pull request và push vào `main` | tách job Packages, API, Web, Admin; chạy lint, typecheck, test/build phù hợp; gửi Telegram |
 
 Thông báo Telegram sẽ tự bỏ qua nếu chưa cấu hình đủ `CI_TELEGRAM_BOT_TOKEN` và `CI_TELEGRAM_CHAT_ID`.
 
@@ -449,6 +455,7 @@ Các khu vực API có sẵn:
 Chỉ đưa code vào shared package khi thật sự có nhu cầu dùng chung giữa nhiều ranh giới:
 
 - Dùng `@repo/shared` cho giao kèo dữ liệu, schema, hằng số và utility thuần.
+- Dùng `@repo/hooks` cho React hooks dùng chung giữa Web/Admin.
 - Dùng `@repo/ui` cho thành phần UI React nền tảng có thể tái sử dụng.
 - Giữ logic riêng của app trong chính app đó nếu chưa có trường hợp dùng chung rõ ràng.
 
@@ -532,6 +539,11 @@ Danh sách kiểm tra khuyến nghị:
 - `AGENTS.md` - điểm bắt đầu cho quy trình AI agent.
 - `CONTEXT.md` - context và quyết định chung của repo.
 - `docs/architecture/overview.md` - tổng quan kiến trúc.
+- `docs/getting-started.md` - hướng dẫn chạy repo lần đầu.
+- `docs/development.md` - workflow phát triển.
+- `docs/testing.md` - chiến lược test.
+- `docs/deployment.md` - build/deploy/CI.
+- `docs/env.md` - quy ước biến môi trường.
 - `docs/conventions/modules.md` - quy ước tổ chức module.
 - `docs/integrations/telegram.md` - hướng dẫn thông báo Telegram.
 - `docker-compose.dev.yml` - hạ tầng phát triển.
