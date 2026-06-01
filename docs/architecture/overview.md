@@ -9,3 +9,6 @@ This base uses a three-app Turborepo layout:
 - `packages/ui` owns reusable React UI primitives.
 
 Apps may import packages. Packages must not import apps.
+
+Backend module structure is documented in `docs/architecture/backend-folder-structure.md`.
+Frontend client structure is documented in `docs/architecture/frontend-folder-structure.md`.

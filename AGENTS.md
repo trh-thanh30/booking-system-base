@@ -28,3 +28,22 @@ This repo uses a lightweight, repo-native agent workflow inspired by Matt Pocock
 - `docs/adr/` stores accepted architecture decisions.
 - `docs/prd/` stores product requirements.
 - `docs/issues/` stores local implementation tickets when GitHub or Linear is not configured.
+
+## Frontend Architecture
+
+- Read `docs/architecture/frontend-folder-structure.md` before changing `apps/admin` or `apps/web`.
+- Keep `app/**/page.tsx` as a thin server component that imports and renders a view from `src/views`.
+- Do not add `"use client"` to `page.tsx`; put client state, event handlers, charts, tables, and browser APIs inside view components or their child components.
+- Put app-level shared components in `src/components/common`, layout components in `src/components/layout`, and feature-specific components in `src/views/<feature>/components`.
+- Use `*.constants.ts`, `*.types.ts`, `*.utils.ts`, and `*.columns.tsx` inside feature folders instead of placing config, mock data, helper logic, or table definitions directly in views.
+- Put API response types and reusable domain DTOs in `packages/shared/src/types`; use `src/views/<feature>/<feature>.types.ts` only for view/local UI state types.
+- Keep `index.ts` files export-only and only in folders that actually re-export child modules. Do not create `index.ts` just to keep an empty folder.
+
+## Backend Architecture
+
+- Read `docs/architecture/backend-folder-structure.md` before creating or refactoring `apps/api/src/modules/*`.
+- Backend modules follow pragmatic Clean Architecture: controller -> use case -> repository -> database.
+- Do not put business logic in controllers; controllers should validate/receive HTTP input and call use cases.
+- Each business module that owns behavior or data access should include `use-cases/`, `repository/`, and `tests/`.
+- Each module test folder should contain `*.use-case.spec.ts` unit tests for use cases, using mocked repositories instead of real database calls.
+- API/domain contracts reused by Admin/Web belong in `packages/shared`; Nest-only DTOs stay in the API module `dto/` folder.

@@ -60,6 +60,71 @@ booking-system-base/
 └── turbo.json               # cấu hình Turborepo
 ```
 
+## Kiến Trúc Frontend
+
+Các app Next.js trong `apps/admin` và `apps/web` dùng chung rule folder để dễ tái sử dụng làm boilerplate.
+
+Nguyên tắc chính:
+
+- `app/**/page.tsx` là server component mỏng, chỉ import và render view.
+- UI màn hình đặt trong `src/views/<feature>/<feature>.view.tsx`.
+- Component riêng của feature đặt trong `src/views/<feature>/components`.
+- Component dùng lại trong app đặt trong `src/components/common`.
+- Layout shell, sidebar, header đặt trong `src/components/layout`.
+- Mock data, tab config, filter options đặt trong `*.constants.ts`.
+- API/domain type đặt trong `packages/shared/src/types`.
+- Type riêng cho view/local UI state đặt trong `*.types.ts`.
+- Table columns đặt trong `*.columns.tsx`.
+- `index.ts` chỉ dùng để export.
+
+Ví dụ:
+
+```tsx
+import { BookingsView } from "@/src/views/bookings/bookings.view";
+
+export default function BookingsPage() {
+  return <BookingsView />;
+}
+```
+
+Chi tiết rule nằm tại `docs/architecture/frontend-folder-structure.md`.
+
+## Kiến Trúc Backend
+
+API trong `apps/api` dùng NestJS và tổ chức module nghiệp vụ theo Clean Architecture nhẹ.
+
+Luồng phụ thuộc chuẩn:
+
+```txt
+controller -> use-case -> repository -> database
+                 |
+                 -> domain service
+                 -> external gateway/job/email service
+```
+
+Mỗi module nghiệp vụ nên có cấu trúc:
+
+```txt
+src/modules/<module>/
+├── <module>.module.ts
+├── <module>.controller.ts
+├── dto/
+├── repository/
+├── use-cases/
+├── service/
+└── tests/
+```
+
+Rule chính:
+
+- Controller chỉ nhận HTTP input và gọi use case.
+- Use case chứa business flow và là phần ưu tiên unit test.
+- Repository chứa data access qua Prisma/database.
+- `tests/` trong mỗi module chứa `*.use-case.spec.ts` để test use case bằng mock repository.
+- DTO chỉ dùng bởi Nest controller nằm trong `dto/`; type/schema dùng chung Admin/Web/API đặt trong `packages/shared`.
+
+Chi tiết rule nằm tại `docs/architecture/backend-folder-structure.md`.
+
 ## Yêu Cầu Môi Trường
 
 - Node.js `>= 20`
@@ -90,13 +155,13 @@ cp .env.example .env.development
 
 Các port mặc định trong `.env.example` đã được đổi sang dải riêng để hạn chế đụng với dự án khác:
 
-| Dịch vụ | Biến môi trường | Mặc định |
-| :------ | :-------------- | :------- |
-| API | `API_PORT` | `4100` |
-| Web | `WEB_PORT` | `4101` |
-| Admin | `ADMIN_PORT` | `4102` |
-| PostgreSQL | `DEV_DB_PORT` | `15432` |
-| Redis | `REDIS_DB_PORT` | `16379` |
+| Dịch vụ    | Biến môi trường | Mặc định |
+| :--------- | :-------------- | :------- |
+| API        | `API_PORT`      | `4100`   |
+| Web        | `WEB_PORT`      | `4101`   |
+| Admin      | `ADMIN_PORT`    | `4102`   |
+| PostgreSQL | `DEV_DB_PORT`   | `15432`  |
+| Redis      | `REDIS_DB_PORT` | `16379`  |
 
 ### 3. Chạy Hạ Tầng Phát Triển
 
@@ -140,94 +205,94 @@ pnpm dev:admin
 
 URL cục bộ mặc định:
 
-- API: `http://localhost:4100`
-- Web: `http://localhost:4101`
-- Admin: `http://localhost:4102`
+- API: `http://localhost:3000`
+- Web: `http://localhost:3001`
+- Admin: `http://localhost:3002`
 
 ## Danh Sách Lệnh
 
 ### Lệnh Chung
 
-| Lệnh | Mô tả |
-| :--- | :---- |
-| `pnpm install` | Cài gói phụ thuộc cho toàn bộ workspace |
-| `pnpm dev` | Chạy toàn bộ tác vụ `dev` qua Turbo |
-| `pnpm dev:full` | Chạy API, Web và Admin |
-| `pnpm build` | Biên dịch toàn bộ monorepo |
-| `pnpm lint` | Kiểm tra lint toàn bộ monorepo |
-| `pnpm check-types` | Kiểm tra TypeScript toàn bộ monorepo |
-| `pnpm test` | Chạy test qua Turbo |
-| `pnpm format` | Format file bằng Prettier |
+| Lệnh               | Mô tả                                   |
+| :----------------- | :-------------------------------------- |
+| `pnpm install`     | Cài gói phụ thuộc cho toàn bộ workspace |
+| `pnpm dev`         | Chạy toàn bộ tác vụ `dev` qua Turbo     |
+| `pnpm dev:full`    | Chạy API, Web và Admin                  |
+| `pnpm build`       | Biên dịch toàn bộ monorepo              |
+| `pnpm lint`        | Kiểm tra lint toàn bộ monorepo          |
+| `pnpm check-types` | Kiểm tra TypeScript toàn bộ monorepo    |
+| `pnpm test`        | Chạy test qua Turbo                     |
+| `pnpm format`      | Format file bằng Prettier               |
 
 ### Lệnh Theo App
 
-| Lệnh | Mô tả |
-| :--- | :---- |
-| `pnpm dev:api` | Chạy API NestJS ở chế độ watch |
-| `pnpm dev:api:debug` | Chạy API ở chế độ debug watch |
-| `pnpm dev:web` | Chạy app Web |
-| `pnpm dev:admin` | Chạy app Admin |
-| `pnpm build:api` | Biên dịch riêng API |
-| `pnpm build:web` | Biên dịch riêng Web |
-| `pnpm build:admin` | Biên dịch riêng Admin |
-| `pnpm start:api` | Chạy API đã build ở chế độ sản xuất |
-| `pnpm start:web` | Chạy Web đã build |
-| `pnpm start:admin` | Chạy Admin đã build |
+| Lệnh                 | Mô tả                               |
+| :------------------- | :---------------------------------- |
+| `pnpm dev:api`       | Chạy API NestJS ở chế độ watch      |
+| `pnpm dev:api:debug` | Chạy API ở chế độ debug watch       |
+| `pnpm dev:web`       | Chạy app Web                        |
+| `pnpm dev:admin`     | Chạy app Admin                      |
+| `pnpm build:api`     | Biên dịch riêng API                 |
+| `pnpm build:web`     | Biên dịch riêng Web                 |
+| `pnpm build:admin`   | Biên dịch riêng Admin               |
+| `pnpm start:api`     | Chạy API đã build ở chế độ sản xuất |
+| `pnpm start:web`     | Chạy Web đã build                   |
+| `pnpm start:admin`   | Chạy Admin đã build                 |
 
 ### Lệnh Test
 
-| Lệnh | Mô tả |
-| :--- | :---- |
-| `pnpm test:api` | Chạy unit test cho API |
-| `pnpm test:api:watch` | Chạy test API ở chế độ watch |
-| `pnpm test:api:cov` | Chạy test API kèm coverage |
-| `pnpm test:api:e2e` | Chạy e2e test cho API |
-| `pnpm test:api:dev` | Chạy test API với môi trường phát triển |
-| `pnpm test:api:prod` | Chạy test API với môi trường sản xuất |
+| Lệnh                  | Mô tả                                   |
+| :-------------------- | :-------------------------------------- |
+| `pnpm test:api`       | Chạy unit test cho API                  |
+| `pnpm test:api:watch` | Chạy test API ở chế độ watch            |
+| `pnpm test:api:cov`   | Chạy test API kèm coverage              |
+| `pnpm test:api:e2e`   | Chạy e2e test cho API                   |
+| `pnpm test:api:dev`   | Chạy test API với môi trường phát triển |
+| `pnpm test:api:prod`  | Chạy test API với môi trường sản xuất   |
 
 ### Lệnh Database Và Prisma
 
-| Lệnh | Mô tả |
-| :--- | :---- |
-| `pnpm prisma:generate` | Sinh Prisma Client |
-| `pnpm prisma:migrate:dev` | Chạy migration cho môi trường phát triển |
+| Lệnh                       | Mô tả                                        |
+| :------------------------- | :------------------------------------------- |
+| `pnpm prisma:generate`     | Sinh Prisma Client                           |
+| `pnpm prisma:migrate:dev`  | Chạy migration cho môi trường phát triển     |
 | `pnpm prisma:migrate:prod` | Triển khai migration cho môi trường sản xuất |
-| `pnpm prisma:studio:dev` | Mở Prisma Studio |
-| `pnpm db:push:dev` | Đẩy schema vào database phát triển |
-| `pnpm db:push:test` | Đẩy schema vào database kiểm thử |
-| `pnpm db:push:prod` | Đẩy schema vào database sản xuất |
-| `pnpm db:seed:dev` | Seed database phát triển |
-| `pnpm db:seed:test` | Seed database kiểm thử |
-| `pnpm db:seed:prod` | Seed database sản xuất |
-| `pnpm db:reset:dev` | Reset migration database phát triển |
+| `pnpm prisma:studio:dev`   | Mở Prisma Studio                             |
+| `pnpm db:push:dev`         | Đẩy schema vào database phát triển           |
+| `pnpm db:push:test`        | Đẩy schema vào database kiểm thử             |
+| `pnpm db:push:prod`        | Đẩy schema vào database sản xuất             |
+| `pnpm db:seed:dev`         | Seed database phát triển                     |
+| `pnpm db:seed:test`        | Seed database kiểm thử                       |
+| `pnpm db:seed:prod`        | Seed database sản xuất                       |
+| `pnpm db:reset:dev`        | Reset migration database phát triển          |
 
 ### Lệnh Hạ Tầng
 
-| Lệnh | Mô tả |
-| :--- | :---- |
-| `pnpm infra:dev:up` | Chạy cụm dev gồm db, redis và api |
-| `pnpm infra:dev:down` | Dừng cụm dev |
-| `pnpm infra:dev:logs` | Xem log cụm dev |
-| `pnpm infra:dev:ps` | Xem container đang chạy của cụm dev |
-| `pnpm infra:dev:config` | Xuất cấu hình compose dev |
-| `pnpm infra:prod:up` | Chạy cụm giống sản xuất |
-| `pnpm infra:prod:down` | Dừng cụm giống sản xuất |
-| `pnpm infra:prod:logs` | Xem log cụm giống sản xuất |
-| `pnpm infra:prod:ps` | Xem container của cụm giống sản xuất |
+| Lệnh                     | Mô tả                                |
+| :----------------------- | :----------------------------------- |
+| `pnpm infra:dev:up`      | Chạy cụm dev gồm db, redis và api    |
+| `pnpm infra:dev:down`    | Dừng cụm dev                         |
+| `pnpm infra:dev:logs`    | Xem log cụm dev                      |
+| `pnpm infra:dev:ps`      | Xem container đang chạy của cụm dev  |
+| `pnpm infra:dev:config`  | Xuất cấu hình compose dev            |
+| `pnpm infra:prod:up`     | Chạy cụm giống sản xuất              |
+| `pnpm infra:prod:down`   | Dừng cụm giống sản xuất              |
+| `pnpm infra:prod:logs`   | Xem log cụm giống sản xuất           |
+| `pnpm infra:prod:ps`     | Xem container của cụm giống sản xuất |
 | `pnpm infra:prod:config` | Xuất cấu hình compose giống sản xuất |
 
 ### Lệnh Docker
 
-| Lệnh | Mô tả |
-| :--- | :---- |
-| `pnpm docker:build:api` | Tạo Docker image cho API |
-| `pnpm docker:build:web` | Tạo Docker image cho Web |
-| `pnpm docker:build:admin` | Tạo Docker image cho Admin |
-| `pnpm docker:build:all` | Tạo toàn bộ image app |
-| `pnpm docker:check:api` | Kiểm tra Dockerfile của API |
-| `pnpm docker:check:web` | Kiểm tra Dockerfile của Web |
+| Lệnh                      | Mô tả                         |
+| :------------------------ | :---------------------------- |
+| `pnpm docker:build:api`   | Tạo Docker image cho API      |
+| `pnpm docker:build:web`   | Tạo Docker image cho Web      |
+| `pnpm docker:build:admin` | Tạo Docker image cho Admin    |
+| `pnpm docker:build:all`   | Tạo toàn bộ image app         |
+| `pnpm docker:check:api`   | Kiểm tra Dockerfile của API   |
+| `pnpm docker:check:web`   | Kiểm tra Dockerfile của Web   |
 | `pnpm docker:check:admin` | Kiểm tra Dockerfile của Admin |
-| `pnpm docker:check:all` | Kiểm tra toàn bộ Dockerfile |
+| `pnpm docker:check:all`   | Kiểm tra toàn bộ Dockerfile   |
 
 ### Shortcut Makefile
 
@@ -351,9 +416,9 @@ Xem thêm tại `docs/integrations/telegram.md`.
 
 Quy trình GitHub Actions hiện có:
 
-| Quy trình | Kích hoạt | Công việc |
-| :------- | :-------- | :-------- |
-| `CI` | Pull request và push vào `main` | cài gói phụ thuộc, lint, kiểm tra type, build, thông báo Telegram |
+| Quy trình | Kích hoạt                       | Công việc                                                         |
+| :-------- | :------------------------------ | :---------------------------------------------------------------- |
+| `CI`      | Pull request và push vào `main` | cài gói phụ thuộc, lint, kiểm tra type, build, thông báo Telegram |
 
 Thông báo Telegram sẽ tự bỏ qua nếu chưa cấu hình đủ `CI_TELEGRAM_BOT_TOKEN` và `CI_TELEGRAM_CHAT_ID`.
 
@@ -389,8 +454,8 @@ Chỉ đưa code vào shared package khi thật sự có nhu cầu dùng chung g
 Import nội bộ trong app nên ưu tiên alias đã cấu hình thay vì relative import quá sâu. Shared package nên được import bằng tên package:
 
 ```ts
-import { something } from '@/module/example';
-import { ApiResponse } from '@repo/shared';
+import { something } from "@/module/example";
+import { ApiResponse } from "@repo/shared";
 ```
 
 ## Quy Trình Cho AI Agent
@@ -427,15 +492,15 @@ Repo dùng Conventional Commits với Commitlint.
 
 Các loại commit thường dùng:
 
-| Type | Ý nghĩa |
-| :--- | :------ |
-| `feat` | Thêm tính năng mới |
-| `fix` | Sửa lỗi |
-| `docs` | Thay đổi tài liệu |
+| Type       | Ý nghĩa                             |
+| :--------- | :---------------------------------- |
+| `feat`     | Thêm tính năng mới                  |
+| `fix`      | Sửa lỗi                             |
+| `docs`     | Thay đổi tài liệu                   |
 | `refactor` | Tái cấu trúc code không đổi hành vi |
-| `test` | Thêm hoặc sửa test |
-| `ci` | Thay đổi CI/CD |
-| `chore` | Công việc bảo trì |
+| `test`     | Thêm hoặc sửa test                  |
+| `ci`       | Thay đổi CI/CD                      |
+| `chore`    | Công việc bảo trì                   |
 
 Ví dụ:
 

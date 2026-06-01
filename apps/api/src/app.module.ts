@@ -33,22 +33,22 @@ import { ResponseInterceptor } from '@/common/interceptors/response.interceptor'
 import { LoggerCoreModule, LoggerModule } from '@/common/logger';
 
 // modules
-import { MiddlewareConsumer, NestModule } from '@nestjs/common';
-import { OptionalAuthGuard } from '@/common/guards/optional-auth.guard';
 import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
+import { OptionalAuthGuard } from '@/common/guards/optional-auth.guard';
 import { RolesGuard } from '@/common/guards/roles.guard';
 import { IdentityMiddleware } from '@/common/middleware/identity.middleware';
 import { PrismaModule } from '@/database/prisma/prisma.module';
 import { RedisModule } from '@/database/redis/redis.module';
-import { AssetsModule } from '@/module/assets/assets.module';
-import { AuthModule } from '@/module/auth/auth.module';
-import { CommonModule } from '@/module/common/common.module';
-import { EmailModule } from '@/module/email/email.module';
-import { HealthModule } from '@/module/health/health.module';
-import { JobsModule } from '@/module/jobs/jobs.module';
-import { NotificationModule } from '@/module/notification/notification.module';
-import { UsersModule } from '@/module/user/user.module';
-import { VerificationModule } from '@/module/verification/verification.module';
+import { AssetsModule } from '@/modules/assets/assets.module';
+import { AuthModule } from '@/modules/auth/auth.module';
+import { CommonModule } from '@/modules/common/common.module';
+import { EmailModule } from '@/modules/email/email.module';
+import { HealthModule } from '@/modules/health/health.module';
+import { JobsModule } from '@/modules/jobs/jobs.module';
+import { NotificationModule } from '@/modules/notification/notification.module';
+import { UsersModule } from '@/modules/user/user.module';
+import { VerificationModule } from '@/modules/verification/verification.module';
+import { MiddlewareConsumer, NestModule } from '@nestjs/common';
 
 const rootDir = join(__dirname, '..', '..', '..');
 const envFile = `.env.${process.env.NODE_ENV || 'development'}`;

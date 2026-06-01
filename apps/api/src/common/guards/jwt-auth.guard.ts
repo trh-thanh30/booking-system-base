@@ -1,9 +1,9 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
-import { Reflector } from '@nestjs/core';
+import { IS_OPTIONAL_AUTH_KEY } from '@/common/decorators/option-auth.decorator';
 import { IS_PUBLIC_KEY } from '@/common/decorators/public.decorator';
 import { UnauthorizedError } from '@/common/response';
-import { AuthTokenService } from '@/module/auth/service/auth-token.service';
-import { IS_OPTIONAL_AUTH_KEY } from '@/common/decorators/option-auth.decorator';
+import { AuthTokenService } from '@/modules/auth/service/auth-token.service';
+import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {

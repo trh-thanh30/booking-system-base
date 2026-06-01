@@ -1,21 +1,56 @@
+import { Slot } from "@radix-ui/react-slot";
+import { cva, type VariantProps } from "class-variance-authority";
 import type { ButtonHTMLAttributes } from "react";
 import { cn } from "@/lib/utils";
 
-export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
-  variant?: "primary" | "secondary" | "ghost";
-};
+const buttonVariants = cva(
+  "inline-flex h-10 items-center justify-center gap-2 whitespace-nowrap rounded-md px-4 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 dark:focus-visible:ring-slate-300",
+  {
+    variants: {
+      variant: {
+        primary:
+          "bg-slate-950 text-white hover:bg-slate-800 dark:bg-slate-50 dark:text-slate-950 dark:hover:bg-slate-200",
+        secondary:
+          "border border-slate-300 bg-white text-slate-950 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-50 dark:hover:bg-slate-900",
+        ghost:
+          "text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-900",
+        outline:
+          "border border-slate-300 bg-transparent text-slate-950 hover:bg-slate-100 dark:border-slate-700 dark:text-slate-50 dark:hover:bg-slate-900",
+        destructive: "bg-red-600 text-white hover:bg-red-700",
+      },
+      size: {
+        sm: "h-9 px-3",
+        md: "h-10 px-4",
+        icon: "h-10 w-10 px-0",
+      },
+    },
+    defaultVariants: {
+      variant: "primary",
+      size: "md",
+    },
+  },
+);
 
-export function Button({ className, variant = "primary", ...props }: ButtonProps) {
+export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> &
+  VariantProps<typeof buttonVariants> & {
+    asChild?: boolean;
+  };
+
+export function Button({
+  asChild,
+  className,
+  size,
+  variant,
+  ...props
+}: ButtonProps) {
+  const Comp = asChild ? Slot : "button";
+
   return (
-    <button
-      className={cn(
-        "inline-flex h-10 items-center justify-center rounded-md px-4 text-sm font-medium transition-colors disabled:pointer-events-none disabled:opacity-50",
-        variant === "primary" && "bg-slate-950 text-white hover:bg-slate-800",
-        variant === "secondary" && "border border-slate-300 bg-white text-slate-950 hover:bg-slate-50",
-        variant === "ghost" && "text-slate-700 hover:bg-slate-100",
-        className,
-      )}
+    <Comp
+      className={cn(buttonVariants({ className, size, variant }))}
       {...props}
     />
   );
 }
+
+export { buttonVariants };

@@ -27,7 +27,7 @@
       "app/*": ["./src/*"],
       "common/*": ["./src/common/*"],
       "config/*": ["./src/config/*"],
-      "module/*": ["./src/module/*"],
+      "module/*": ["src/modules/*"],
       "infra/*": ["src/database/*"],
       "shared/*": ["./src/shared/*"],
       "test/*": ["./test/*"]
