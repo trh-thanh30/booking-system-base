@@ -38,6 +38,9 @@ importers:
       '@hookform/resolvers':
         specifier: ^5.4.0
         version: 5.4.0(react-hook-form@7.77.0(react@19.2.6))
+      '@repo/hooks':
+        specifier: workspace:*
+        version: link:../../packages/hooks
       '@repo/shared':
         specifier: workspace:*
         version: link:../../packages/shared
@@ -451,6 +454,9 @@ importers:
       '@hookform/resolvers':
         specifier: ^5.4.0
         version: 5.4.0(react-hook-form@7.77.0(react@19.2.6))
+      '@repo/hooks':
+        specifier: workspace:*
+        version: link:../../packages/hooks
       '@repo/shared':
         specifier: workspace:*
         version: link:../../packages/shared
@@ -566,6 +572,27 @@ importers:
       typescript-eslint:
         specifier: ^8.50.0
         version: 8.60.0(eslint@9.39.4(jiti@2.7.0))(typescript@5.9.2)
+
+  packages/hooks:
+    devDependencies:
+      '@repo/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+      '@types/react':
+        specifier: 19.2.2
+        version: 19.2.2
+      eslint:
+        specifier: ^9.39.1
+        version: 9.39.4(jiti@2.7.0)
+      react:
+        specifier: ^19.2.0
+        version: 19.2.6
+      typescript:
+        specifier: 5.9.2
+        version: 5.9.2
 
   packages/shared:
     dependencies:

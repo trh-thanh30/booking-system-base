@@ -15,6 +15,7 @@ Mục tiêu của repo là cung cấp một nền tảng đủ chuẩn để clo
 ### Package Dùng Chung
 
 - **@repo/shared** (`packages/shared`): kiểu dữ liệu, schema, hằng số, HTTP helper và utility dùng chung.
+- **@repo/hooks** (`packages/hooks`): React hooks dùng chung cho admin, web và các client Next.js khác.
 - **@repo/ui** (`packages/ui`): các thành phần UI nền tảng có thể tái sử dụng.
 - **@repo/telegram** (`packages/telegram`): module gửi thông báo CI/CD qua Telegram, hỗ trợ tin nhắn HTML và ảnh được dựng từ mẫu giao diện.
 - **@repo/eslint-config** (`packages/eslint-config`): cấu hình ESLint dùng chung.
@@ -39,6 +40,7 @@ booking-system-base/
 │   └── admin/               # @repo/admin - app Next.js quản trị
 ├── packages/
 │   ├── shared/              # @repo/shared - giao kèo dữ liệu và utility dùng chung
+│   ├── hooks/               # @repo/hooks - React hooks dùng chung
 │   ├── ui/                  # @repo/ui - thành phần UI dùng chung
 │   ├── telegram/            # @repo/telegram - thông báo CI/CD qua Telegram
 │   ├── eslint-config/       # @repo/eslint-config
@@ -71,6 +73,7 @@ Nguyên tắc chính:
 - Component riêng của feature đặt trong `src/views/<feature>/components`.
 - Component dùng lại trong app đặt trong `src/components/common`.
 - Layout shell, sidebar, header đặt trong `src/components/layout`.
+- Hook dùng chung nhiều client đặt trong `packages/hooks`.
 - Mock data, tab config, filter options đặt trong `*.constants.ts`.
 - API/domain type đặt trong `packages/shared/src/types`.
 - Type riêng cho view/local UI state đặt trong `*.types.ts`.
@@ -87,7 +90,7 @@ export default function BookingsPage() {
 }
 ```
 
-Chi tiết rule nằm tại `docs/architecture/frontend-folder-structure.md`.
+Chi tiết rule nằm tại `docs/architecture/frontend-folder-structure.md` và `docs/architecture/frontend-shared-hooks.md`.
 
 ## Kiến Trúc Backend
 
