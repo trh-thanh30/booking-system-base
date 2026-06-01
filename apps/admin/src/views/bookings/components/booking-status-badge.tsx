@@ -17,5 +17,9 @@ const statusConfig: Record<
 export function BookingStatusBadge({ status }: { status: BookingStatus }) {
   const config = statusConfig[status];
 
+  if (!config) {
+    return <Badge variant="secondary">{status}</Badge>;
+  }
+
   return <Badge variant={config.variant}>{config.label}</Badge>;
 }
