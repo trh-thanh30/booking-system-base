@@ -122,9 +122,9 @@ services:
       retries: 12
       start_period: 30s
 
-  worker:
+  worker-email:
     image: ${API_IMAGE:-booking-api}:${IMAGE_TAG:-latest}
-    container_name: booking-worker
+    container_name: booking-worker-email
     restart: unless-stopped
     init: true
     stop_grace_period: 30s
@@ -134,7 +134,7 @@ services:
         required: false
     environment:
       NODE_ENV: production
-      APP_ROLE: worker
+      APP_ROLE: worker-email
       DB_HOST: db
       DB_PORT: 5432
       REDIS_HOST: redis

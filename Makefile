@@ -4,7 +4,7 @@ DEV_COMPOSE := docker compose -f docker-compose.dev.yml
 PROD_COMPOSE := docker compose -f docker-compose.prod.yml
 
 .PHONY: help install dev dev-full build build-packages lint lint-packages check-types typecheck typecheck-packages test \
-	api web admin worker-dev worker-prod \
+	api web admin worker-dev worker-prod worker-email-dev worker-email-prod \
 	infra-dev-up infra-dev-down infra-dev-logs infra-dev-ps infra-dev-config \
 	infra-prod-up infra-prod-down infra-prod-logs infra-prod-ps infra-prod-config \
 	docker-build-api docker-build-web docker-build-admin docker-build-all \
@@ -84,10 +84,16 @@ admin:
 	pnpm dev:admin
 
 worker-dev:
-	pnpm worker:dev
+	pnpm worker:email:dev
 
 worker-prod:
-	pnpm worker:prod
+	pnpm worker:email:prod
+
+worker-email-dev:
+	pnpm worker:email:dev
+
+worker-email-prod:
+	pnpm worker:email:prod
 
 infra-dev-up:
 	pnpm infra:dev:up

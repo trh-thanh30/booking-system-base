@@ -56,7 +56,7 @@ booking-system-base/
 ├── .github/
 │   └── workflows/           # quy trình CI
 ├── docker-compose.dev.yml   # cụm dev: db, redis, api
-├── docker-compose.prod.yml  # cụm giống sản xuất: db, redis, api, worker, web, admin
+├── docker-compose.prod.yml  # cụm giống sản xuất: db, redis, api, worker-email, web, admin
 ├── Makefile                 # shortcut lệnh
 ├── pnpm-workspace.yaml      # cấu hình pnpm workspace
 └── turbo.json               # cấu hình Turborepo
@@ -348,7 +348,7 @@ pnpm infra:dev:down
 - `db`
 - `redis`
 - `api`
-- `worker`
+- `worker-email`
 - `web`
 - `admin`
 
