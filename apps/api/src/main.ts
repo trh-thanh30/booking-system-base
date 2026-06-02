@@ -106,7 +106,7 @@ async function bootstrap() {
       `🗄️  Database     : ${e.DB_HOST || 'localhost'}:${e.DB_PORT || '5432'}/${e.DB_NAME || '-'}`,
     );
     console.log(
-      `⚡ Redis         : ${e.REDIS_HOST || 'localhost'}:${e.REDIS_PORT || '6379'}`,
+      `⚡ Redis         : ${e.REDIS_HOST || 'localhost'}:${e.REDIS_PORT || e.REDIS_DEV_PORT || '6379'}`,
     );
     console.log(
       `🔐 JWT Access   : expires in ${e.JWT_ACCESS_EXPIRES_IN || '-'}`,

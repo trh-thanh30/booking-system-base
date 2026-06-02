@@ -31,7 +31,15 @@ Repo dùng nhiều file env theo môi trường. File mẫu là `.env.example`.
 ### Redis
 
 - `REDIS_URL`
+- `REDIS_DEV_PORT`
 - `REDIS_DB_PORT`
+
+### Asset Storage
+
+- `STORAGE_DRIVER`: `local` hoặc `minio`.
+- `ASSET_CDN_URL`: base URL dùng để trả public asset URL. Khi dùng MinIO local, có thể đặt là `http://localhost:9000/booking-public`.
+- `MINIO_ENDPOINT`, `MINIO_PORT`, `MINIO_ACCESS_KEY`, `MINIO_SECRET_KEY`.
+- `MINIO_BUCKET_PUBLIC`, `MINIO_BUCKET_PRIVATE`, `MINIO_BUCKET_TEMP`.
 
 ### Telegram CI
 

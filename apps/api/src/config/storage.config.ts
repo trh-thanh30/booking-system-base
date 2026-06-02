@@ -22,6 +22,17 @@ export default registerAs('storage', () => ({
     process.env.ASSET_ALLOWED_MIME_TYPES ??
     'image/jpeg,image/png,image/gif,image/webp,image/svg+xml,video/mp4,video/quicktime,audio/mpeg,audio/wav,application/pdf'
   ).split(','),
+  minio: {
+    endpoint: process.env.MINIO_ENDPOINT ?? 'minio',
+    port: parseInt(process.env.MINIO_PORT ?? '9000', 10),
+    useSsl: process.env.MINIO_USE_SSL === 'true',
+    region: process.env.MINIO_REGION ?? 'us-east-1',
+    accessKey: process.env.MINIO_ACCESS_KEY,
+    secretKey: process.env.MINIO_SECRET_KEY,
+    publicBucket: process.env.MINIO_BUCKET_PUBLIC ?? 'booking-public',
+    privateBucket: process.env.MINIO_BUCKET_PRIVATE ?? 'booking-private',
+    tempBucket: process.env.MINIO_BUCKET_TEMP ?? 'booking-temp',
+  },
 }));
 
 function resolveStorageRootDir(rootDir: string): string {

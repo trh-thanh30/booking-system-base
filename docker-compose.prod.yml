@@ -38,11 +38,46 @@ services:
       test:
         [
           "CMD-SHELL",
-          "redis-cli -a \"$${REDIS_PASSWORD:-booking_base_redis_password}\" ping",
+          'redis-cli -a "$${REDIS_PASSWORD:-booking_base_redis_password}" ping',
         ]
       interval: 10s
       timeout: 5s
       retries: 5
+
+  minio:
+    image: minio/minio:RELEASE.2025-09-07T16-13-09Z
+    container_name: booking-minio
+    restart: unless-stopped
+    env_file:
+      - path: .env.production
+        required: false
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin}
+    ports:
+      - "${MINIO_PORT:-9000}:9000"
+      - "${MINIO_CONSOLE_PORT:-9001}:9001"
+    volumes:
+      - booking_minio_data:/data
+
+  minio-init:
+    image: minio/mc:RELEASE.2025-08-13T08-35-41Z
+    container_name: booking-minio-init
+    env_file:
+      - path: .env.production
+        required: false
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - >
+        until mc alias set minio http://minio:9000 "$${MINIO_ROOT_USER}" "$${MINIO_ROOT_PASSWORD}"; do sleep 2; done &&
+        mc mb --ignore-existing "minio/$${MINIO_BUCKET_PUBLIC}" &&
+        mc mb --ignore-existing "minio/$${MINIO_BUCKET_PRIVATE}" &&
+        mc mb --ignore-existing "minio/$${MINIO_BUCKET_TEMP}" &&
+        mc anonymous set download "minio/$${MINIO_BUCKET_PUBLIC}"
+    depends_on:
+      minio:
+        condition: service_started
 
   api:
     image: ${API_IMAGE:-booking-api}:${IMAGE_TAG:-latest}
@@ -61,6 +96,7 @@ services:
       DB_PORT: 5432
       REDIS_HOST: redis
       REDIS_PORT: 6379
+      MINIO_ENDPOINT: minio
       DATABASE_URL: postgresql://${DB_USER:-booking_base_user}:${DB_PASSWORD:-booking_base_password}@db:5432/${DB_NAME:-booking_base}?schema=${DB_SCHEMA:-public}
       REDIS_URL: redis://:${REDIS_PASSWORD:-booking_base_redis_password}@redis:6379
     ports:
@@ -73,11 +109,13 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
     healthcheck:
       test:
         [
           "CMD-SHELL",
-          "node -e \"require('http').get('http://127.0.0.1:3000/health/live', r => process.exit(r.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))\"",
+          'node -e "require(''http'').get(''http://127.0.0.1:3000/health/live'', r => process.exit(r.statusCode === 200 ? 0 : 1)).on(''error'', () => process.exit(1))"',
         ]
       interval: 10s
       timeout: 5s
@@ -101,6 +139,7 @@ services:
       DB_PORT: 5432
       REDIS_HOST: redis
       REDIS_PORT: 6379
+      MINIO_ENDPOINT: minio
       DATABASE_URL: postgresql://${DB_USER:-booking_base_user}:${DB_PASSWORD:-booking_base_password}@db:5432/${DB_NAME:-booking_base}?schema=${DB_SCHEMA:-public}
       REDIS_URL: redis://:${REDIS_PASSWORD:-booking_base_redis_password}@redis:6379
     volumes:
@@ -111,6 +150,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
 
   web:
     image: ${WEB_IMAGE:-booking-web}:${IMAGE_TAG:-latest}
@@ -155,5 +196,6 @@ services:
 volumes:
   booking_postgres_data:
   booking_redis_data:
+  booking_minio_data:
   booking_storage:
   booking_logs:

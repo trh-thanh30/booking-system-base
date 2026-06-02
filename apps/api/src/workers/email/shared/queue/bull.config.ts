@@ -6,7 +6,9 @@ export const bullEmailConfig = (
 ): BullRootModuleOptions => ({
   connection: {
     host: config.get<string>('REDIS_HOST', 'localhost'),
-    port: config.get<number>('REDIS_PORT', 6379),
+    port:
+      config.get<number>('REDIS_PORT') ??
+      config.get<number>('REDIS_DEV_PORT', 6379),
     password: config.get<string>('REDIS_PASSWORD', ''),
     family: 0,
   },

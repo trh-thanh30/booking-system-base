@@ -3,7 +3,7 @@ import { registerAs } from '@nestjs/config';
 export default registerAs('redis', () => {
   let url = process.env.REDIS_URL;
   const host = process.env.REDIS_HOST || 'localhost';
-  const port = process.env.REDIS_PORT || '6379';
+  const port = process.env.REDIS_PORT || process.env.REDIS_DEV_PORT || '6379';
   const password = process.env.REDIS_PASSWORD || '';
 
   // Manual expansion for variables like ${VAR} which might not be expanded by Railway/dotenv
@@ -13,6 +13,7 @@ export default registerAs('redis', () => {
       url = url
         .replace(/\${REDIS_HOST}/g, host)
         .replace(/\${REDIS_PORT}/g, port)
+        .replace(/\${REDIS_DEV_PORT}/g, port)
         .replace(/\${REDIS_PASSWORD}/g, password);
     }
 
