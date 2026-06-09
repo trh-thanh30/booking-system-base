@@ -76,16 +76,18 @@ export function SettingsView() {
                   type="email"
                 />
               </FormField>
-              <FormField
-                description="Visible to operators when they open admin."
-                htmlFor="workspace-notes"
-                label="Internal notes"
-              >
-                <Textarea
-                  defaultValue="Use this template as the starting point for booking, CRM, inventory, or marketplace admin apps."
-                  id="workspace-notes"
-                />
-              </FormField>
+              <div className="md:col-span-2">
+                <FormField
+                  description="Visible to operators when they open admin."
+                  htmlFor="workspace-notes"
+                  label="Internal notes"
+                >
+                  <Textarea
+                    defaultValue="Use this template as the starting point for booking, CRM, inventory, or marketplace admin apps."
+                    id="workspace-notes"
+                  />
+                </FormField>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>

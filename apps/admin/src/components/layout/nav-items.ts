@@ -1,35 +1,10 @@
-import {
-  Activity,
-  CalendarCheck,
-  LayoutDashboard,
-  Settings,
-  Users,
-} from "lucide-react";
+import { dashboardConfig } from "@/src/config/dashboard.config";
 
-export const navItems = [
-  {
-    title: "Dashboard",
-    href: "/dashboard",
-    icon: LayoutDashboard,
-  },
-  {
-    title: "Bookings",
-    href: "/bookings",
-    icon: CalendarCheck,
-  },
-  {
-    title: "Users",
-    href: "/users",
-    icon: Users,
-  },
-  {
-    title: "System",
-    href: "/system",
-    icon: Activity,
-  },
-  {
-    title: "Settings",
-    href: "/settings",
-    icon: Settings,
-  },
-] as const;
+export const navItems = dashboardConfig.sidebarSections
+  .flatMap((section) => section.items)
+  .filter((item) => !!item.href)
+  .map((item) => ({
+    title: item.title,
+    href: item.href!,
+    icon: item.icon,
+  }));

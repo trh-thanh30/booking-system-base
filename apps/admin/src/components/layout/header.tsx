@@ -9,27 +9,11 @@ import { ThemeToggle } from "@/src/components/theme-toggle";
 import { UserMenu } from "@/src/components/user-menu";
 import { useAdminUiStore } from "@/src/app/stores/ui.store";
 
-const topNav = [
-  {
-    href: "/dashboard",
-    title: "Overview",
-  },
-  {
-    href: "/users",
-    title: "Customers",
-  },
-  {
-    href: "/bookings",
-    title: "Bookings",
-  },
-  {
-    href: "/settings",
-    title: "Settings",
-  },
-];
+import { dashboardConfig } from "@/src/config/dashboard.config";
 
 export function Header() {
   const setCommandOpen = useAdminUiStore((state) => state.setCommandOpen);
+  const toggleSidebar = useAdminUiStore((state) => state.toggleSidebar);
 
   return (
     <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-slate-200 bg-white/95 px-4 backdrop-blur dark:border-slate-800 dark:bg-slate-950/95 lg:px-6">
@@ -38,6 +22,7 @@ export function Header() {
         <Button
           aria-label="Toggle sidebar"
           className="hidden lg:inline-flex"
+          onClick={toggleSidebar}
           size="icon"
           variant="ghost"
         >
@@ -45,7 +30,7 @@ export function Header() {
         </Button>
         <div className="hidden h-6 w-px bg-slate-200 dark:bg-slate-800 lg:block" />
         <nav className="hidden items-center gap-6 lg:flex">
-          {topNav.map((item) => (
+          {dashboardConfig.topNavigation.map((item) => (
             <Link
               className="text-sm font-medium text-slate-500 transition-colors hover:text-slate-950 first:text-slate-950 dark:text-slate-400 dark:hover:text-slate-50 dark:first:text-slate-50"
               href={item.href}

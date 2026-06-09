@@ -180,25 +180,27 @@ export function BookingsTable() {
             workflows.
           </CardDescription>
         </CardHeader>
-        <CardContent className="grid gap-4 md:grid-cols-3">
-          <FormField
-            description="Use visible labels instead of placeholder-only fields."
-            htmlFor="booking-customer"
-            label="Customer"
-          >
-            <Input id="booking-customer" placeholder="Workspace name" />
-          </FormField>
-          <FormField htmlFor="booking-date" label="Booking date">
-            <Input id="booking-date" type="date" />
-          </FormField>
-          <FormField
-            description="Operators can update this after assignment."
-            htmlFor="booking-owner"
-            label="Owner"
-          >
-            <Input id="booking-owner" placeholder="Team member" />
-          </FormField>
-          <div className="flex items-end md:justify-end">
+        <CardContent className="space-y-6">
+          <div className="grid gap-4 md:grid-cols-3">
+            <FormField
+              description="Use visible labels instead of placeholder-only fields."
+              htmlFor="booking-customer"
+              label="Customer"
+            >
+              <Input id="booking-customer" placeholder="Workspace name" />
+            </FormField>
+            <FormField htmlFor="booking-date" label="Booking date">
+              <Input id="booking-date" type="date" />
+            </FormField>
+            <FormField
+              description="Operators can update this after assignment."
+              htmlFor="booking-owner"
+              label="Owner"
+            >
+              <Input id="booking-owner" placeholder="Team member" />
+            </FormField>
+          </div>
+          <div className="flex justify-end border-t border-slate-100 pt-4 dark:border-slate-800">
             <Button className="w-full md:w-auto" variant="secondary">
               <SlidersHorizontal className="h-4 w-4" />
               Save draft

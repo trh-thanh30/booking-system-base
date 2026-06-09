@@ -1,11 +1,18 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Button } from "@repo/ui";
 
 export function ThemeToggle() {
   const { setTheme, theme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const nextTheme = theme === "dark" ? "light" : "dark";
 
   return (
@@ -15,8 +22,13 @@ export function ThemeToggle() {
       size="icon"
       variant="ghost"
     >
-      <Sun className="h-5 w-5 dark:hidden" />
-      <Moon className="hidden h-5 w-5 dark:block" />
+      {!mounted ? (
+        <Sun className="h-5 w-5" />
+      ) : theme === "dark" ? (
+        <Moon className="h-5 w-5" />
+      ) : (
+        <Sun className="h-5 w-5" />
+      )}
     </Button>
   );
 }
