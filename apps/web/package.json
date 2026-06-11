@@ -4,9 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "next dev --port ${WEB_PORT:-3001}",
+    "dev": "node ../../scripts/next-port.mjs dev WEB_PORT 3001",
     "build": "next build",
-    "start": "next start --port ${WEB_PORT:-3001}",
+    "start": "node ../../scripts/next-port.mjs start WEB_PORT 3001",
     "lint": "eslint . --max-warnings 0",
     "check-types": "next typegen && tsc --noEmit"
   },
