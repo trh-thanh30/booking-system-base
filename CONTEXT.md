@@ -14,3 +14,6 @@
 - Shared packages must not import from apps.
 - Apps may import from packages through workspace dependencies.
 - Add tests around behavior and module contracts, not implementation details.
+- Frontend i18n uses locale-prefixed routes with `vi` as the default locale and
+  `en` as the secondary locale. Next.js apps own their `src/messages` catalogs
+  and use app-local `src/i18n/navigation.ts` helpers for locale-aware links.

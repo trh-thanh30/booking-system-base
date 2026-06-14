@@ -14,114 +14,118 @@ import {
 } from "lucide-react";
 import type { DashboardConfig } from "./dashboard.types";
 
-export const dashboardConfig: DashboardConfig = {
-  brand: {
-    name: "Booking Admin",
-    description: "Next + Turborepo",
-    logo: ClipboardList,
-  },
-  sidebarSections: [
-    {
-      label: "General",
-      items: [
-        {
-          title: "Dashboard",
-          href: "/dashboard",
-          icon: LayoutDashboard,
-        },
-        {
-          title: "Bookings",
-          href: "/bookings",
-          icon: CalendarCheck,
-        },
-        {
-          title: "Users",
-          href: "/users",
-          icon: Users,
-        },
-        {
-          title: "Chats",
-          badge: "3",
-          icon: MessageSquare,
-        },
-        {
-          title: "Secured by Auth",
-          icon: ShieldCheck,
-        },
-      ],
+type Translate = (key: string) => string;
+
+export function getDashboardConfig(t: Translate): DashboardConfig {
+  return {
+    brand: {
+      name: "Booking Admin",
+      description: t("brandDescription"),
+      logo: ClipboardList,
     },
-    {
-      label: "Pages",
-      items: [
+    sidebarSections: [
+      {
+        label: t("sections.general"),
+        items: [
+          {
+            title: t("items.dashboard"),
+            href: "/dashboard",
+            icon: LayoutDashboard,
+          },
+          {
+            title: t("items.bookings"),
+            href: "/bookings",
+            icon: CalendarCheck,
+          },
+          {
+            title: t("items.users"),
+            href: "/users",
+            icon: Users,
+          },
+          {
+            title: t("items.chats"),
+            badge: "3",
+            icon: MessageSquare,
+          },
+          {
+            title: t("items.securedByAuth"),
+            icon: ShieldCheck,
+          },
+        ],
+      },
+      {
+        label: t("sections.pages"),
+        items: [
+          {
+            title: t("items.auth"),
+            icon: ShieldCheck,
+          },
+          {
+            title: t("items.errors"),
+            icon: TriangleAlert,
+          },
+        ],
+      },
+      {
+        label: t("sections.other"),
+        items: [
+          {
+            title: t("items.system"),
+            href: "/system",
+            icon: Activity,
+          },
+          {
+            title: t("items.settings"),
+            href: "/settings",
+            icon: Settings,
+          },
+          {
+            title: t("items.helpCenter"),
+            icon: CircleHelp,
+          },
+        ],
+      },
+    ],
+    topNavigation: [
+      {
+        title: t("items.overview"),
+        href: "/dashboard",
+      },
+      {
+        title: t("items.customers"),
+        href: "/users",
+      },
+      {
+        title: t("items.bookings"),
+        href: "/bookings",
+      },
+      {
+        title: t("items.settings"),
+        href: "/settings",
+      },
+    ],
+    userMenu: {
+      name: "Admin",
+      email: "admin@example.com",
+      avatarFallback: "AD",
+      menuItems: [
         {
-          title: "Auth",
-          icon: ShieldCheck,
+          label: t("items.profile"),
+          href: "/settings", // or a profile subpage
+          icon: User,
         },
         {
-          title: "Errors",
-          icon: TriangleAlert,
-        },
-      ],
-    },
-    {
-      label: "Other",
-      items: [
-        {
-          title: "System",
-          href: "/system",
-          icon: Activity,
-        },
-        {
-          title: "Settings",
+          label: t("items.settings"),
           href: "/settings",
           icon: Settings,
         },
         {
-          title: "Help Center",
-          icon: CircleHelp,
+          label: t("items.signOut"),
+          href: "/auth/logout", // typical logout URL
+          icon: LogOut,
+          isDestructive: true,
         },
       ],
     },
-  ],
-  topNavigation: [
-    {
-      title: "Overview",
-      href: "/dashboard",
-    },
-    {
-      title: "Customers",
-      href: "/users",
-    },
-    {
-      title: "Bookings",
-      href: "/bookings",
-    },
-    {
-      title: "Settings",
-      href: "/settings",
-    },
-  ],
-  userMenu: {
-    name: "Admin",
-    email: "admin@example.com",
-    avatarFallback: "AD",
-    menuItems: [
-      {
-        label: "Profile",
-        href: "/settings", // or a profile subpage
-        icon: User,
-      },
-      {
-        label: "Settings",
-        href: "/settings",
-        icon: Settings,
-      },
-      {
-        label: "Sign out",
-        href: "/auth/logout", // typical logout URL
-        icon: LogOut,
-        isDestructive: true,
-      },
-    ],
-  },
-};
+  };
+}

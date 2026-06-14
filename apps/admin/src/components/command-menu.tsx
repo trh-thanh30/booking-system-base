@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { Command as CommandPrimitive } from "cmdk";
 import { LayoutDashboard, Search } from "lucide-react";
-import Link from "next/link";
+import { useTranslations } from "next-intl";
 import {
   Dialog,
   DialogContent,
@@ -11,9 +11,13 @@ import {
   DialogDescription,
 } from "@repo/ui";
 import { useAdminUiStore } from "@/src/app/stores/ui.store";
-import { dashboardConfig } from "@/src/config/dashboard.config";
+import { getDashboardConfig } from "@/src/config/dashboard.config";
+import { Link } from "@/src/i18n/navigation";
 
 export function CommandMenu() {
+  const t = useTranslations("DashboardConfig");
+  const tCommon = useTranslations("Common");
+  const dashboardConfig = getDashboardConfig(t);
   const open = useAdminUiStore((state) => state.commandOpen);
   const setOpen = useAdminUiStore((state) => state.setCommandOpen);
 
@@ -67,21 +71,21 @@ export function CommandMenu() {
   return (
     <Dialog onOpenChange={setOpen} open={open}>
       <DialogContent className="p-0">
-        <DialogTitle className="sr-only">Search pages</DialogTitle>
+        <DialogTitle className="sr-only">{tCommon("searchPages")}</DialogTitle>
         <DialogDescription className="sr-only">
-          Search and navigate to pages in the booking system dashboard.
+          {tCommon("searchPagesDescription")}
         </DialogDescription>
         <CommandPrimitive className="overflow-hidden rounded-lg bg-white dark:bg-slate-950">
           <div className="flex items-center border-b border-slate-200 px-3 dark:border-slate-800">
             <Search className="mr-2 h-4 w-4 shrink-0 text-slate-500" />
             <CommandPrimitive.Input
               className="h-12 w-full bg-transparent text-sm outline-none placeholder:text-slate-500"
-              placeholder="Search pages..."
+              placeholder={tCommon("searchPagesPlaceholder")}
             />
           </div>
           <CommandPrimitive.List className="max-h-80 overflow-y-auto p-2">
             <CommandPrimitive.Empty className="py-6 text-center text-sm text-slate-500">
-              No results found.
+              {tCommon("noResults")}
             </CommandPrimitive.Empty>
             {searchableItems.map((item) => {
               const Icon = item.icon;

@@ -1,51 +1,60 @@
 import { Activity, CreditCard, DollarSign, Users } from "lucide-react";
 
-export const dashboardStats = [
-  {
-    title: "Total Revenue",
-    value: "$45,231.89",
-    description: "+20.1% from last month",
-    trend: "Live",
-    icon: DollarSign,
-  },
-  {
-    title: "Subscriptions",
-    value: "+2350",
-    description: "+180.1% from last month",
-    trend: "+12%",
-    icon: Users,
-  },
-  {
-    title: "Sales",
-    value: "+12,234",
-    description: "+19% from last month",
-    trend: "+19%",
-    icon: CreditCard,
-  },
-  {
-    title: "Active Now",
-    value: "+573",
-    description: "+201 since last hour",
-    trend: "Now",
-    icon: Activity,
-  },
-];
+type Translate = (
+  key: string,
+  values?: Record<string, string | number>,
+) => string;
 
-export const dashboardTabs = [
-  {
-    label: "Overview",
-    value: "overview",
-  },
-  {
-    label: "Analytics",
-    value: "analytics",
-  },
-  {
-    label: "Reports",
-    value: "reports",
-  },
-  {
-    label: "Notifications",
-    value: "notifications",
-  },
-] as const;
+export function getDashboardStats(t: Translate) {
+  return [
+    {
+      title: t("stats.totalRevenue"),
+      value: "$45,231.89",
+      description: t("stats.fromLastMonth", { value: "20.1%" }),
+      trend: t("stats.live"),
+      icon: DollarSign,
+    },
+    {
+      title: t("stats.subscriptions"),
+      value: "+2350",
+      description: t("stats.fromLastMonth", { value: "180.1%" }),
+      trend: "+12%",
+      icon: Users,
+    },
+    {
+      title: t("stats.sales"),
+      value: "+12,234",
+      description: t("stats.fromLastMonth", { value: "19%" }),
+      trend: "+19%",
+      icon: CreditCard,
+    },
+    {
+      title: t("stats.activeNow"),
+      value: "+573",
+      description: t("stats.sinceLastHour"),
+      trend: t("stats.now"),
+      icon: Activity,
+    },
+  ];
+}
+
+export function getDashboardTabs(t: Translate) {
+  return [
+    {
+      label: t("tabs.overview"),
+      value: "overview",
+    },
+    {
+      label: t("tabs.analytics"),
+      value: "analytics",
+    },
+    {
+      label: t("tabs.reports"),
+      value: "reports",
+    },
+    {
+      label: t("tabs.notifications"),
+      value: "notifications",
+    },
+  ] as const;
+}

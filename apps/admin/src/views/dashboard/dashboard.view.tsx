@@ -2,6 +2,7 @@
 
 import { Download } from "lucide-react";
 import { motion } from "framer-motion";
+import { useTranslations } from "next-intl";
 import {
   Button,
   Card,
@@ -16,8 +17,8 @@ import {
 } from "@repo/ui";
 import { StatsCard } from "@/src/components/common/stats-card";
 import {
-  dashboardStats,
-  dashboardTabs,
+  getDashboardStats,
+  getDashboardTabs,
 } from "@/src/views/dashboard/dashboard.constants";
 import { DashboardOverviewChart } from "@/src/views/dashboard/components/dashboard-overview-chart";
 import { RecentSales } from "@/src/views/dashboard/components/recent-sales";
@@ -46,6 +47,10 @@ const itemVariants = {
 } as const;
 
 export function DashboardView() {
+  const t = useTranslations("Dashboard");
+  const dashboardStats = getDashboardStats(t);
+  const dashboardTabs = getDashboardTabs(t);
+
   return (
     <motion.div
       className="space-y-4"
@@ -58,11 +63,11 @@ export function DashboardView() {
         variants={itemVariants}
       >
         <h1 className="text-3xl font-bold tracking-normal text-slate-950 dark:text-slate-50">
-          Dashboard
+          {t("title")}
         </h1>
         <Button variant="secondary" className="cursor-pointer">
           <Download className="h-4 w-4" />
-          Download
+          {t("download")}
         </Button>
       </motion.div>
 
@@ -97,7 +102,7 @@ export function DashboardView() {
             >
               <Card className="lg:col-span-4">
                 <CardHeader>
-                  <CardTitle>Overview</CardTitle>
+                  <CardTitle>{t("overview")}</CardTitle>
                 </CardHeader>
                 <CardContent className="pl-2">
                   <DashboardOverviewChart />
@@ -105,9 +110,9 @@ export function DashboardView() {
               </Card>
               <Card className="lg:col-span-3">
                 <CardHeader>
-                  <CardTitle>Recent Sales</CardTitle>
+                  <CardTitle>{t("recentSales")}</CardTitle>
                   <CardDescription>
-                    You made 265 sales this month.
+                    {t("recentSalesDescription")}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -119,30 +124,25 @@ export function DashboardView() {
           <TabsContent value="analytics">
             <Card>
               <CardHeader>
-                <CardTitle>Analytics</CardTitle>
-                <CardDescription>
-                  Analytics widgets can be mounted here when product metrics are
-                  connected.
-                </CardDescription>
+                <CardTitle>{t("analyticsTitle")}</CardTitle>
+                <CardDescription>{t("analyticsDescription")}</CardDescription>
               </CardHeader>
             </Card>
           </TabsContent>
           <TabsContent value="reports">
             <Card>
               <CardHeader>
-                <CardTitle>Reports</CardTitle>
-                <CardDescription>
-                  Use this tab for exportable operational reports.
-                </CardDescription>
+                <CardTitle>{t("reportsTitle")}</CardTitle>
+                <CardDescription>{t("reportsDescription")}</CardDescription>
               </CardHeader>
             </Card>
           </TabsContent>
           <TabsContent value="notifications">
             <Card>
               <CardHeader>
-                <CardTitle>Notifications</CardTitle>
+                <CardTitle>{t("notificationsTitle")}</CardTitle>
                 <CardDescription>
-                  Use this tab for recent system and workflow notifications.
+                  {t("notificationsDescription")}
                 </CardDescription>
               </CardHeader>
             </Card>

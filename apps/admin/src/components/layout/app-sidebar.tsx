@@ -1,13 +1,13 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { ChevronRight, PanelLeft } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Avatar, AvatarFallback, Badge, Button } from "@repo/ui";
 import { cn } from "@repo/ui/lib/utils";
 import { useAdminUiStore } from "@/src/app/stores/ui.store";
-import { dashboardConfig } from "@/src/config/dashboard.config";
+import { getDashboardConfig } from "@/src/config/dashboard.config";
 import type { NavigationItem } from "@/src/config/dashboard.types";
+import { Link, usePathname } from "@/src/i18n/navigation";
 
 function NavGroup({
   items,
@@ -91,12 +91,22 @@ function NavGroup({
   );
 }
 
-export function AppSidebar() {
+export function AppSidebar({
+  collapsedOverride,
+  showCollapseButton = true,
+}: {
+  collapsedOverride?: boolean;
+  showCollapseButton?: boolean;
+}) {
+  const t = useTranslations("DashboardConfig");
+  const tCommon = useTranslations("Common");
+  const dashboardConfig = getDashboardConfig(t);
   const pathname = usePathname();
   const BrandLogo = dashboardConfig.brand.logo;
   const user = dashboardConfig.userMenu;
-  const collapsed = useAdminUiStore((state) => state.sidebarCollapsed);
+  const storedCollapsed = useAdminUiStore((state) => state.sidebarCollapsed);
   const toggleSidebar = useAdminUiStore((state) => state.toggleSidebar);
+  const collapsed = collapsedOverride ?? storedCollapsed;
 
   return (
     <aside
@@ -124,15 +134,17 @@ export function AppSidebar() {
                 {dashboardConfig.brand.description}
               </p>
             </div>
-            <Button
-              aria-label="Collapse sidebar"
-              onClick={toggleSidebar}
-              size="icon"
-              variant="ghost"
-              className="h-8 w-8"
-            >
-              <PanelLeft className="h-4 w-4" />
-            </Button>
+            {showCollapseButton ? (
+              <Button
+                aria-label={tCommon("collapseSidebar")}
+                onClick={toggleSidebar}
+                size="icon"
+                variant="ghost"
+                className="h-8 w-8"
+              >
+                <PanelLeft className="h-4 w-4" />
+              </Button>
+            ) : null}
           </>
         )}
       </div>

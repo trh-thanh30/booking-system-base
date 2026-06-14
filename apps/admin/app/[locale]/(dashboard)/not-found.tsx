@@ -1,19 +1,22 @@
-import Link from "next/link";
 import { SearchX } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Button } from "@repo/ui";
 import { StatePanel } from "@/src/components/common/state-panel";
+import { Link } from "@/src/i18n/navigation";
 
 export default function DashboardNotFound() {
+  const t = useTranslations("RouteStates");
+
   return (
     <StatePanel
       action={
         <Button asChild>
-          <Link href="/dashboard">Back to dashboard</Link>
+          <Link href="/dashboard">{t("backToDashboard")}</Link>
         </Button>
       }
-      description="The admin route does not exist or has not been added to the dashboard navigation yet."
+      description={t("notFoundDescription")}
       icon={SearchX}
-      title="Admin page not found"
+      title={t("notFoundTitle")}
     />
   );
 }

@@ -9,6 +9,7 @@ import {
 } from "@tanstack/react-table";
 import { CalendarPlus, Filter, Search, SlidersHorizontal } from "lucide-react";
 import { useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 import {
   Button,
   Card,
@@ -26,7 +27,7 @@ import {
 } from "@repo/ui";
 import { FormField } from "@/src/components/common/form-field";
 import { StatePanel } from "@/src/components/common/state-panel";
-import { bookingColumns } from "@/src/views/bookings/bookings.columns";
+import { getBookingColumns } from "@/src/views/bookings/bookings.columns";
 import {
   bookings,
   bookingStatusFilters,
@@ -35,6 +36,7 @@ import type { BookingStatusFilter } from "@/src/views/bookings/bookings.types";
 import { getBookingStatusFilterLabel } from "@/src/views/bookings/bookings.utils";
 
 export function BookingsTable() {
+  const t = useTranslations("Bookings");
   const [query, setQuery] = useState("");
   const [sorting, setSorting] = useState<SortingState>([]);
   const [status, setStatus] = useState<BookingStatusFilter>("all");
@@ -55,7 +57,7 @@ export function BookingsTable() {
   }, [query, status]);
 
   const table = useReactTable({
-    columns: bookingColumns,
+    columns: getBookingColumns(t),
     data: filteredBookings,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -71,25 +73,22 @@ export function BookingsTable() {
         <CardHeader className="gap-4">
           <div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
             <div>
-              <CardTitle>Booking queue</CardTitle>
-              <CardDescription>
-                Search, filter, and triage booking records before wiring real
-                API data.
-              </CardDescription>
+              <CardTitle>{t("queueTitle")}</CardTitle>
+              <CardDescription>{t("queueDescription")}</CardDescription>
             </div>
             <Button>
               <CalendarPlus className="h-4 w-4" />
-              New booking
+              {t("newBooking")}
             </Button>
           </div>
           <div className="grid gap-3 lg:grid-cols-[1fr_auto]">
             <div className="relative">
               <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
               <Input
-                aria-label="Search bookings"
+                aria-label={t("searchLabel")}
                 className="pl-9"
                 onChange={(event) => setQuery(event.target.value)}
-                placeholder="Search by booking, customer, location, or owner"
+                placeholder={t("searchPlaceholder")}
                 value={query}
               />
             </div>
@@ -102,7 +101,7 @@ export function BookingsTable() {
                   size="sm"
                   variant={status === item ? "primary" : "secondary"}
                 >
-                  {getBookingStatusFilterLabel(item)}
+                  {getBookingStatusFilterLabel(item, t)}
                 </Button>
               ))}
             </div>
@@ -161,12 +160,12 @@ export function BookingsTable() {
                   }}
                   variant="secondary"
                 >
-                  Clear filters
+                  {t("clearFilters")}
                 </Button>
               }
-              description="Try another keyword or reset status filters to see all booking records."
+              description={t("emptyDescription")}
               icon={Filter}
-              title="No bookings match these filters"
+              title={t("emptyTitle")}
             />
           )}
         </CardContent>
@@ -174,36 +173,33 @@ export function BookingsTable() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Quick create pattern</CardTitle>
-          <CardDescription>
-            A compact form pattern for later booking, user, and system
-            workflows.
-          </CardDescription>
+          <CardTitle>{t("quickCreateTitle")}</CardTitle>
+          <CardDescription>{t("quickCreateDescription")}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="grid gap-4 md:grid-cols-3">
             <FormField
-              description="Use visible labels instead of placeholder-only fields."
+              description={t("visibleLabelsDescription")}
               htmlFor="booking-customer"
-              label="Customer"
+              label={t("customer")}
             >
-              <Input id="booking-customer" placeholder="Workspace name" />
+              <Input id="booking-customer" placeholder={t("workspaceName")} />
             </FormField>
-            <FormField htmlFor="booking-date" label="Booking date">
+            <FormField htmlFor="booking-date" label={t("bookingDate")}>
               <Input id="booking-date" type="date" />
             </FormField>
             <FormField
-              description="Operators can update this after assignment."
+              description={t("ownerDescription")}
               htmlFor="booking-owner"
-              label="Owner"
+              label={t("owner")}
             >
-              <Input id="booking-owner" placeholder="Team member" />
+              <Input id="booking-owner" placeholder={t("teamMember")} />
             </FormField>
           </div>
           <div className="flex justify-end border-t border-slate-100 pt-4 dark:border-slate-800">
             <Button className="w-full md:w-auto" variant="secondary">
               <SlidersHorizontal className="h-4 w-4" />
-              Save draft
+              {t("saveDraft")}
             </Button>
           </div>
         </CardContent>

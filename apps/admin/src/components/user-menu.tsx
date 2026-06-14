@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { useTranslations } from "next-intl";
 import {
   Avatar,
   AvatarFallback,
@@ -13,9 +13,12 @@ import {
   DropdownMenuTrigger,
 } from "@repo/ui";
 import { cn } from "@repo/ui/lib/utils";
-import { dashboardConfig } from "@/src/config/dashboard.config";
+import { getDashboardConfig } from "@/src/config/dashboard.config";
+import { Link } from "@/src/i18n/navigation";
 
 export function UserMenu() {
+  const t = useTranslations("DashboardConfig");
+  const dashboardConfig = getDashboardConfig(t);
   const user = dashboardConfig.userMenu;
 
   return (

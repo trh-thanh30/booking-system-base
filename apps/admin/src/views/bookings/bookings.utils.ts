@@ -1,7 +1,10 @@
 import type { BookingStatusFilter } from "@/src/views/bookings/bookings.types";
 
-export function getBookingStatusFilterLabel(status: BookingStatusFilter) {
-  return status === "all"
-    ? "All"
-    : `${status.charAt(0).toUpperCase()}${status.slice(1)}`;
+type Translate = (key: string) => string;
+
+export function getBookingStatusFilterLabel(
+  status: BookingStatusFilter,
+  t: Translate,
+) {
+  return t(`filters.${status}`);
 }

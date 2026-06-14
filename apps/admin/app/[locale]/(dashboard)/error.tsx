@@ -1,6 +1,7 @@
 "use client";
 
 import { AlertTriangle, RotateCcw } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Button } from "@repo/ui";
 import { StatePanel } from "@/src/components/common/state-panel";
 
@@ -10,17 +11,19 @@ export default function DashboardError({
   error: Error;
   reset: () => void;
 }) {
+  const t = useTranslations("RouteStates");
+
   return (
     <StatePanel
       action={
         <Button onClick={reset}>
           <RotateCcw className="h-4 w-4" />
-          Try again
+          {t("tryAgain")}
         </Button>
       }
-      description="The admin view could not be rendered. Retry the route or inspect the browser console and server logs."
+      description={t("errorDescription")}
       icon={AlertTriangle}
-      title="Dashboard failed to load"
+      title={t("errorTitle")}
     />
   );
 }
