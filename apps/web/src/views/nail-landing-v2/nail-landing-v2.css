@@ -1,0 +1,26 @@
+@theme {
+  --color-brand-50: #fff1f3;
+  --color-brand-100: #ffe4e9;
+  --color-brand-200: #fecdd6;
+  --color-brand-300: #fda4b4;
+  --color-brand-400: #fb7192;
+  --color-brand-500: #f43f68;
+  --color-brand-600: #e11d4a;
+  --color-brand-700: #be1239;
+  --color-brand-900: #881337;
+
+  @keyframes shimmer {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
+  --animate-shimmer: shimmer 2.5s infinite;
+}
+
+.nail-salon-v2,
+.nail-salon-v2 :is(h1, h2, h3, h4, h5, h6, p, span, button, input, select, textarea, a, .font-sans, .font-serif) {
+  font-family: var(--font-urbanist), ui-sans-serif, system-ui, sans-serif;
+}
