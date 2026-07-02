@@ -1,115 +1,141 @@
 "use client";
 
-import Image from "next/image";
-import { motion, useReducedMotion } from "framer-motion";
-import { SERVICES_V2 } from "../nail-landing-v2.constants";
-import {
-  getStaggerContainer,
-  getFadeUp,
-  getScaleIn,
-} from "../nail-landing-v2.animations";
+import { useState } from "react";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import type { ServicesV2Props } from "../nail-landing-v2.types";
+import { ArrowRight, Clock } from "lucide-react";
+import { getFadeUp } from "../nail-landing-v2.animations";
 
-function ManicureIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="37"
-      height="40"
-      viewBox="0 0 37 40"
-      fill="none"
-      className={className}
-    >
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M29.3106 0.740171C28.4766 1.85265 27.0926 3.33754 25.9717 4.32243C25.4193 4.80787 24.9675 5.26991 24.9678 5.3492C24.9683 5.50142 27.1138 7.80067 27.3946 7.95004C27.4849 7.99808 27.6212 8.01352 27.6977 7.98433C27.7741 7.95522 28.1909 7.48326 28.624 6.9356C29.3981 5.9566 31.1156 4.17377 32.2195 3.20325C32.5282 2.93183 32.7808 2.6363 32.7808 2.54657C32.7808 2.45675 32.2473 1.84765 31.5951 1.19284C30.0957 -0.312489 30.0992 -0.311774 29.3106 0.740171ZM4.51849 2.67826C4.40057 2.72755 4.01609 3.2745 3.55653 4.0469L2.79098 5.33348L1.50768 5.98695C0.801856 6.34632 0.175156 6.70372 0.114983 6.78113C-0.0707459 7.02015 -0.0241342 7.53817 0.201919 7.74781C0.313015 7.85094 0.909179 8.23129 1.52663 8.59315L2.64926 9.25109L3.32284 10.5124C3.69331 11.2061 4.05193 11.8371 4.11964 11.9147C4.2575 12.0724 4.77338 12.1026 5.02682 11.9677C5.1178 11.9193 5.52509 11.3151 5.93185 10.625L6.67144 9.3702L7.99058 8.70592C9.31062 8.0412 9.51979 7.86647 9.51979 7.42862C9.51979 7.11899 9.21667 6.86408 8.0027 6.15293L6.76448 5.42759L6.1905 4.27546C5.87482 3.64182 5.53488 3.02388 5.4351 2.90227C5.23258 2.6554 4.81658 2.5538 4.51849 2.67826ZM15.4922 6.81667C13.8047 7.62433 12.5077 9.29439 11.6373 11.7806C10.997 13.609 10.936 14.0743 10.8924 17.4575C10.8483 20.8747 10.8982 21.3335 11.4364 22.4542C12.1825 24.0078 13.5258 25.0783 15.2526 25.4955C15.7513 25.6161 16.122 25.6411 16.8638 25.6042C17.939 25.5509 18.6697 25.3348 19.5414 24.8124C20.233 24.398 21.1723 23.3899 21.5693 22.6359C22.06 21.704 22.1842 21.0998 22.226 19.4412C22.2662 17.8477 22.1867 15.002 22.102 15.0025C22.0725 15.0028 21.7983 15.4949 21.4925 16.0962C20.8645 17.3317 20.4696 17.8401 19.8629 18.1947C19.4946 18.4099 19.3513 18.4396 18.6786 18.4396C17.9899 18.4396 17.8505 18.409 17.2865 18.1348C16.4367 17.7215 15.4094 16.7035 14.9978 15.8669C14.7596 15.3829 14.6902 15.1173 14.6582 14.5684C14.5815 13.2502 15.1022 12.5694 16.8286 11.7314C17.7895 11.265 17.9024 11.1801 18.9491 10.137L20.0548 9.0352L19.776 8.6853C19.2607 8.03852 18.2578 7.17113 17.7261 6.91229C16.9855 6.55185 16.1227 6.51489 15.4922 6.81667ZM21.3298 9.64519L18.996 11.9667L20.0505 13.0151L21.1052 14.0635L23.4404 11.7434C24.9601 10.2334 25.7749 9.36064 25.7737 9.24395C25.771 8.98833 24.1118 7.32371 23.8596 7.32371C23.7231 7.32371 22.9557 8.0279 21.3298 9.64519ZM17.1703 13.01C16.1783 13.484 15.987 13.7184 15.9865 14.4606C15.9854 16.0197 18.1103 17.6355 19.3092 16.987C19.5542 16.8545 19.7052 16.6513 19.994 16.0658C20.1977 15.6527 20.3831 15.2343 20.406 15.1361C20.438 14.9991 20.1634 14.6841 19.2273 13.7839L18.0069 12.6101L17.1703 13.01ZM31.9585 15.5403C31.8766 15.5878 31.4784 16.19 31.0735 16.8786L30.3371 18.1308L29.0147 18.7966C27.6809 19.4683 27.4819 19.6362 27.4819 20.0905C27.4819 20.3832 27.8497 20.6862 29.0441 21.3775L30.2021 22.0476L30.8965 23.3686C31.6571 24.8157 31.8396 25.0004 32.3648 24.8541C32.6048 24.7871 32.7599 24.5866 33.4221 23.4873L34.1981 22.1989L35.4429 21.5545C36.1274 21.2001 36.7583 20.8394 36.8447 20.7529C37.0136 20.5841 37.0555 20.046 36.9166 19.8279C36.8713 19.7566 36.2758 19.3747 35.5934 18.979L34.3525 18.2598L33.716 17.0335C33.366 16.3592 33.006 15.7266 32.9162 15.6279C32.7398 15.4342 32.2229 15.3869 31.9585 15.5403ZM9.26598 21.944C8.65823 23.5198 8.66658 23.3896 8.66658 31.2965V38.4392L8.87629 38.8299C9.13495 39.312 9.45503 39.6186 9.92393 39.8333C10.262 39.9881 10.6536 39.9979 16.5699 39.9989L22.8567 40L23.3201 39.7358C23.5749 39.5905 23.8728 39.3469 23.9819 39.1945C24.4273 38.5727 24.4284 38.5544 24.4284 31.4809C24.4284 27.474 24.3919 24.5739 24.3359 24.1297C24.2408 23.3769 23.9297 22.198 23.6587 21.5645L23.5059 21.2074L23.2643 21.9663C22.831 23.3278 22.28 24.1944 21.2134 25.1919C18.7805 27.4672 15.0114 27.5875 12.237 25.4783C11.1015 24.6152 10.1707 23.2245 10.8183 21.8645C10.7310 21.5277 9.63106 21.252 9.59621 21.252C9.56137 21.252 9.41273 21.5635 9.26598 21.944Z"
-        fill="currentColor"
-      ></path>
-    </svg>
-  );
+interface ServiceCategory {
+  id: string;
+  name: string;
+  description: string;
+  items: {
+    id: string;
+    name: string;
+    price: string;
+    duration: string;
+    description: string;
+  }[];
 }
 
-function PedicureIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="40"
-      height="40"
-      viewBox="0 0 40 40"
-      fill="none"
-      className={className}
-    >
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M35.6431 0.589237C35.0426 2.11958 33.712 3.43161 32.3134 3.87246C32.0664 3.95034 31.8644 4.03822 31.8644 4.0678C31.8644 4.09737 32.0647 4.18492 32.3093 4.26237C33.7278 4.71127 35.0365 6.00042 35.6431 7.54636C35.7702 7.87042 35.9003 8.13559 35.9322 8.13559C35.9641 8.13559 36.0942 7.87042 36.2214 7.54636C36.8279 6.00042 38.1366 4.71127 39.5551 4.26237C39.7997 4.18492 40 4.09737 40 4.0678C40 4.03822 39.7997 3.95068 39.5551 3.87322C38.1366 3.42432 36.8279 2.13517 36.2214 0.589237C36.0942 0.265169 35.9641 0 35.9322 0C35.9003 0 35.7702 0.265169 35.6431 0.589237ZM1.14051 1.20763C1.25085 1.49898 1.91839 3.22356 2.62381 5.04008C4.08051 8.7911 4.17203 9.14331 3.96025 10.1818C3.76475 11.1403 3.44322 11.731 2.76771 12.3729C1.01119 14.0419 0.879915 14.1884 0.566356 14.8305C0.0875424 15.811 -0.0262712 16.3852 0.0211864 17.5819C0.0664407 18.7244 0.272288 19.4686 0.777881 20.3172C1.12331 20.8969 1.8311 21.6791 2.35932 22.0648C2.57653 22.2234 5.93856 24.0784 9.83051 26.187C13.7225 28.2957 17.2309 30.2331 17.6271 30.4926C18.5719 31.1113 20.0744 32.6154 20.713 33.5818C20.9829 33.9903 21.2846 34.3812 21.3835 34.4504C21.4883 34.5238 21.753 34.5763 22.0189 34.5763C22.4242 34.5763 22.5064 34.5444 22.7627 34.2881L23.0508 34V33.0395V32.0791L22.1603 31.1857L21.2697 30.2923L21.7191 29.8486L22.1684 29.4047L23.1162 30.3653C23.6375 30.8937 24.1208 31.462 24.1903 31.6282C24.2597 31.7945 24.3429 32.2493 24.3752 32.639C24.4289 33.2881 24.4569 33.3705 24.7085 33.6229C24.948 33.8631 25.0394 33.8983 25.4237 33.8983C25.8119 33.8983 25.8987 33.864 26.1525 33.6102L26.4407 33.322V31.6836V30.0452L25.5501 29.1518L24.6595 28.2584L25.1089 27.8147L25.5582 27.3708L26.506 28.3314C27.0641 28.8971 27.5105 29.4278 27.5917 29.6221C27.68 29.8336 27.7464 30.3183 27.7763 30.9718C27.8226 31.9832 27.8253 31.9938 28.098 32.2669C28.3377 32.5071 28.4292 32.5424 28.8136 32.5424C29.2017 32.5424 29.2886 32.5081 29.5424 32.2542L29.8305 31.9661V30.3273V28.6885L28.6008 27.4567L27.371 26.2249L27.82 25.7815L28.2689 25.3381L29.5548 26.6336C30.307 27.3916 30.8937 28.0561 30.9685 28.235C31.0387 28.4031 31.1225 28.8595 31.1548 29.2492C31.2086 29.8982 31.2365 29.9807 31.4881 30.2331C31.7276 30.4733 31.8191 30.5085 32.2034 30.5085C32.5915 30.5085 32.6784 30.4742 32.9322 30.2203L33.2203 29.9322V28.2932V26.6542L31.6515 25.0837L30.0826 23.5132L30.5305 23.0709L30.9783 22.6286L32.2042 23.8567L33.43 25.0847L34.2786 25.0829C35.2466 25.0808 35.6281 24.953 36.0762 24.4807C36.4494 24.0874 36.6102 23.6569 36.6102 23.0508C36.6102 22.4439 36.4487 22.0125 36.0762 21.6242C35.5775 21.1042 35.4346 21.0652 33.8559 21.0178L32.4153 20.9746L25.5085 17.8066C21.7097 16.0643 18.3729 14.5248 18.0932 14.3857C16.8625 13.7731 15.9095 12.8553 15.3108 11.7058C15.0845 11.2714 12.4944 3.22458 11.8498 0.95339L11.7717 0.677966H6.35576H0.939831L1.14051 1.20763ZM25.5235 2.47881C25.1052 3.48127 24.1653 4.44127 23.0068 5.04949C22.6592 5.23203 22.3744 5.40042 22.3741 5.42373C22.3738 5.44703 22.627 5.59712 22.9366 5.75729C24.1468 6.38314 25.0942 7.33949 25.5236 8.36864C25.6257 8.61339 25.7332 8.81356 25.7627 8.81356C25.7922 8.81356 25.8997 8.61331 26.0019 8.36864C26.4312 7.33949 27.3786 6.38314 28.5888 5.75729C28.8985 5.59712 29.1516 5.44703 29.1514 5.42373C29.151 5.40042 28.8663 5.23203 28.5186 5.04949C27.3602 4.44127 26.4203 3.48127 26.0019 2.47881C25.8998 2.23407 25.7922 2.0339 25.7627 2.0339C25.7332 2.0339 25.6256 2.23407 25.5235 2.47881ZM32.3031 9.93644C31.8848 10.9389 30.9449 11.8989 29.7864 12.5071C29.4388 12.6897 29.1541 12.8581 29.1537 12.8814C29.1535 12.9047 29.4066 13.0547 29.7163 13.2149C30.9264 13.8408 31.8739 14.7971 32.3032 15.8263C32.4053 16.0709 32.5129 16.2712 32.5424 16.2712C32.5719 16.2712 32.6794 16.0709 32.7815 15.8263C33.2108 14.7971 34.1583 13.8408 35.3685 13.2149C35.6781 13.0547 35.9313 12.9047 35.931 12.8814C35.9307 12.8581 35.6459 12.6897 35.2983 12.5071C34.1398 11.8989 33.1999 10.9389 32.7816 9.93644C32.6795 9.69178 32.5719 9.49153 32.5424 9.49153C32.5129 9.49153 32.4053 9.69178 32.3031 9.93644ZM6.31356 26.7352C2.94915 27.7699 0.855509 28.9942 0.177373 30.3236C-0.053983 30.777 -0.0574577 31.5177 0.169322 32.0175C0.367458 32.454 1.13322 33.2334 1.78364 33.6606C4.30805 35.3184 8.57763 36.4931 14.273 37.0965C16.2539 37.3064 23.0833 37.3046 25.0847 37.0935C30.7379 36.4975 35.007 35.3199 37.5424 33.6575C38.1886 33.2337 38.9549 32.4533 39.1527 32.0175C39.4108 31.4488 39.3798 30.7391 39.0736 30.2052C38.5825 29.3491 37.3733 28.4572 35.6779 27.7007C35.1694 27.4738 34.7186 27.2881 34.676 27.2881C34.6334 27.2881 34.5806 27.8887 34.5585 28.6229C34.5118 30.1778 34.3764 30.6195 33.7778 31.1713C33.269 31.6403 33.2719 31.8095 32.0595 31.756C31.7425 31.7323 31.3973 31.6853 31.2924 31.6516C31.125 31.5979 31.1014 31.6201 31.0998 31.8333C31.0952 32.4443 30.4661 33.2989 29.7887 33.6143C29.2835 33.8496 28.4635 33.882 27.9927 33.6853C27.824 33.6148 27.6794 33.5671 27.6715 33.5794C27.6637 33.5917 27.5559 33.7788 27.432 33.9953C26.9923 34.7636 26.3029 35.1647 25.4169 35.1676C24.9913 35.1691 24.7625 35.1206 24.4509 34.9628L24.0426 34.7561L23.6724 35.1371C23.1863 35.6373 22.7204 35.8432 22.0702 35.8456C21.0081 35.8494 20.5121 35.5164 19.5928 34.1815C18.9712 33.2789 17.7551 32.0703 16.9068 31.5119C15.8758 30.8333 7.68542 26.4404 7.4589 26.4446C7.34169 26.4467 6.82627 26.5775 6.31356 26.7352ZM0 36.9049V40H19.661H39.322V36.9049V33.8098L38.7801 34.2566C36.6025 36.0518 32.4042 37.4765 27.3729 38.1277C22.6459 38.7396 16.4179 38.7253 11.7373 38.0917C6.72492 37.4133 2.69754 36.0336 0.541949 34.2566L0 33.8098V36.9049Z"
-        fill="currentColor"
-      ></path>
-    </svg>
-  );
-}
-
-function GelPolishIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="32"
-      height="40"
-      viewBox="0 0 32 40"
-      fill="none"
-      className={className}
-    >
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M6.85079 0.264772C6.60014 0.409427 6.30709 0.65206 6.19975 0.803828C5.75801 1.42806 5.76057 1.3788 5.76057 9.30515V16.7149H10.5314H15.3022L15.3001 9.3577C15.2986 4.74642 15.2647 1.85562 15.209 1.61237C15.0794 1.04664 14.681 0.519675 14.1725 0.241122L13.7321 0L10.5195 0.000800252L7.30667 0.0016892L6.85079 0.264772ZM25.5948 1.59112C25.1457 1.80032 24.7763 2.19517 24.6653 2.5845C24.6127 2.76926 24.5787 5.19683 24.5787 8.77916V14.67H28.2894H32L31.9995 8.82424C31.9992 4.83346 31.968 2.86626 31.9015 2.62487C31.7764 2.17161 31.2557 1.64758 30.8053 1.52168C30.5905 1.46167 29.5783 1.42415 28.201 1.42504C26.1962 1.42628 25.9093 1.4446 25.5948 1.59112ZM26.6943 15.6258C26.6918 15.7114 26.5206 17.2918 26.314 19.1377L25.9384 22.494H28.2747H30.6111L30.5625 22.0717C30.5357 21.8394 30.3622 20.2591 30.1768 18.5598L29.8398 15.4702H28.2694C26.8346 15.4702 26.6987 15.4836 26.6943 15.6258ZM1.65238 17.7681C1.04993 18.0553 0.528765 18.5863 0.253383 19.1935C0.0919709 19.5494 0.0624627 19.8118 0.0334845 21.1508L0 22.697L0.828707 22.6534C1.47285 22.6195 1.86335 22.5383 2.58251 22.2888C4.06508 21.7745 4.97948 21.6862 9.38285 21.6323C14.8748 21.5651 16.9946 21.7257 18.597 22.3304C19.1596 22.5428 19.515 22.6143 20.1834 22.6498L21.0448 22.6956V21.4956C21.0448 20.8356 21.005 20.0843 20.9564 19.8262C20.772 18.8479 20.2325 18.1505 19.3344 17.7297L18.8803 17.5169L10.5314 17.5161L2.18247 17.5153L1.65238 17.7681ZM5.98144 22.4964C4.49251 22.5869 3.75462 22.7184 2.67713 23.0858C1.9441 23.3357 1.5536 23.415 0.87933 23.4504L0.017935 23.4958V27.2626V31.0293H0.81784C1.49706 31.0293 1.75716 31.0763 2.54231 31.3406C4.33286 31.9435 4.56328 31.9614 10.5314 31.9614C16.4995 31.9614 16.7299 31.9435 18.5204 31.3406C19.3056 31.0763 19.5657 31.0293 20.2449 31.0293H21.0448V27.2626V23.4958L20.1834 23.4521C19.5252 23.4187 19.1342 23.3425 18.5257 23.1288C17.435 22.7457 16.5831 22.596 14.9135 22.4938C13.3175 22.3961 7.60652 22.3977 5.98144 22.4964ZM27.3175 25.0431V26.7921L27.7747 28.2439C28.026 29.0424 28.2547 29.6957 28.2827 29.6956C28.3107 29.6956 28.5423 29.0217 28.7974 28.1979L29.2612 26.7002V24.9972V23.2942H28.2894H27.3175V25.0431ZM0.0337494 33.3187C0.0631693 34.6189 0.0920594 34.8625 0.261688 35.2374C0.562514 35.9023 0.931633 36.3074 1.53788 36.6382L2.09412 36.9418H10.5314H18.9686L19.4269 36.6986C20.0284 36.3795 20.4865 35.9001 20.7667 35.297C20.9761 34.8463 20.9967 34.6912 21.0295 33.3187L21.0652 31.8295H20.274C19.6153 31.8295 19.351 31.8759 18.6956 32.1068C17.0423 32.6893 16.5557 32.7343 11.3903 32.7817C5.40126 32.8368 4.06897 32.7351 2.31057 32.0894C1.72314 31.8736 1.4672 31.8295 0.801584 31.8295H8.82997e-05L0.0337494 33.3187ZM27.4299 35.1858C26.215 37.7123 26.09 38.2654 26.5545 39.0628C26.9179 39.6869 27.3797 39.9554 28.1569 39.9949C28.9035 40.0329 29.3259 39.8622 29.7835 39.3377C30.5148 38.4995 30.427 37.968 29.0834 35.0969C28.6772 34.229 28.3193 33.5188 28.2882 33.5188C28.257 33.5188 27.8709 34.269 27.4299 35.1858ZM3.10897 38.0057C3.43348 38.8646 3.88812 39.4507 4.47952 39.7725C4.83132 39.9638 4.85809 39.9647 10.5314 39.9647C16.2047 39.9647 16.2314 39.9638 16.5832 39.7725C17.1746 39.4507 17.6293 38.8646 17.9538 38.0057L18.0366 37.7864H10.5314H3.02619L3.10897 38.0057Z"
-        fill="currentColor"
-      ></path>
-    </svg>
-  );
-}
-
-function NailArtIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="42"
-      height="40"
-      viewBox="0 0 42 40"
-      fill="none"
-      className={className}
-    >
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M31.2658 0.474481C30.8221 1.84517 29.9104 2.96757 28.7919 3.51987C28.4443 3.69155 28.1597 3.86132 28.1597 3.89704C28.1597 3.93285 28.4268 4.08854 28.7532 4.24299C29.884 4.77834 30.952 6.11168 31.3059 7.42971C31.3664 7.6552 31.4587 7.82545 31.5109 7.80802C31.5631 7.7905 31.7091 7.47998 31.8352 7.11784C32.2733 5.86014 33.1728 4.79509 34.2435 4.26635C34.5725 4.10396 34.8417 3.93505 34.8417 3.8912C34.8417 3.84734 34.5948 3.6951 34.2928 3.5529C33.9397 3.38658 33.5052 3.0526 33.0747 2.61655C32.4057 1.93901 32.0748 1.39868 31.7829 0.507611C31.6976 0.247262 31.5833 0.0192767 31.5288 0.0010838C31.4744 -0.0171091 31.356 0.195939 31.2658 0.474481ZM15.3045 0.828955C14.2863 1.20114 13.5928 1.85637 13.0999 2.91185L12.8389 3.47065L12.8128 10.8358C12.7828 19.2742 12.7407 18.8007 13.5964 19.6589C14.4027 20.4678 14.4821 20.4808 18.4378 20.4473L21.8119 20.4187L22.3253 20.1335C22.6082 19.9764 22.9844 19.657 23.1628 19.4227C23.79 18.5986 23.7774 18.7845 23.7477 10.785L23.721 3.56641L23.497 3.00942C23.182 2.22626 22.3269 1.33041 21.5516 0.971242L20.9527 0.693849L18.3754 0.671156C16.0539 0.650665 15.7491 0.666368 15.3045 0.828955ZM3.14654 3.8235C2.80967 5.09307 1.68987 6.49019 0.594982 7.00715C0.267756 7.1616 0 7.31729 0 7.35311C0 7.38882 0.276729 7.55476 0.614932 7.72175C1.72147 8.26821 2.66315 9.42575 3.09996 10.7766C3.19026 11.0557 3.30509 11.2705 3.35511 11.2538C3.40513 11.237 3.54755 10.9321 3.67155 10.5761C3.79555 10.2201 4.03333 9.71579 4.2 9.45524C4.61524 8.80624 5.51568 7.99225 6.15276 7.68987C6.44381 7.55179 6.68197 7.4028 6.68197 7.35895C6.68197 7.31509 6.39932 7.13958 6.05377 6.96895C4.95602 6.4268 4.09433 5.39354 3.65704 4.09496C3.54221 3.75379 3.40494 3.46012 3.35215 3.4425C3.29937 3.42479 3.20687 3.59628 3.14654 3.8235ZM19.2786 5.19093C19.4559 5.3518 19.4782 5.35036 19.7901 5.15694C20.1743 4.91881 20.6144 4.89812 21.0036 5.10006C21.5827 5.40044 21.742 6.26565 21.3637 7.05503C21.1242 7.55486 20.2379 8.48882 19.7758 8.72858C19.4774 8.88332 19.4501 8.88188 19.15 8.69593C18.3649 8.20922 17.3767 6.83174 17.3741 6.22046C17.3725 5.86914 17.6148 5.38703 17.9104 5.15301C18.1331 4.97664 18.2697 4.94408 18.6389 4.97932C18.8888 5.00316 19.1767 5.09834 19.2786 5.19093ZM10.7816 8.65514C10.4979 8.92143 10.1835 9.35288 9.99823 9.73034L9.68886 10.3608L9.66413 25.1804L9.63932 40H18.2791H26.9188V32.0717V24.1434L26.4092 23.6157C26.1289 23.3254 25.7902 22.8536 25.6565 22.5672C25.3719 21.9577 25.1055 20.8425 25.1043 20.2563C25.1031 19.6532 25.1031 19.6532 25.1043 20.2563C25.1031 19.6532 24.9937 18.8388 24.914 18.8388C24.876 18.8388 24.7094 19.115 24.5438 19.4525C24.0379 20.4832 22.9446 21.3562 21.8396 21.6119C21.6139 21.6642 19.9886 21.7078 18.2184 21.7091C15.2821 21.7112 14.9543 21.6951 14.3942 21.5216C13.2548 21.1686 12.2742 20.252 11.8025 19.0992C11.6034 18.6127 11.5972 18.462 11.5702 13.4049C11.546 8.86015 11.5246 8.21037 11.3992 8.21037C11.3202 8.21037 11.0424 8.41049 10.7816 8.65514ZM25.0321 11L25.0574 13.7896L25.9094 14.1598C26.3781 14.3634 26.8 14.53 26.8468 14.53C26.8952 14.53 26.9189 13.6282 26.9016 12.4449L26.8711 10.3598L26.5617 9.72986C26.2447 9.08459 25.4357 8.21037 25.1555 8.21037C25.0237 8.21037 25.0097 8.52722 25.0321 11ZM16.997 12.9554C17.1792 13.1206 17.1995 13.1193 17.5551 12.9188C17.9852 12.6762 18.3264 12.6557 18.7001 12.8495C19.3514 13.1873 19.5025 14.0188 19.0674 14.8711C18.8095 15.3763 17.7228 16.4773 17.3718 16.5891C16.9794 16.714 15.7278 15.5928 15.3652 14.7916C15.0142 14.0159 15.1881 13.1721 15.7685 12.8348C16.0575 12.6668 16.7546 12.7352 16.997 12.9554ZM26.1074 15.679C26.075 15.7317 26.0817 15.8287 26.1224 15.8945C26.1631 15.9603 26.2279 17.0914 26.2663 18.4079C26.3117 19.9624 26.383 20.9696 26.4698 21.2805C26.8727 22.7248 27.7861 23.5132 29.2575 23.6867C29.7125 23.7403 29.7835 23.716 30.5881 23.23C31.4041 22.7373 31.4453 22.6958 31.6205 22.1901C31.8614 21.4953 31.8763 20.5565 31.657 19.9149C31.3278 18.9527 30.5065 18.2315 28.2403 16.9144C27.5922 16.5377 26.8829 16.0841 26.6641 15.9064C26.2282 15.5523 26.194 15.5385 26.1074 15.679ZM38.4696 16.4914C38.4168 16.6307 38.3736 16.8367C38.3736 16.8367C38.3736 16.8872 38.2176 17.2399 38.0269 17.6204C37.58 18.5122 36.6359 19.4649 35.8685 19.7983C35.5681 19.9289 35.3215 20.0803 35.3206 20.1347C35.3197 20.1892 35.5875 20.3614 35.9156 20.5173C37.0204 21.0422 38.2175 22.5508 38.4298 23.6858C38.5238 24.1884 38.7329 24.0538 38.985 23.3284C39.418 22.0827 40.3614 20.9913 41.4406 20.4878C41.7477 20.3444 41.9994 20.1955 42 20.1568C42.0005 20.1181 41.7364 19.9523 41.4128 19.7886C40.3068 19.2285 39.3848 18.1462 38.976 16.928C38.7423 16.231 38.6112 16.118 38.4696 16.4914ZM31.1414 24.303C30.499 24.6751 29.9734 25.0258 29.9734 25.0824C29.9734 25.2496 33.9154 32.0526 34.0123 32.0526C34.061 32.0526 34.6132 31.7617 35.2394 31.4063C36.1821 30.871 36.3718 30.7263 36.3427 30.5643C36.3017 30.3359 32.4598 23.6264 32.3699 23.6264C32.3366 23.6264 31.7838 23.9309 31.1414 24.303ZM35.7995 32.4255C34.3575 33.2628 33.1624 33.9941 33.1436 34.0506C33.0988 34.1857 35.0431 37.5696 35.5685 38.2706C35.7934 38.5708 36.2419 39.0025 36.5651 39.2299C38.3235 40.4671 40.2026 40.1522 41.0197 38.4834C41.2625 37.9873 41.2846 37.8519 41.2796 36.8881C41.2752 36.0341 41.2341 35.7326 41.062 35.295C40.7672 34.5451 38.7011 30.9568 38.5472 30.9274C38.4779 30.9141 37.2416 31.5883 35.7995 32.4255Z"
-        fill="currentColor"
-      ></path>
-    </svg>
-  );
-}
-
-const serviceIcons = [
-  <ManicureIcon
-    className="w-[37px] h-[40px] text-brand-100 transition-transform group-hover:scale-105"
-    key="manicure"
-  />,
-  <PedicureIcon
-    className="w-[40px] h-[40px] text-brand-100 transition-transform group-hover:scale-105"
-    key="pedicure"
-  />,
-  <GelPolishIcon
-    className="w-[32px] h-[40px] text-brand-100 transition-transform group-hover:scale-105"
-    key="gel-polish"
-  />,
-  <NailArtIcon
-    className="w-[42px] h-[40px] text-brand-100 transition-transform group-hover:scale-105"
-    key="nail-art"
-  />,
+const CATEGORIES_DATA: ServiceCategory[] = [
+  {
+    id: "classics",
+    name: "Classic Nails",
+    description:
+      "Essential treatments for natural nail beauty and maintenance.",
+    items: [
+      {
+        id: "manicure",
+        name: "Classic Manicure",
+        price: "£28",
+        duration: "30 mins",
+        description:
+          "Essential nail shaping, cuticle grooming, and light hand massage with premium organic polish.",
+      },
+      {
+        id: "pedicure",
+        name: "Classic Pedicure",
+        price: "£38",
+        duration: "45 mins",
+        description:
+          "Warm foot soak, sea salt exfoliation, cuticle care, sole smoothing, and massage.",
+      },
+      {
+        id: "gel-polish",
+        name: "Gel Polish Overlay",
+        price: "£42",
+        duration: "40 mins",
+        description:
+          "Long-lasting premium gel color applied to natural nails. Guaranteed chip-free for up to 4 weeks.",
+      },
+    ],
+  },
+  {
+    id: "extensions",
+    name: "Extensions & Art",
+    description:
+      "Sculpted length and custom-tailored creative hand-painted aesthetics.",
+    items: [
+      {
+        id: "gel-x",
+        name: "Aprés Gel-X Extensions",
+        price: "£65",
+        duration: "60 mins",
+        description:
+          "High-grade full-coverage soft gel extensions for a feather-light feel and natural look.",
+      },
+      {
+        id: "acrylics",
+        name: "Sculpted Acrylics Full Set",
+        price: "£75",
+        duration: "75 mins",
+        description:
+          "Premium durable acrylic extensions sculpted directly on the nail by senior artists.",
+      },
+      {
+        id: "nail-art",
+        name: "Bespoke Custom Nail Art",
+        price: "£55",
+        duration: "50 mins",
+        description:
+          "Bespoke custom painting, chrome finishes, foils, or gems tailored exactly to your vision.",
+      },
+    ],
+  },
+  {
+    id: "therapy",
+    name: "Spa & Therapy",
+    description:
+      "Indulgent skin restoration treatments using premium organic oils.",
+    items: [
+      {
+        id: "paraffin",
+        name: "Paraffin Hydration therapy",
+        price: "£20",
+        duration: "20 mins",
+        description:
+          "Deep nourishing warm paraffin wax wrap to soften, hydrate, and soothe tired hand joints.",
+      },
+      {
+        id: "milk-bath",
+        name: "Organic Milk & Rose Spa Bath",
+        price: "£35",
+        duration: "30 mins",
+        description:
+          "Luxury warm hand soak in organic honey milk, followed by a warm stone oil massage.",
+      },
+      {
+        id: "cuticle-rest",
+        name: "Cuticle Intensive Repair",
+        price: "£15",
+        duration: "15 mins",
+        description:
+          "Targeted conditioning treatment using vitamin E and jojoba oils to restore dry, cracked cuticles.",
+      },
+    ],
+  },
 ];
 
-// ─── Character-by-character center-out animation ─────────────────────────
+const PART1 = "Quick Book Your";
+const PART2 = "Service";
+
+const BASE_DELAY = 0.05;
+const CHAR_STAGGER = 0.038;
+
+const FULL_TEXT = `${PART1} ${PART2}`;
+const CENTER_IDX = (FULL_TEXT.length - 1) / 2;
+
+function getCharDelay(globalIdx: number): number {
+  return BASE_DELAY + Math.abs(globalIdx - CENTER_IDX) * CHAR_STAGGER;
+}
+
+let _offset = 0;
+const PART1_DELAYS = PART1.split("").map((_, i) => getCharDelay(_offset + i));
+_offset += PART1.length + 1;
+const PART2_DELAYS = PART2.split("").map((_, i) => getCharDelay(_offset + i));
+
 const charVariants = {
   hidden: { y: "108%", opacity: 0 },
   show: (delay: number) => ({
@@ -151,7 +177,7 @@ function AnimatedPhrase({ text, delays }: { text: string; delays: number[] }) {
     <>
       {words.map((word, wi) => {
         const wordDelays = delays.slice(charOffset, charOffset + word.length);
-        charOffset += word.length + 1; // +1 for the space
+        charOffset += word.length + 1;
         return (
           <span key={wi} className="inline-block">
             <AnimatedWord word={word} delays={wordDelays} />
@@ -163,80 +189,23 @@ function AnimatedPhrase({ text, delays }: { text: string; delays: number[] }) {
   );
 }
 
-// ─── Main Heading parts: Quick Book Your Service ─────────────────────────
-const PART1 = "Quick Book Your";
-const PART2 = "Service"; // accent phrase
-
-const BASE_DELAY = 0.05;
-const CHAR_STAGGER = 0.038;
-
-const FULL_TEXT = `${PART1} ${PART2}`;
-const CENTER_IDX = (FULL_TEXT.length - 1) / 2;
-
-function getCharDelay(globalIdx: number): number {
-  return BASE_DELAY + Math.abs(globalIdx - CENTER_IDX) * CHAR_STAGGER;
-}
-
-let _offset = 0;
-const PART1_DELAYS = PART1.split("").map((_, i) => getCharDelay(_offset + i));
-_offset += PART1.length + 1;
-const PART2_DELAYS = PART2.split("").map((_, i) => getCharDelay(_offset + i));
-
-// ─── Banner 1 Title parts: Glow with Gel Nails ───────────────────────────
-const B1_PART1 = "Glow with";
-const B1_PART2 = "Gel Nails"; // accent
-
-const B1_FULL_TEXT = `${B1_PART1} ${B1_PART2}`;
-const B1_CENTER_IDX = (B1_FULL_TEXT.length - 1) / 2;
-
-function getB1CharDelay(globalIdx: number): number {
-  return BASE_DELAY + Math.abs(globalIdx - B1_CENTER_IDX) * CHAR_STAGGER;
-}
-
-let b1Offset = 0;
-const B1_PART1_DELAYS = B1_PART1.split("").map((_, i) =>
-  getB1CharDelay(b1Offset + i),
-);
-b1Offset += B1_PART1.length + 1;
-const B1_PART2_DELAYS = B1_PART2.split("").map((_, i) =>
-  getB1CharDelay(b1Offset + i),
-);
-
-// ─── Banner 2 Title parts: Chic Nail Art Sale ───────────────────────────
-const B2_PART1 = "Chic";
-const B2_PART2 = "Nail Art Sale"; // accent
-
-const B2_FULL_TEXT = `${B2_PART1} ${B2_PART2}`;
-const B2_CENTER_IDX = (B2_FULL_TEXT.length - 1) / 2;
-
-function getB2CharDelay(globalIdx: number): number {
-  return BASE_DELAY + Math.abs(globalIdx - B2_CENTER_IDX) * CHAR_STAGGER;
-}
-
-let b2Offset = 0;
-const B2_PART1_DELAYS = B2_PART1.split("").map((_, i) =>
-  getB2CharDelay(b2Offset + i),
-);
-b2Offset += B2_PART1.length + 1;
-const B2_PART2_DELAYS = B2_PART2.split("").map((_, i) =>
-  getB2CharDelay(b2Offset + i),
-);
-
 export function ServicesV2({ onSelectService }: ServicesV2Props) {
   const prefersReduced = useReducedMotion();
+  const [activeTab, setActiveTab] = useState("classics");
 
-  const containerVariants = getStaggerContainer(prefersReduced, 0.1, 0.05);
+  const currentCategory =
+    CATEGORIES_DATA.find((cat) => cat.id === activeTab) || CATEGORIES_DATA[0]!;
+
   const fadeUp = getFadeUp(prefersReduced, 20, 0.5);
-  const scaleIn = getScaleIn(prefersReduced, 0.95, 0.5);
 
   return (
     <section
       id="services"
-      className="py-20 bg-white border-y border-stone-200 overflow-hidden"
+      className="py-24 bg-stone-50/30 border-y border-stone-200/60 overflow-hidden"
     >
       <div className="max-w-[1200px] mx-auto px-6">
-        {/* Title */}
-        <div className="text-center max-w-2xl mx-auto mb-14 space-y-3">
+        {/* Header */}
+        <div className="text-center max-w-2xl mx-auto mb-16 space-y-3">
           <motion.div
             variants={{
               hidden: {},
@@ -255,7 +224,7 @@ export function ServicesV2({ onSelectService }: ServicesV2Props) {
               variants={fadeUp}
               className="text-xs font-bold tracking-widest text-brand-500 uppercase block"
             >
-              Our Services
+              Nail Rituals & Care
             </motion.span>
             <motion.h2
               className="text-3xl sm:text-4xl font-bold font-serif text-brand-900 leading-[1.35] select-none text-center"
@@ -263,11 +232,8 @@ export function ServicesV2({ onSelectService }: ServicesV2Props) {
               whileInView="show"
               viewport={{ once: false, amount: 0.3 }}
             >
-              {/* Part 1 – normal */}
               <AnimatedPhrase text={PART1} delays={PART1_DELAYS} />
               {"\u00A0"}
-
-              {/* Part 2 – accent */}
               <span className="inline-block text-brand-500">
                 <AnimatedPhrase text={PART2} delays={PART2_DELAYS} />
               </span>
@@ -281,148 +247,118 @@ export function ServicesV2({ onSelectService }: ServicesV2Props) {
             viewport={{ once: false, amount: 0.3 }}
             className="text-sm sm:text-base text-stone-500 max-w-lg mx-auto font-light leading-relaxed"
           >
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut et massa
-            mi. Aliquam in hendrerit urna.
+            Choose from our curated collection of luxury nail art and
+            therapeutic skincare rituals.
           </motion.p>
         </div>
 
-        {/* 4-Column Mauve Service Cards Grid */}
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: false, amount: 0.15 }}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16"
-        >
-          {SERVICES_V2.map((service, index) => (
-            <motion.div
-              key={service.id}
-              variants={fadeUp}
-              onClick={() => onSelectService(service.id)}
-              whileHover={prefersReduced ? {} : { y: -6, scale: 1.02 }}
-              className="group bg-brand-500 text-white rounded-[32px] p-9 text-center cursor-pointer shadow-md hover:shadow-lg transition-all flex flex-col items-center justify-start min-h-[300px] gap-6"
-            >
-              {/* Icon wrapper */}
-              <div className="h-16 flex items-center justify-center">
-                {serviceIcons[index]}
-              </div>
-
-              {/* Content */}
-              <div className="space-y-3 flex flex-col items-center">
-                <h3 className="text-xl font-bold font-sans tracking-wide">
-                  {service.name}
-                </h3>
-                <p className="text-sm text-brand-50/90 leading-relaxed font-light px-2">
-                  Lorem ipsum dolor sit amet, consectetur elit in adipiscing
-                  elit. Ut et massa mi.
-                </p>
-              </div>
-            </motion.div>
-          ))}
-        </motion.div>
-
-        {/* Dual Discount Promo Banners (Image 3 Bottom Part) */}
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: false, amount: 0.15 }}
-          className="grid grid-cols-1 lg:grid-cols-2 gap-8"
-        >
-          {/* Banner 1: Gel Nails Discount */}
-          <motion.div
-            variants={scaleIn}
-            className="bg-brand-100 text-brand-900 rounded-[32px] p-8 sm:p-10 lg:p-12 flex flex-col sm:flex-row items-center gap-8 border border-stone-200/50 shadow-sm"
-          >
-            {/* Left side Leaf image */}
-            <div className="relative w-full sm:w-1/2 aspect-square rounded-[60px_0_60px_0] overflow-hidden bg-stone-100 border border-stone-300 flex-shrink-0">
-              <Image
-                src="/nail-salon/ver1.jpg"
-                alt="Glow with Gel Nails"
-                fill
-                className="object-cover"
-              />
+        {/* Tabbed Menu Grid Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+          {/* Left Column: Category Tabs & Description */}
+          <div className="lg:col-span-4 space-y-6">
+            <div className="flex lg:flex-col flex-row overflow-x-auto lg:overflow-visible gap-6 pb-2 lg:pb-0 scrollbar-none lg:border-r border-stone-200/80 pr-0 lg:pr-8 mb-4 lg:mb-0">
+              {CATEGORIES_DATA.map((cat) => {
+                const isActive = cat.id === activeTab;
+                return (
+                  <button
+                    key={cat.id}
+                    onClick={() => setActiveTab(cat.id)}
+                    className={`flex-shrink-0 text-left pb-2 lg:pb-0 lg:py-2.5 transition-all duration-300 text-xs sm:text-sm font-bold uppercase tracking-widest border-b-2 lg:border-b-0 lg:border-l-2 ${
+                      isActive
+                        ? "text-brand-900 border-brand-500 lg:pl-4"
+                        : "text-stone-450 hover:text-stone-700 border-transparent lg:pl-4"
+                    }`}
+                  >
+                    {cat.name}
+                  </button>
+                );
+              })}
             </div>
-            {/* Right side Text */}
-            <div className="space-y-5 flex-1">
-              <div>
-                <span className="text-xs font-bold uppercase tracking-widest text-brand-500 bg-white border border-brand-500/15 px-3.5 py-1.5 rounded-full inline-block">
-                  Flat 25% Discount
-                </span>
-              </div>
-              <motion.h3
-                initial={prefersReduced ? "show" : "hidden"}
-                whileInView="show"
-                viewport={{ once: false, amount: 0.3 }}
-                className="text-2xl sm:text-3xl font-bold font-serif leading-tight text-brand-900 select-none"
-              >
-                <AnimatedPhrase text={B1_PART1} delays={B1_PART1_DELAYS} />
-                {"\u00A0"}
-                <span className="inline-block text-brand-500">
-                  <AnimatedPhrase text={B1_PART2} delays={B1_PART2_DELAYS} />
-                </span>
-              </motion.h3>
-              <p className="text-sm text-stone-500 font-normal leading-relaxed">
-                Experience long-lasting elegance and flawless finish with our
-                premium gel nail services.
+
+            {/* Mobile Category Intro */}
+            <div className="lg:hidden px-2 mb-4">
+              <p className="text-xs italic font-serif text-brand-900/80 leading-relaxed">
+                &ldquo;{currentCategory.description}&rdquo;
               </p>
-              <button
-                onClick={() => onSelectService("gel-polish")}
-                className="px-8 py-3.5 bg-brand-500 hover:bg-stone-900 text-white text-sm font-bold uppercase tracking-wider rounded-full transition-all"
-              >
-                Book Now
-              </button>
             </div>
-          </motion.div>
 
-          {/* Banner 2: Nail Art Sale */}
-          <motion.div
-            variants={scaleIn}
-            className="bg-brand-500 text-white rounded-[32px] p-8 sm:p-10 lg:p-12 flex flex-col sm:flex-row items-center gap-8 shadow-md"
-          >
-            {/* Left side Leaf image */}
-            <div className="relative w-full sm:w-1/2 aspect-square rounded-[60px_0_60px_0] overflow-hidden bg-stone-700/50 border border-white/10 flex-shrink-0">
-              <Image
-                src="/nail-salon/ver2.jpg"
-                alt="Chic Nail Art Sale"
-                fill
-                className="object-cover"
-              />
-            </div>
-            {/* Right side Text */}
-            <div className="space-y-5 flex-1">
-              <div>
-                <span className="text-xs font-bold uppercase tracking-widest text-brand-100 bg-white/10 border border-white/15 px-3.5 py-1.5 rounded-full inline-block">
-                  Flat 20% Discount
-                </span>
-              </div>
-              <motion.h3
-                initial={prefersReduced ? "show" : "hidden"}
-                whileInView="show"
-                viewport={{ once: false, amount: 0.3 }}
-                className="text-2xl sm:text-3xl font-bold font-serif leading-tight text-brand-100 select-none"
-              >
-                <AnimatedPhrase text={B2_PART1} delays={B2_PART1_DELAYS} />
-                {"\u00A0"}
-                <span className="inline-block text-white">
-                  <AnimatedPhrase text={B2_PART2} delays={B2_PART2_DELAYS} />
-                </span>
-              </motion.h3>
-              <p className="text-sm text-white/95 font-normal leading-relaxed">
-                Get artistic designs hand-painted by our certified designers at
-                a special seasonal price.
+            {/* Desktop Category Intro */}
+            <div className="bg-brand-50/30 p-6 rounded-2xl border border-brand-100/50 hidden lg:block">
+              <p className="text-sm italic font-serif text-brand-900 leading-relaxed">
+                &ldquo;{currentCategory.description}&rdquo;
               </p>
-              <button
-                onClick={() => onSelectService("nail-art")}
-                className="px-8 py-3.5 bg-brand-100 hover:bg-white text-brand-500 hover:text-brand-600 text-sm font-bold uppercase tracking-wider rounded-full transition-all"
-              >
-                Book Now
-              </button>
             </div>
-          </motion.div>
-        </motion.div>
+          </div>
+
+          {/* Right Column: Interactive Line Menu */}
+          <div className="lg:col-span-8">
+            <div className="bg-white border border-stone-200/60 rounded-3xl p-6 sm:p-10 shadow-lg relative min-h-[400px]">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={activeTab}
+                  initial={{ opacity: 0, y: prefersReduced ? 0 : 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: prefersReduced ? 0 : -15 }}
+                  transition={{ duration: 0.35, ease: "easeInOut" }}
+                  className="space-y-8"
+                >
+                  {currentCategory.items.map((item) => (
+                    <motion.div
+                      key={item.id}
+                      className="group block space-y-2 cursor-pointer pb-6 border-b border-stone-100 last:border-b-0 last:pb-0"
+                      onClick={() => onSelectService(item.id)}
+                      whileHover={{ x: prefersReduced ? 0 : 6 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 400,
+                        damping: 25,
+                      }}
+                    >
+                      {/* Name - Line - Price Row */}
+                      <div className="flex items-baseline justify-between gap-4">
+                        <h4 className="text-base sm:text-lg font-serif font-semibold text-brand-900 group-hover:text-brand-650 transition-colors flex items-center gap-2">
+                          {item.name}
+                          <span className="opacity-0 group-hover:opacity-100 transition-opacity text-brand-500">
+                            ✦
+                          </span>
+                        </h4>
+
+                        {/* Dot leader */}
+                        <div className="flex-grow border-b border-dotted border-stone-300/60 mx-2 relative -top-1" />
+
+                        <span className="text-base sm:text-lg font-bold font-serif text-brand-600">
+                          {item.price}
+                        </span>
+                      </div>
+
+                      {/* Details Row */}
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <p className="text-xs sm:text-sm text-stone-500 font-light max-w-xl">
+                          {item.description}
+                        </p>
+
+                        <div className="flex items-center gap-4 flex-shrink-0">
+                          <span className="inline-flex items-center gap-1 text-[10px] text-stone-400 font-medium">
+                            <Clock className="w-3.5 h-3.5" />
+                            {item.duration}
+                          </span>
+
+                          <span className="inline-flex items-center gap-1 px-3 py-1 bg-brand-50 hover:bg-brand-500 text-brand-600 hover:text-white rounded-full text-[10px] font-bold uppercase tracking-wider transition-colors duration-200">
+                            Book
+                            <ArrowRight className="w-3 h-3" />
+                          </span>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
+                </motion.div>
+              </AnimatePresence>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   );
 }
+
 export default ServicesV2;

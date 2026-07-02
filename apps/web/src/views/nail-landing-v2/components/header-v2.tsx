@@ -17,6 +17,23 @@ export function HeaderV2({
   onOpenMenu,
   activeSection,
 }: HeaderV2Props) {
+  // Helper to map secondary sections to high-level header categories
+  const getMappedActiveSection = (section: string): string => {
+    if (section === "team") return "about";
+    if (section === "gallery") return "special-offers";
+    if (
+      section === "testimonials" ||
+      section === "blog" ||
+      section === "faq" ||
+      section === "booking"
+    ) {
+      return "booking";
+    }
+    return section;
+  };
+
+  const mappedActive = getMappedActiveSection(activeSection);
+
   return (
     <header
       className={`fixed top-0 inset-x-0 z-50 text-white select-none h-16 transition-all duration-300 ${scrolled ? "bg-brand-500/90 backdrop-blur-md shadow-md border-b border-brand-400/20" : "bg-brand-500"}`}
@@ -38,7 +55,7 @@ export function HeaderV2({
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center gap-8 h-full">
           {navLinks.map((link) => {
-            const isActive = activeSection === link.id;
+            const isActive = mappedActive === link.id;
             return (
               <a
                 key={link.id}

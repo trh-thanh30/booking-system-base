@@ -8,6 +8,10 @@ export interface HeroV2Props {
   onBook: () => void;
 }
 
+export interface OffersV2Props {
+  onBook: () => void;
+}
+
 export interface ServicesV2Props {
   onSelectService: (serviceId: string) => void;
 }
