@@ -116,18 +116,21 @@ export function GalleryV2() {
               Our Gallery
             </motion.span>
             <motion.h2
+              aria-label={`${PART1} ${PART2}`}
               className="text-3xl sm:text-4xl font-bold font-serif text-brand-900 leading-[1.35] select-none text-center"
               initial={prefersReduced ? "show" : "hidden"}
               whileInView="show"
               viewport={{ once: false, amount: 0.3 }}
             >
-              {/* Part 1 – normal */}
-              <AnimatedPhrase text={PART1} delays={PART1_DELAYS} />
-              {"\u00A0"}
+              <span aria-hidden="true">
+                {/* Part 1 – normal */}
+                <AnimatedPhrase text={PART1} delays={PART1_DELAYS} />
+                {"\u00A0"}
 
-              {/* Part 2 – accent */}
-              <span className="inline-block text-brand-500">
-                <AnimatedPhrase text={PART2} delays={PART2_DELAYS} />
+                {/* Part 2 – accent */}
+                <span className="inline-block text-brand-500">
+                  <AnimatedPhrase text={PART2} delays={PART2_DELAYS} />
+                </span>
               </span>
             </motion.h2>
           </motion.div>

@@ -119,15 +119,18 @@ export function BlogV2() {
               Our Blog
             </motion.span>
             <motion.h2
+              aria-label={`${PART1} ${PART2}`}
               className="text-3xl sm:text-4xl font-bold font-serif text-brand-900 leading-[1.35] select-none text-center"
               initial={prefersReduced ? "show" : "hidden"}
               whileInView="show"
               viewport={{ once: false, amount: 0.3 }}
             >
-              <AnimatedPhrase text={PART1} delays={PART1_DELAYS} />
-              {"\u00A0"}
-              <span className="inline-block text-brand-500">
-                <AnimatedPhrase text={PART2} delays={PART2_DELAYS} />
+              <span aria-hidden="true">
+                <AnimatedPhrase text={PART1} delays={PART1_DELAYS} />
+                {"\u00A0"}
+                <span className="inline-block text-brand-500">
+                  <AnimatedPhrase text={PART2} delays={PART2_DELAYS} />
+                </span>
               </span>
             </motion.h2>
           </motion.div>
