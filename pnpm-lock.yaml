@@ -458,6 +458,15 @@ importers:
         specifier: ^8.20.0
         version: 8.60.0(eslint@9.39.4(jiti@2.7.0))(typescript@5.9.2)
 
+  apps/docs:
+    devDependencies:
+      '@tailwindcss/cli':
+        specifier: ^4.1.13
+        version: 4.3.0
+      tailwindcss:
+        specifier: ^4.1.13
+        version: 4.3.0
+
   apps/web:
     dependencies:
       '@hookform/resolvers':

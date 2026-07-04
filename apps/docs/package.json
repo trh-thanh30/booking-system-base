@@ -1,0 +1,15 @@
+{
+  "name": "@repo/docs",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tailwindcss -i ./src/styles.css -o ./public/assets/styles.css --minify",
+    "dev": "pnpm run build && python3 -m http.server 8000 --directory public",
+    "preview": "python3 -m http.server 8000 --directory public"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.1.13",
+    "tailwindcss": "^4.1.13"
+  }
+}

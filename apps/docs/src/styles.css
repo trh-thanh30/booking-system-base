@@ -1,0 +1,135 @@
+@import "tailwindcss";
+
+@source "../public/**/*.html";
+@source "../public/assets/**/*.js";
+
+@theme {
+  --font-sans: "Poppins", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  --color-ink: #0f172a;
+  --color-muted: #64748b;
+  --color-paper: #f8fbff;
+  --color-panel: #ffffff;
+  --color-line: #dbeafe;
+  --color-brand: #2563eb;
+  --color-brand-soft: #dbeafe;
+  --color-warn: #a16207;
+  --color-danger: #b91c1c;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: #f8fbff;
+}
+
+code,
+pre {
+  font-variant-ligatures: none;
+}
+
+.endpoint-row {
+  scroll-margin-top: 6rem;
+}
+
+.method {
+  @apply inline-flex min-w-16 items-center justify-center rounded border px-2 py-1 text-xs font-bold uppercase tracking-normal;
+}
+
+.method-get {
+  @apply border-emerald-200 bg-emerald-50 text-emerald-800;
+}
+
+.method-post {
+  @apply border-sky-200 bg-sky-50 text-sky-800;
+}
+
+.method-patch {
+  @apply border-amber-200 bg-amber-50 text-amber-800;
+}
+
+.method-put {
+  @apply border-indigo-200 bg-indigo-50 text-indigo-800;
+}
+
+.method-delete {
+  @apply border-red-200 bg-red-50 text-red-800;
+}
+
+.kbd {
+  @apply rounded border border-blue-100 bg-white px-1.5 py-0.5 font-mono text-[0.78rem] font-normal text-slate-700 shadow-sm;
+}
+
+.nav-link {
+  @apply flex h-9 items-center justify-between gap-2 rounded-md border-l-2 border-l-transparent px-2.5 py-1.5 text-[0.82rem] font-medium text-slate-700 outline-none transition hover:bg-blue-50 hover:text-blue-500 focus:ring-2 focus:ring-brand;
+}
+
+.nav-link small {
+  @apply rounded border border-blue-100 bg-white px-1.5 py-0.5 text-[0.65rem] font-medium uppercase tracking-normal text-blue-500;
+}
+
+.nav-link-active {
+  @apply border-l-blue-500 bg-blue-50 text-blue-500 hover:bg-blue-50 hover:text-blue-500;
+}
+
+.nav-link-active small {
+  @apply border-blue-100 bg-white text-blue-500;
+}
+
+.doc-content {
+  @apply text-base font-normal leading-7 text-slate-800;
+}
+
+.doc-content h1 {
+  @apply text-3xl font-semibold leading-tight text-slate-950 sm:text-4xl;
+}
+
+.doc-content h2 {
+  @apply mt-10 border-t border-line pt-8 text-2xl font-semibold text-slate-950;
+}
+
+.doc-content h3 {
+  @apply mt-8 text-xl font-medium text-slate-950;
+}
+
+.doc-content p {
+  @apply mt-4 max-w-3xl text-slate-700;
+}
+
+.doc-content ul {
+  @apply mt-4 grid gap-2 pl-5;
+}
+
+.doc-content li {
+  @apply list-disc pl-1 text-slate-700;
+}
+
+.doc-content code {
+  @apply rounded border border-blue-100 bg-blue-50 px-1.5 py-0.5 font-mono text-[0.9em] font-normal text-blue-950;
+}
+
+.doc-content pre {
+  @apply mt-4 overflow-x-auto rounded-lg border border-blue-100 border-l-4 border-l-blue-500 bg-blue-50 p-4 text-sm leading-6 text-blue-500;
+}
+
+.doc-content pre code {
+  @apply border-0 bg-transparent p-0 text-blue-500;
+}
+
+.doc-content .table-wrap {
+  @apply mt-5 overflow-x-auto rounded-lg border border-line;
+}
+
+.doc-content table {
+  @apply w-full min-w-[720px] border-collapse bg-white text-left text-sm;
+}
+
+.doc-content th {
+  @apply bg-blue-50 px-4 py-3 text-xs font-medium uppercase tracking-normal text-blue-900;
+}
+
+.doc-content td {
+  @apply border-t border-line px-4 py-3 align-top text-slate-700;
+}
