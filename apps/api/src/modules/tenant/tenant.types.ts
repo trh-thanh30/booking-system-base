@@ -3,7 +3,7 @@ import type {
   TenantDomainSummary,
   TenantSettings,
   TenantSummary,
-} from '@repo/shared';
+} from '@/common/types/tenant-context.types';
 import { tenant_domain_type, tenant_status, type Prisma } from '@prisma/client';
 
 export type TenantWithContext = Prisma.TenantGetPayload<{
@@ -49,9 +49,13 @@ export function toTenantDomainSummary(domain: {
   };
 }
 
+function isObjectRecord(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === 'object' && !Array.isArray(value);
+}
+
 export function toTenantSettings(value: unknown): TenantSettings {
-  if (value && typeof value === 'object' && !Array.isArray(value)) {
-    return value as TenantSettings;
+  if (isObjectRecord(value)) {
+    return { ...value };
   }
 
   return {};

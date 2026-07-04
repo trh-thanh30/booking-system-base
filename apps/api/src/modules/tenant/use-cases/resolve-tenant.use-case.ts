@@ -1,4 +1,5 @@
 import { NotFoundError } from '@/common/response';
+import type { TenantResolveResult } from '@/common/types/tenant-context.types';
 import { TenantRepository } from '@/modules/tenant/repository/tenant.repository';
 import {
   normalizeHost,
@@ -6,7 +7,6 @@ import {
   toTenantSummary,
 } from '@/modules/tenant/tenant.types';
 import { Injectable } from '@nestjs/common';
-import type { TenantResolveResult } from '@repo/shared';
 
 @Injectable()
 export class ResolveTenantUseCase {

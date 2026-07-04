@@ -1,5 +1,5 @@
 import { User } from '@prisma/client';
-import type { TenantContext } from '@repo/shared';
+import type { TenantContext } from '@/common/types/tenant-context.types';
 
 declare global {
   namespace Express {
