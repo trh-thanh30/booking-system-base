@@ -39,6 +39,7 @@
     "prisma:migrate:reset:dev": "dotenv -e ../../.env.development -- npx prisma migrate reset",
     "prisma:migrate:reset:force": "dotenv -e ../../.env.development -- npx prisma migrate reset --force",
     "prisma:migrate": "dotenv -e ../../.env.development -- npx prisma migrate dev",
+    "prisma:migrate:deploy": "dotenv -e ../../.env.development -- npx prisma migrate deploy",
     "prisma:migrate:prod": "dotenv -e ../../.env.production -- npx prisma migrate deploy",
     "prisma:studio": "dotenv -e ../../.env.development -- npx prisma studio",
     "prisma:generate": "prisma generate",
