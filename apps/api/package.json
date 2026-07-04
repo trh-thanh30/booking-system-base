@@ -184,6 +184,7 @@
     "coverageDirectory": "../coverage",
     "testEnvironment": "node",
     "moduleNameMapper": {
+      "^@repo/shared$": "<rootDir>/test/repo-shared.jest.ts",
       "^@/(.*)$": "<rootDir>/$1"
     }
   }

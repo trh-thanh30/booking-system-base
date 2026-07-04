@@ -5,4 +5,5 @@ export * from "./booking.types.ts";
 export * from "./notification.types.ts";
 export * from "./pagination.types.ts";
 export * from "./system-health.types.ts";
+export * from "./tenant.types.ts";
 export * from "./user.types.ts";
