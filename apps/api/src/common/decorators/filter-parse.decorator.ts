@@ -5,20 +5,53 @@ import {
 } from '@nestjs/common';
 import dayjs from 'dayjs';
 import { Request } from 'express';
-import { z, ZodObject } from 'zod';
-import {
-  defaultFilterQuerySchema,
-  type FilterParseOptions,
-  type FilterParseResult,
-} from '@repo/shared';
+import { z } from 'zod';
+
+type FilterSchema = z.ZodObject<z.ZodRawShape>;
+type SortDirection = 'asc' | 'desc';
+
+type FilterParseOptions<TSchema extends FilterSchema> = {
+  schema: TSchema;
+  allowGetBetweenDate?: boolean;
+  allowPagination?: boolean;
+  allowSorting?: boolean;
+  allowedSortBy?: string[];
+  defaultSortBy: string;
+  defaultSort: SortDirection;
+  rangeFields?: string[];
+  searchBy?: string[];
+  searchKey?: string;
+  listFields?: string[];
+  relationCountSorts?: Record<string, string>;
+};
+
+type PrismaFilterQuery = {
+  where: Record<string, unknown>;
+  skip: number;
+  take: number;
+  orderBy: Array<Record<string, unknown>>;
+};
+
+type FilterParseResult = {
+  page: number;
+  limit: number;
+  filters: Record<string, unknown>;
+  prismaQuery: PrismaFilterQuery;
+};
 
 //
 // 🔹 Default query schema (pagination + sorting)
 //
-export const DefaultUserQuerySchema = defaultFilterQuerySchema;
-export type DefaultUserQueryType = z.infer<typeof DefaultUserQuerySchema>;
-type ParsedFilterQuery<TSchema extends ZodObject> = DefaultUserQueryType &
-  z.infer<TSchema>;
+export const DefaultUserQuerySchema = z.object({
+  page: z.string().optional(),
+  limit: z.string().optional(),
+  sortBy: z.string().optional(),
+  sort_by: z.string().optional(),
+  sort: z.enum(['asc', 'desc']).optional(),
+  startDate: z.string().optional(),
+  endDate: z.string().optional(),
+});
+type QueryRecord = Record<string, unknown>;
 
 // helpers:
 const toNum = (v: unknown) => {
@@ -27,11 +60,20 @@ const toNum = (v: unknown) => {
   return Number.isFinite(n) ? n : undefined;
 };
 
-function foldMinMax(
-  where: Record<string, any>,
-  data: Record<string, any>,
-  fields: string[],
-) {
+function readString(value: unknown): string | undefined {
+  return typeof value === 'string' ? value : undefined;
+}
+
+function isRecordArray(
+  value: unknown,
+): value is Array<Record<string, unknown>> {
+  return (
+    Array.isArray(value) &&
+    value.every((item) => item !== null && typeof item === 'object')
+  );
+}
+
+function foldMinMax(where: QueryRecord, data: QueryRecord, fields: string[]) {
   for (const f of fields) {
     const min = toNum(data[`min_${f}`]);
     const max = toNum(data[`max_${f}`]);
@@ -41,22 +83,19 @@ function foldMinMax(
         ...(max != null ? { lte: max } : {}),
       };
     }
-    delete (data as any)[`min_${f}`];
-    delete (data as any)[`max_${f}`];
+    delete data[`min_${f}`];
+    delete data[`max_${f}`];
   }
 }
 
 //
 // 🔹 Decorator factory
 //
-export const FilterParse = <TSchema extends ZodObject<any>>(
+export const FilterParse = <TSchema extends FilterSchema>(
   options: FilterParseOptions<TSchema>,
 ) =>
   createParamDecorator(
-    (
-      data: unknown,
-      ctx: ExecutionContext,
-    ): FilterParseResult<z.infer<TSchema>> => {
+    (data: unknown, ctx: ExecutionContext): FilterParseResult => {
       const request = ctx.switchToHttp().getRequest<Request>();
       const query = request.query;
 
@@ -68,11 +107,11 @@ export const FilterParse = <TSchema extends ZodObject<any>>(
         throw new UnprocessableEntityException(parsed.error.format());
       }
 
-      // ✅ Type of validated query now includes BOTH parts
-      const validatedQuery = parsed.data as ParsedFilterQuery<TSchema>;
+      const queryRecord: QueryRecord = parsed.data;
 
-      const result = {} as FilterParseResult<z.infer<TSchema>>;
-      const filters = {} as Record<string, any>;
+      let page = 1;
+      let limit = 10;
+      const filters: QueryRecord = {};
 
       const qKey = options.searchKey ?? 'q';
 
@@ -80,21 +119,16 @@ export const FilterParse = <TSchema extends ZodObject<any>>(
       // ✅ Pagination
       //
       if (options.allowPagination) {
-        const page = parseInt(validatedQuery.page ?? '1', 10);
-        const limit = parseInt(validatedQuery.limit ?? '10', 10);
-        result.page = isNaN(page) || page < 1 ? 1 : page;
-        result.limit = isNaN(limit) || limit < 1 ? 10 : limit;
-      } else {
-        result.page = 1;
-        result.limit = 10;
+        const parsedPage = parseInt(readString(queryRecord.page) ?? '1', 10);
+        const parsedLimit = parseInt(readString(queryRecord.limit) ?? '10', 10);
+        page = isNaN(parsedPage) || parsedPage < 1 ? 1 : parsedPage;
+        limit = isNaN(parsedLimit) || parsedLimit < 1 ? 10 : parsedLimit;
       }
 
       //
       // ✅ Extract filters (exclude reserved keys)
       //
-      (
-        Object.keys(validatedQuery) as Array<keyof typeof validatedQuery>
-      ).forEach((key) => {
+      Object.keys(queryRecord).forEach((key) => {
         const k = String(key);
         if (
           ![
@@ -111,23 +145,24 @@ export const FilterParse = <TSchema extends ZodObject<any>>(
           k !== 'created_at' &&
           k !== qKey
         ) {
-          filters[k] = validatedQuery[key];
+          filters[k] = queryRecord[k];
         }
       });
 
       // ✅ Map min_/max_ thành range Prisma
       if (options.rangeFields?.length) {
-        foldMinMax(filters, validatedQuery, options.rangeFields);
+        foldMinMax(filters, queryRecord, options.rangeFields);
       }
 
       if (options.searchBy?.length) {
-        const qVal = (validatedQuery as any)[qKey] as string | undefined;
+        const qVal = readString(queryRecord[qKey]);
         if (qVal && qVal.trim().length) {
           const or = options.searchBy.map((field) => ({
             [field]: { contains: qVal, mode: 'insensitive' as const },
           }));
-          if (filters.OR?.length) {
-            filters.OR = [...filters.OR, ...or];
+          const currentOr = filters.OR;
+          if (isRecordArray(currentOr)) {
+            filters.OR = [...currentOr, ...or];
           } else {
             filters.OR = or;
           }
@@ -135,12 +170,14 @@ export const FilterParse = <TSchema extends ZodObject<any>>(
       }
 
       if (options.allowGetBetweenDate) {
-        const dateFilter: Record<string, any> = {};
-        if (validatedQuery.startDate) {
-          dateFilter.gte = dayjs(validatedQuery.startDate).toDate();
+        const dateFilter: QueryRecord = {};
+        const startDate = readString(queryRecord.startDate);
+        const endDate = readString(queryRecord.endDate);
+        if (startDate) {
+          dateFilter.gte = dayjs(startDate).toDate();
         }
-        if (validatedQuery.endDate) {
-          dateFilter.lte = dayjs(validatedQuery.endDate).endOf('day').toDate();
+        if (endDate) {
+          dateFilter.lte = dayjs(endDate).endOf('day').toDate();
         }
         if (Object.keys(dateFilter).length > 0) {
           filters.created_at = dateFilter;
@@ -149,7 +186,7 @@ export const FilterParse = <TSchema extends ZodObject<any>>(
 
       if (options.listFields?.length) {
         for (const field of options.listFields) {
-          const val = (validatedQuery as any)[field];
+          const val = queryRecord[field];
           if (typeof val === 'string') {
             const arr = val
               .split(',')
@@ -178,11 +215,15 @@ export const FilterParse = <TSchema extends ZodObject<any>>(
       //
       // ✅ Sorting
       //
-      const orderBy: any = [];
-      const orderDirection = validatedQuery.sort ?? options.defaultSort;
+      const orderBy: Array<Record<string, unknown>> = [];
+      const querySort = readString(queryRecord.sort);
+      const orderDirection =
+        querySort === 'asc' || querySort === 'desc'
+          ? querySort
+          : options.defaultSort;
       const sortBy =
-        validatedQuery.sort_by ??
-        validatedQuery.sortBy ??
+        readString(queryRecord.sort_by) ??
+        readString(queryRecord.sortBy) ??
         options.defaultSortBy;
 
       if (options.allowSorting && sortBy) {
@@ -212,14 +253,16 @@ export const FilterParse = <TSchema extends ZodObject<any>>(
         }
       }
 
-      result.filters = filters as Partial<z.infer<TSchema>>;
-      result.prismaQuery = {
-        where: filters,
-        skip: (result.page - 1) * result.limit,
-        take: result.limit,
-        orderBy,
+      return {
+        page,
+        limit,
+        filters,
+        prismaQuery: {
+          where: filters,
+          skip: (page - 1) * limit,
+          take: limit,
+          orderBy,
+        },
       };
-
-      return result;
     },
   )();
