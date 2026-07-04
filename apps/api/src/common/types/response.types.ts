@@ -1,30 +1,18 @@
+import type {
+  ApiResponse as SharedApiResponse,
+  PaginatedApiResponse,
+  PaginationMeta,
+} from '@repo/shared';
+
 /**
  * Base response interface for all API responses
  */
-export interface BaseResponse {
-  /** Whether the request was successful */
-  success: boolean;
-  /** Metadata about the response */
-  meta: {
-    /** Timestamp of the response */
-    timestamp: string;
-    /** API version */
-    version: string;
-    /** Optional request ID for tracking */
-    requestId?: string;
-  };
-}
+export type BaseResponse = Pick<SharedApiResponse<unknown>, 'success' | 'meta'>;
 
 /**
  * Success response interface
  */
-export interface SuccessResponse<T = unknown> extends BaseResponse {
-  success: true;
-  /** Response data */
-  data: T;
-  /** Optional success message */
-  message?: string;
-}
+export type SuccessResponse<T = unknown> = SharedApiResponse<T>;
 
 /**
  * Error response interface
@@ -45,30 +33,12 @@ export interface ErrorResponse extends BaseResponse {
 /**
  * Pagination information interface
  */
-export interface PaginationInfo {
-  /** Current page number (1-based) */
-  page: number;
-  /** Number of items per page */
-  limit: number;
-  /** Total number of items */
-  total: number;
-  /** Total number of pages */
-  totalPages: number;
-  /** Whether there is a next page */
-  hasNext: boolean;
-  /** Whether there is a previous page */
-  hasPrev: boolean;
-}
+export type PaginationInfo = PaginationMeta;
 
 /**
  * Paginated response interface
  */
-export interface PaginatedSuccessResponse<T = unknown> extends SuccessResponse<
-  T[]
-> {
-  /** Pagination information */
-  pagination: PaginationInfo;
-}
+export type PaginatedSuccessResponse<T = unknown> = PaginatedApiResponse<T>;
 
 /**
  * Raw response wrapper to bypass the response interceptor

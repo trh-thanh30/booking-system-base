@@ -2,7 +2,7 @@
 
 Docs app này là một trang HTML tĩnh, chạy riêng ở port `8000`, dùng để đọc nội dung từ các file Markdown trong `apps/docs/public/content`.
 
-Hiện tại dự án chưa triển khai module API nghiệp vụ chính thức để FE tích hợp, nên docs chỉ giữ trang tổng quan. Khi API module được hoàn thiện, hãy thêm file Markdown mới cho module đó rồi khai báo thêm trong `apps/docs/public/assets/docs.js`.
+Hiện tại docs app dùng để ghi lại các module nền tảng đã triển khai và cách FE/BE dùng chung contract. F0 đã có trang riêng cho phần SaaS foundation, tenant resolution và health endpoints.
 
 ## Runtime
 
@@ -18,7 +18,8 @@ Hiện tại dự án chưa triển khai module API nghiệp vụ chính thức 
 
 - `index.html` là shell giao diện, có sidebar bên trái và vùng đọc Markdown.
 - `assets/docs.js` chịu trách nhiệm load file `.md`, render heading, list, bảng và code block.
-- `content/overview.md` là nội dung duy nhất đang được hiển thị.
+- `content/overview.md` là nội dung tổng quan.
+- `content/f0.md` mô tả Core Infrastructure & SaaS Foundation.
 - `src/styles.css` là nguồn Tailwind, build ra `public/assets/styles.css`.
 
 ## Base API dự kiến
@@ -34,6 +35,8 @@ Health endpoints không dùng prefix này:
 ```txt
 /health
 /health/live
+/health/liveness
+/health/readiness
 /health/debug-sentry
 ```
 

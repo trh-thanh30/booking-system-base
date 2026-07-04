@@ -5,8 +5,9 @@ import {
 } from '@prisma/client';
 import { Type } from 'class-transformer';
 import { IsEnum, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
+import type { ListAdminNotificationsQuery } from '@repo/shared';
 
-export class ListAdminNotificationsDto {
+export class ListAdminNotificationsDto implements ListAdminNotificationsQuery {
   @IsOptional()
   @Type(() => Number)
   @IsInt()

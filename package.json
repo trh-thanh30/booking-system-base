@@ -82,6 +82,7 @@
     "prisma:studio:dev": "pnpm --filter @repo/api prisma:studio",
     "prisma:migrate": "pnpm --filter @repo/api prisma:migrate",
     "prisma:migrate:dev": "pnpm --filter @repo/api prisma:migrate",
+    "prisma:migrate:deploy": "pnpm --filter @repo/api prisma:migrate:deploy",
     "prisma:migrate:prod": "pnpm --filter @repo/api prisma:migrate:prod",
     "prisma:migrate:reset:dev": "pnpm --filter @repo/api prisma:migrate:reset:dev",
     "prisma:migrate:reset:force": "pnpm --filter @repo/api prisma:migrate:reset:force",

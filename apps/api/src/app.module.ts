@@ -36,7 +36,9 @@ import { LoggerCoreModule, LoggerModule } from '@/common/logger';
 import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
 import { OptionalAuthGuard } from '@/common/guards/optional-auth.guard';
 import { RolesGuard } from '@/common/guards/roles.guard';
+import { TenantGuard } from '@/common/guards/tenant.guard';
 import { IdentityMiddleware } from '@/common/middleware/identity.middleware';
+import { TenantContextMiddleware } from '@/common/middleware/tenant-context.middleware';
 import { PrismaModule } from '@/database/prisma/prisma.module';
 import { RedisModule } from '@/database/redis/redis.module';
 import { AssetsModule } from '@/modules/assets/assets.module';
@@ -46,6 +48,7 @@ import { EmailModule } from '@/modules/email/email.module';
 import { HealthModule } from '@/modules/health/health.module';
 import { JobsModule } from '@/modules/jobs/jobs.module';
 import { NotificationModule } from '@/modules/notification/notification.module';
+import { TenantModule } from '@/modules/tenant/tenant.module';
 import { UsersModule } from '@/modules/user/user.module';
 import { VerificationModule } from '@/modules/verification/verification.module';
 import { MiddlewareConsumer, NestModule } from '@nestjs/common';
@@ -131,6 +134,7 @@ const envPath = join(rootDir, envFile);
     HealthModule,
     AssetsModule,
     CommonModule,
+    TenantModule,
     NotificationModule,
     UsersModule,
     VerificationModule,
@@ -155,10 +159,14 @@ const envPath = join(rootDir, envFile);
       provide: APP_GUARD,
       useClass: RolesGuard,
     },
+    {
+      provide: APP_GUARD,
+      useClass: TenantGuard,
+    },
   ],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(IdentityMiddleware).forRoutes('*');
+    consumer.apply(IdentityMiddleware, TenantContextMiddleware).forRoutes('*');
   }
 }

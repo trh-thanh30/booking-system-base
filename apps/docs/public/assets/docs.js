@@ -5,6 +5,12 @@ const docs = [
     eyebrow: "tổng quan",
     file: "./content/overview.md",
   },
+  {
+    id: "f0",
+    title: "F0 Foundation",
+    eyebrow: "core",
+    file: "./content/f0.md",
+  },
 ];
 
 const nav = document.querySelector("#doc-nav");

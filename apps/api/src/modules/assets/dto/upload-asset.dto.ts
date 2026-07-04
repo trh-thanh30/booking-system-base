@@ -5,6 +5,7 @@ import {
   IsUUID,
   MaxLength,
 } from 'class-validator';
+import type { UploadAssetInput } from '@repo/shared';
 
 export enum AssetAccessTypeDto {
   PUBLIC = 'PUBLIC',
@@ -12,7 +13,7 @@ export enum AssetAccessTypeDto {
   TEMP = 'TEMP',
 }
 
-export class UploadAssetDto {
+export class UploadAssetDto implements UploadAssetInput {
   @IsOptional()
   @IsString()
   @MaxLength(100)
@@ -29,7 +30,7 @@ export class UploadAssetDto {
 
   @IsOptional()
   @IsEnum(AssetAccessTypeDto)
-  accessType?: AssetAccessTypeDto;
+  accessType?: UploadAssetInput['accessType'];
 
   @IsOptional()
   @IsString()

@@ -1,5 +1,11 @@
 import { PrismaPg } from '@prisma/adapter-pg';
-import { PrismaClient, user_role, user_status } from '@prisma/client';
+import {
+  PrismaClient,
+  tenant_domain_type,
+  tenant_status,
+  user_role,
+  user_status,
+} from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
 import { Pool } from 'pg';
 
@@ -12,6 +18,7 @@ type SeedUserInput = {
   role: user_role;
   status: user_status;
   is_verified: boolean;
+  tenant_id?: string;
 };
 
 async function upsertSeedUser(data: SeedUserInput) {
@@ -52,7 +59,112 @@ async function main() {
 
   const hashedPassword = await bcrypt.hash('password123', 12);
 
+  const demoTenant = await prisma.tenant.upsert({
+    where: { slug: 'demo-spa' },
+    update: {
+      name: 'Demo Spa',
+      status: tenant_status.ACTIVE,
+      timezone: 'Asia/Ho_Chi_Minh',
+      locale: 'vi',
+    },
+    create: {
+      slug: 'demo-spa',
+      name: 'Demo Spa',
+      status: tenant_status.ACTIVE,
+      timezone: 'Asia/Ho_Chi_Minh',
+      locale: 'vi',
+      settings: {
+        create: {
+          settings: {
+            branding: {
+              primaryColor: '#2563eb',
+              displayName: 'Demo Spa',
+            },
+            features: {
+              booking: true,
+              notifications: true,
+            },
+          },
+        },
+      },
+      domains: {
+        create: [
+          {
+            host: 'demo.localhost',
+            type: tenant_domain_type.SUBDOMAIN,
+            is_primary: true,
+          },
+          {
+            host: 'demo-spa.localhost',
+            type: tenant_domain_type.SUBDOMAIN,
+            is_primary: false,
+          },
+        ],
+      },
+    },
+  });
+
+  await prisma.tenantSettings.upsert({
+    where: { tenant_id: demoTenant.id },
+    update: {
+      settings: {
+        branding: {
+          primaryColor: '#2563eb',
+          displayName: 'Demo Spa',
+        },
+        features: {
+          booking: true,
+          notifications: true,
+        },
+      },
+    },
+    create: {
+      tenant_id: demoTenant.id,
+      settings: {
+        branding: {
+          primaryColor: '#2563eb',
+          displayName: 'Demo Spa',
+        },
+        features: {
+          booking: true,
+          notifications: true,
+        },
+      },
+    },
+  });
+
+  await prisma.tenantDomain.upsert({
+    where: { host: 'demo.localhost' },
+    update: {
+      tenant_id: demoTenant.id,
+      type: tenant_domain_type.SUBDOMAIN,
+      is_primary: true,
+    },
+    create: {
+      tenant_id: demoTenant.id,
+      host: 'demo.localhost',
+      type: tenant_domain_type.SUBDOMAIN,
+      is_primary: true,
+    },
+  });
+
+  await prisma.tenantDomain.upsert({
+    where: { host: 'demo-spa.localhost' },
+    update: {
+      tenant_id: demoTenant.id,
+      type: tenant_domain_type.SUBDOMAIN,
+      is_primary: false,
+    },
+    create: {
+      tenant_id: demoTenant.id,
+      host: 'demo-spa.localhost',
+      type: tenant_domain_type.SUBDOMAIN,
+      is_primary: false,
+    },
+  });
+
   const adminUser = await upsertSeedUser({
+    tenant_id: demoTenant.id,
     email: 'admin@example.com',
     password: hashedPassword,
     username: 'admin',
@@ -62,6 +174,7 @@ async function main() {
   });
 
   const staffUser = await upsertSeedUser({
+    tenant_id: demoTenant.id,
     email: 'staff@example.com',
     password: hashedPassword,
     username: 'staff',
@@ -71,6 +184,7 @@ async function main() {
   });
 
   const regularUser = await upsertSeedUser({
+    tenant_id: demoTenant.id,
     email: 'user@example.com',
     password: hashedPassword,
     username: 'user',
@@ -80,6 +194,8 @@ async function main() {
   });
 
   console.log('Base database seed completed successfully.');
+  console.log(`Tenant: ${demoTenant.name} (${demoTenant.slug})`);
+  console.log('Tenant domains: demo.localhost, demo-spa.localhost');
   console.log(`Admin: ${adminUser.email} (${adminUser.role})`);
   console.log(`Staff: ${staffUser.email} (${staffUser.role})`);
   console.log(`User: ${regularUser.email} (${regularUser.role})`);

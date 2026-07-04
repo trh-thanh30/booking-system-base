@@ -1,7 +1,8 @@
 import { Match } from '@/common/decorators/match.decorator';
 import { IsEmail, IsNotEmpty, MinLength } from 'class-validator';
+import type { RegisterInput } from '@repo/shared';
 
-export class RegisterDto {
+export class RegisterDto implements RegisterInput {
   @IsNotEmpty()
   username: string;
 
