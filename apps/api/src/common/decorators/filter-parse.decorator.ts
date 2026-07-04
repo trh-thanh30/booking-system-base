@@ -5,20 +5,20 @@ import {
 } from '@nestjs/common';
 import dayjs from 'dayjs';
 import { Request } from 'express';
-import { ZodObject } from 'zod';
+import { z, ZodObject } from 'zod';
 import {
   defaultFilterQuerySchema,
-  type DefaultFilterQuery,
   type FilterParseOptions,
   type FilterParseResult,
-  type InferFilters,
 } from '@repo/shared';
 
 //
 // 🔹 Default query schema (pagination + sorting)
 //
 export const DefaultUserQuerySchema = defaultFilterQuerySchema;
-export type DefaultUserQueryType = DefaultFilterQuery;
+export type DefaultUserQueryType = z.infer<typeof DefaultUserQuerySchema>;
+type ParsedFilterQuery<TSchema extends ZodObject> = DefaultUserQueryType &
+  z.infer<TSchema>;
 
 // helpers:
 const toNum = (v: unknown) => {
@@ -56,7 +56,7 @@ export const FilterParse = <TSchema extends ZodObject<any>>(
     (
       data: unknown,
       ctx: ExecutionContext,
-    ): FilterParseResult<InferFilters<TSchema>> => {
+    ): FilterParseResult<z.infer<TSchema>> => {
       const request = ctx.switchToHttp().getRequest<Request>();
       const query = request.query;
 
@@ -69,10 +69,9 @@ export const FilterParse = <TSchema extends ZodObject<any>>(
       }
 
       // ✅ Type of validated query now includes BOTH parts
-      const validatedQuery = parsed.data as DefaultUserQueryType &
-        InferFilters<TSchema>;
+      const validatedQuery = parsed.data as ParsedFilterQuery<TSchema>;
 
-      const result = {} as FilterParseResult<InferFilters<TSchema>>;
+      const result = {} as FilterParseResult<z.infer<TSchema>>;
       const filters = {} as Record<string, any>;
 
       const qKey = options.searchKey ?? 'q';
@@ -213,7 +212,7 @@ export const FilterParse = <TSchema extends ZodObject<any>>(
         }
       }
 
-      result.filters = filters as Partial<InferFilters<TSchema>>;
+      result.filters = filters as Partial<z.infer<TSchema>>;
       result.prismaQuery = {
         where: filters,
         skip: (result.page - 1) * result.limit,

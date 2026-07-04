@@ -12,10 +12,7 @@ export type BaseResponse = Pick<SharedApiResponse<unknown>, 'success' | 'meta'>;
 /**
  * Success response interface
  */
-export type SuccessResponse<T = unknown> = SharedApiResponse<T> & {
-  success: true;
-  data: T;
-};
+export type SuccessResponse<T = unknown> = SharedApiResponse<T>;
 
 /**
  * Error response interface
