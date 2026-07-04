@@ -1,26 +1,27 @@
+import {
+  createApiResponseMeta,
+  createPaginationMeta,
+  type ApiResponse as SharedApiResponse,
+  type PaginatedApiResponse,
+  type PaginationMeta,
+} from '@repo/shared';
+
 /**
  * Success Response Class
  * Provides standardized success responses following API structure guidelines
  * Implements Builder pattern for fluent API
  */
-export class ApiResponse<T = any> {
+export class ApiResponse<T = unknown> implements SharedApiResponse<T> {
   public success: boolean;
   public data?: T;
   public message?: string;
-  public meta: {
-    timestamp: string;
-    version: string;
-    requestId?: string;
-  };
+  public meta: SharedApiResponse<T>['meta'];
 
   constructor(success: boolean, data?: T, message?: string) {
     this.success = success;
     this.data = data;
     this.message = message;
-    this.meta = {
-      timestamp: new Date().toISOString(),
-      version: 'v1',
-    };
+    this.meta = createApiResponseMeta();
   }
 
   /**
@@ -33,8 +34,8 @@ export class ApiResponse<T = any> {
   /**
    * Create an error response
    */
-  static error(message: string): ApiResponse {
-    return new ApiResponse(false, undefined, message);
+  static error(message: string): ApiResponse<never> {
+    return new ApiResponse<never>(false, undefined, message);
   }
 
   /**
@@ -48,8 +49,8 @@ export class ApiResponse<T = any> {
   /**
    * Convert to JSON object
    */
-  toJSON() {
-    const response: any = {
+  toJSON(): SharedApiResponse<T> {
+    const response: SharedApiResponse<T> = {
       success: this.success,
       meta: this.meta,
     };
@@ -71,14 +72,7 @@ export class ApiResponse<T = any> {
  * Extends ApiResponse for paginated data
  */
 export class PaginatedResponse<T> extends ApiResponse<T[]> {
-  public pagination: {
-    page: number;
-    limit: number;
-    total: number;
-    totalPages: number;
-    hasNext: boolean;
-    hasPrev: boolean;
-  };
+  public pagination: PaginationMeta;
 
   constructor(
     data: T[],
@@ -88,16 +82,7 @@ export class PaginatedResponse<T> extends ApiResponse<T[]> {
     message?: string,
   ) {
     super(true, data, message);
-    const totalPages = Math.ceil(total / limit);
-
-    this.pagination = {
-      page,
-      limit,
-      total,
-      totalPages,
-      hasNext: page < totalPages,
-      hasPrev: page > 1,
-    };
+    this.pagination = createPaginationMeta(page, limit, total);
   }
 
   /**
@@ -116,10 +101,11 @@ export class PaginatedResponse<T> extends ApiResponse<T[]> {
   /**
    * Convert to JSON object
    */
-  toJSON() {
-    const response = super.toJSON();
-    response.pagination = this.pagination;
-    return response;
+  toJSON(): PaginatedApiResponse<T> {
+    return {
+      ...super.toJSON(),
+      pagination: this.pagination,
+    };
   }
 }
 

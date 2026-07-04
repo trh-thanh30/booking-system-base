@@ -5,40 +5,20 @@ import {
 } from '@nestjs/common';
 import dayjs from 'dayjs';
 import { Request } from 'express';
-import { z, ZodObject } from 'zod';
+import { ZodObject } from 'zod';
+import {
+  defaultFilterQuerySchema,
+  type DefaultFilterQuery,
+  type FilterParseOptions,
+  type FilterParseResult,
+  type InferFilters,
+} from '@repo/shared';
 
 //
 // 🔹 Default query schema (pagination + sorting)
 //
-export const DefaultUserQuerySchema = z.object({
-  page: z.string().optional(),
-  limit: z.string().optional(),
-  sortBy: z.string().optional(),
-  sort_by: z.string().optional(),
-  sort: z.enum(['asc', 'desc']).optional(),
-  startDate: z.string().optional(),
-  endDate: z.string().optional(),
-});
-
-export type DefaultUserQueryType = z.infer<typeof DefaultUserQuerySchema>;
-
-//
-// 🔹 Options type
-//
-interface FilterParseOptions<TSchema extends ZodObject<any>> {
-  schema: TSchema;
-  allowGetBetweenDate?: boolean;
-  allowPagination?: boolean;
-  allowSorting?: boolean;
-  allowedSortBy?: string[];
-  defaultSortBy: string;
-  defaultSort: 'asc' | 'desc';
-  rangeFields?: string[];
-  searchBy?: string[];
-  searchKey?: string; // default 'q'
-  listFields?: string[];
-  relationCountSorts?: Record<string, string>;
-}
+export const DefaultUserQuerySchema = defaultFilterQuerySchema;
+export type DefaultUserQueryType = DefaultFilterQuery;
 
 // helpers:
 const toNum = (v: unknown) => {
@@ -64,26 +44,6 @@ function foldMinMax(
     delete (data as any)[`min_${f}`];
     delete (data as any)[`max_${f}`];
   }
-}
-
-//
-// 🔹 Infer filters type from schema
-//
-export type InferFilters<TSchema extends ZodObject<any>> = z.infer<TSchema>;
-
-//
-// 🔹 Return type
-//
-export interface FilterParseResult<TFilters extends Record<string, any>> {
-  page: number;
-  limit: number;
-  filters: Partial<TFilters>;
-  prismaQuery: {
-    where: any;
-    skip: number;
-    take: number;
-    orderBy: any;
-  };
 }
 
 //

@@ -621,8 +621,8 @@ importers:
         specifier: ^1.11.0
         version: 1.16.1
       zod:
-        specifier: ^3.25.76
-        version: 3.25.76
+        specifier: ^4.1.5
+        version: 4.4.3
     devDependencies:
       '@repo/eslint-config':
         specifier: workspace:*

@@ -1,6 +1,12 @@
 import axios from "axios";
-import { toHttpClientError } from "./http-error.js";
-import type { CreateHttpClientOptions, HttpClient } from "./http.types.js";
+import { toHttpClientError } from "./http-error.ts";
+import type {
+  ApiClient,
+  CreateHttpClientOptions,
+  HttpClient,
+  HttpRequestConfig,
+} from "./http.types.ts";
+import type { ApiResponse, PaginatedApiResponse } from "../types/index.ts";
 
 export function createHttpClient(
   options: CreateHttpClientOptions = {},
@@ -39,4 +45,42 @@ export function createHttpClient(
   );
 
   return client;
+}
+
+export function createApiClient(
+  options: CreateHttpClientOptions = {},
+): ApiClient {
+  const client = createHttpClient(options);
+
+  return {
+    request<T>(config: HttpRequestConfig) {
+      return client.request<unknown, ApiResponse<T>>(config);
+    },
+    get<T>(url: string, config?: HttpRequestConfig) {
+      return client.get<unknown, ApiResponse<T>>(url, config);
+    },
+    delete<T>(url: string, config?: HttpRequestConfig) {
+      return client.delete<unknown, ApiResponse<T>>(url, config);
+    },
+    post<T>(url: string, data?: unknown, config?: HttpRequestConfig) {
+      return client.post<unknown, ApiResponse<T>>(url, data, config);
+    },
+    put<T>(url: string, data?: unknown, config?: HttpRequestConfig) {
+      return client.put<unknown, ApiResponse<T>>(url, data, config);
+    },
+    patch<T>(url: string, data?: unknown, config?: HttpRequestConfig) {
+      return client.patch<unknown, ApiResponse<T>>(url, data, config);
+    },
+    paginated<T>(config: HttpRequestConfig) {
+      return client.request<unknown, PaginatedApiResponse<T>>(config);
+    },
+  };
+}
+
+export function unwrapApiData<T>(response: ApiResponse<T>): T {
+  if (!response.success || response.data === undefined) {
+    throw new Error(response.message ?? "API response does not contain data");
+  }
+
+  return response.data;
 }

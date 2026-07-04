@@ -6,8 +6,9 @@ import {
   IsString,
 } from 'class-validator';
 import { user_role, user_status } from '@prisma/client';
+import type { CreateUserInput } from '@repo/shared';
 
-export class CreateUserDto {
+export class CreateUserDto implements CreateUserInput {
   @IsNotEmpty()
   @IsString()
   username: string;

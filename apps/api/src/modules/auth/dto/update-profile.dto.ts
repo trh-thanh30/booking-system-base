@@ -6,6 +6,7 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
+import type { UpdateProfileInput } from '@repo/shared';
 
 const optionalText = ({ value }: { value: unknown }) => {
   if (typeof value !== 'string') return value;
@@ -13,7 +14,7 @@ const optionalText = ({ value }: { value: unknown }) => {
   return trimmed.length > 0 ? trimmed : null;
 };
 
-export class UpdateProfileDto {
+export class UpdateProfileDto implements UpdateProfileInput {
   @IsOptional()
   @IsString()
   @MinLength(2)

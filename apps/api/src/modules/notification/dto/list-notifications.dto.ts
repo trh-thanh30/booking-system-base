@@ -1,8 +1,9 @@
 import { notification_read_status } from '@prisma/client';
 import { Type } from 'class-transformer';
 import { IsEnum, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
+import type { ListNotificationsQuery } from '@repo/shared';
 
-export class ListNotificationsDto {
+export class ListNotificationsDto implements ListNotificationsQuery {
   @IsOptional()
   @Type(() => Number)
   @IsInt()
