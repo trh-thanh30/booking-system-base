@@ -19,7 +19,9 @@ Bảo vệ dữ liệu doanh nghiệp, cho phép mỗi nhóm người dùng ch�
 - Đăng nhập bằng email/số điện thoại và mật khẩu.
 - Refresh token/session management.
 - Role-based access control.
+- Permission engine: định nghĩa quyền, gán quyền cho role và kiểm tra quyền theo tenant.
 - Guard theo tenant và role.
+- Guard theo permission cho từng API/action.
 - Đổi mật khẩu, quên mật khẩu qua email.
 - Invite user nội bộ cho doanh nghiệp.
 - Logout và revoke session.
@@ -41,6 +43,7 @@ Bảo vệ dữ liệu doanh nghiệp, cho phép mỗi nhóm người dùng ch�
 - `roles`
 - `permissions`
 - `user_roles`
+- `role_permissions`
 - `sessions`
 - `password_reset_tokens`
 - `user_invitations`
@@ -69,13 +72,18 @@ Bảo vệ dữ liệu doanh nghiệp, cho phép mỗi nhóm người dùng ch�
 
 - Đăng nhập trả token/session hợp lệ.
 - User không đủ quyền bị trả `403`.
+- API có thể bảo vệ action bằng permission cụ thể, ví dụ `staff.invite`, `booking.read`, `service.update`.
+- UI không hardcode quyền; navigation/action visibility dựa trên permission trả về từ API.
 - Staff không xem được dữ liệu tenant hoặc nhân viên khác ngoài phạm vi cho phép.
 - Super Admin tách biệt khỏi Business Admin tenant flow.
 
 ## Technical Notes
 
 - Dùng guard/decorator để lấy `currentUser` và `tenantContext`.
+- Dùng `@Permissions()`/`PermissionsGuard` cho permission-level access control.
+- `RolesGuard` dùng cho role-level access control thô, `PermissionsGuard` dùng cho action-level access control chi tiết.
 - Không hardcode quyền trong UI; API vẫn là nguồn kiểm soát cuối.
+- F1 triển khai permission engine dùng chung; các feature sau chỉ khai báo permission cụ thể theo module.
 
 ## Dependencies
 

@@ -21,6 +21,48 @@ type SeedUserInput = {
   tenant_id?: string;
 };
 
+const DEFAULT_PERMISSION_KEYS = [
+  'user:read',
+  'user:create',
+  'user:update',
+  'user:delete',
+  'user:manage',
+  'permission:read',
+  'permission:manage',
+  'booking:read',
+  'booking:create',
+  'booking:update',
+  'booking:delete',
+  'booking:manage',
+  'service:read',
+  'service:create',
+  'service:update',
+  'service:delete',
+  'service:manage',
+  'staff:read',
+  'staff:invite',
+  'staff:update',
+  'staff:delete',
+  'staff:manage',
+  'tenant:read',
+  'tenant:update',
+  'tenant:manage',
+] as const;
+
+function toPermissionSeed(key: string) {
+  const [resource, action] = key.split(':');
+  if (!resource || !action) {
+    throw new Error(`Invalid permission key: ${key}`);
+  }
+
+  return {
+    key,
+    resource,
+    action,
+    description: `${resource}:${action}`,
+  };
+}
+
 async function upsertSeedUser(data: SeedUserInput) {
   const [userByEmail, userByUsername] = await Promise.all([
     prisma.user.findUnique({ where: { email: data.email } }),
@@ -192,6 +234,45 @@ async function main() {
     status: user_status.ACTIVE,
     is_verified: true,
   });
+
+  for (const key of DEFAULT_PERMISSION_KEYS) {
+    await prisma.permission.upsert({
+      where: { key },
+      update: toPermissionSeed(key),
+      create: toPermissionSeed(key),
+    });
+  }
+
+  const allPermissions = await prisma.permission.findMany();
+
+  const staffPermissionKeys = new Set([
+    'booking:read',
+    'booking:create',
+    'booking:update',
+    'user:read',
+    'staff:read',
+  ]);
+
+  for (const permission of allPermissions.filter((item) =>
+    staffPermissionKeys.has(item.key),
+  )) {
+    await prisma.userPermission.upsert({
+      where: {
+        user_id_permission_id_tenant_id: {
+          user_id: staffUser.id,
+          permission_id: permission.id,
+          tenant_id: demoTenant.id,
+        },
+      },
+      update: {},
+      create: {
+        user_id: staffUser.id,
+        permission_id: permission.id,
+        tenant_id: demoTenant.id,
+        granted_by_id: adminUser.id,
+      },
+    });
+  }
 
   console.log('Base database seed completed successfully.');
   console.log(`Tenant: ${demoTenant.name} (${demoTenant.slug})`);

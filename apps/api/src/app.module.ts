@@ -35,6 +35,7 @@ import { LoggerCoreModule, LoggerModule } from '@/common/logger';
 // modules
 import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
 import { OptionalAuthGuard } from '@/common/guards/optional-auth.guard';
+import { PermissionsGuard } from '@/common/guards/permissions.guard';
 import { RolesGuard } from '@/common/guards/roles.guard';
 import { TenantGuard } from '@/common/guards/tenant.guard';
 import { IdentityMiddleware } from '@/common/middleware/identity.middleware';
@@ -48,6 +49,7 @@ import { EmailModule } from '@/modules/email/email.module';
 import { HealthModule } from '@/modules/health/health.module';
 import { JobsModule } from '@/modules/jobs/jobs.module';
 import { NotificationModule } from '@/modules/notification/notification.module';
+import { PermissionModule } from '@/modules/permission/permission.module';
 import { TenantModule } from '@/modules/tenant/tenant.module';
 import { UsersModule } from '@/modules/user/user.module';
 import { VerificationModule } from '@/modules/verification/verification.module';
@@ -135,6 +137,7 @@ const envPath = join(rootDir, envFile);
     AssetsModule,
     CommonModule,
     TenantModule,
+    PermissionModule,
     NotificationModule,
     UsersModule,
     VerificationModule,
@@ -162,6 +165,10 @@ const envPath = join(rootDir, envFile);
     {
       provide: APP_GUARD,
       useClass: TenantGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: PermissionsGuard,
     },
   ],
 })
