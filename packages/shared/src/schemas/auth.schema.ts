@@ -1,4 +1,6 @@
 import { z } from "zod";
+import { permissionKeySchema } from "./permission.schema.ts";
+import { USER_ROLES } from "../constants/index.ts";
 
 const passwordSchema = z.string().min(6);
 const optionalTextSchema = z
@@ -81,3 +83,26 @@ export const updateProfileSchema = z.object({
 });
 
 export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
+
+export const createInvitationSchema = z.object({
+  email: z.string().email(),
+  role: z.enum(USER_ROLES).optional(),
+  permission_keys: z.array(permissionKeySchema).optional(),
+});
+
+export type CreateInvitationInput = z.infer<typeof createInvitationSchema>;
+
+export const acceptInvitationSchema = z
+  .object({
+    token: z.string().min(1),
+    username: z.string().min(1),
+    full_name: z.string().max(120).optional(),
+    password: passwordSchema,
+    confirmPassword: z.string().min(1),
+  })
+  .refine((input) => input.password === input.confirmPassword, {
+    path: ["confirmPassword"],
+    message: "Confirm password does not match",
+  });
+
+export type AcceptInvitationInput = z.infer<typeof acceptInvitationSchema>;

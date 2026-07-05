@@ -1,8 +1,8 @@
-# F1 - Authentication & RBAC
+# F1 - Authentication & Permissions
 
 ## Overview
 
-Xây dựng đăng nhập, quản lý session/token và phân quyền theo vai trò: Super Admin, Business Admin, Manager, Receptionist, Staff.
+Xây dựng đăng nhập, refresh token đơn giản và phân quyền chi tiết theo user trong tenant.
 
 ## Business Goal
 
@@ -18,13 +18,13 @@ Bảo vệ dữ liệu doanh nghiệp, cho phép mỗi nhóm người dùng ch�
 
 - Đăng nhập bằng email/số điện thoại và mật khẩu.
 - Refresh token/session management.
-- Role-based access control.
-- Permission engine: định nghĩa quyền, gán quyền cho role và kiểm tra quyền theo tenant.
+- Role-based access control thô bằng `user_role` enum hiện có.
+- Permission engine: định nghĩa quyền, gán quyền trực tiếp cho user và kiểm tra quyền theo tenant.
 - Guard theo tenant và role.
 - Guard theo permission cho từng API/action.
 - Đổi mật khẩu, quên mật khẩu qua email.
 - Invite user nội bộ cho doanh nghiệp.
-- Logout và revoke session.
+- Logout và revoke refresh token hiện tại trên `User.refresh_token`.
 
 ## API Endpoints
 
@@ -35,18 +35,17 @@ Bảo vệ dữ liệu doanh nghiệp, cho phép mỗi nhóm người dùng ch�
 - `POST /auth/reset-password`
 - `GET /auth/me`
 - `POST /auth/invitations`
+- `GET /auth/invitations/:token`
 - `POST /auth/invitations/accept`
 
 ## Database Changes
 
 - `users`
-- `roles`
 - `permissions`
-- `user_roles`
-- `role_permissions`
-- `sessions`
-- `password_reset_tokens`
+- `user_permission`
 - `user_invitations`
+
+Không thêm `sessions` table trong F1. Refresh/session state dùng `users.refresh_token`.
 
 ## Frontend Screens
 
@@ -72,7 +71,7 @@ Bảo vệ dữ liệu doanh nghiệp, cho phép mỗi nhóm người dùng ch�
 
 - Đăng nhập trả token/session hợp lệ.
 - User không đủ quyền bị trả `403`.
-- API có thể bảo vệ action bằng permission cụ thể, ví dụ `staff.invite`, `booking.read`, `service.update`.
+- API có thể bảo vệ action bằng permission cụ thể, ví dụ `staff:invite`, `booking:read`, `service:update`.
 - UI không hardcode quyền; navigation/action visibility dựa trên permission trả về từ API.
 - Staff không xem được dữ liệu tenant hoặc nhân viên khác ngoài phạm vi cho phép.
 - Super Admin tách biệt khỏi Business Admin tenant flow.
@@ -82,8 +81,29 @@ Bảo vệ dữ liệu doanh nghiệp, cho phép mỗi nhóm người dùng ch�
 - Dùng guard/decorator để lấy `currentUser` và `tenantContext`.
 - Dùng `@Permissions()`/`PermissionsGuard` cho permission-level access control.
 - `RolesGuard` dùng cho role-level access control thô, `PermissionsGuard` dùng cho action-level access control chi tiết.
+- `ADMIN` bypass permission checks.
+- Non-admin đọc quyền từ `UserPermission` theo `user_id + tenant_id`.
+- `resource:manage` cover các action cùng resource.
 - Không hardcode quyền trong UI; API vẫn là nguồn kiểm soát cuối.
 - F1 triển khai permission engine dùng chung; các feature sau chỉ khai báo permission cụ thể theo module.
+
+## Delivery Phases
+
+### Phase 1 - API
+
+- Cập nhật `/auth/me` trả user, tenant và permissions.
+- Chuẩn hóa login/refresh/logout dựa trên `User.refresh_token`.
+- Clear refresh token khi logout, đổi mật khẩu hoặc reset mật khẩu.
+- Gắn permission guard vào API quản trị.
+- Thêm backend invitation flow.
+- Bổ sung unit tests cho auth, permission và invitation use cases.
+
+### Phase 2 - Admin FE
+
+- Login, forgot password, reset password và accept invitation screens.
+- Current user state đọc từ `/auth/me`.
+- Sidebar/navigation/action visibility dựa trên permissions từ API.
+- User menu và logout flow.
 
 ## Dependencies
 

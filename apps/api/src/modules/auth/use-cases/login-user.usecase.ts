@@ -35,7 +35,7 @@ export class LoginUserUseCase implements BaseUseCase<LoginDto, AuthResponse> {
 
   async execute(
     dto: LoginDto,
-    requiredRole?: user_role,
+    requiredRole?: user_role | user_role[],
   ): Promise<AuthResponse> {
     // Find user by email or username
     const user = await this.prismaService.user.findFirst({
@@ -48,7 +48,7 @@ export class LoginUserUseCase implements BaseUseCase<LoginDto, AuthResponse> {
     }
 
     // Check role if required
-    if (requiredRole && user.role !== requiredRole) {
+    if (requiredRole && !this.isAllowedRole(user.role, requiredRole)) {
       throw new UnauthorizedError(this.errorMessages.INVALID_CREDENTIALS);
     }
 
@@ -104,6 +104,14 @@ export class LoginUserUseCase implements BaseUseCase<LoginDto, AuthResponse> {
     if (user.status !== user_status.ACTIVE) {
       throw new ValidationError(this.errorMessages.ACCOUNT_INACTIVE);
     }
+  }
+
+  private isAllowedRole(
+    role: user_role,
+    requiredRole: user_role | user_role[],
+  ): boolean {
+    const roles = Array.isArray(requiredRole) ? requiredRole : [requiredRole];
+    return roles.includes(role);
   }
 
   private async updateUserRefreshToken(

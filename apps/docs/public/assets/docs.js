@@ -11,6 +11,18 @@ const docs = [
     eyebrow: "core",
     file: "./content/f0.md",
   },
+  {
+    id: "auth",
+    title: "Auth API",
+    eyebrow: "api module",
+    file: "./content/auth.md",
+  },
+  {
+    id: "permission",
+    title: "Permission API",
+    eyebrow: "api module",
+    file: "./content/permission.md",
+  },
 ];
 
 const nav = document.querySelector("#doc-nav");

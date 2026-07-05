@@ -62,7 +62,10 @@ describe('ResetPasswordUseCase', () => {
 
     expect(prisma.user.update).toHaveBeenCalledWith({
       where: { email: 'user@example.com' },
-      data: { password: 'hashed-new' },
+      data: {
+        password: 'hashed-new',
+        refresh_token: null,
+      },
     });
     expect(sessions.deleteSession).toHaveBeenCalledWith('session-1');
   });

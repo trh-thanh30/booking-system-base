@@ -116,4 +116,30 @@ describe('LoginUserUseCase', () => {
       data: { refresh_token: 'refresh-token' },
     });
   });
+
+  it('accepts any role in the allowed role list', async () => {
+    const prisma = {
+      user: {
+        findFirst: jest.fn().mockResolvedValue(user({ role: user_role.STAFF })),
+        update: jest.fn().mockResolvedValue(undefined),
+      },
+    };
+
+    await expect(
+      new LoginUserUseCase(
+        prisma as any,
+        { comparePassword: jest.fn().mockResolvedValue(true) } as any,
+        {
+          generateTokenPair: jest.fn().mockReturnValue({
+            access_token: 'access-token',
+            refresh_token: 'refresh-token',
+          }),
+        } as any,
+        { createSession: jest.fn() } as any,
+      ).execute(dto, [user_role.ADMIN, user_role.STAFF]),
+    ).resolves.toMatchObject({
+      access_token: 'access-token',
+      refresh_token: 'refresh-token',
+    });
+  });
 });

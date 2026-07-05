@@ -7,8 +7,11 @@ import { AssetsModule } from '@/modules/assets/assets.module';
 import { AuthController } from '@/modules/auth/auth.controller';
 import { AuthTokenService } from '@/modules/auth/service/auth-token.service';
 import { VerificationSessionService } from '@/modules/auth/service/verification-session.service';
+import { AcceptInvitationUseCase } from '@/modules/auth/use-cases/accept-invitation.usecase';
 import { ChangePasswordUseCase } from '@/modules/auth/use-cases/change-password.usecase';
+import { CreateInvitationUseCase } from '@/modules/auth/use-cases/create-invitation.usecase';
 import { ForgotPasswordUseCase } from '@/modules/auth/use-cases/forgot-password.usecase';
+import { GetInvitationUseCase } from '@/modules/auth/use-cases/get-invitation.usecase';
 import { LoginUserUseCase } from '@/modules/auth/use-cases/login-user.usecase';
 import { RefreshTokenUseCase } from '@/modules/auth/use-cases/refresh-token.usecase';
 import { RegisterUserUseCase } from '@/modules/auth/use-cases/register-user.usecase';
@@ -17,6 +20,7 @@ import { ResendVerificationUseCase } from '@/modules/auth/use-cases/resend-verif
 import { ResetPasswordUseCase } from '@/modules/auth/use-cases/reset-password.usecase';
 import { VerifyAccountUseCase } from '@/modules/auth/use-cases/verify-account.usecase';
 import { EmailModule } from '@/modules/email/email.module';
+import { PermissionModule } from '@/modules/permission/permission.module';
 import { UsersModule } from '@/modules/user/user.module';
 import { VerificationModule } from '@/modules/verification/verification.module';
 import { Module } from '@nestjs/common';
@@ -33,6 +37,9 @@ import { ConfigModule } from '@nestjs/config';
     ResetPasswordUseCase,
     RefreshTokenUseCase,
     RequestVerificationUseCase,
+    CreateInvitationUseCase,
+    GetInvitationUseCase,
+    AcceptInvitationUseCase,
     PrismaService,
     CodeService,
     AuthTokenService,
@@ -43,6 +50,7 @@ import { ConfigModule } from '@nestjs/config';
   imports: [
     AssetsModule,
     UsersModule,
+    PermissionModule,
     EmailModule,
     VerificationModule,
     RedisModule,

@@ -1,6 +1,12 @@
-import { ApiSuccess } from '@/common/decorators/api-response.decorator';
+import {
+  ApiSuccess,
+  Permissions,
+  RequireTenant,
+  Tenant,
+} from '@/common/decorators';
 import { Public } from '@/common/decorators/public.decorator';
 import { User } from '@/common/decorators/user.decorator';
+import type { TenantContext } from '@/common/types/tenant-context.types';
 import {
   BadRequestError,
   ConflictError,
@@ -10,7 +16,9 @@ import {
 import { cookieConfig } from '@/config';
 import { AssetsService } from '@/modules/assets/assets.service';
 import { AssetAccessTypeDto } from '@/modules/assets/dto/upload-asset.dto';
+import { AcceptInvitationDto } from '@/modules/auth/dto/accept-invitation.dto';
 import { ChangePasswordDto } from '@/modules/auth/dto/change-password.dto';
+import { CreateInvitationDto } from '@/modules/auth/dto/create-invitation.dto';
 import { ForgotPasswordDto } from '@/modules/auth/dto/forgot-password.dto';
 import { LoginDto } from '@/modules/auth/dto/login.dto';
 import { RegisterDto } from '@/modules/auth/dto/register.dto';
@@ -18,8 +26,11 @@ import { RequestVerificationDto } from '@/modules/auth/dto/request-verification.
 import { ResetPasswordDto } from '@/modules/auth/dto/reset-password.dto';
 import { UpdateProfileDto } from '@/modules/auth/dto/update-profile.dto';
 import { VerifyEmailDto } from '@/modules/auth/dto/verify-email.dto';
+import { AcceptInvitationUseCase } from '@/modules/auth/use-cases/accept-invitation.usecase';
 import { ChangePasswordUseCase } from '@/modules/auth/use-cases/change-password.usecase';
+import { CreateInvitationUseCase } from '@/modules/auth/use-cases/create-invitation.usecase';
 import { ForgotPasswordUseCase } from '@/modules/auth/use-cases/forgot-password.usecase';
+import { GetInvitationUseCase } from '@/modules/auth/use-cases/get-invitation.usecase';
 import { LoginUserUseCase } from '@/modules/auth/use-cases/login-user.usecase';
 import { RefreshTokenUseCase } from '@/modules/auth/use-cases/refresh-token.usecase';
 import { RegisterUserUseCase } from '@/modules/auth/use-cases/register-user.usecase';
@@ -27,6 +38,11 @@ import { RequestVerificationUseCase } from '@/modules/auth/use-cases/request-ver
 import { ResendVerificationUseCase } from '@/modules/auth/use-cases/resend-verification.usecase';
 import { ResetPasswordUseCase } from '@/modules/auth/use-cases/reset-password.usecase';
 import { VerifyAccountUseCase } from '@/modules/auth/use-cases/verify-account.usecase';
+import {
+  ALL_PERMISSIONS,
+  PERMISSIONS,
+} from '@/modules/permission/constants/permission.constants';
+import { GetUserPermissionsUseCase } from '@/modules/permission/use-cases/get-user-permissions.use-case';
 import { UsersService } from '@/modules/user/user.service';
 import {
   Body,
@@ -34,6 +50,7 @@ import {
   Get,
   Headers,
   Inject,
+  Param,
   Patch,
   Post,
   Req,
@@ -60,6 +77,10 @@ export class AuthController {
     private readonly resendVerificationUseCase: ResendVerificationUseCase,
     private readonly requestVerificationUseCase: RequestVerificationUseCase,
     private readonly changePasswordUseCase: ChangePasswordUseCase,
+    private readonly createInvitationUseCase: CreateInvitationUseCase,
+    private readonly getInvitationUseCase: GetInvitationUseCase,
+    private readonly acceptInvitationUseCase: AcceptInvitationUseCase,
+    private readonly getUserPermissionsUseCase: GetUserPermissionsUseCase,
     private readonly usersService: UsersService,
     private readonly assetsService: AssetsService,
     @Inject(cookieConfig.KEY)
@@ -83,7 +104,10 @@ export class AuthController {
     @Body() dto: LoginDto,
     @Res({ passthrough: true }) res: express.Response,
   ) {
-    const result = await this.loginUserUseCase.execute(dto, user_role.ADMIN);
+    const result = await this.loginUserUseCase.execute(
+      dto,
+      this.getRequiredRoles('admin'),
+    );
     this.setRefreshCookies(res, 'admin', result.refresh_token);
 
     return {
@@ -99,7 +123,10 @@ export class AuthController {
     @Body() dto: LoginDto,
     @Res({ passthrough: true }) res: express.Response,
   ) {
-    const result = await this.loginUserUseCase.execute(dto, user_role.USER);
+    const result = await this.loginUserUseCase.execute(
+      dto,
+      this.getRequiredRoles('client'),
+    );
     this.setRefreshCookies(res, 'client', result.refresh_token);
 
     return {
@@ -125,7 +152,7 @@ export class AuthController {
     try {
       const result = await this.refreshTokenUseCase.execute(
         refreshToken,
-        this.getRequiredRole(context),
+        this.getRequiredRoles(context),
       );
 
       this.setRefreshCookies(res, context, result.refresh_token);
@@ -226,11 +253,22 @@ export class AuthController {
   @Public()
   @Post('logout')
   @ApiSuccess('Logged out successfully')
-  logout(
+  async logout(
     @Headers('x-auth-context') authContext: string | undefined,
+    @Req() req: express.Request,
     @Res({ passthrough: true }) res: express.Response,
   ) {
-    this.clearRefreshCookies(res, this.resolveAuthContext(authContext));
+    const context = this.resolveAuthContext(authContext);
+    const cookieNames = this.getRefreshCookieNames(context);
+    const refreshToken = (req.cookies as Record<string, string>)?.[
+      cookieNames.refreshToken
+    ];
+
+    await this.refreshTokenUseCase.revoke(
+      refreshToken,
+      this.getRequiredRoles(context),
+    );
+    this.clearRefreshCookies(res, context);
   }
 
   @Public()
@@ -271,6 +309,32 @@ export class AuthController {
     return await this.requestVerificationUseCase.execute(dto);
   }
 
+  @Post('invitations')
+  @RequireTenant()
+  @Permissions([PERMISSIONS.STAFF.INVITE])
+  @ApiSuccess('Invitation created successfully')
+  async createInvitation(
+    @Tenant() tenant: TenantContext,
+    @User() user: AuthRequestUser,
+    @Body() dto: CreateInvitationDto,
+  ) {
+    return this.createInvitationUseCase.execute(tenant.id, user.id, dto);
+  }
+
+  @Public()
+  @Get('invitations/:token')
+  @ApiSuccess('Invitation retrieved successfully')
+  async getInvitation(@Param('token') token: string) {
+    return this.getInvitationUseCase.execute(token);
+  }
+
+  @Public()
+  @Post('invitations/accept')
+  @ApiSuccess('Invitation accepted successfully')
+  async acceptInvitation(@Body() dto: AcceptInvitationDto) {
+    return this.acceptInvitationUseCase.execute(dto);
+  }
+
   private async assertProfileIsUnique(
     userId: string,
     dto: UpdateProfileDto,
@@ -307,6 +371,7 @@ export class AuthController {
 
     return {
       id: user.id,
+      tenant_id: user.tenant_id,
       email: user.email,
       username: user.username,
       full_name: user.full_name,
@@ -315,6 +380,21 @@ export class AuthController {
       role: user.role,
       status: user.status,
       is_verified: user.is_verified,
+      tenant: user.tenant
+        ? {
+            id: user.tenant.id,
+            slug: user.tenant.slug,
+            name: user.tenant.name,
+            status: user.tenant.status,
+            timezone: user.tenant.timezone,
+            locale: user.tenant.locale,
+          }
+        : null,
+      permissions: await this.resolveUserPermissions(
+        user.id,
+        user.tenant_id,
+        user.role,
+      ),
       created_at: user.created_at,
       updated_at: user.updated_at,
     };
@@ -330,17 +410,35 @@ export class AuthController {
       : { refreshToken: 'client_refresh_token', refreshFlag: 'client_has_rt' };
   }
 
-  private getRequiredRole(context: 'client' | 'admin'): user_role {
-    return context === 'admin' ? user_role.ADMIN : user_role.USER;
+  private getRequiredRoles(context: 'client' | 'admin'): user_role[] {
+    return context === 'admin'
+      ? [user_role.ADMIN, user_role.STAFF]
+      : [user_role.USER];
   }
 
   private assertUserMatchesAuthContext(
     user: AuthRequestUser,
     context: 'client' | 'admin',
   ): void {
-    if (user.role !== this.getRequiredRole(context)) {
+    if (!this.getRequiredRoles(context).includes(user.role)) {
       throw new UnauthorizedError('Invalid session for this app');
     }
+  }
+
+  private async resolveUserPermissions(
+    userId: string,
+    tenantId: string | null,
+    role: user_role,
+  ) {
+    if (role === user_role.ADMIN) {
+      return [ALL_PERMISSIONS];
+    }
+
+    if (!tenantId) {
+      return [];
+    }
+
+    return this.getUserPermissionsUseCase.execute(userId, tenantId);
   }
 
   private setRefreshCookies(

@@ -28,6 +28,7 @@ model User {
   notification_recipients NotificationRecipient[]
   user_permissions        UserPermission[]
   granted_permissions     UserPermission[]        @relation("GrantedPermissions")
+  sent_invitations        UserInvitation[]        @relation("InvitationsSent")
 
   @@index([tenant_id])
   @@index([role, status])
@@ -161,6 +162,7 @@ model Tenant {
   job_runs         JobRun[]
   system_events    SystemEvent[]
   user_permissions UserPermission[]
+  user_invitations UserInvitation[]
 
   @@index([status])
   @@map("tenant")
@@ -199,6 +201,27 @@ model UserPermission {
   @@index([permission_id])
   @@index([tenant_id])
   @@map("user_permission")
+}
+
+model UserInvitation {
+  id              String    @id @default(uuid()) @db.Uuid
+  tenant_id       String    @db.Uuid
+  email           String
+  role            user_role @default(STAFF)
+  permission_keys Json?
+  token_hash      String    @unique
+  invited_by_id   String?   @db.Uuid
+  accepted_at     DateTime?
+  expires_at      DateTime
+  created_at      DateTime  @default(now())
+
+  tenant     Tenant @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
+  invited_by User?  @relation("InvitationsSent", fields: [invited_by_id], references: [id], onDelete: SetNull)
+
+  @@index([tenant_id])
+  @@index([email])
+  @@index([expires_at])
+  @@map("user_invitation")
 }
 
 model TenantDomain {

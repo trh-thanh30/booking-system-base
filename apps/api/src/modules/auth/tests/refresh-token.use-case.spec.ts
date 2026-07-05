@@ -102,4 +102,49 @@ describe('RefreshTokenUseCase', () => {
       'Invalid or expired refresh token',
     );
   });
+
+  it('revokes the stored refresh token when the token matches', async () => {
+    const prisma = {
+      user: {
+        findUnique: jest.fn().mockResolvedValue(user()),
+        update: jest.fn().mockResolvedValue(undefined),
+      },
+    };
+    const useCase = new RefreshTokenUseCase(
+      prisma as any,
+      {
+        verifyRefreshToken: jest
+          .fn()
+          .mockReturnValue({ payload: { id: 'user-1' } }),
+      } as any,
+    );
+
+    await useCase.revoke('refresh-token', [user_role.USER]);
+
+    expect(prisma.user.update).toHaveBeenCalledWith({
+      where: { id: 'user-1' },
+      data: { refresh_token: null },
+    });
+  });
+
+  it('does not revoke when token role context does not match', async () => {
+    const prisma = {
+      user: {
+        findUnique: jest.fn().mockResolvedValue(user()),
+        update: jest.fn(),
+      },
+    };
+    const useCase = new RefreshTokenUseCase(
+      prisma as any,
+      {
+        verifyRefreshToken: jest
+          .fn()
+          .mockReturnValue({ payload: { id: 'user-1' } }),
+      } as any,
+    );
+
+    await useCase.revoke('refresh-token', [user_role.ADMIN]);
+
+    expect(prisma.user.update).not.toHaveBeenCalled();
+  });
 });
