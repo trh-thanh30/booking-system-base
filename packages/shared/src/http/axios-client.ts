@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosHeaders } from "axios";
 import { toHttpClientError } from "./http-error.ts";
 import type {
   ApiClient,
@@ -37,7 +37,25 @@ export function createHttpClient(
       const httpError = toHttpClientError(error);
 
       if (httpError.status === 401) {
-        await options.onUnauthorized?.(httpError);
+        const originalConfig = axios.isAxiosError(error)
+          ? error.config
+          : undefined;
+        const retryConfig = originalConfig as
+          | (HttpRequestConfig & { _retry?: boolean })
+          | undefined;
+        const nextToken = await options.onUnauthorized?.(httpError);
+
+        if (nextToken && retryConfig && !retryConfig._retry) {
+          retryConfig._retry = true;
+          retryConfig.headers = new AxiosHeaders(
+            retryConfig.headers as ConstructorParameters<
+              typeof AxiosHeaders
+            >[0],
+          );
+          retryConfig.headers.set("Authorization", `Bearer ${nextToken}`);
+
+          return client.request(retryConfig);
+        }
       }
 
       throw httpError;

@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { Avatar, AvatarFallback, Badge, Button } from "@repo/ui";
 import { cn } from "@repo/ui/lib/utils";
 import { useAdminUiStore } from "@/src/app/stores/ui.store";
+import { useAuth } from "@/src/app/providers";
 import { getDashboardConfig } from "@/src/config/dashboard.config";
 import type { NavigationItem } from "@/src/config/dashboard.types";
 import { Link, usePathname } from "@/src/i18n/navigation";
@@ -101,12 +102,33 @@ export function AppSidebar({
   const t = useTranslations("DashboardConfig");
   const tCommon = useTranslations("Common");
   const dashboardConfig = getDashboardConfig(t);
+  const { can, user: currentUser } = useAuth();
   const pathname = usePathname();
   const BrandLogo = dashboardConfig.brand.logo;
-  const user = dashboardConfig.userMenu;
+  const user = currentUser
+    ? {
+        avatarFallback:
+          currentUser.full_name
+            ?.split(" ")
+            .map((part) => part[0])
+            .join("")
+            .slice(0, 2)
+            .toUpperCase() || currentUser.username.slice(0, 2).toUpperCase(),
+        email: currentUser.email,
+        name: currentUser.full_name ?? currentUser.username,
+      }
+    : dashboardConfig.userMenu;
   const storedCollapsed = useAdminUiStore((state) => state.sidebarCollapsed);
   const toggleSidebar = useAdminUiStore((state) => state.toggleSidebar);
   const collapsed = collapsedOverride ?? storedCollapsed;
+  const sidebarSections = dashboardConfig.sidebarSections
+    .map((section) => ({
+      ...section,
+      items: section.items.filter(
+        (item) => !item.permission || can(item.permission),
+      ),
+    }))
+    .filter((section) => section.items.length > 0);
 
   return (
     <aside
@@ -150,7 +172,7 @@ export function AppSidebar({
       </div>
 
       <nav className="flex-1 overflow-y-auto px-3 pb-3">
-        {dashboardConfig.sidebarSections.map((section) => (
+        {sidebarSections.map((section) => (
           <NavGroup
             items={section.items}
             key={section.label}

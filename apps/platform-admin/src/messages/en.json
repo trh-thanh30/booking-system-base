@@ -1,0 +1,61 @@
+{
+  "App": {
+    "title": "Platform Admin",
+    "description": "Super admin portal for the booking platform"
+  },
+  "Auth": {
+    "fields": {
+      "usernameOrEmail": "Email or username",
+      "password": "Password"
+    },
+    "login": {
+      "title": "Platform sign in",
+      "description": "Use a super admin account to manage tenants, platform users, and system operations.",
+      "submit": "Sign in",
+      "submitting": "Signing in",
+      "success": "Signed in successfully",
+      "failed": "Login failed"
+    }
+  },
+  "Platform": {
+    "brandDescription": "Super Admin",
+    "sections": {
+      "platform": "Platform",
+      "operations": "Operations"
+    },
+    "items": {
+      "dashboard": "Dashboard",
+      "tenants": "Tenants",
+      "users": "Platform users",
+      "system": "System",
+      "signOut": "Sign out"
+    },
+    "dashboard": {
+      "title": "Platform overview",
+      "description": "Monitor tenant activity, platform health, and operational risk from one control surface.",
+      "tenantCard": "Tenants",
+      "tenantDescription": "Businesses on the platform",
+      "userCard": "Platform users",
+      "userDescription": "Internal operator accounts",
+      "systemCard": "System health",
+      "systemDescription": "Infrastructure status"
+    },
+    "tenants": {
+      "title": "Tenants",
+      "description": "Review businesses, lifecycle status, and platform-level controls."
+    },
+    "users": {
+      "title": "Platform users",
+      "description": "Manage super admin and internal operator access."
+    },
+    "system": {
+      "title": "System",
+      "description": "Inspect platform health, configuration, and background operations."
+    }
+  },
+  "Common": {
+    "collapseSidebar": "Collapse sidebar",
+    "openNavigation": "Open navigation",
+    "toggleSidebar": "Toggle sidebar"
+  }
+}

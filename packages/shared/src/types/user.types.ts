@@ -1,4 +1,5 @@
 import type { USER_ROLES, USER_STATUSES } from "../constants/index.ts";
+import type { TenantSummary } from "./tenant.types.ts";
 
 export type UserRole = (typeof USER_ROLES)[number];
 export type UserStatus = (typeof USER_STATUSES)[number];
@@ -18,3 +19,14 @@ export type UserSummary = {
 };
 
 export type AuthUser = UserSummary;
+
+export type CurrentAuthUser = AuthUser & {
+  tenant_id: string | null;
+  tenant: TenantSummary | null;
+  permissions: string[];
+};
+
+export type AuthSession = {
+  access_token: string;
+  user: CurrentAuthUser;
+};

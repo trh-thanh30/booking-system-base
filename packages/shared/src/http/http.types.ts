@@ -10,7 +10,7 @@ export type TokenResolver = () =>
 
 export type UnauthorizedHandler = (
   error: HttpClientError,
-) => Promise<void> | void;
+) => Promise<string | false | void> | string | false | void;
 
 export type CreateHttpClientOptions = {
   baseURL?: string;

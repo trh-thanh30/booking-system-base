@@ -3,13 +3,15 @@ import { notFound } from "next/navigation";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
 import NextTopLoader from "nextjs-toploader";
+import { AuthProvider, QueryProvider } from "@/src/app/providers";
 import { ThemeProvider } from "@/src/app/providers/theme-provider";
 import { routing } from "@/src/i18n/routing";
+import { Toaster } from "sonner";
 import "../globals.css";
 
 export const metadata: Metadata = {
-  title: "Booking Admin",
-  description: "Operational dashboard for the booking system base",
+  title: "Business Admin",
+  description: "Tenant workspace for business owners and staff",
 };
 
 export function generateStaticParams() {
@@ -36,17 +38,22 @@ export default async function LocaleLayout({
       <body>
         <NextIntlClientProvider messages={messages}>
           <ThemeProvider>
-            <NextTopLoader
-              color="#2563eb"
-              crawlSpeed={180}
-              easing="ease-out"
-              height={3}
-              shadow="0 0 10px rgba(37, 99, 235, 0.35)"
-              showSpinner={false}
-              speed={220}
-              zIndex={2147483647}
-            />
-            {children}
+            <QueryProvider>
+              <AuthProvider>
+                <NextTopLoader
+                  color="#2563eb"
+                  crawlSpeed={180}
+                  easing="ease-out"
+                  height={3}
+                  shadow="0 0 10px rgba(37, 99, 235, 0.35)"
+                  showSpinner={false}
+                  speed={220}
+                  zIndex={2147483647}
+                />
+                {children}
+                <Toaster richColors />
+              </AuthProvider>
+            </QueryProvider>
           </ThemeProvider>
         </NextIntlClientProvider>
       </body>
