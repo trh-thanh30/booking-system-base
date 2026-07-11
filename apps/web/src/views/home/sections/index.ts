@@ -1,0 +1,16 @@
+export { Header } from "./header";
+export { Footer } from "./footer";
+export { Hero } from "./hero";
+export { ChallengesSection as Problem } from "./challenges/ChallengesSection";
+export { HowItWorksSection as HowItWorks } from "./how-it-works/HowItWorksSection";
+export { Features } from "./features";
+export { NoShowSection } from "./no-show/NoShowSection";
+export { Templates } from "./templates";
+export { Customization } from "../components/customization";
+export { Channels } from "../components/channels";
+export { Marketplace } from "./marketplace";
+export { Industries } from "./industries";
+export { EarlyAccess } from "./early-access";
+export { Pricing } from "./pricing";
+export { FAQ } from "./faq";
+export { FinalCTA } from "./final-cta";
