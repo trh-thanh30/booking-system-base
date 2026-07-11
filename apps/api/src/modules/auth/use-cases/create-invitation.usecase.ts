@@ -32,6 +32,10 @@ export class CreateInvitationUseCase {
       throw new ConflictError('An account with this email already exists');
     }
 
+    if (dto.role && ![user_role.OWNER, user_role.STAFF].includes(dto.role)) {
+      throw new BadRequestError('Only OWNER or STAFF can be invited');
+    }
+
     const permissionKeys = Array.from(new Set(dto.permission_keys ?? []));
     const permissions =
       await this.permissionRepository.findPermissionsByKeys(permissionKeys);

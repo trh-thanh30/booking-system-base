@@ -43,7 +43,7 @@ describe('PermissionsGuard', () => {
     expect(getUserPermissionsUseCase.execute).not.toHaveBeenCalled();
   });
 
-  it('bypasses permission checks for ADMIN users', async () => {
+  it('bypasses permission checks for SUPER_ADMIN users', async () => {
     const { permissionsGuard, getUserPermissionsUseCase } = guard([
       'permission:manage',
     ]);
@@ -51,7 +51,7 @@ describe('PermissionsGuard', () => {
     await expect(
       permissionsGuard.canActivate(
         context({
-          user: { id: 'admin-1', role: user_role.ADMIN },
+          user: { id: 'super-admin-1', role: user_role.SUPER_ADMIN },
         }) as any,
       ),
     ).resolves.toBe(true);
@@ -59,7 +59,7 @@ describe('PermissionsGuard', () => {
     expect(getUserPermissionsUseCase.execute).not.toHaveBeenCalled();
   });
 
-  it('requires tenant context for non-admin permission checks', async () => {
+  it('requires tenant context for tenant permission checks', async () => {
     const { permissionsGuard } = guard(['booking:read']);
 
     await expect(
@@ -69,6 +69,23 @@ describe('PermissionsGuard', () => {
         }) as any,
       ),
     ).rejects.toThrow('Tenant context is required for permissions');
+  });
+
+  it('bypasses tenant permission checks for OWNER users with tenant context', async () => {
+    const { permissionsGuard, getUserPermissionsUseCase } = guard([
+      'permission:manage',
+    ]);
+
+    await expect(
+      permissionsGuard.canActivate(
+        context({
+          user: { id: 'owner-1', role: user_role.OWNER },
+          tenant: { id: 'tenant-1' },
+        }) as any,
+      ),
+    ).resolves.toBe(true);
+
+    expect(getUserPermissionsUseCase.execute).not.toHaveBeenCalled();
   });
 
   it('allows exact permission matches', async () => {

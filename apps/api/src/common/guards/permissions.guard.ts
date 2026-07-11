@@ -32,13 +32,17 @@ export class PermissionsGuard implements CanActivate {
       throw new ForbiddenError('User not found in request');
     }
 
-    if (user.role === user_role.ADMIN) {
+    if (user.role === user_role.SUPER_ADMIN) {
       return true;
     }
 
     const tenantId = request.tenant?.id;
     if (!tenantId) {
       throw new BadRequestError('Tenant context is required for permissions');
+    }
+
+    if (user.role === user_role.OWNER) {
+      return true;
     }
 
     const userPermissions = await this.getUserPermissionsUseCase.execute(

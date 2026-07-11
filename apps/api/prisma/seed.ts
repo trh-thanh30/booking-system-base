@@ -205,12 +205,21 @@ async function main() {
     },
   });
 
-  const adminUser = await upsertSeedUser({
+  const superAdminUser = await upsertSeedUser({
+    email: 'superadmin@example.com',
+    password: hashedPassword,
+    username: 'superadmin',
+    role: user_role.SUPER_ADMIN,
+    status: user_status.ACTIVE,
+    is_verified: true,
+  });
+
+  const ownerUser = await upsertSeedUser({
     tenant_id: demoTenant.id,
     email: 'admin@example.com',
     password: hashedPassword,
     username: 'admin',
-    role: user_role.ADMIN,
+    role: user_role.OWNER,
     status: user_status.ACTIVE,
     is_verified: true,
   });
@@ -225,12 +234,12 @@ async function main() {
     is_verified: true,
   });
 
-  const regularUser = await upsertSeedUser({
+  const customerUser = await upsertSeedUser({
     tenant_id: demoTenant.id,
     email: 'user@example.com',
     password: hashedPassword,
     username: 'user',
-    role: user_role.USER,
+    role: user_role.CUSTOMER,
     status: user_status.ACTIVE,
     is_verified: true,
   });
@@ -269,7 +278,7 @@ async function main() {
         user_id: staffUser.id,
         permission_id: permission.id,
         tenant_id: demoTenant.id,
-        granted_by_id: adminUser.id,
+        granted_by_id: ownerUser.id,
       },
     });
   }
@@ -277,9 +286,10 @@ async function main() {
   console.log('Base database seed completed successfully.');
   console.log(`Tenant: ${demoTenant.name} (${demoTenant.slug})`);
   console.log('Tenant domains: demo.localhost, demo-spa.localhost');
-  console.log(`Admin: ${adminUser.email} (${adminUser.role})`);
+  console.log(`Super Admin: ${superAdminUser.email} (${superAdminUser.role})`);
+  console.log(`Owner: ${ownerUser.email} (${ownerUser.role})`);
   console.log(`Staff: ${staffUser.email} (${staffUser.role})`);
-  console.log(`User: ${regularUser.email} (${regularUser.role})`);
+  console.log(`Customer: ${customerUser.email} (${customerUser.role})`);
   console.log('Default password: password123');
 }
 

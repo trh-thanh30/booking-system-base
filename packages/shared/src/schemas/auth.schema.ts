@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { permissionKeySchema } from "./permission.schema.ts";
-import { USER_ROLES } from "../constants/index.ts";
+import { BUSINESS_USER_ROLES } from "../constants/index.ts";
 
 const passwordSchema = z.string().min(6);
 const optionalTextSchema = z
@@ -86,7 +86,7 @@ export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
 
 export const createInvitationSchema = z.object({
   email: z.string().email(),
-  role: z.enum(USER_ROLES).optional(),
+  role: z.enum(BUSINESS_USER_ROLES).optional(),
   permission_keys: z.array(permissionKeySchema).optional(),
 });
 

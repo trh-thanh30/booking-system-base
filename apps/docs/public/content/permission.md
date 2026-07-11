@@ -33,7 +33,8 @@ Status: `implemented`
 - `UserPermission` assignment theo `user_id + tenant_id`.
 - `PermissionsGuard`.
 - `@Permissions()` decorator.
-- `ADMIN` bypass permission check.
+- `SUPER_ADMIN` bypass permission check toàn hệ thống.
+- `OWNER` bypass permission check trong tenant của chính họ.
 - `resource:manage` cover action cùng resource.
 - API list permissions.
 - API list/assign/replace/revoke user permissions.
@@ -56,18 +57,19 @@ UserPermission table  -> quyền chi tiết theo user trong tenant
 
 Role thô hiện có:
 
-| Role  | Ý nghĩa chính                                   |
-| ----- | ----------------------------------------------- |
-| ADMIN | Bypass mọi permission check                     |
-| STAFF | Dùng admin app, phải có permission chi tiết     |
-| USER  | Dùng web/client app, thường không vào admin app |
+| Role        | Ý nghĩa chính                               |
+| ----------- | ------------------------------------------- |
+| SUPER_ADMIN | Quản trị platform, không phụ thuộc tenant   |
+| OWNER       | Chủ tenant, bypass permission trong tenant  |
+| STAFF       | Nhân sự tenant, phải có permission chi tiết |
+| CUSTOMER    | Người dùng web/client, không vào admin app  |
 
 Permission check:
 
 - Endpoint không có `@Permissions()` thì guard bỏ qua.
-- `ADMIN` pass ngay, không query database.
-- Non-admin phải có tenant context.
-- Non-admin đọc quyền từ `UserPermission`.
+- `SUPER_ADMIN` pass ngay, không query database.
+- `OWNER` cần tenant context và pass trong tenant đó.
+- `STAFF` phải có tenant context và đọc quyền từ `UserPermission`.
 - Required permission phải match exact hoặc được cover bởi `resource:manage`.
 
 Ví dụ:
@@ -497,7 +499,8 @@ Guard behavior:
 ```txt
 requiredPermissions empty -> allow
 request.user missing -> 403
-user.role ADMIN -> allow
+user.role SUPER_ADMIN -> allow
+user.role OWNER + tenant -> allow
 tenant missing -> 400
 exact permission exists -> allow
 resource:manage exists -> allow

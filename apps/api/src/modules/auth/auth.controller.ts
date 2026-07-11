@@ -64,6 +64,7 @@ import { user_role, type User as CurrentUser } from '@prisma/client';
 import express from 'express';
 
 type AuthRequestUser = CurrentUser;
+type AuthContext = 'platform' | 'admin' | 'client';
 
 @Controller('auth')
 export class AuthController {
@@ -109,6 +110,25 @@ export class AuthController {
       this.getRequiredRoles('admin'),
     );
     this.setRefreshCookies(res, 'admin', result.refresh_token);
+
+    return {
+      access_token: result.access_token,
+      user: await this.toAuthUser(result.user.id),
+    };
+  }
+
+  @Public()
+  @Post('login-platform')
+  @ApiSuccess('Platform login successful')
+  async loginPlatform(
+    @Body() dto: LoginDto,
+    @Res({ passthrough: true }) res: express.Response,
+  ) {
+    const result = await this.loginUserUseCase.execute(
+      dto,
+      this.getRequiredRoles('platform'),
+    );
+    this.setRefreshCookies(res, 'platform', result.refresh_token);
 
     return {
       access_token: result.access_token,
@@ -400,25 +420,48 @@ export class AuthController {
     };
   }
 
-  private resolveAuthContext(authContext?: string): 'client' | 'admin' {
+  private resolveAuthContext(authContext?: string): AuthContext {
+    if (authContext === 'platform') {
+      return 'platform';
+    }
+
     return authContext === 'admin' ? 'admin' : 'client';
   }
 
-  private getRefreshCookieNames(context: 'client' | 'admin') {
-    return context === 'admin'
-      ? { refreshToken: 'admin_refresh_token', refreshFlag: 'admin_has_rt' }
-      : { refreshToken: 'client_refresh_token', refreshFlag: 'client_has_rt' };
+  private getRefreshCookieNames(context: AuthContext) {
+    if (context === 'platform') {
+      return {
+        refreshToken: 'platform_refresh_token',
+        refreshFlag: 'platform_has_rt',
+      };
+    }
+
+    if (context === 'admin') {
+      return {
+        refreshToken: 'admin_refresh_token',
+        refreshFlag: 'admin_has_rt',
+      };
+    }
+
+    return {
+      refreshToken: 'client_refresh_token',
+      refreshFlag: 'client_has_rt',
+    };
   }
 
-  private getRequiredRoles(context: 'client' | 'admin'): user_role[] {
+  private getRequiredRoles(context: AuthContext): user_role[] {
+    if (context === 'platform') {
+      return [user_role.SUPER_ADMIN];
+    }
+
     return context === 'admin'
-      ? [user_role.ADMIN, user_role.STAFF]
-      : [user_role.USER];
+      ? [user_role.OWNER, user_role.STAFF]
+      : [user_role.CUSTOMER];
   }
 
   private assertUserMatchesAuthContext(
     user: AuthRequestUser,
-    context: 'client' | 'admin',
+    context: AuthContext,
   ): void {
     if (!this.getRequiredRoles(context).includes(user.role)) {
       throw new UnauthorizedError('Invalid session for this app');
@@ -430,7 +473,7 @@ export class AuthController {
     tenantId: string | null,
     role: user_role,
   ) {
-    if (role === user_role.ADMIN) {
+    if (role === user_role.SUPER_ADMIN || role === user_role.OWNER) {
       return [ALL_PERMISSIONS];
     }
 
@@ -443,7 +486,7 @@ export class AuthController {
 
   private setRefreshCookies(
     res: express.Response,
-    context: 'client' | 'admin',
+    context: AuthContext,
     refreshToken: string,
   ) {
     const cookieNames = this.getRefreshCookieNames(context);
@@ -472,7 +515,7 @@ export class AuthController {
 
   private clearPartitionedRefreshCookies(
     res: express.Response,
-    context: 'client' | 'admin',
+    context: AuthContext,
   ) {
     const cookieNames = this.getRefreshCookieNames(context);
 
@@ -494,10 +537,7 @@ export class AuthController {
     });
   }
 
-  private clearRefreshCookies(
-    res: express.Response,
-    context: 'client' | 'admin',
-  ) {
+  private clearRefreshCookies(res: express.Response, context: AuthContext) {
     const cookieNames = this.getRefreshCookieNames(context);
 
     res.clearCookie(cookieNames.refreshToken, {

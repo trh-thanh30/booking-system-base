@@ -18,7 +18,7 @@ Bảo vệ dữ liệu doanh nghiệp, cho phép mỗi nhóm người dùng ch�
 
 - Đăng nhập bằng email/số điện thoại và mật khẩu.
 - Refresh token/session management.
-- Role-based access control thô bằng `user_role` enum hiện có.
+- Role-based access control thô bằng `user_role`: `SUPER_ADMIN`, `OWNER`, `STAFF`, `CUSTOMER`.
 - Permission engine: định nghĩa quyền, gán quyền trực tiếp cho user và kiểm tra quyền theo tenant.
 - Guard theo tenant và role.
 - Guard theo permission cho từng API/action.
@@ -29,6 +29,8 @@ Bảo vệ dữ liệu doanh nghiệp, cho phép mỗi nhóm người dùng ch�
 ## API Endpoints
 
 - `POST /auth/login`
+- `POST /auth/login-admin`
+- `POST /auth/login-platform`
 - `POST /auth/refresh`
 - `POST /auth/logout`
 - `POST /auth/forgot-password`
@@ -46,6 +48,16 @@ Bảo vệ dữ liệu doanh nghiệp, cho phép mỗi nhóm người dùng ch�
 - `user_invitations`
 
 Không thêm `sessions` table trong F1. Refresh/session state dùng `users.refresh_token`.
+
+## Auth Contexts
+
+| Context    | App                   | Roles hợp lệ     | Refresh cookies                             |
+| :--------- | :-------------------- | :--------------- | :------------------------------------------ |
+| `platform` | `apps/platform-admin` | `SUPER_ADMIN`    | `platform_refresh_token`, `platform_has_rt` |
+| `admin`    | `apps/admin`          | `OWNER`, `STAFF` | `admin_refresh_token`, `admin_has_rt`       |
+| `client`   | `apps/web`            | `CUSTOMER`       | `client_refresh_token`, `client_has_rt`     |
+
+`SUPER_ADMIN` là global role, không cần `tenant_id`. `OWNER` và `STAFF` là tenant-scoped roles.
 
 ## Frontend Screens
 
@@ -81,8 +93,9 @@ Không thêm `sessions` table trong F1. Refresh/session state dùng `users.refre
 - Dùng guard/decorator để lấy `currentUser` và `tenantContext`.
 - Dùng `@Permissions()`/`PermissionsGuard` cho permission-level access control.
 - `RolesGuard` dùng cho role-level access control thô, `PermissionsGuard` dùng cho action-level access control chi tiết.
-- `ADMIN` bypass permission checks.
-- Non-admin đọc quyền từ `UserPermission` theo `user_id + tenant_id`.
+- `SUPER_ADMIN` bypass platform-level checks.
+- `OWNER` bypass permission checks trong tenant của chính họ.
+- `STAFF` đọc quyền từ `UserPermission` theo `user_id + tenant_id`.
 - `resource:manage` cover các action cùng resource.
 - Không hardcode quyền trong UI; API vẫn là nguồn kiểm soát cuối.
 - F1 triển khai permission engine dùng chung; các feature sau chỉ khai báo permission cụ thể theo module.
@@ -92,6 +105,7 @@ Không thêm `sessions` table trong F1. Refresh/session state dùng `users.refre
 ### Phase 1 - API
 
 - Cập nhật `/auth/me` trả user, tenant và permissions.
+- Thêm `POST /auth/login-platform` cho `SUPER_ADMIN`.
 - Chuẩn hóa login/refresh/logout dựa trên `User.refresh_token`.
 - Clear refresh token khi logout, đổi mật khẩu hoặc reset mật khẩu.
 - Gắn permission guard vào API quản trị.

@@ -15,7 +15,7 @@ model User {
   full_name     String?
   phone         String?     @unique
   avatar_url    String?
-  role          user_role   @default(USER)
+  role          user_role   @default(CUSTOMER)
   status        user_status @default(ACTIVE)
   is_verified   Boolean     @default(false)
   refresh_token String?
@@ -289,9 +289,10 @@ model SystemEvent {
 }
 
 enum user_role {
-  ADMIN
+  SUPER_ADMIN
+  OWNER
   STAFF
-  USER
+  CUSTOMER
 }
 
 enum user_status {

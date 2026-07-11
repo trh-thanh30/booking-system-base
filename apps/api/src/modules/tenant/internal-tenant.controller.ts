@@ -11,7 +11,7 @@ export class InternalTenantController {
   ) {}
 
   @Get(':tenantId/context')
-  @Roles([user_role.ADMIN])
+  @Roles([user_role.SUPER_ADMIN])
   @ApiSuccess('Tenant context retrieved successfully')
   getContext(@Param('tenantId') tenantId: string) {
     return this.getTenantContextUseCase.execute(tenantId);

@@ -14,7 +14,7 @@ export class CreateInvitationDto implements CreateInvitationInput {
 
   @IsOptional()
   @IsEnum(user_role)
-  role?: user_role;
+  role?: 'OWNER' | 'STAFF';
 
   @IsOptional()
   @IsArray()

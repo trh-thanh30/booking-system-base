@@ -120,7 +120,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<AuthContextValue>(() => {
     const permissions = user?.permissions ?? [];
-    const isAdmin = permissions.includes("*") || user?.role === "ADMIN";
+    const isAdmin =
+      permissions.includes("*") ||
+      user?.role === "OWNER" ||
+      user?.role === "SUPER_ADMIN";
 
     return {
       can(permission) {

@@ -7,7 +7,7 @@ function user(overrides: Record<string, unknown> = {}) {
     email: 'user@example.com',
     username: 'user',
     password: 'hashed-password',
-    role: user_role.USER,
+    role: user_role.CUSTOMER,
     status: user_status.ACTIVE,
     is_verified: true,
     ...overrides,
@@ -41,7 +41,7 @@ describe('LoginUserUseCase', () => {
         { comparePassword: jest.fn() } as any,
         baseTokenService as any,
         sessionService as any,
-      ).execute(dto, user_role.ADMIN),
+      ).execute(dto, user_role.OWNER),
     ).rejects.toThrow('Invalid email/username or password');
 
     await expect(
@@ -136,7 +136,7 @@ describe('LoginUserUseCase', () => {
           }),
         } as any,
         { createSession: jest.fn() } as any,
-      ).execute(dto, [user_role.ADMIN, user_role.STAFF]),
+      ).execute(dto, [user_role.OWNER, user_role.STAFF]),
     ).resolves.toMatchObject({
       access_token: 'access-token',
       refresh_token: 'refresh-token',

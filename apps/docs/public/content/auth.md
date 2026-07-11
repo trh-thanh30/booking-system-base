@@ -8,7 +8,13 @@ Backend module:
 apps/api/src/modules/auth
 ```
 
-FE Admin dùng module này cho:
+FE Platform Admin dùng module này cho:
+
+- Login/logout platform app bằng `SUPER_ADMIN`.
+- Bootstrap current user bằng `GET /auth/me`.
+- Refresh access token khi access token hết hạn.
+
+FE Business Admin dùng module này cho:
 
 - Login/logout admin app.
 - Bootstrap current user bằng `GET /auth/me`.
@@ -30,7 +36,7 @@ Status: `partial`
 Đã hỗ trợ:
 
 - Register user thường.
-- Login admin/client theo `x-auth-context`.
+- Login platform/admin/client theo `x-auth-context`.
 - Refresh access token bằng refresh cookie.
 - Logout và revoke `User.refresh_token`.
 - Current user profile kèm tenant và permissions.
@@ -55,7 +61,13 @@ Chưa hỗ trợ:
 
 ## Auth context
 
-Admin app gửi:
+Platform admin app gửi:
+
+```txt
+x-auth-context: platform
+```
+
+Business admin app gửi:
 
 ```txt
 x-auth-context: admin
@@ -71,10 +83,11 @@ Nếu không gửi header, backend mặc định là `client`.
 
 Refresh cookie theo context:
 
-| Context | Refresh cookie         | JS-visible flag |
-| ------- | ---------------------- | --------------- |
-| admin   | `admin_refresh_token`  | `admin_has_rt`  |
-| client  | `client_refresh_token` | `client_has_rt` |
+| Context  | Refresh cookie           | JS-visible flag   |
+| -------- | ------------------------ | ----------------- |
+| platform | `platform_refresh_token` | `platform_has_rt` |
+| admin    | `admin_refresh_token`    | `admin_has_rt`    |
+| client   | `client_refresh_token`   | `client_has_rt`   |
 
 Access token gửi qua header:
 
@@ -84,10 +97,11 @@ Authorization: Bearer <access_token>
 
 ## Role theo auth context
 
-| Context | Role được phép   |
-| ------- | ---------------- |
-| admin   | `ADMIN`, `STAFF` |
-| client  | `USER`           |
+| Context  | Role được phép   |
+| -------- | ---------------- |
+| platform | `SUPER_ADMIN`    |
+| admin    | `OWNER`, `STAFF` |
+| client   | `CUSTOMER`       |
 
 Nếu token hợp lệ nhưng role không đúng context, API trả:
 
@@ -108,7 +122,7 @@ type AuthUser = {
   full_name: string | null;
   phone: string | null;
   avatar_url: string | null;
-  role: "ADMIN" | "STAFF" | "USER";
+  role: "SUPER_ADMIN" | "OWNER" | "STAFF" | "CUSTOMER";
   status: "ACTIVE" | "INACTIVE";
   is_verified: boolean;
   tenant: {
@@ -127,8 +141,9 @@ type AuthUser = {
 
 Permission behavior:
 
-- `ADMIN` nhận `["*"]`.
-- `STAFF` và `USER` nhận danh sách quyền từ `UserPermission` theo `user_id + tenant_id`.
+- `SUPER_ADMIN` và `OWNER` nhận `["*"]`.
+- `STAFF` nhận danh sách quyền từ `UserPermission` theo `user_id + tenant_id`.
+- `CUSTOMER` thường nhận `permissions: []` trừ khi sau này có flow cấp quyền theo tenant riêng.
 - User không có tenant nhận `permissions: []`.
 
 ## POST /api/v1/auth/register
@@ -188,6 +203,41 @@ FE states:
 - Error: hiển thị message từ API.
 - Không tự login sau register vì user chưa verified.
 
+## POST /api/v1/auth/login-platform
+
+Dùng cho: Platform Admin app login.
+
+Auth: public.
+
+Body:
+
+```ts
+type LoginBody = {
+  usernameOrEmail: string;
+  password: string;
+};
+```
+
+Response chính:
+
+```ts
+type LoginResponse = {
+  access_token: string;
+  user: AuthUser;
+};
+```
+
+BE behavior:
+
+- Chỉ cho role `SUPER_ADMIN`.
+- Verify password.
+- Check account `ACTIVE`.
+- Check email verified.
+- Generate access token và refresh token.
+- Lưu refresh token vào `User.refresh_token`.
+- Set `platform_refresh_token` và `platform_has_rt`.
+- Trả `AuthUser` kèm permissions.
+
 ## POST /api/v1/auth/login-admin
 
 Dùng cho: Admin app login.
@@ -214,7 +264,7 @@ type LoginResponse = {
 
 BE behavior:
 
-- Chỉ cho role `ADMIN` hoặc `STAFF`.
+- Chỉ cho role `OWNER` hoặc `STAFF`.
 - Verify password.
 - Check account `ACTIVE`.
 - Check email verified.
@@ -248,7 +298,7 @@ Response giống `login-admin`.
 
 BE behavior:
 
-- Chỉ cho role `USER`.
+- Chỉ cho role `CUSTOMER`.
 - Set `client_refresh_token` và `client_has_rt`.
 
 FE states:
@@ -310,7 +360,7 @@ Auth: public nhưng nên gọi khi user đang đăng nhập.
 Headers:
 
 ```txt
-x-auth-context: admin | client
+x-auth-context: platform | admin | client
 ```
 
 BE behavior:
@@ -359,8 +409,10 @@ BE behavior:
 - Load auth profile từ users service.
 - Include tenant summary.
 - Resolve permissions:
-  - `ADMIN` -> `["*"]`
-  - non-admin -> `UserPermission`
+  - `SUPER_ADMIN` -> `["*"]`
+  - `OWNER` -> `["*"]`
+  - `STAFF` -> `UserPermission`
+  - `CUSTOMER` -> thường là `[]`
 
 Error thường gặp:
 
@@ -690,7 +742,7 @@ Body:
 ```ts
 type CreateInvitationBody = {
   email: string;
-  role?: "ADMIN" | "STAFF" | "USER";
+  role?: "OWNER" | "STAFF";
   permission_keys?: string[];
 };
 ```
@@ -701,7 +753,7 @@ Response chính:
 type CreateInvitationResponse = {
   id: string;
   email: string;
-  role: "ADMIN" | "STAFF" | "USER";
+  role: "OWNER" | "STAFF";
   permission_keys: string[];
   tenant: {
     id: string;
@@ -756,7 +808,7 @@ Response chính:
 type InvitationPreview = {
   id: string;
   email: string;
-  role: "ADMIN" | "STAFF" | "USER";
+  role: "OWNER" | "STAFF";
   tenant: {
     id: string;
     slug: string;
@@ -809,7 +861,7 @@ type AcceptInvitationResponse = {
   email: string;
   username: string;
   full_name: string | null;
-  role: "ADMIN" | "STAFF" | "USER";
+  role: "OWNER" | "STAFF";
   status: "ACTIVE" | "INACTIVE";
   is_verified: boolean;
 };

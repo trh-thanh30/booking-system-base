@@ -189,7 +189,7 @@ function InviteUserDialog({
                 {...register("role")}
               >
                 <option value="STAFF">STAFF</option>
-                <option value="ADMIN">ADMIN</option>
+                <option value="OWNER">OWNER</option>
               </select>
             </FormField>
             <Button
@@ -218,7 +218,7 @@ export function UsersView() {
   });
   const users = useMemo(() => usersQuery.data ?? [], [usersQuery.data]);
   const activeUsers = users.filter((user) => user.status === "ACTIVE").length;
-  const privilegedUsers = users.filter((user) => user.role === "ADMIN").length;
+  const privilegedUsers = users.filter((user) => user.role === "OWNER").length;
   const canInvite = can(PERMISSIONS.STAFF.INVITE);
 
   return (
