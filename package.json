@@ -35,7 +35,7 @@
     "start:worker:email": "pnpm --filter @repo/api start:worker:email:prod",
     "lint": "turbo run lint",
     "lint:all": "turbo run lint",
-    "lint:api": "pnpm --filter @repo/api lint",
+    "lint:api": "pnpm --filter @repo/shared build && pnpm --filter @repo/api lint",
     "lint:web": "pnpm --filter @repo/web lint",
     "lint:admin": "pnpm --filter @repo/admin lint",
     "lint:platform-admin": "pnpm --filter @repo/platform-admin lint",
