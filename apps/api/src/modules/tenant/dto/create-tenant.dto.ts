@@ -21,6 +21,18 @@ export class CreateTenantDto implements CreateTenantInput {
   name: string;
 
   @IsOptional()
+  @IsString()
+  @MinLength(1)
+  @MaxLength(160)
+  default_business_name?: string;
+
+  @IsOptional()
+  @IsString()
+  @MinLength(2)
+  @MaxLength(80)
+  default_business_slug?: string;
+
+  @IsOptional()
   @IsEnum(tenant_status)
   status?: tenant_status;
 

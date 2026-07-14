@@ -39,6 +39,8 @@ export function SignupBusinessView() {
     setError,
   } = useForm<SignupTenantInput>({
     defaultValues: {
+      default_business_name: "",
+      default_business_slug: "",
       locale: "vi",
       name: "",
       owner: {
@@ -133,6 +135,10 @@ export function SignupBusinessView() {
                 onSubmit={handleSubmit((input) => {
                   const parsed = signupTenantSchema.safeParse({
                     ...input,
+                    default_business_name:
+                      input.default_business_name?.trim() || undefined,
+                    default_business_slug:
+                      input.default_business_slug?.trim() || undefined,
                     primary_domain: input.primary_domain?.trim() || undefined,
                     owner: {
                       ...input.owner,
@@ -189,6 +195,30 @@ export function SignupBusinessView() {
                     {...register("primary_domain")}
                   />
                 </Field>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <Field
+                    error={errors.default_business_name?.message}
+                    id="default-business-name"
+                    label="First business"
+                  >
+                    <Input
+                      id="default-business-name"
+                      placeholder="Same as account name"
+                      {...register("default_business_name")}
+                    />
+                  </Field>
+                  <Field
+                    error={errors.default_business_slug?.message}
+                    id="default-business-slug"
+                    label="Business slug"
+                  >
+                    <Input
+                      id="default-business-slug"
+                      placeholder="Same as account slug"
+                      {...register("default_business_slug")}
+                    />
+                  </Field>
+                </div>
                 <div className="grid gap-4 sm:grid-cols-2">
                   <Field
                     error={errors.owner?.full_name?.message}

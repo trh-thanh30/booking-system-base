@@ -60,7 +60,7 @@ Không thêm `sessions` table trong F1. Refresh/session state dùng `users.refre
 | `admin`    | `apps/admin`          | `OWNER`, `STAFF` | `admin_refresh_token`, `admin_has_rt`       |
 | `client`   | `apps/web`            | `CUSTOMER`       | `client_refresh_token`, `client_has_rt`     |
 
-`SUPER_ADMIN` là global role, không cần `tenant_id`. `OWNER` và `STAFF` là tenant-scoped roles.
+`SUPER_ADMIN` là global role, không cần `tenant_id`. `OWNER` và `STAFF` là tenant-scoped roles. Tenant là account/organization; business/branch/location nằm trong `Business`.
 
 ## Frontend Screens
 
@@ -72,6 +72,7 @@ Không thêm `sessions` table trong F1. Refresh/session state dùng `users.refre
 ## Admin Screens
 
 - Current user menu.
+- Business switcher dựa trên `businesses` từ `/auth/me`.
 - Session/logout flow.
 - Permission-based navigation visibility.
 

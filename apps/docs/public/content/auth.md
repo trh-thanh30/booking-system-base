@@ -134,6 +134,16 @@ type AuthUser = {
     timezone: string;
     locale: string;
   } | null;
+  businesses: Array<{
+    id: string;
+    tenant_id: string;
+    slug: string;
+    name: string;
+    status: "ACTIVE" | "SUSPENDED" | "DISABLED";
+    timezone: string;
+    locale: string;
+    is_default: boolean;
+  }>;
   permissions: string[];
   created_at: string;
   updated_at: string;
@@ -146,6 +156,8 @@ Permission behavior:
 - `STAFF` nhận danh sách quyền từ `UserPermission` theo `user_id + tenant_id`.
 - `CUSTOMER` thường nhận `permissions: []` trừ khi sau này có flow cấp quyền theo tenant riêng.
 - User không có tenant nhận `permissions: []`.
+- `OWNER` nhận toàn bộ businesses trong tenant.
+- `STAFF` nhận businesses được gán qua `BusinessMembership`.
 
 ## POST /api/v1/auth/register
 

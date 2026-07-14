@@ -1,6 +1,7 @@
 import { PrismaService } from '@/database/prisma/prisma.service';
 import { Injectable } from '@nestjs/common';
 import {
+  business_status,
   tenant_domain_type,
   tenant_status,
   user_role,
@@ -18,6 +19,7 @@ export class TenantRepository {
       include: {
         tenant: {
           include: {
+            businesses: true,
             domains: true,
             settings: true,
           },
@@ -30,6 +32,7 @@ export class TenantRepository {
     return this.prisma.tenant.findUnique({
       where: { id: tenantId },
       include: {
+        businesses: true,
         domains: true,
         settings: true,
       },
@@ -60,10 +63,12 @@ export class TenantRepository {
   listTenants() {
     return this.prisma.tenant.findMany({
       include: {
+        businesses: true,
         domains: true,
         settings: true,
         _count: {
           select: {
+            businesses: true,
             users: true,
           },
         },
@@ -78,6 +83,7 @@ export class TenantRepository {
     return this.prisma.tenant.create({
       data,
       include: {
+        businesses: true,
         domains: true,
         settings: true,
       },
@@ -91,6 +97,8 @@ export class TenantRepository {
       timezone?: string;
       locale?: string;
       primaryDomain?: string;
+      defaultBusinessName?: string;
+      defaultBusinessSlug?: string;
       settings?: Record<string, unknown>;
     };
     owner: {
@@ -123,8 +131,20 @@ export class TenantRepository {
               settings: (input.tenant.settings ?? {}) as Prisma.InputJsonValue,
             },
           },
+          businesses: {
+            create: {
+              slug: input.tenant.defaultBusinessSlug ?? input.tenant.slug,
+              name: input.tenant.defaultBusinessName ?? input.tenant.name,
+              status: business_status.ACTIVE,
+              timezone: input.tenant.timezone ?? 'Asia/Ho_Chi_Minh',
+              locale: input.tenant.locale ?? 'vi',
+              settings: (input.tenant.settings ?? {}) as Prisma.InputJsonValue,
+              is_default: true,
+            },
+          },
         },
         include: {
+          businesses: true,
           domains: true,
           settings: true,
         },
@@ -144,7 +164,21 @@ export class TenantRepository {
         },
       });
 
-      return { tenant, owner };
+      const defaultBusiness = tenant.businesses.find(
+        (business) => business.is_default,
+      );
+
+      if (defaultBusiness) {
+        await tx.businessMembership.create({
+          data: {
+            tenant_id: tenant.id,
+            business_id: defaultBusiness.id,
+            user_id: owner.id,
+          },
+        });
+      }
+
+      return { tenant, business: defaultBusiness, owner };
     });
   }
 }

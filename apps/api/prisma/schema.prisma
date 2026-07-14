@@ -24,6 +24,7 @@ model User {
 
   tenant                  Tenant?                 @relation(fields: [tenant_id], references: [id], onDelete: SetNull)
   assets                  Asset[]
+  business_memberships    BusinessMembership[]
   created_notifications   Notification[]          @relation("NotificationCreatedBy")
   notification_recipients NotificationRecipient[]
   user_permissions        UserPermission[]
@@ -155,6 +156,8 @@ model Tenant {
 
   domains          TenantDomain[]
   settings         TenantSettings?
+  businesses       Business[]
+  business_memberships BusinessMembership[]
   users            User[]
   assets           Asset[]
   notifications    Notification[]
@@ -166,6 +169,45 @@ model Tenant {
 
   @@index([status])
   @@map("tenant")
+}
+
+model Business {
+  id         String          @id @default(uuid()) @db.Uuid
+  tenant_id  String          @db.Uuid
+  slug       String
+  name       String
+  status     business_status @default(ACTIVE)
+  timezone   String          @default("Asia/Ho_Chi_Minh")
+  locale     String          @default("vi")
+  settings   Json?
+  is_default Boolean         @default(false)
+  created_at DateTime        @default(now())
+  updated_at DateTime        @updatedAt
+
+  tenant      Tenant               @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
+  memberships BusinessMembership[]
+
+  @@unique([tenant_id, slug])
+  @@index([tenant_id])
+  @@index([status])
+  @@map("business")
+}
+
+model BusinessMembership {
+  id          String   @id @default(uuid()) @db.Uuid
+  tenant_id   String   @db.Uuid
+  business_id String   @db.Uuid
+  user_id     String   @db.Uuid
+  created_at  DateTime @default(now())
+
+  tenant   Tenant   @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
+  business Business @relation(fields: [business_id], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([user_id, business_id])
+  @@index([tenant_id, user_id])
+  @@index([business_id])
+  @@map("business_membership")
 }
 
 model Permission {
@@ -338,6 +380,12 @@ enum notification_read_status {
 }
 
 enum tenant_status {
+  ACTIVE
+  SUSPENDED
+  DISABLED
+}
+
+enum business_status {
   ACTIVE
   SUSPENDED
   DISABLED

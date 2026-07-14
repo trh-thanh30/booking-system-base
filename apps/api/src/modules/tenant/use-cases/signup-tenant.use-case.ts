@@ -1,5 +1,6 @@
 import { BcryptService } from '@/common/helpers/bcrypt.util';
 import { BadRequestError, ConflictError } from '@/common/response';
+import { toBusinessContext } from '@/modules/business/business.types';
 import { SignupTenantDto } from '@/modules/tenant/dto/signup-tenant.dto';
 import { TenantRepository } from '@/modules/tenant/repository/tenant.repository';
 import { normalizeHost, toTenantContext } from '@/modules/tenant/tenant.types';
@@ -31,6 +32,8 @@ export class SignupTenantUseCase {
         primaryDomain: dto.primary_domain
           ? normalizeHost(dto.primary_domain)
           : undefined,
+        defaultBusinessName: dto.default_business_name,
+        defaultBusinessSlug: dto.default_business_slug,
         settings: dto.settings,
       },
       owner: {
@@ -41,9 +44,13 @@ export class SignupTenantUseCase {
         phone: dto.owner.phone,
       },
     });
+    if (!result.business) {
+      throw new BadRequestError('Default business was not created');
+    }
 
     return {
       tenant: toTenantContext(result.tenant),
+      business: toBusinessContext(result.business),
       owner: {
         id: result.owner.id,
         tenant_id: result.owner.tenant_id,

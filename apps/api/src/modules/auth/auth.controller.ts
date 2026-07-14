@@ -42,6 +42,7 @@ import {
   ALL_PERMISSIONS,
   PERMISSIONS,
 } from '@/modules/permission/constants/permission.constants';
+import { toBusinessSummary } from '@/modules/business/business.types';
 import { GetUserPermissionsUseCase } from '@/modules/permission/use-cases/get-user-permissions.use-case';
 import { UsersService } from '@/modules/user/user.service';
 import {
@@ -410,6 +411,7 @@ export class AuthController {
             locale: user.tenant.locale,
           }
         : null,
+      businesses: this.resolveAuthBusinesses(user),
       permissions: await this.resolveUserPermissions(
         user.id,
         user.tenant_id,
@@ -482,6 +484,22 @@ export class AuthController {
     }
 
     return this.getUserPermissionsUseCase.execute(userId, tenantId);
+  }
+
+  private resolveAuthBusinesses(
+    user: NonNullable<Awaited<ReturnType<UsersService['findAuthProfileById']>>>,
+  ) {
+    if (user.role === user_role.SUPER_ADMIN || !user.tenant_id) {
+      return [];
+    }
+
+    if (user.role === user_role.OWNER) {
+      return (user.tenant?.businesses ?? []).map(toBusinessSummary);
+    }
+
+    return user.business_memberships
+      .map((membership) => membership.business)
+      .map(toBusinessSummary);
   }
 
   private setRefreshCookies(

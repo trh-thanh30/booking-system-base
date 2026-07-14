@@ -44,6 +44,7 @@ import { PrismaModule } from '@/database/prisma/prisma.module';
 import { RedisModule } from '@/database/redis/redis.module';
 import { AssetsModule } from '@/modules/assets/assets.module';
 import { AuthModule } from '@/modules/auth/auth.module';
+import { BusinessModule } from '@/modules/business/business.module';
 import { CommonModule } from '@/modules/common/common.module';
 import { EmailModule } from '@/modules/email/email.module';
 import { HealthModule } from '@/modules/health/health.module';
@@ -135,6 +136,7 @@ const envPath = join(rootDir, envFile);
     JobsModule,
     HealthModule,
     AssetsModule,
+    BusinessModule,
     CommonModule,
     TenantModule,
     PermissionModule,

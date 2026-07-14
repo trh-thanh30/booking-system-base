@@ -1,5 +1,6 @@
 import { PrismaPg } from '@prisma/adapter-pg';
 import {
+  business_status,
   PrismaClient,
   tenant_domain_type,
   tenant_status,
@@ -190,6 +191,37 @@ async function main() {
     },
   });
 
+  const demoBusiness = await prisma.business.upsert({
+    where: {
+      tenant_id_slug: {
+        tenant_id: demoTenant.id,
+        slug: 'demo-spa',
+      },
+    },
+    update: {
+      name: 'Demo Spa',
+      status: business_status.ACTIVE,
+      timezone: 'Asia/Ho_Chi_Minh',
+      locale: 'vi',
+      is_default: true,
+      settings: {
+        booking_window_days: 30,
+      },
+    },
+    create: {
+      tenant_id: demoTenant.id,
+      slug: 'demo-spa',
+      name: 'Demo Spa',
+      status: business_status.ACTIVE,
+      timezone: 'Asia/Ho_Chi_Minh',
+      locale: 'vi',
+      is_default: true,
+      settings: {
+        booking_window_days: 30,
+      },
+    },
+  });
+
   await prisma.tenantDomain.upsert({
     where: { host: 'demo-spa.localhost' },
     update: {
@@ -244,6 +276,23 @@ async function main() {
     is_verified: true,
   });
 
+  for (const member of [ownerUser, staffUser]) {
+    await prisma.businessMembership.upsert({
+      where: {
+        user_id_business_id: {
+          user_id: member.id,
+          business_id: demoBusiness.id,
+        },
+      },
+      update: {},
+      create: {
+        tenant_id: demoTenant.id,
+        business_id: demoBusiness.id,
+        user_id: member.id,
+      },
+    });
+  }
+
   for (const key of DEFAULT_PERMISSION_KEYS) {
     await prisma.permission.upsert({
       where: { key },
@@ -285,6 +334,7 @@ async function main() {
 
   console.log('Base database seed completed successfully.');
   console.log(`Tenant: ${demoTenant.name} (${demoTenant.slug})`);
+  console.log(`Business: ${demoBusiness.name} (${demoBusiness.slug})`);
   console.log('Tenant domains: demo.localhost, demo-spa.localhost');
   console.log(`Super Admin: ${superAdminUser.email} (${superAdminUser.role})`);
   console.log(`Owner: ${ownerUser.email} (${ownerUser.role})`);

@@ -8,6 +8,7 @@ import {
   MessageSquare,
   Settings,
   ShieldCheck,
+  Store,
   TriangleAlert,
   User,
   Users,
@@ -44,6 +45,12 @@ export function getDashboardConfig(t: Translate): DashboardConfig {
             href: "/users",
             icon: Users,
             permission: PERMISSIONS.USER.READ,
+          },
+          {
+            title: t("items.businesses"),
+            href: "/businesses",
+            icon: Store,
+            permission: PERMISSIONS.TENANT.READ,
           },
           {
             title: t("items.chats"),
@@ -100,6 +107,11 @@ export function getDashboardConfig(t: Translate): DashboardConfig {
         title: t("items.customers"),
         href: "/users",
         permission: PERMISSIONS.USER.READ,
+      },
+      {
+        title: t("items.businesses"),
+        href: "/businesses",
+        permission: PERMISSIONS.TENANT.READ,
       },
       {
         title: t("items.bookings"),

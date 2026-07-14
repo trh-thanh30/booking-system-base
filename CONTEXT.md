@@ -8,10 +8,11 @@
 - **Domain module**: product-specific module, such as booking, ecommerce, CRM, inventory, or billing.
 - **Platform Admin Portal**: `apps/platform-admin`, the super-admin surface for managing the whole SaaS platform.
 - **Business Admin Portal**: `apps/admin`, the tenant workspace for a business owner and staff.
-- **Tenant**: a business/workspace on the platform. Tenant-scoped APIs must not leak data across tenants.
+- **Tenant**: an organization/account boundary on the platform. It owns billing, users, domains, settings, and one or more businesses. Tenant-scoped APIs must not leak data across tenants.
+- **Business**: an operational booking unit inside a tenant, such as a branch, brand, location, or store. Booking/service/staff data should move toward `business_id` scope.
 - **Super Admin**: global platform operator. Uses `SUPER_ADMIN`, does not require `tenant_id`, and authenticates with the `platform` context.
-- **Owner**: tenant owner/business admin. Uses `OWNER`, belongs to one tenant in the current model, and authenticates with the `admin` context.
-- **Staff**: tenant employee/operator. Uses `STAFF`, belongs to one tenant in the current model, and receives explicit `UserPermission` grants.
+- **Owner**: tenant owner/business admin. Uses `OWNER`, belongs to one tenant, can access all businesses in that tenant, and authenticates with the `admin` context.
+- **Staff**: tenant employee/operator. Uses `STAFF`, belongs to one tenant, can be scoped to businesses through `BusinessMembership`, and receives explicit `UserPermission` grants.
 - **Customer**: public booking user. Uses `CUSTOMER` and authenticates with the `client` context.
 - **Auth context**: app boundary sent with `x-auth-context`. Valid values are `platform`, `admin`, and `client`.
 
@@ -27,3 +28,5 @@
   and use app-local `src/i18n/navigation.ts` helpers for locale-aware links.
 - Do not use one role to mean both global and tenant administration. Platform
   administration is `SUPER_ADMIN`; tenant administration is `OWNER`.
+- Do not use `Tenant` to mean a physical business location. Use `Business`
+  for branches/brands/locations under the tenant account.

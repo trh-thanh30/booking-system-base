@@ -3,6 +3,7 @@
 import { PanelLeft, Search, Settings } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Button } from "@repo/ui";
+import { BusinessSwitcher } from "@/src/components/business-switcher";
 import { CommandMenu } from "@/src/components/command-menu";
 import { MobileSidebar } from "@/src/components/layout/mobile-sidebar";
 import { ThemeToggle } from "@/src/components/theme-toggle";
@@ -51,6 +52,7 @@ export function Header() {
         </nav>
       </div>
       <div className="flex items-center gap-2">
+        <BusinessSwitcher />
         <Button
           className="hidden w-64 justify-start text-slate-500 md:inline-flex"
           onClick={() => setCommandOpen(true)}

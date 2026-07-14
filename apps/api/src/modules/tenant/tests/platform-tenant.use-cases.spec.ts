@@ -2,6 +2,7 @@ import { CreateTenantUseCase } from '@/modules/tenant/use-cases/create-tenant.us
 import { ListTenantsUseCase } from '@/modules/tenant/use-cases/list-tenants.use-case';
 import { SignupTenantUseCase } from '@/modules/tenant/use-cases/signup-tenant.use-case';
 import {
+  business_status,
   tenant_domain_type,
   tenant_status,
   user_role,
@@ -18,6 +19,21 @@ function makeTenant(overrides: Record<string, unknown> = {}) {
     locale: 'vi',
     created_at: new Date('2026-01-01T00:00:00.000Z'),
     updated_at: new Date('2026-01-02T00:00:00.000Z'),
+    businesses: [
+      {
+        id: 'business-1',
+        tenant_id: 'tenant-1',
+        slug: 'demo-spa',
+        name: 'Demo Spa',
+        status: business_status.ACTIVE,
+        timezone: 'Asia/Ho_Chi_Minh',
+        locale: 'vi',
+        settings: { booking_window_days: 30 },
+        is_default: true,
+        created_at: new Date('2026-01-01T00:00:00.000Z'),
+        updated_at: new Date('2026-01-02T00:00:00.000Z'),
+      },
+    ],
     domains: [
       {
         id: 'domain-1',
@@ -27,7 +43,7 @@ function makeTenant(overrides: Record<string, unknown> = {}) {
       },
     ],
     settings: { settings: { booking_window_days: 30 } },
-    _count: { users: 2 },
+    _count: { businesses: 1, users: 2 },
     ...overrides,
   };
 }
@@ -106,6 +122,7 @@ describe('Platform tenant use cases', () => {
       findUserIdentity: jest.fn().mockResolvedValue(null),
       createTenantWithOwner: jest.fn().mockResolvedValue({
         tenant: makeTenant(),
+        business: makeTenant().businesses[0],
         owner: {
           id: 'owner-1',
           tenant_id: 'tenant-1',
@@ -136,6 +153,10 @@ describe('Platform tenant use cases', () => {
       } as any),
     ).resolves.toEqual({
       tenant: expect.objectContaining({ id: 'tenant-1' }),
+      business: expect.objectContaining({
+        id: 'business-1',
+        is_default: true,
+      }),
       owner: expect.objectContaining({
         id: 'owner-1',
         role: user_role.OWNER,

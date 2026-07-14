@@ -3,7 +3,12 @@ import { CreateTenantDto } from '@/modules/tenant/dto/create-tenant.dto';
 import { TenantRepository } from '@/modules/tenant/repository/tenant.repository';
 import { normalizeHost, toTenantContext } from '@/modules/tenant/tenant.types';
 import { Injectable } from '@nestjs/common';
-import { tenant_domain_type, tenant_status, type Prisma } from '@prisma/client';
+import {
+  business_status,
+  tenant_domain_type,
+  tenant_status,
+  type Prisma,
+} from '@prisma/client';
 
 @Injectable()
 export class CreateTenantUseCase {
@@ -30,6 +35,17 @@ export class CreateTenantUseCase {
       settings: {
         create: {
           settings: (dto.settings ?? {}) as Prisma.InputJsonValue,
+        },
+      },
+      businesses: {
+        create: {
+          slug: dto.default_business_slug ?? dto.slug,
+          name: dto.default_business_name ?? dto.name,
+          status: business_status.ACTIVE,
+          timezone: dto.timezone ?? 'Asia/Ho_Chi_Minh',
+          locale: dto.locale ?? 'vi',
+          settings: (dto.settings ?? {}) as Prisma.InputJsonValue,
+          is_default: true,
         },
       },
     });

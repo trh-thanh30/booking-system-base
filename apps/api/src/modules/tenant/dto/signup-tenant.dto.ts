@@ -52,6 +52,18 @@ export class SignupTenantDto implements SignupTenantInput {
 
   @IsOptional()
   @IsString()
+  @MinLength(1)
+  @MaxLength(160)
+  default_business_name?: string;
+
+  @IsOptional()
+  @IsString()
+  @MinLength(2)
+  @MaxLength(80)
+  default_business_slug?: string;
+
+  @IsOptional()
+  @IsString()
   timezone?: string;
 
   @IsOptional()

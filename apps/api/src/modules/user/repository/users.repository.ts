@@ -44,12 +44,23 @@ export class UsersRepository {
       include: {
         tenant: {
           select: {
+            businesses: {
+              orderBy: [{ is_default: 'desc' }, { created_at: 'asc' }],
+            },
             id: true,
             slug: true,
             name: true,
             status: true,
             timezone: true,
             locale: true,
+          },
+        },
+        business_memberships: {
+          include: {
+            business: true,
+          },
+          orderBy: {
+            created_at: 'asc',
           },
         },
       },

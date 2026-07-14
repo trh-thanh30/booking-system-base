@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Building2, Globe2, Plus, RefreshCw, Users } from "lucide-react";
+import { Building2, Globe2, Plus, RefreshCw, Store } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -63,6 +63,8 @@ function CreateTenantDialog({
     setError,
   } = useForm<CreateTenantInput>({
     defaultValues: {
+      default_business_name: "",
+      default_business_slug: "",
       locale: "vi",
       name: "",
       primary_domain: "",
@@ -75,6 +77,8 @@ function CreateTenantDialog({
     mutationFn: tenantsService.createTenant,
     onSuccess() {
       reset({
+        default_business_name: "",
+        default_business_slug: "",
         locale: "vi",
         name: "",
         primary_domain: "",
@@ -106,6 +110,10 @@ function CreateTenantDialog({
           onSubmit={handleSubmit((input) => {
             const parsed = createTenantSchema.safeParse({
               ...input,
+              default_business_name:
+                input.default_business_name?.trim() || undefined,
+              default_business_slug:
+                input.default_business_slug?.trim() || undefined,
               primary_domain: input.primary_domain?.trim() || undefined,
             });
 
@@ -148,6 +156,30 @@ function CreateTenantDialog({
           </FormField>
           <div className="grid gap-4 sm:grid-cols-2">
             <FormField
+              error={errors.default_business_name?.message}
+              htmlFor="default-business-name"
+              label="Default business"
+            >
+              <Input
+                id="default-business-name"
+                placeholder="Same as business name"
+                {...register("default_business_name")}
+              />
+            </FormField>
+            <FormField
+              error={errors.default_business_slug?.message}
+              htmlFor="default-business-slug"
+              label="Business slug"
+            >
+              <Input
+                id="default-business-slug"
+                placeholder="Same as tenant slug"
+                {...register("default_business_slug")}
+              />
+            </FormField>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <FormField
               error={errors.timezone?.message}
               htmlFor="tenant-timezone"
               label="Timezone"
@@ -187,8 +219,8 @@ export function TenantsView() {
   const activeTenants = tenants.filter(
     (tenant) => tenant.status === "ACTIVE",
   ).length;
-  const totalUsers = tenants.reduce(
-    (total, tenant) => total + tenant.users_count,
+  const totalBusinesses = tenants.reduce(
+    (total, tenant) => total + tenant.businesses_count,
     0,
   );
 
@@ -229,10 +261,10 @@ export function TenantsView() {
           value={String(activeTenants)}
         />
         <StatCard
-          description="Across all tenants"
-          icon={Users}
-          title="Tenant users"
-          value={String(totalUsers)}
+          description="Operational booking units"
+          icon={Store}
+          title="Businesses"
+          value={String(totalBusinesses)}
         />
       </section>
       <Card>
@@ -259,6 +291,7 @@ export function TenantsView() {
                   <TableHead>Business</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Domain</TableHead>
+                  <TableHead>Businesses</TableHead>
                   <TableHead>Users</TableHead>
                   <TableHead>Created</TableHead>
                 </TableRow>
@@ -282,6 +315,7 @@ export function TenantsView() {
                       </Badge>
                     </TableCell>
                     <TableCell>{primaryDomain(tenant)}</TableCell>
+                    <TableCell>{tenant.businesses_count}</TableCell>
                     <TableCell>{tenant.users_count}</TableCell>
                     <TableCell>{formatDate(tenant.created_at)}</TableCell>
                   </TableRow>
