@@ -1,5 +1,7 @@
 export * from '@/common/decorators/match.decorator';
 export * from '@/common/decorators/api-response.decorator';
+export * from '@/common/decorators/business.decorator';
 export * from '@/common/decorators/permissions.decorator';
+export * from '@/common/decorators/require-business.decorator';
 export * from '@/common/decorators/require-tenant.decorator';
 export * from '@/common/decorators/tenant.decorator';

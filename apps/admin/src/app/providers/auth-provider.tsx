@@ -14,8 +14,10 @@ import { authService } from "@/src/services/auth.service";
 import {
   clearAccessToken,
   getAccessToken,
+  setTenantId,
   setAccessToken,
 } from "@/src/lib/auth-token";
+import { useAdminUiStore } from "@/src/app/stores/ui.store";
 
 type AuthContextValue = {
   can: (permission: string) => boolean;
@@ -51,6 +53,14 @@ function canByManagePermission(permissions: string[], permission: string) {
   return permissions.includes(`${resource}:manage`);
 }
 
+function resolveDefaultBusinessId(user: CurrentAuthUser | null) {
+  return (
+    user?.businesses.find((business) => business.is_default)?.id ??
+    user?.businesses[0]?.id ??
+    null
+  );
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<CurrentAuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -59,10 +69,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const currentUser = await authService.getMe();
       setUser(currentUser);
+      setTenantId(currentUser.tenant_id);
+      useAdminUiStore
+        .getState()
+        .setActiveBusinessId(resolveDefaultBusinessId(currentUser));
       return currentUser;
     } catch {
       clearAccessToken();
       setUser(null);
+      useAdminUiStore.getState().setActiveBusinessId(null);
       return null;
     }
   }, []);
@@ -81,12 +96,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           const currentUser = await authService.getMe();
           if (mounted) {
             setUser(currentUser);
+            setTenantId(currentUser.tenant_id);
+            useAdminUiStore
+              .getState()
+              .setActiveBusinessId(resolveDefaultBusinessId(currentUser));
           }
         }
       } catch {
         clearAccessToken();
         if (mounted) {
           setUser(null);
+          useAdminUiStore.getState().setActiveBusinessId(null);
         }
       } finally {
         if (mounted) {
@@ -106,6 +126,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const result = await authService.loginAdmin(input);
     setAccessToken(result.access_token);
     setUser(result.user);
+    setTenantId(result.user.tenant_id);
+    useAdminUiStore
+      .getState()
+      .setActiveBusinessId(resolveDefaultBusinessId(result.user));
     return result.user;
   }, []);
 
@@ -115,6 +139,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } finally {
       clearAccessToken();
       setUser(null);
+      useAdminUiStore.getState().setActiveBusinessId(null);
     }
   }, []);
 

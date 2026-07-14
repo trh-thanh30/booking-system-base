@@ -9,7 +9,7 @@
 - **Platform Admin Portal**: `apps/platform-admin`, the super-admin surface for managing the whole SaaS platform.
 - **Business Admin Portal**: `apps/admin`, the tenant workspace for a business owner and staff.
 - **Tenant**: an organization/account boundary on the platform. It owns billing, users, domains, settings, and one or more businesses. Tenant-scoped APIs must not leak data across tenants.
-- **Business**: an operational booking unit inside a tenant, such as a branch, brand, location, or store. Booking/service/staff data should move toward `business_id` scope.
+- **Business**: an operational booking unit inside a tenant, such as a branch, brand, location, or store. Business-scoped APIs use `x-business-id` and `@RequireBusiness()` so booking/service/staff data stays inside `tenant_id + business_id`.
 - **Super Admin**: global platform operator. Uses `SUPER_ADMIN`, does not require `tenant_id`, and authenticates with the `platform` context.
 - **Owner**: tenant owner/business admin. Uses `OWNER`, belongs to one tenant, can access all businesses in that tenant, and authenticates with the `admin` context.
 - **Staff**: tenant employee/operator. Uses `STAFF`, belongs to one tenant, can be scoped to businesses through `BusinessMembership`, and receives explicit `UserPermission` grants.
@@ -30,3 +30,4 @@
   administration is `SUPER_ADMIN`; tenant administration is `OWNER`.
 - Do not use `Tenant` to mean a physical business location. Use `Business`
   for branches/brands/locations under the tenant account.
+- Business-scoped backend routes must resolve business context before use-case execution; controllers should receive `@Business()` rather than trusting a raw request body `business_id`.

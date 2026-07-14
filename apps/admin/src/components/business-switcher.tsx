@@ -11,6 +11,7 @@ import {
 } from "@repo/ui";
 import { useAuth } from "@/src/app/providers";
 import { useAdminUiStore } from "@/src/app/stores/ui.store";
+import { useEffect } from "react";
 
 export function BusinessSwitcher() {
   const { user } = useAuth();
@@ -19,6 +20,17 @@ export function BusinessSwitcher() {
   const setActiveBusinessId = useAdminUiStore(
     (state) => state.setActiveBusinessId,
   );
+
+  const defaultBusinessId =
+    businesses.find((business) => business.is_default)?.id ??
+    businesses[0]?.id ??
+    null;
+
+  useEffect(() => {
+    if (!activeBusinessId && defaultBusinessId) {
+      setActiveBusinessId(defaultBusinessId);
+    }
+  }, [activeBusinessId, defaultBusinessId, setActiveBusinessId]);
 
   if (businesses.length === 0) {
     return null;

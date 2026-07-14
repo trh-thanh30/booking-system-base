@@ -1,9 +1,12 @@
 import {
   ApiSuccess,
+  Business,
   Permissions,
+  RequireBusiness,
   RequireTenant,
   Tenant,
 } from '@/common/decorators';
+import type { BusinessContext } from '@repo/shared';
 import type { TenantContext } from '@/common/types/tenant-context.types';
 import { CreateBusinessDto } from '@/modules/business/dto/create-business.dto';
 import { CreateBusinessUseCase } from '@/modules/business/use-cases/create-business.use-case';
@@ -24,6 +27,14 @@ export class BusinessController {
   @ApiSuccess('Businesses retrieved successfully')
   list(@Tenant() tenant: TenantContext) {
     return this.listBusinessesUseCase.execute(tenant.id);
+  }
+
+  @Get('current')
+  @RequireBusiness()
+  @Permissions([PERMISSIONS.TENANT.READ])
+  @ApiSuccess('Current business retrieved successfully')
+  current(@Business() business: BusinessContext) {
+    return business;
   }
 
   @Post()

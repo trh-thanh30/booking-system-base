@@ -17,6 +17,29 @@ export class BusinessRepository {
     });
   }
 
+  findAccessibleById(
+    businessId: string,
+    tenantId: string,
+    userId: string,
+    includeAllTenantBusinesses: boolean,
+  ) {
+    return this.prisma.business.findFirst({
+      where: {
+        id: businessId,
+        tenant_id: tenantId,
+        ...(includeAllTenantBusinesses
+          ? {}
+          : {
+              memberships: {
+                some: {
+                  user_id: userId,
+                },
+              },
+            }),
+      },
+    });
+  }
+
   listByTenant(tenantId: string) {
     return this.prisma.business.findMany({
       where: { tenant_id: tenantId },

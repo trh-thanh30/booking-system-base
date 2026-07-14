@@ -1,5 +1,11 @@
 import { createApiClient } from "@repo/shared";
-import { clearAccessToken, getAccessToken, setAccessToken } from "./auth-token";
+import { useAdminUiStore } from "@/src/app/stores/ui.store";
+import {
+  clearAccessToken,
+  getAccessToken,
+  getTenantId,
+  setAccessToken,
+} from "./auth-token";
 
 let refreshPromise: Promise<string | false> | undefined;
 
@@ -49,6 +55,15 @@ async function refreshAccessToken(): Promise<string | false> {
 
 export const apiClient = createApiClient({
   baseURL: process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000/api/v1",
+  getHeaders: () => {
+    const tenantId = getTenantId();
+    const businessId = useAdminUiStore.getState().activeBusinessId;
+
+    return {
+      "x-business-id": businessId ?? undefined,
+      "x-tenant-id": tenantId,
+    };
+  },
   headers: {
     "x-auth-context": "admin",
   },

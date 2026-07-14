@@ -22,6 +22,21 @@ export function createHttpClient(
   });
 
   client.interceptors.request.use(async (config) => {
+    const dynamicHeaders = await options.getHeaders?.();
+    if (dynamicHeaders) {
+      const headers = new AxiosHeaders(
+        config.headers as ConstructorParameters<typeof AxiosHeaders>[0],
+      );
+
+      Object.entries(dynamicHeaders).forEach(([key, value]) => {
+        if (value) {
+          headers.set(key, value);
+        }
+      });
+
+      config.headers = headers;
+    }
+
     const token = await options.getAccessToken?.();
 
     if (token) {

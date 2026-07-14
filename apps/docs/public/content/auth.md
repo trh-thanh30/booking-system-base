@@ -96,6 +96,15 @@ Access token gửi qua header:
 Authorization: Bearer <access_token>
 ```
 
+Business Admin app cũng lưu tenant/business context hiện tại và tự gửi:
+
+```txt
+x-tenant-id: <tenant_id>
+x-business-id: <business_id>
+```
+
+`x-business-id` được dùng bởi các route có `@RequireBusiness()` để chống đọc/ghi nhầm dữ liệu giữa các business trong cùng tenant.
+
 ## Role theo auth context
 
 | Context  | Role được phép   |
@@ -158,6 +167,12 @@ Permission behavior:
 - User không có tenant nhận `permissions: []`.
 - `OWNER` nhận toàn bộ businesses trong tenant.
 - `STAFF` nhận businesses được gán qua `BusinessMembership`.
+
+Business context behavior:
+
+- `OWNER` có thể chọn mọi active business trong tenant.
+- `STAFF` chỉ chọn được business đã có membership.
+- Business không active hoặc không thuộc tenant hiện tại sẽ bị chặn trước khi vào controller.
 
 ## POST /api/v1/auth/register
 

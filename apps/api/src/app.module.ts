@@ -34,6 +34,7 @@ import { LoggerCoreModule, LoggerModule } from '@/common/logger';
 
 // modules
 import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
+import { BusinessGuard } from '@/common/guards/business.guard';
 import { OptionalAuthGuard } from '@/common/guards/optional-auth.guard';
 import { PermissionsGuard } from '@/common/guards/permissions.guard';
 import { RolesGuard } from '@/common/guards/roles.guard';
@@ -167,6 +168,10 @@ const envPath = join(rootDir, envFile);
     {
       provide: APP_GUARD,
       useClass: TenantGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: BusinessGuard,
     },
     {
       provide: APP_GUARD,
