@@ -18,6 +18,11 @@ const LANGUAGES = [
   { code: "zh", label: "中文 (简体)", flag: "🇨🇳" },
 ];
 
+function getSignupPath() {
+  const locale = window.location.pathname.split("/").filter(Boolean)[0] || "vi";
+  return `/${locale}/signup-business`;
+}
+
 export function Header() {
   const isHeaderScrolled = useScrollHeader(12);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -250,8 +255,7 @@ export function Header() {
               variant="primary"
               className="h-10 px-4 text-xs font-semibold py-2"
               onClick={() => {
-                const el = document.getElementById("pricing");
-                if (el) el.scrollIntoView({ behavior: "smooth" });
+                window.location.assign(getSignupPath());
               }}
             >
               Start free trial
@@ -459,8 +463,7 @@ export function Header() {
               type="button"
               onClick={() => {
                 setIsMobileMenuOpen(false);
-                const el = document.getElementById("pricing");
-                if (el) el.scrollIntoView({ behavior: "smooth" });
+                window.location.assign(getSignupPath());
               }}
               className="w-full py-3 text-center text-sm font-bold text-white bg-brand-blue rounded-full active:scale-[0.98] transition-all cursor-pointer min-h-11"
             >

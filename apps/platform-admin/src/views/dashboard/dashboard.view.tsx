@@ -1,3 +1,6 @@
+"use client";
+
+import { useQuery } from "@tanstack/react-query";
 import { Activity, Building2, ShieldCheck, Users } from "lucide-react";
 import { useTranslations } from "next-intl";
 import {
@@ -8,9 +11,22 @@ import {
   CardTitle,
 } from "@repo/ui";
 import { PageHeader, StatCard } from "@/src/components/common";
+import { tenantsService } from "@/src/services/tenants.service";
 
 export function DashboardView() {
   const t = useTranslations("Platform.dashboard");
+  const tenantsQuery = useQuery({
+    queryFn: tenantsService.listTenants,
+    queryKey: ["platform-tenants"],
+  });
+  const tenants = tenantsQuery.data ?? [];
+  const totalUsers = tenants.reduce(
+    (total, tenant) => total + tenant.users_count,
+    0,
+  );
+  const activeTenants = tenants.filter(
+    (tenant) => tenant.status === "ACTIVE",
+  ).length;
 
   return (
     <div className="space-y-6">
@@ -24,19 +40,19 @@ export function DashboardView() {
           description={t("tenantDescription")}
           icon={Building2}
           title={t("tenantCard")}
-          value="--"
+          value={tenantsQuery.isLoading ? "..." : String(tenants.length)}
         />
         <StatCard
           description={t("userDescription")}
           icon={Users}
           title={t("userCard")}
-          value="--"
+          value={tenantsQuery.isLoading ? "..." : String(totalUsers)}
         />
         <StatCard
           description={t("systemDescription")}
           icon={Activity}
           title={t("systemCard")}
-          value="--"
+          value={tenantsQuery.isLoading ? "..." : `${activeTenants} active`}
         />
       </section>
       <Card>

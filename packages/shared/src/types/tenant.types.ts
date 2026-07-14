@@ -38,3 +38,23 @@ export type TenantResolveResult = {
   tenant: TenantSummary;
   domain: TenantDomainSummary;
 };
+
+export type TenantListItem = TenantContext & {
+  created_at: string;
+  updated_at: string;
+  users_count: number;
+};
+
+export type TenantSignupResult = {
+  tenant: TenantContext;
+  owner: {
+    id: string;
+    tenant_id: string;
+    email: string;
+    username: string;
+    full_name: string | null;
+    role: "OWNER";
+    status: "ACTIVE" | "INACTIVE";
+    is_verified: boolean;
+  };
+};

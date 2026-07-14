@@ -28,6 +28,7 @@ FE Web dùng module này cho:
 - Customer register/login.
 - Email verification.
 - Forgot/reset password.
+- Business signup route `/signup-business` gọi tenant signup rồi owner đăng nhập bằng admin context.
 
 ## Trạng thái triển khai
 

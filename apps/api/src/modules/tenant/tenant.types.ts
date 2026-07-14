@@ -13,6 +13,18 @@ export type TenantWithContext = Prisma.TenantGetPayload<{
   };
 }>;
 
+export type TenantWithListContext = Prisma.TenantGetPayload<{
+  include: {
+    domains: true;
+    settings: true;
+    _count: {
+      select: {
+        users: true;
+      };
+    };
+  };
+}>;
+
 export function normalizeHost(host: string): string {
   return host.trim().toLowerCase().replace(/:\d+$/, '');
 }
@@ -66,5 +78,14 @@ export function toTenantContext(tenant: TenantWithContext): TenantContext {
     ...toTenantSummary(tenant),
     settings: toTenantSettings(tenant.settings?.settings),
     domains: tenant.domains.map(toTenantDomainSummary),
+  };
+}
+
+export function toTenantListItem(tenant: TenantWithListContext) {
+  return {
+    ...toTenantContext(tenant),
+    created_at: tenant.created_at,
+    updated_at: tenant.updated_at,
+    users_count: tenant._count.users,
   };
 }

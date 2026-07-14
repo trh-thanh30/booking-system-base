@@ -39,6 +39,9 @@ Bảo vệ dữ liệu doanh nghiệp, cho phép mỗi nhóm người dùng ch�
 - `POST /auth/invitations`
 - `GET /auth/invitations/:token`
 - `POST /auth/invitations/accept`
+- `POST /tenants/signup`
+- `GET /platform/tenants`
+- `POST /platform/tenants`
 
 ## Database Changes
 
@@ -112,12 +115,37 @@ Không thêm `sessions` table trong F1. Refresh/session state dùng `users.refre
 - Thêm backend invitation flow.
 - Bổ sung unit tests cho auth, permission và invitation use cases.
 
-### Phase 2 - Admin FE
+### Phase 2 - Business Admin FE
 
 - Login, forgot password, reset password và accept invitation screens.
 - Current user state đọc từ `/auth/me`.
 - Sidebar/navigation/action visibility dựa trên permissions từ API.
 - User menu và logout flow.
+
+### Phase 3 - Platform Admin FE
+
+- Platform Admin dùng `/auth/login-platform` và `x-auth-context: platform`.
+- Tenant registry đọc `GET /platform/tenants`.
+- Super Admin tạo tenant thủ công bằng `POST /platform/tenants`.
+- Dashboard platform hiển thị tenant/user totals từ tenant registry API.
+
+### Phase 4 - Public Business Signup
+
+- Web route `/{locale}/signup-business`.
+- Tạo tenant + owner account bằng `POST /tenants/signup`.
+- Sau signup, owner đi tới Business Admin login.
+
+### Phase 5 - Migration & Docs
+
+- Thêm migration đổi `user_role`: `ADMIN -> OWNER`, `USER -> CUSTOMER`, thêm `SUPER_ADMIN`.
+- Thêm migration cho `permission`, `user_permission`, `user_invitation`.
+- Cập nhật docs app cho auth, permission, tenant signup và platform registry.
+
+### Phase 6 - Hardening
+
+- Unit tests cho auth/permission/tenant use cases.
+- Typecheck API/Admin/Platform/Web.
+- Lint platform admin.
 
 ## Dependencies
 
