@@ -9,6 +9,7 @@ pnpm build:packages
 pnpm build:api
 pnpm build:web
 pnpm build:admin
+pnpm build:platform-admin
 ```
 
 Hoặc build toàn bộ:
@@ -25,6 +26,7 @@ Build image:
 pnpm docker:build:api
 pnpm docker:build:web
 pnpm docker:build:admin
+pnpm docker:build:platform-admin
 pnpm docker:build:all
 ```
 
@@ -58,6 +60,7 @@ Production compose dùng image qua biến:
 - `API_IMAGE`
 - `WEB_IMAGE`
 - `ADMIN_IMAGE`
+- `PLATFORM_ADMIN_IMAGE`
 - `IMAGE_TAG`
 
 ## Database Migration
@@ -84,6 +87,7 @@ GitHub Actions hiện tách job:
 - API
 - Web
 - Admin
+- Platform Admin
 - Telegram notification
 
 Telegram secrets cần cấu hình trong GitHub Actions:

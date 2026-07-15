@@ -5,6 +5,11 @@ import { motion, useReducedMotion } from "framer-motion";
 import { Reveal } from "@/src/components/motion/Reveal";
 import { Footer } from "./footer";
 
+function getSignupPath() {
+  const locale = window.location.pathname.split("/").filter(Boolean)[0] || "vi";
+  return `/${locale}/signup-business`;
+}
+
 export function FinalCTA() {
   const shouldReduceMotion = useReducedMotion();
 
@@ -39,8 +44,7 @@ export function FinalCTA() {
               whileHover={shouldReduceMotion ? undefined : { scale: 1.02 }}
               whileTap={shouldReduceMotion ? undefined : { scale: 0.98 }}
               onClick={() => {
-                const el = document.getElementById("pricing");
-                if (el) el.scrollIntoView({ behavior: "smooth" });
+                window.location.assign(getSignupPath());
               }}
               className="w-full sm:w-auto inline-flex h-12 px-8 text-sm font-bold items-center justify-center rounded-full bg-brand-blue hover:bg-brand-blue-hover text-white shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer select-none"
             >

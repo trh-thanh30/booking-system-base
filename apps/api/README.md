@@ -49,7 +49,7 @@ Content-Type: application/json
   "data": {
     "id": "uuid-v4-identifier",
     "email": "john@example.com",
-    "role": "USER"
+    "role": "CUSTOMER"
   }
 }
 ```
@@ -399,7 +399,7 @@ The application uses `@nestjs/throttler` for rate limiting to prevent abuse:
 ### Authentication & Authorization
 
 - **JWT Tokens**: Access and refresh tokens with secure cookie handling
-- **Role-Based Access**: Three user roles (ADMIN, STAFF, USER)
+- **Role-Based Access**: Platform, tenant, and client roles (`SUPER_ADMIN`, `OWNER`, `STAFF`, `CUSTOMER`)
 - **Email Verification**: Required for account activation
 - **Password Security**: Bcrypt hashing with configurable rounds
 - **Secure Cookies**: httpOnly, secure, sameSite cookies for refresh tokens

@@ -11,6 +11,7 @@ import {
   DialogDescription,
 } from "@repo/ui";
 import { useAdminUiStore } from "@/src/app/stores/ui.store";
+import { useAuth } from "@/src/app/providers";
 import { getDashboardConfig } from "@/src/config/dashboard.config";
 import { Link } from "@/src/i18n/navigation";
 
@@ -18,6 +19,7 @@ export function CommandMenu() {
   const t = useTranslations("DashboardConfig");
   const tCommon = useTranslations("Common");
   const dashboardConfig = getDashboardConfig(t);
+  const { can } = useAuth();
   const open = useAdminUiStore((state) => state.commandOpen);
   const setOpen = useAdminUiStore((state) => state.setCommandOpen);
 
@@ -46,7 +48,7 @@ export function CommandMenu() {
 
   dashboardConfig.sidebarSections.forEach((section) => {
     section.items.forEach((item) => {
-      if (item.href) {
+      if (item.href && (!item.permission || can(item.permission))) {
         itemsMap.set(item.href, {
           title: item.title,
           href: item.href,
@@ -57,7 +59,11 @@ export function CommandMenu() {
   });
 
   dashboardConfig.topNavigation.forEach((item) => {
-    if (item.href && !itemsMap.has(item.href)) {
+    if (
+      item.href &&
+      !itemsMap.has(item.href) &&
+      (!item.permission || can(item.permission))
+    ) {
       itemsMap.set(item.href, {
         title: item.title,
         href: item.href,

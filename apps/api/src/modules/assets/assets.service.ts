@@ -202,7 +202,7 @@ export class AssetsService {
       throw new NotFoundException('Asset not found');
     }
 
-    if (asset.uploaded_by_id !== user.id && user.role !== 'ADMIN') {
+    if (asset.uploaded_by_id !== user.id && user.role !== 'OWNER') {
       throw new ForbiddenException(
         'You do not have permission to delete this asset',
       );

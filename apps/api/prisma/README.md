@@ -17,7 +17,7 @@ The database is powered by PostgreSQL and managed through Prisma, providing a ro
 model User {
   id          String      @id @default(uuid()) @db.Uuid
   email       String      @unique
-  role        user_role   @default(USER)
+  role        user_role   @default(CUSTOMER)
   status      user_status @default(ACTIVE)
   createdAt   DateTime    @default(now())
 

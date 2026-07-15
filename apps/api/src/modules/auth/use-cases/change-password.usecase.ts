@@ -37,9 +37,10 @@ export class ChangePasswordUseCase {
       );
     }
 
-    await this.usersService.update(currentUser.id, {
-      password: dto.password,
-    });
+    await this.usersService.updatePasswordAndClearRefreshToken(
+      currentUser.id,
+      dto.password,
+    );
 
     return { success: true };
   }

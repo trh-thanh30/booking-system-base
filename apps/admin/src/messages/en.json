@@ -1,10 +1,10 @@
 {
   "App": {
-    "title": "Booking Admin",
-    "description": "Operational dashboard for the booking system base"
+    "title": "Business Admin",
+    "description": "Tenant workspace for business owners and staff"
   },
   "DashboardConfig": {
-    "brandDescription": "Next + Turborepo",
+    "brandDescription": "Tenant workspace",
     "sections": {
       "general": "General",
       "pages": "Pages",
@@ -14,6 +14,7 @@
       "dashboard": "Dashboard",
       "bookings": "Bookings",
       "users": "Users",
+      "businesses": "Businesses",
       "chats": "Chats",
       "securedByAuth": "Secured by Auth",
       "auth": "Auth",
@@ -109,6 +110,56 @@
       "confirmed": "Confirmed",
       "completed": "Completed",
       "cancelled": "Cancelled"
+    }
+  },
+  "Auth": {
+    "backToLogin": "Back to login",
+    "fields": {
+      "code": "Verification code",
+      "confirmPassword": "Confirm password",
+      "email": "Email",
+      "fullName": "Full name",
+      "password": "Password",
+      "sessionId": "Session ID",
+      "username": "Username",
+      "usernameOrEmail": "Email or username"
+    },
+    "login": {
+      "description": "Use an admin or staff account to access the tenant workspace.",
+      "failed": "Login failed",
+      "forgotPassword": "Forgot password?",
+      "submit": "Sign in",
+      "submitting": "Signing in",
+      "success": "Signed in successfully",
+      "title": "Sign in"
+    },
+    "forgot": {
+      "description": "Request a reset code for your admin account.",
+      "failed": "Could not request password reset",
+      "sessionTitle": "Reset session",
+      "submit": "Send reset code",
+      "submitting": "Sending reset code",
+      "success": "Reset code requested",
+      "title": "Forgot password"
+    },
+    "reset": {
+      "description": "Enter the reset session, code, and a new password.",
+      "failed": "Could not reset password",
+      "submit": "Reset password",
+      "submitting": "Resetting password",
+      "success": "Password reset successfully",
+      "title": "Reset password"
+    },
+    "invitation": {
+      "description": "Accept your tenant invitation and create your staff account.",
+      "failed": "Could not accept invitation",
+      "notFoundDescription": "This invitation is invalid, expired, or already accepted.",
+      "notFoundTitle": "Invitation unavailable",
+      "submit": "Accept invitation",
+      "submitting": "Creating account",
+      "success": "Invitation accepted. You can now sign in.",
+      "title": "Accept invitation",
+      "unavailable": "Unavailable"
     }
   },
   "Home": {

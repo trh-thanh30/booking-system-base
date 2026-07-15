@@ -19,7 +19,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { type User as UserEntity } from '@prisma/client';
+import { user_role, type User as UserEntity } from '@prisma/client';
 
 @Controller('assets')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -57,7 +57,7 @@ export class AssetsController {
    * List all assets (Admin only)
    */
   @Get()
-  @Roles(['ADMIN'])
+  @Roles([user_role.OWNER])
   async findAll(@Query() dto: ListAssetsDto) {
     return this.assetsService.listAssets(dto);
   }

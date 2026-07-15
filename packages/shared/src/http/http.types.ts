@@ -8,9 +8,14 @@ export type TokenResolver = () =>
   | string
   | undefined;
 
+export type HeaderResolver = () =>
+  | Promise<Record<string, string | undefined> | undefined>
+  | Record<string, string | undefined>
+  | undefined;
+
 export type UnauthorizedHandler = (
   error: HttpClientError,
-) => Promise<void> | void;
+) => Promise<string | false | void> | string | false | void;
 
 export type CreateHttpClientOptions = {
   baseURL?: string;
@@ -18,6 +23,7 @@ export type CreateHttpClientOptions = {
   timeout?: number;
   withCredentials?: boolean;
   getAccessToken?: TokenResolver;
+  getHeaders?: HeaderResolver;
   onUnauthorized?: UnauthorizedHandler;
 };
 

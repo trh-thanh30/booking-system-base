@@ -1,7 +1,8 @@
 import { BcryptService } from '@/common/helpers/bcrypt.util';
-import { PrismaService } from '@/database/prisma/prisma.service';
+import { NotFoundError } from '@/common/response';
 import { CreateUserDto } from '@/modules/user/dto/create-user.dto';
 import { UpdateUserDto } from '@/modules/user/dto/update-user.dto';
+import { UsersRepository } from '@/modules/user/repository/users.repository';
 import { Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
 
@@ -11,10 +12,10 @@ import { User } from '@prisma/client';
 @Injectable()
 export class UsersService {
   /**
-   * Initialize service with PrismaService and BcryptService
+   * Initialize service with repository and password hashing helper.
    */
   constructor(
-    private readonly prismaService: PrismaService,
+    private readonly usersRepository: UsersRepository,
     private readonly bcryptService: BcryptService,
   ) {}
 
@@ -24,9 +25,7 @@ export class UsersService {
    * @returns User or null if not found
    */
   async findByEmail(email: string): Promise<User | null> {
-    return this.prismaService.user.findUnique({
-      where: { email },
-    });
+    return this.usersRepository.findByEmail(email);
   }
 
   /**
@@ -35,15 +34,11 @@ export class UsersService {
    * @returns User or null if not found
    */
   async findByUsername(username: string): Promise<User | null> {
-    return this.prismaService.user.findUnique({
-      where: { username },
-    });
+    return this.usersRepository.findByUsername(username);
   }
 
   async findByPhone(phone: string): Promise<User | null> {
-    return this.prismaService.user.findUnique({
-      where: { phone },
-    });
+    return this.usersRepository.findByPhone(phone);
   }
 
   /**
@@ -52,11 +47,7 @@ export class UsersService {
    * @returns User or null if not found
    */
   async findByEmailOrUsername(identifier: string): Promise<User | null> {
-    return this.prismaService.user.findFirst({
-      where: {
-        OR: [{ email: identifier }, { username: identifier }],
-      },
-    });
+    return this.usersRepository.findByEmailOrUsername(identifier);
   }
 
   /**
@@ -65,15 +56,11 @@ export class UsersService {
    * @returns User or null if not found
    */
   async findById(id: string): Promise<User | null> {
-    return this.prismaService.user.findUnique({
-      where: { id },
-    });
+    return this.usersRepository.findById(id);
   }
 
   async findAuthProfileById(id: string) {
-    return this.prismaService.user.findUnique({
-      where: { id },
-    });
+    return this.usersRepository.findAuthProfileById(id);
   }
 
   /**
@@ -83,11 +70,19 @@ export class UsersService {
    */
   async create(dto: CreateUserDto): Promise<User> {
     const hashedPassword = await this.bcryptService.hashPassword(dto.password);
-    return this.prismaService.user.create({
-      data: {
-        ...dto,
-        password: hashedPassword,
-      },
+    return this.usersRepository.createUnchecked({
+      ...dto,
+      password: hashedPassword,
+    });
+  }
+
+  async createInTenant(tenantId: string, dto: CreateUserDto): Promise<User> {
+    const hashedPassword = await this.bcryptService.hashPassword(dto.password);
+
+    return this.usersRepository.createUnchecked({
+      ...dto,
+      tenant_id: tenantId,
+      password: hashedPassword,
     });
   }
 
@@ -101,10 +96,23 @@ export class UsersService {
     if (dto.password) {
       dto.password = await this.bcryptService.hashPassword(dto.password);
     }
-    return this.prismaService.user.update({
-      where: { id },
-      data: dto,
+    return this.usersRepository.update(id, dto);
+  }
+
+  async updatePasswordAndClearRefreshToken(
+    id: string,
+    password: string,
+  ): Promise<User> {
+    const hashedPassword = await this.bcryptService.hashPassword(password);
+
+    return this.usersRepository.update(id, {
+      password: hashedPassword,
+      refresh_token: null,
     });
+  }
+
+  async clearRefreshToken(id: string): Promise<User> {
+    return this.usersRepository.update(id, { refresh_token: null });
   }
 
   /**
@@ -112,7 +120,41 @@ export class UsersService {
    * @returns List of users
    */
   async findAll(): Promise<User[]> {
-    return this.prismaService.user.findMany();
+    return this.usersRepository.findAll();
+  }
+
+  async findAllByTenant(tenantId: string): Promise<User[]> {
+    return this.usersRepository.findAllByTenant(tenantId);
+  }
+
+  async findByIdInTenant(id: string, tenantId: string): Promise<User | null> {
+    return this.usersRepository.findByIdInTenant(id, tenantId);
+  }
+
+  async updateInTenant(
+    id: string,
+    tenantId: string,
+    dto: UpdateUserDto,
+  ): Promise<User> {
+    if (dto.password) {
+      dto.password = await this.bcryptService.hashPassword(dto.password);
+    }
+
+    const user = await this.findByIdInTenant(id, tenantId);
+    if (!user) {
+      throw new NotFoundError('User not found');
+    }
+
+    return this.usersRepository.update(id, dto);
+  }
+
+  async deleteInTenant(id: string, tenantId: string): Promise<User> {
+    const user = await this.findByIdInTenant(id, tenantId);
+    if (!user) {
+      throw new NotFoundError('User not found');
+    }
+
+    return this.usersRepository.delete(id);
   }
 
   /**
@@ -121,8 +163,6 @@ export class UsersService {
    * @returns Deleted user
    */
   async delete(id: string): Promise<User> {
-    return this.prismaService.user.delete({
-      where: { id },
-    });
+    return this.usersRepository.delete(id);
   }
 }

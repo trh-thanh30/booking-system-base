@@ -3,7 +3,9 @@
 import { create } from "zustand";
 
 type AdminUiState = {
+  activeBusinessId: string | null;
   commandOpen: boolean;
+  setActiveBusinessId: (businessId: string | null) => void;
   setCommandOpen: (open: boolean) => void;
   sidebarCollapsed: boolean;
   toggleSidebar: () => void;
@@ -11,7 +13,9 @@ type AdminUiState = {
 };
 
 export const useAdminUiStore = create<AdminUiState>((set) => ({
+  activeBusinessId: null,
   commandOpen: false,
+  setActiveBusinessId: (businessId) => set({ activeBusinessId: businessId }),
   setCommandOpen: (open) => set({ commandOpen: open }),
   sidebarCollapsed: false,
   toggleSidebar: () =>

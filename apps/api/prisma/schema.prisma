@@ -15,7 +15,7 @@ model User {
   full_name     String?
   phone         String?     @unique
   avatar_url    String?
-  role          user_role   @default(USER)
+  role          user_role   @default(CUSTOMER)
   status        user_status @default(ACTIVE)
   is_verified   Boolean     @default(false)
   refresh_token String?
@@ -24,8 +24,12 @@ model User {
 
   tenant                  Tenant?                 @relation(fields: [tenant_id], references: [id], onDelete: SetNull)
   assets                  Asset[]
+  business_memberships    BusinessMembership[]
   created_notifications   Notification[]          @relation("NotificationCreatedBy")
   notification_recipients NotificationRecipient[]
+  user_permissions        UserPermission[]
+  granted_permissions     UserPermission[]        @relation("GrantedPermissions")
+  sent_invitations        UserInvitation[]        @relation("InvitationsSent")
 
   @@index([tenant_id])
   @@index([role, status])
@@ -150,17 +154,116 @@ model Tenant {
   created_at DateTime      @default(now())
   updated_at DateTime      @updatedAt
 
-  domains       TenantDomain[]
-  settings      TenantSettings?
-  users         User[]
-  assets        Asset[]
-  notifications Notification[]
-  activity_logs ActivityLog[]
-  job_runs      JobRun[]
-  system_events SystemEvent[]
+  domains          TenantDomain[]
+  settings         TenantSettings?
+  businesses       Business[]
+  business_memberships BusinessMembership[]
+  users            User[]
+  assets           Asset[]
+  notifications    Notification[]
+  activity_logs    ActivityLog[]
+  job_runs         JobRun[]
+  system_events    SystemEvent[]
+  user_permissions UserPermission[]
+  user_invitations UserInvitation[]
 
   @@index([status])
   @@map("tenant")
+}
+
+model Business {
+  id         String          @id @default(uuid()) @db.Uuid
+  tenant_id  String          @db.Uuid
+  slug       String
+  name       String
+  status     business_status @default(ACTIVE)
+  timezone   String          @default("Asia/Ho_Chi_Minh")
+  locale     String          @default("vi")
+  settings   Json?
+  is_default Boolean         @default(false)
+  created_at DateTime        @default(now())
+  updated_at DateTime        @updatedAt
+
+  tenant      Tenant               @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
+  memberships BusinessMembership[]
+
+  @@unique([tenant_id, slug])
+  @@index([tenant_id])
+  @@index([status])
+  @@map("business")
+}
+
+model BusinessMembership {
+  id          String   @id @default(uuid()) @db.Uuid
+  tenant_id   String   @db.Uuid
+  business_id String   @db.Uuid
+  user_id     String   @db.Uuid
+  created_at  DateTime @default(now())
+
+  tenant   Tenant   @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
+  business Business @relation(fields: [business_id], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([user_id, business_id])
+  @@index([tenant_id, user_id])
+  @@index([business_id])
+  @@map("business_membership")
+}
+
+model Permission {
+  id          String   @id @default(uuid()) @db.Uuid
+  key         String   @unique
+  resource    String
+  action      String
+  description String?
+  created_at  DateTime @default(now())
+
+  user_permissions UserPermission[]
+
+  @@unique([resource, action])
+  @@index([resource])
+  @@map("permission")
+}
+
+model UserPermission {
+  id            String   @id @default(uuid()) @db.Uuid
+  user_id       String   @db.Uuid
+  permission_id String   @db.Uuid
+  tenant_id     String   @db.Uuid
+  granted_by_id String?  @db.Uuid
+  created_at    DateTime @default(now())
+
+  user       User       @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permission_id], references: [id], onDelete: Cascade)
+  tenant     Tenant     @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
+  granted_by User?      @relation("GrantedPermissions", fields: [granted_by_id], references: [id], onDelete: SetNull)
+
+  @@unique([user_id, permission_id, tenant_id])
+  @@index([user_id, tenant_id])
+  @@index([permission_id])
+  @@index([tenant_id])
+  @@map("user_permission")
+}
+
+model UserInvitation {
+  id              String    @id @default(uuid()) @db.Uuid
+  tenant_id       String    @db.Uuid
+  email           String
+  role            user_role @default(STAFF)
+  permission_keys Json?
+  token_hash      String    @unique
+  invited_by_id   String?   @db.Uuid
+  accepted_at     DateTime?
+  expires_at      DateTime
+  created_at      DateTime  @default(now())
+
+  tenant     Tenant @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
+  invited_by User?  @relation("InvitationsSent", fields: [invited_by_id], references: [id], onDelete: SetNull)
+
+  @@index([tenant_id])
+  @@index([email])
+  @@index([expires_at])
+  @@map("user_invitation")
 }
 
 model TenantDomain {
@@ -228,9 +331,10 @@ model SystemEvent {
 }
 
 enum user_role {
-  ADMIN
+  SUPER_ADMIN
+  OWNER
   STAFF
-  USER
+  CUSTOMER
 }
 
 enum user_status {
@@ -276,6 +380,12 @@ enum notification_read_status {
 }
 
 enum tenant_status {
+  ACTIVE
+  SUSPENDED
+  DISABLED
+}
+
+enum business_status {
   ACTIVE
   SUSPENDED
   DISABLED

@@ -24,7 +24,7 @@ export class RefreshTokenUseCase extends BaseUseCase<
 
   async execute(
     refreshToken: string,
-    requiredRole?: user_role,
+    requiredRole?: user_role | user_role[],
   ): Promise<RefreshTokenResponse> {
     if (!refreshToken) {
       throw new UnauthorizedError('Refresh token is missing');
@@ -59,7 +59,7 @@ export class RefreshTokenUseCase extends BaseUseCase<
         });
       }
 
-      if (requiredRole && user.role !== requiredRole) {
+      if (requiredRole && !this.isAllowedRole(user.role, requiredRole)) {
         throw new UnauthorizedError('Invalid refresh token for this app');
       }
 
@@ -84,5 +84,39 @@ export class RefreshTokenUseCase extends BaseUseCase<
       }
       throw new UnauthorizedError('Invalid or expired refresh token');
     }
+  }
+
+  async revoke(refreshToken: string, requiredRole?: user_role | user_role[]) {
+    if (!refreshToken) {
+      return;
+    }
+
+    try {
+      const decoded = this.tokenService.verifyRefreshToken(refreshToken);
+      const user = await this.prismaService.user.findUnique({
+        where: { id: decoded.payload.id },
+      });
+
+      if (
+        user &&
+        user.refresh_token === refreshToken &&
+        (!requiredRole || this.isAllowedRole(user.role, requiredRole))
+      ) {
+        await this.prismaService.user.update({
+          where: { id: user.id },
+          data: { refresh_token: null },
+        });
+      }
+    } catch {
+      return;
+    }
+  }
+
+  private isAllowedRole(
+    role: user_role,
+    requiredRole: user_role | user_role[],
+  ): boolean {
+    const roles = Array.isArray(requiredRole) ? requiredRole : [requiredRole];
+    return roles.includes(role);
   }
 }

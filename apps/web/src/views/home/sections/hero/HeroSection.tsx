@@ -10,6 +10,11 @@ import { DashboardMockup } from "./components/DashboardMockup";
 import { PhoneMockup } from "./components/PhoneMockup";
 import { SuccessToast } from "./components/SuccessToast";
 
+function getSignupPath() {
+  const locale = window.location.pathname.split("/").filter(Boolean)[0] || "vi";
+  return `/${locale}/signup-business`;
+}
+
 export function HeroSection() {
   const dashboardFloating = useFloating({ distance: 8, duration: 6 });
   const mobileFloating = useFloating({ distance: 12, duration: 5 });
@@ -31,11 +36,6 @@ export function HeroSection() {
   } = useHeroAutoplay();
 
   const containerRef = useRef<HTMLDivElement>(null);
-
-  const handleScrollToPricing = () => {
-    const el = document.getElementById("pricing");
-    if (el) el.scrollIntoView({ behavior: "smooth" });
-  };
 
   const handleScrollToTemplates = () => {
     const el = document.getElementById("templates");
@@ -74,7 +74,7 @@ export function HeroSection() {
             <MotionButton
               variant="primary"
               className="w-full sm:w-auto h-12 px-8 text-sm font-bold cursor-pointer"
-              onClick={handleScrollToPricing}
+              onClick={() => window.location.assign(getSignupPath())}
             >
               Create Your Page Free
             </MotionButton>

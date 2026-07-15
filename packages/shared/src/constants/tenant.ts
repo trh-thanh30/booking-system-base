@@ -5,3 +5,5 @@ export const TENANT_DOMAIN_TYPES = [
   "CUSTOM_DOMAIN",
   "INTERNAL",
 ] as const;
+
+export const BUSINESS_STATUSES = ["ACTIVE", "SUSPENDED", "DISABLED"] as const;

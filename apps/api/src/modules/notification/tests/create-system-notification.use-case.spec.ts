@@ -27,13 +27,13 @@ describe('CreateSystemNotificationUseCase', () => {
         content: 'Content',
         type: 'TEST',
         scope: notification_scope.ROLE,
-        target_roles: [user_role.ADMIN],
+        target_roles: [user_role.OWNER],
         metadata: { source_id: 'x' },
       } as any),
     ).resolves.toEqual({ id: 'notification-1' });
 
     expect(repository.findTargetUserIds).toHaveBeenCalledWith(
-      { scope: notification_scope.ROLE, target_roles: [user_role.ADMIN] },
+      { scope: notification_scope.ROLE, target_roles: [user_role.OWNER] },
       { tx: true },
     );
     expect(repository.createNotification).toHaveBeenCalledWith(
@@ -48,7 +48,7 @@ describe('CreateSystemNotificationUseCase', () => {
           source_id: 'x',
           target: {
             scope: notification_scope.ROLE,
-            target_roles: [user_role.ADMIN],
+            target_roles: [user_role.OWNER],
             target_user_ids: [],
           },
         },

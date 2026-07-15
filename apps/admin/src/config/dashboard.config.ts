@@ -8,10 +8,12 @@ import {
   MessageSquare,
   Settings,
   ShieldCheck,
+  Store,
   TriangleAlert,
   User,
   Users,
 } from "lucide-react";
+import { PERMISSIONS } from "@repo/shared";
 import type { DashboardConfig } from "./dashboard.types";
 
 type Translate = (key: string) => string;
@@ -19,7 +21,7 @@ type Translate = (key: string) => string;
 export function getDashboardConfig(t: Translate): DashboardConfig {
   return {
     brand: {
-      name: "Booking Admin",
+      name: "Business Admin",
       description: t("brandDescription"),
       logo: ClipboardList,
     },
@@ -36,11 +38,19 @@ export function getDashboardConfig(t: Translate): DashboardConfig {
             title: t("items.bookings"),
             href: "/bookings",
             icon: CalendarCheck,
+            permission: PERMISSIONS.BOOKING.READ,
           },
           {
             title: t("items.users"),
             href: "/users",
             icon: Users,
+            permission: PERMISSIONS.USER.READ,
+          },
+          {
+            title: t("items.businesses"),
+            href: "/businesses",
+            icon: Store,
+            permission: PERMISSIONS.TENANT.READ,
           },
           {
             title: t("items.chats"),
@@ -73,11 +83,13 @@ export function getDashboardConfig(t: Translate): DashboardConfig {
             title: t("items.system"),
             href: "/system",
             icon: Activity,
+            permission: PERMISSIONS.TENANT.READ,
           },
           {
             title: t("items.settings"),
             href: "/settings",
             icon: Settings,
+            permission: PERMISSIONS.TENANT.UPDATE,
           },
           {
             title: t("items.helpCenter"),
@@ -94,14 +106,22 @@ export function getDashboardConfig(t: Translate): DashboardConfig {
       {
         title: t("items.customers"),
         href: "/users",
+        permission: PERMISSIONS.USER.READ,
+      },
+      {
+        title: t("items.businesses"),
+        href: "/businesses",
+        permission: PERMISSIONS.TENANT.READ,
       },
       {
         title: t("items.bookings"),
         href: "/bookings",
+        permission: PERMISSIONS.BOOKING.READ,
       },
       {
         title: t("items.settings"),
         href: "/settings",
+        permission: PERMISSIONS.TENANT.UPDATE,
       },
     ],
     userMenu: {

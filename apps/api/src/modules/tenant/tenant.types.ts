@@ -8,8 +8,23 @@ import { tenant_domain_type, tenant_status, type Prisma } from '@prisma/client';
 
 export type TenantWithContext = Prisma.TenantGetPayload<{
   include: {
+    businesses: true;
     domains: true;
     settings: true;
+  };
+}>;
+
+export type TenantWithListContext = Prisma.TenantGetPayload<{
+  include: {
+    businesses: true;
+    domains: true;
+    settings: true;
+    _count: {
+      select: {
+        businesses: true;
+        users: true;
+      };
+    };
   };
 }>;
 
@@ -66,5 +81,15 @@ export function toTenantContext(tenant: TenantWithContext): TenantContext {
     ...toTenantSummary(tenant),
     settings: toTenantSettings(tenant.settings?.settings),
     domains: tenant.domains.map(toTenantDomainSummary),
+  };
+}
+
+export function toTenantListItem(tenant: TenantWithListContext) {
+  return {
+    ...toTenantContext(tenant),
+    created_at: tenant.created_at,
+    updated_at: tenant.updated_at,
+    businesses_count: tenant._count.businesses,
+    users_count: tenant._count.users,
   };
 }

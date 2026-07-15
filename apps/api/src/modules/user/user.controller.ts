@@ -1,9 +1,13 @@
-import { Roles } from '@/common/decorators/roles.decorator';
-import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
-import { RolesGuard } from '@/common/guards/roles.guard';
+import { Permissions, RequireTenant, Tenant } from '@/common/decorators';
+import type { TenantContext } from '@/common/types/tenant-context.types';
+import { PERMISSIONS } from '@/modules/permission/constants/permission.constants';
 import { CreateUserDto } from '@/modules/user/dto/create-user.dto';
 import { UpdateUserDto } from '@/modules/user/dto/update-user.dto';
-import { UsersService } from '@/modules/user/user.service';
+import { CreateUserUseCase } from '@/modules/user/use-cases/create-user.use-case';
+import { DeleteUserUseCase } from '@/modules/user/use-cases/delete-user.use-case';
+import { GetUserUseCase } from '@/modules/user/use-cases/get-user.use-case';
+import { ListUsersUseCase } from '@/modules/user/use-cases/list-users.use-case';
+import { UpdateUserUseCase } from '@/modules/user/use-cases/update-user.use-case';
 import {
   Body,
   Controller,
@@ -12,16 +16,21 @@ import {
   Param,
   Post,
   Put,
-  UseGuards,
 } from '@nestjs/common';
 
 /**
  * Controller for user management endpoints
  */
 @Controller('users')
-@UseGuards(JwtAuthGuard, RolesGuard)
+@RequireTenant()
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly createUserUseCase: CreateUserUseCase,
+    private readonly listUsersUseCase: ListUsersUseCase,
+    private readonly getUserUseCase: GetUserUseCase,
+    private readonly updateUserUseCase: UpdateUserUseCase,
+    private readonly deleteUserUseCase: DeleteUserUseCase,
+  ) {}
 
   /**
    * Create a new user (Admin only)
@@ -29,9 +38,12 @@ export class UsersController {
    * @returns Created user
    */
   @Post()
-  @Roles(['ADMIN'])
-  async create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+  @Permissions([PERMISSIONS.USER.CREATE])
+  async create(
+    @Tenant() tenant: TenantContext,
+    @Body() createUserDto: CreateUserDto,
+  ) {
+    return this.createUserUseCase.execute(tenant.id, createUserDto);
   }
 
   /**
@@ -39,10 +51,9 @@ export class UsersController {
    * @returns List of all users
    */
   @Get()
-  @Roles(['ADMIN'])
-  async findAll() {
-    // Implement pagination later
-    return this.usersService.findAll();
+  @Permissions([PERMISSIONS.USER.READ])
+  async findAll(@Tenant() tenant: TenantContext) {
+    return this.listUsersUseCase.execute(tenant.id);
   }
 
   /**
@@ -51,9 +62,9 @@ export class UsersController {
    * @returns User data
    */
   @Get(':id')
-  @Roles(['ADMIN'])
-  async findOne(@Param('id') id: string) {
-    return this.usersService.findById(id);
+  @Permissions([PERMISSIONS.USER.READ])
+  async findOne(@Tenant() tenant: TenantContext, @Param('id') id: string) {
+    return this.getUserUseCase.execute(tenant.id, id);
   }
 
   /**
@@ -63,9 +74,13 @@ export class UsersController {
    * @returns Updated user
    */
   @Put(':id')
-  @Roles(['ADMIN'])
-  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(id, updateUserDto);
+  @Permissions([PERMISSIONS.USER.UPDATE])
+  async update(
+    @Tenant() tenant: TenantContext,
+    @Param('id') id: string,
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
+    return this.updateUserUseCase.execute(tenant.id, id, updateUserDto);
   }
 
   /**
@@ -74,8 +89,8 @@ export class UsersController {
    * @returns Deleted user
    */
   @Delete(':id')
-  @Roles(['ADMIN'])
-  async remove(@Param('id') id: string) {
-    return this.usersService.delete(id);
+  @Permissions([PERMISSIONS.USER.DELETE])
+  async remove(@Tenant() tenant: TenantContext, @Param('id') id: string) {
+    return this.deleteUserUseCase.execute(tenant.id, id);
   }
 }

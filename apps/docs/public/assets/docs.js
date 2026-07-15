@@ -11,6 +11,48 @@ const docs = [
     eyebrow: "core",
     file: "./content/f0.md",
   },
+  {
+    id: "auth",
+    title: "Auth API",
+    eyebrow: "api module",
+    file: "./content/auth.md",
+  },
+  {
+    id: "permission",
+    title: "Permission API",
+    eyebrow: "api module",
+    file: "./content/permission.md",
+  },
+  {
+    id: "business",
+    title: "Business API",
+    eyebrow: "api module",
+    file: "./content/business.md",
+  },
+  {
+    id: "users",
+    title: "Users API",
+    eyebrow: "api module",
+    file: "./content/users.md",
+  },
+  {
+    id: "notifications",
+    title: "Notifications API",
+    eyebrow: "api module",
+    file: "./content/notifications.md",
+  },
+  {
+    id: "assets",
+    title: "Assets API",
+    eyebrow: "api module",
+    file: "./content/assets.md",
+  },
+  {
+    id: "health",
+    title: "Health API",
+    eyebrow: "api module",
+    file: "./content/health.md",
+  },
 ];
 
 const nav = document.querySelector("#doc-nav");

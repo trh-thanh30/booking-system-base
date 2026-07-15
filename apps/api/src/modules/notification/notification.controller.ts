@@ -26,7 +26,7 @@ export class NotificationController {
   constructor(private readonly notificationService: NotificationService) {}
 
   @Post('admin')
-  @Roles([user_role.ADMIN])
+  @Roles([user_role.OWNER])
   createAdminNotification(
     @Body() dto: CreateAdminNotificationDto,
     @User() user: AuthUser,
@@ -35,7 +35,7 @@ export class NotificationController {
   }
 
   @Get('admin')
-  @Roles([user_role.ADMIN, user_role.STAFF])
+  @Roles([user_role.OWNER, user_role.STAFF])
   async listAdmin(@Query() query: ListAdminNotificationsDto) {
     const { data, total } = await this.notificationService.listAdmin(query);
 
@@ -49,7 +49,7 @@ export class NotificationController {
   }
 
   @Post('admin/scheduled/publish')
-  @Roles([user_role.ADMIN])
+  @Roles([user_role.OWNER])
   publishScheduledNotifications() {
     return this.notificationService.publishScheduled();
   }

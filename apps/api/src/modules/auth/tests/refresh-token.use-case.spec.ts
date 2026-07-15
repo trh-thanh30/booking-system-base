@@ -6,7 +6,7 @@ function user(overrides: Record<string, unknown> = {}) {
     id: 'user-1',
     email: 'user@example.com',
     username: 'user',
-    role: user_role.USER,
+    role: user_role.CUSTOMER,
     status: user_status.ACTIVE,
     refresh_token: 'refresh-token',
     ...overrides,
@@ -53,7 +53,7 @@ describe('RefreshTokenUseCase', () => {
       new RefreshTokenUseCase(
         { user: { findUnique: jest.fn().mockResolvedValue(user()) } } as any,
         tokenService,
-      ).execute('refresh-token', user_role.ADMIN),
+      ).execute('refresh-token', user_role.OWNER),
     ).rejects.toThrow('Invalid refresh token for this app');
   });
 
@@ -83,7 +83,7 @@ describe('RefreshTokenUseCase', () => {
       expect.objectContaining({
         id: 'user-1',
         email: 'user@example.com',
-        role: user_role.USER,
+        role: user_role.CUSTOMER,
       }),
     );
   });
@@ -101,5 +101,50 @@ describe('RefreshTokenUseCase', () => {
     await expect(useCase.execute('refresh-token')).rejects.toThrow(
       'Invalid or expired refresh token',
     );
+  });
+
+  it('revokes the stored refresh token when the token matches', async () => {
+    const prisma = {
+      user: {
+        findUnique: jest.fn().mockResolvedValue(user()),
+        update: jest.fn().mockResolvedValue(undefined),
+      },
+    };
+    const useCase = new RefreshTokenUseCase(
+      prisma as any,
+      {
+        verifyRefreshToken: jest
+          .fn()
+          .mockReturnValue({ payload: { id: 'user-1' } }),
+      } as any,
+    );
+
+    await useCase.revoke('refresh-token', [user_role.CUSTOMER]);
+
+    expect(prisma.user.update).toHaveBeenCalledWith({
+      where: { id: 'user-1' },
+      data: { refresh_token: null },
+    });
+  });
+
+  it('does not revoke when token role context does not match', async () => {
+    const prisma = {
+      user: {
+        findUnique: jest.fn().mockResolvedValue(user()),
+        update: jest.fn(),
+      },
+    };
+    const useCase = new RefreshTokenUseCase(
+      prisma as any,
+      {
+        verifyRefreshToken: jest
+          .fn()
+          .mockReturnValue({ payload: { id: 'user-1' } }),
+      } as any,
+    );
+
+    await useCase.revoke('refresh-token', [user_role.OWNER]);
+
+    expect(prisma.user.update).not.toHaveBeenCalled();
   });
 });

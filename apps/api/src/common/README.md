@@ -34,7 +34,7 @@ We provide a set of decorators to simplify common tasks like authorization and r
 export class ProfileController {
   @Get()
   @ApiSuccess('Profile retrieved')
-  @Roles('USER', 'ADMIN')
+  @Roles('CUSTOMER', 'OWNER')
   getProfile(@CurrentUser() user: User) {
     return user;
   }

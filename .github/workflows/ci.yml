@@ -80,6 +80,23 @@ jobs:
       - run: pnpm typecheck:admin
       - run: pnpm build:admin
 
+  platform-admin:
+    name: Platform Admin
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.0.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint:platform-admin
+      - run: pnpm typecheck:platform-admin
+      - run: pnpm build:platform-admin
+
   notify:
     name: Send Webhook Notification
     runs-on: ubuntu-latest
@@ -88,6 +105,7 @@ jobs:
       - api
       - web
       - admin
+      - platform-admin
     if: always()
     steps:
       - uses: actions/checkout@v4
@@ -138,7 +156,7 @@ jobs:
             --message "$CI_COMMIT_MESSAGE" \
             --author "${{ github.actor }}" \
             --workflow "${{ github.workflow }}" \
-            --job "Packages, API, Web, Admin" \
+            --job "Packages, API, Web, Admin, Platform Admin" \
             --jobs-json "$JOBS_JSON" \
             --passed "$PASSED" \
             --failed "$FAILED" \

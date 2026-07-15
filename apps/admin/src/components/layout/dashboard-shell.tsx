@@ -1,13 +1,40 @@
 "use client";
 
 import type { ReactNode } from "react";
+import { useEffect } from "react";
 import { AppSidebar } from "@/src/components/layout/app-sidebar";
 import { Header } from "@/src/components/layout/header";
+import { useAuth } from "@/src/app/providers";
 import { useAdminUiStore } from "@/src/app/stores/ui.store";
+import { useRouter } from "@/src/i18n/navigation";
 import { cn } from "@repo/ui/lib/utils";
+import { Skeleton } from "@repo/ui";
 
 export function DashboardShell({ children }: { children: ReactNode }) {
   const collapsed = useAdminUiStore((state) => state.sidebarCollapsed);
+  const router = useRouter();
+  const { isAuthenticated, isLoading } = useAuth();
+
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      router.replace("/login");
+    }
+  }, [isAuthenticated, isLoading, router]);
+
+  if (isLoading || !isAuthenticated) {
+    return (
+      <div className="min-h-dvh bg-slate-50 p-4 text-slate-950 dark:bg-[#020817] dark:text-slate-50">
+        <div className="mx-auto flex max-w-[88rem] gap-4">
+          <Skeleton className="hidden h-[calc(100dvh-2rem)] w-72 lg:block" />
+          <div className="flex-1 space-y-4">
+            <Skeleton className="h-16 w-full" />
+            <Skeleton className="h-40 w-full" />
+            <Skeleton className="h-80 w-full" />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-dvh bg-slate-50 text-slate-950 dark:bg-[#020817] dark:text-slate-50">

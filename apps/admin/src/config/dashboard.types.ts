@@ -11,6 +11,7 @@ export interface NavigationItem {
   href?: string;
   icon: ComponentType<{ className?: string }>;
   badge?: string;
+  permission?: string;
 }
 
 export interface NavigationSection {
@@ -21,6 +22,7 @@ export interface NavigationSection {
 export interface TopNavigationItem {
   title: string;
   href: string;
+  permission?: string;
 }
 
 export interface UserMenuItem {
