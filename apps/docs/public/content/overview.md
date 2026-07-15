@@ -20,7 +20,7 @@ Hiện tại docs app dùng để ghi lại các module nền tảng đã triể
 - `assets/docs.js` chịu trách nhiệm load file `.md`, render heading, list, bảng và code block.
 - `content/overview.md` là nội dung tổng quan.
 - `content/f0.md` mô tả Core Infrastructure & SaaS Foundation.
-- `content/auth.md`, `content/permission.md`, `content/business.md`, `content/users.md`, `content/notifications.md`, `content/assets.md`, `content/health.md` mô tả các API module đã triển khai.
+- `content/auth.md`, `content/permission.md`, `content/business.md`, `content/categories.md`, `content/users.md`, `content/notifications.md`, `content/assets.md`, `content/health.md` mô tả các API module đã triển khai.
 - Docs app hiện chỉ hiển thị module đã có endpoint thật trong BE để FE không nhầm contract dự kiến với API đã sẵn sàng.
 - `src/styles.css` là nguồn Tailwind, build ra `public/assets/styles.css`.
 

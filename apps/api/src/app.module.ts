@@ -46,6 +46,7 @@ import { RedisModule } from '@/database/redis/redis.module';
 import { AssetsModule } from '@/modules/assets/assets.module';
 import { AuthModule } from '@/modules/auth/auth.module';
 import { BusinessModule } from '@/modules/business/business.module';
+import { CategoryModule } from '@/modules/category/category.module';
 import { CommonModule } from '@/modules/common/common.module';
 import { EmailModule } from '@/modules/email/email.module';
 import { HealthModule } from '@/modules/health/health.module';
@@ -138,6 +139,7 @@ const envPath = join(rootDir, envFile);
     HealthModule,
     AssetsModule,
     BusinessModule,
+    CategoryModule,
     CommonModule,
     TenantModule,
     PermissionModule,

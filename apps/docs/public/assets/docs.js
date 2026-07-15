@@ -30,6 +30,12 @@ const docs = [
     file: "./content/business.md",
   },
   {
+    id: "categories",
+    title: "Categories API",
+    eyebrow: "api module",
+    file: "./content/categories.md",
+  },
+  {
     id: "users",
     title: "Users API",
     eyebrow: "api module",

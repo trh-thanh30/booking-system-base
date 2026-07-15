@@ -158,6 +158,7 @@ model Tenant {
   settings         TenantSettings?
   businesses       Business[]
   business_memberships BusinessMembership[]
+  categories       Category[]
   users            User[]
   assets           Asset[]
   notifications    Notification[]
@@ -185,6 +186,7 @@ model Business {
   updated_at DateTime        @updatedAt
 
   tenant      Tenant               @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
+  categories  Category[]
   memberships BusinessMembership[]
 
   @@unique([tenant_id, slug])
@@ -208,6 +210,33 @@ model BusinessMembership {
   @@index([tenant_id, user_id])
   @@index([business_id])
   @@map("business_membership")
+}
+
+model Category {
+  id          String          @id @default(uuid()) @db.Uuid
+  tenant_id   String          @db.Uuid
+  business_id String?         @db.Uuid
+  type        category_type
+  name        String
+  slug        String
+  description String?
+  status      category_status @default(ACTIVE)
+  sort_order  Int             @default(0)
+  parent_id   String?         @db.Uuid
+  metadata    Json?
+  created_at  DateTime        @default(now())
+  updated_at  DateTime        @updatedAt
+
+  tenant   Tenant     @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
+  business Business?  @relation(fields: [business_id], references: [id], onDelete: Cascade)
+  parent   Category?  @relation("CategoryTree", fields: [parent_id], references: [id], onDelete: SetNull)
+  children Category[] @relation("CategoryTree")
+
+  @@unique([tenant_id, business_id, type, slug])
+  @@index([tenant_id, business_id, type])
+  @@index([type, status])
+  @@index([parent_id])
+  @@map("category")
 }
 
 model Permission {
@@ -389,6 +418,20 @@ enum business_status {
   ACTIVE
   SUSPENDED
   DISABLED
+}
+
+enum category_type {
+  SERVICE
+  PRODUCT
+  EXPENSE
+  CUSTOMER
+  CONTENT
+}
+
+enum category_status {
+  ACTIVE
+  INACTIVE
+  ARCHIVED
 }
 
 enum tenant_domain_type {

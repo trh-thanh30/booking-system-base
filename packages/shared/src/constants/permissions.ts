@@ -32,6 +32,13 @@ export const PERMISSIONS = {
     DELETE: "service:delete",
     MANAGE: "service:manage",
   },
+  CATEGORY: {
+    READ: "category:read",
+    CREATE: "category:create",
+    UPDATE: "category:update",
+    DELETE: "category:delete",
+    MANAGE: "category:manage",
+  },
   STAFF: {
     READ: "staff:read",
     INVITE: "staff:invite",
