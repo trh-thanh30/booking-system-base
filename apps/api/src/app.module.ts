@@ -53,6 +53,7 @@ import { HealthModule } from '@/modules/health/health.module';
 import { JobsModule } from '@/modules/jobs/jobs.module';
 import { NotificationModule } from '@/modules/notification/notification.module';
 import { PermissionModule } from '@/modules/permission/permission.module';
+import { ServiceModule } from '@/modules/service/service.module';
 import { TenantModule } from '@/modules/tenant/tenant.module';
 import { UsersModule } from '@/modules/user/user.module';
 import { VerificationModule } from '@/modules/verification/verification.module';
@@ -142,6 +143,7 @@ const envPath = join(rootDir, envFile);
     CategoryModule,
     CommonModule,
     TenantModule,
+    ServiceModule,
     PermissionModule,
     NotificationModule,
     UsersModule,

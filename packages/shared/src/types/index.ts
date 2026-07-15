@@ -6,6 +6,7 @@ export * from "./category.types.ts";
 export * from "./notification.types.ts";
 export * from "./pagination.types.ts";
 export * from "./permission.types.ts";
+export * from "./service.types.ts";
 export * from "./system-health.types.ts";
 export * from "./tenant.types.ts";
 export * from "./user.types.ts";
