@@ -1,14 +1,9 @@
 import { ConflictError } from '@/common/response';
-import { CategoryRepository } from '@/modules/category/repository/category.repository';
 import { CreateServiceDto } from '@/modules/service/dto/create-service.dto';
 import { ServiceRepository } from '@/modules/service/repository/service.repository';
 import { toServiceDetail } from '@/modules/service/service.types';
-import { validateServiceCategory } from '@/modules/service/use-cases/service-category.util';
-import {
-  normalizeServiceCurrency,
-  normalizeServiceName,
-  normalizeServiceSlug,
-} from '@/modules/service/use-cases/service-input.util';
+import { ServiceCategoryValidator } from '@/modules/service/utils/service-category.util';
+import { ServiceInputNormalizer } from '@/modules/service/utils/service-input.util';
 import { Injectable } from '@nestjs/common';
 import { service_status } from '@prisma/client';
 
@@ -16,15 +11,15 @@ import { service_status } from '@prisma/client';
 export class CreateServiceUseCase {
   constructor(
     private readonly serviceRepository: ServiceRepository,
-    private readonly categoryRepository: CategoryRepository,
+    private readonly serviceInputNormalizer: ServiceInputNormalizer,
+    private readonly serviceCategoryValidator: ServiceCategoryValidator,
   ) {}
 
   async execute(tenantId: string, businessId: string, dto: CreateServiceDto) {
-    const name = normalizeServiceName(dto.name);
-    const slug = normalizeServiceSlug(dto.slug ?? name);
+    const name = this.serviceInputNormalizer.normalizeName(dto.name);
+    const slug = this.serviceInputNormalizer.normalizeSlug(dto.slug ?? name);
 
-    await validateServiceCategory(
-      this.categoryRepository,
+    await this.serviceCategoryValidator.validate(
       tenantId,
       businessId,
       dto.category_id,
@@ -51,7 +46,7 @@ export class CreateServiceUseCase {
       buffer_before_minutes: dto.buffer_before_minutes ?? 0,
       buffer_after_minutes: dto.buffer_after_minutes ?? 0,
       price_amount: dto.price_amount,
-      currency: normalizeServiceCurrency(dto.currency),
+      currency: this.serviceInputNormalizer.normalizeCurrency(dto.currency),
       status: dto.status ?? service_status.ACTIVE,
       sort_order: dto.sort_order ?? 0,
     });

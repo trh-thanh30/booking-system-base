@@ -3,6 +3,8 @@ import { CreateCategoryUseCase } from '@/modules/category/use-cases/create-categ
 import { GetCategoryUseCase } from '@/modules/category/use-cases/get-category.use-case';
 import { ListCategoriesUseCase } from '@/modules/category/use-cases/list-categories.use-case';
 import { UpdateCategoryUseCase } from '@/modules/category/use-cases/update-category.use-case';
+import { CategoryInputNormalizer } from '@/modules/category/utils/category-input.util';
+import { CategoryParentValidator } from '@/modules/category/utils/category-parent.util';
 import { category_status, category_type } from '@prisma/client';
 
 const tenantId = 'tenant-1';
@@ -55,6 +57,22 @@ function repository(overrides: Record<string, unknown> = {}) {
     ),
     ...overrides,
   };
+}
+
+function createCategoryUseCase(repo: ReturnType<typeof repository>) {
+  return new CreateCategoryUseCase(
+    repo as any,
+    new CategoryInputNormalizer(),
+    new CategoryParentValidator(repo as any),
+  );
+}
+
+function updateCategoryUseCase(repo: ReturnType<typeof repository>) {
+  return new UpdateCategoryUseCase(
+    repo as any,
+    new CategoryInputNormalizer(),
+    new CategoryParentValidator(repo as any),
+  );
 }
 
 describe('Category use cases', () => {
@@ -111,7 +129,7 @@ describe('Category use cases', () => {
     const repo = repository();
 
     await expect(
-      new CreateCategoryUseCase(repo as any).execute(tenantId, businessId, {
+      createCategoryUseCase(repo).execute(tenantId, businessId, {
         type: category_type.SERVICE,
         name: '  Spa Services  ',
       } as any),
@@ -139,7 +157,7 @@ describe('Category use cases', () => {
     });
 
     await expect(
-      new CreateCategoryUseCase(repo as any).execute(tenantId, businessId, {
+      createCategoryUseCase(repo).execute(tenantId, businessId, {
         type: category_type.SERVICE,
         name: 'Massage',
       } as any),
@@ -150,12 +168,12 @@ describe('Category use cases', () => {
 
   it('rejects archived or mismatched parent categories', async () => {
     await expect(
-      new CreateCategoryUseCase(
+      createCategoryUseCase(
         repository({
           findByIdInBusiness: jest
             .fn()
             .mockResolvedValue(makeCategory({ type: category_type.PRODUCT })),
-        }) as any,
+        }),
       ).execute(tenantId, businessId, {
         type: category_type.SERVICE,
         name: 'Massage',
@@ -164,14 +182,14 @@ describe('Category use cases', () => {
     ).rejects.toThrow('Parent category must have the same type');
 
     await expect(
-      new CreateCategoryUseCase(
+      createCategoryUseCase(
         repository({
           findByIdInBusiness: jest.fn().mockResolvedValue(
             makeCategory({
               status: category_status.ARCHIVED,
             }),
           ),
-        }) as any,
+        }),
       ).execute(tenantId, businessId, {
         type: category_type.SERVICE,
         name: 'Massage',
@@ -187,7 +205,7 @@ describe('Category use cases', () => {
         .mockResolvedValueOnce(makeCategory({ id: 'category-2' }))
         .mockResolvedValueOnce(null),
     });
-    const useCase = new UpdateCategoryUseCase(repo as any);
+    const useCase = updateCategoryUseCase(repo);
 
     await expect(
       useCase.execute(tenantId, businessId, 'category-1', {
@@ -220,7 +238,7 @@ describe('Category use cases', () => {
 
   it('rejects parent self-reference and cycles on update', async () => {
     await expect(
-      new UpdateCategoryUseCase(repository() as any).execute(
+      updateCategoryUseCase(repository()).execute(
         tenantId,
         businessId,
         'category-1',
@@ -231,7 +249,7 @@ describe('Category use cases', () => {
     ).rejects.toThrow('Category cannot be its own parent');
 
     await expect(
-      new UpdateCategoryUseCase(
+      updateCategoryUseCase(
         repository({
           findByIdInBusiness: jest
             .fn()
@@ -241,7 +259,7 @@ describe('Category use cases', () => {
             { id: 'parent-1', parent_id: 'category-1' },
             { id: 'category-1', parent_id: null },
           ]),
-        }) as any,
+        }),
       ).execute(tenantId, businessId, 'category-1', {
         parent_id: 'parent-1',
       } as any),

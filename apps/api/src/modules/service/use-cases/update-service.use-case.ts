@@ -1,14 +1,9 @@
 import { ConflictError, NotFoundError } from '@/common/response';
-import { CategoryRepository } from '@/modules/category/repository/category.repository';
 import { UpdateServiceDto } from '@/modules/service/dto/update-service.dto';
 import { ServiceRepository } from '@/modules/service/repository/service.repository';
 import { toServiceDetail } from '@/modules/service/service.types';
-import { validateServiceCategory } from '@/modules/service/use-cases/service-category.util';
-import {
-  normalizeServiceCurrency,
-  normalizeServiceName,
-  normalizeServiceSlug,
-} from '@/modules/service/use-cases/service-input.util';
+import { ServiceCategoryValidator } from '@/modules/service/utils/service-category.util';
+import { ServiceInputNormalizer } from '@/modules/service/utils/service-input.util';
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 
@@ -16,7 +11,8 @@ import { Prisma } from '@prisma/client';
 export class UpdateServiceUseCase {
   constructor(
     private readonly serviceRepository: ServiceRepository,
-    private readonly categoryRepository: CategoryRepository,
+    private readonly serviceInputNormalizer: ServiceInputNormalizer,
+    private readonly serviceCategoryValidator: ServiceCategoryValidator,
   ) {}
 
   async execute(
@@ -36,7 +32,9 @@ export class UpdateServiceUseCase {
     }
 
     const nextSlug =
-      dto.slug !== undefined ? normalizeServiceSlug(dto.slug) : undefined;
+      dto.slug !== undefined
+        ? this.serviceInputNormalizer.normalizeSlug(dto.slug)
+        : undefined;
 
     if (nextSlug && nextSlug !== current.slug) {
       const existing =
@@ -53,8 +51,7 @@ export class UpdateServiceUseCase {
     }
 
     if (dto.category_id !== undefined) {
-      await validateServiceCategory(
-        this.categoryRepository,
+      await this.serviceCategoryValidator.validate(
         tenantId,
         businessId,
         dto.category_id,
@@ -66,7 +63,7 @@ export class UpdateServiceUseCase {
         ? { category_id: dto.category_id }
         : {}),
       ...(dto.name !== undefined
-        ? { name: normalizeServiceName(dto.name) }
+        ? { name: this.serviceInputNormalizer.normalizeName(dto.name) }
         : {}),
       ...(nextSlug ? { slug: nextSlug } : {}),
       ...(dto.description !== undefined
@@ -85,7 +82,11 @@ export class UpdateServiceUseCase {
         ? { price_amount: dto.price_amount }
         : {}),
       ...(dto.currency !== undefined
-        ? { currency: normalizeServiceCurrency(dto.currency) }
+        ? {
+            currency: this.serviceInputNormalizer.normalizeCurrency(
+              dto.currency,
+            ),
+          }
         : {}),
       ...(dto.status !== undefined ? { status: dto.status } : {}),
       ...(dto.sort_order !== undefined ? { sort_order: dto.sort_order } : {}),

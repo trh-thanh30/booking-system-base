@@ -6,6 +6,8 @@ import { CreateCategoryUseCase } from '@/modules/category/use-cases/create-categ
 import { GetCategoryUseCase } from '@/modules/category/use-cases/get-category.use-case';
 import { ListCategoriesUseCase } from '@/modules/category/use-cases/list-categories.use-case';
 import { UpdateCategoryUseCase } from '@/modules/category/use-cases/update-category.use-case';
+import { CategoryInputNormalizer } from '@/modules/category/utils/category-input.util';
+import { CategoryParentValidator } from '@/modules/category/utils/category-parent.util';
 import { Module } from '@nestjs/common';
 
 @Module({
@@ -13,6 +15,8 @@ import { Module } from '@nestjs/common';
   controllers: [CategoryController],
   providers: [
     CategoryRepository,
+    CategoryInputNormalizer,
+    CategoryParentValidator,
     ListCategoriesUseCase,
     GetCategoryUseCase,
     CreateCategoryUseCase,
@@ -21,6 +25,8 @@ import { Module } from '@nestjs/common';
   ],
   exports: [
     CategoryRepository,
+    CategoryInputNormalizer,
+    CategoryParentValidator,
     ListCategoriesUseCase,
     GetCategoryUseCase,
     CreateCategoryUseCase,

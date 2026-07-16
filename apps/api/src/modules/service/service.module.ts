@@ -7,6 +7,8 @@ import { CreateServiceUseCase } from '@/modules/service/use-cases/create-service
 import { GetServiceUseCase } from '@/modules/service/use-cases/get-service.use-case';
 import { ListServicesUseCase } from '@/modules/service/use-cases/list-services.use-case';
 import { UpdateServiceUseCase } from '@/modules/service/use-cases/update-service.use-case';
+import { ServiceCategoryValidator } from '@/modules/service/utils/service-category.util';
+import { ServiceInputNormalizer } from '@/modules/service/utils/service-input.util';
 import { Module } from '@nestjs/common';
 
 @Module({
@@ -15,6 +17,8 @@ import { Module } from '@nestjs/common';
   providers: [
     ServiceRepository,
     CategoryRepository,
+    ServiceInputNormalizer,
+    ServiceCategoryValidator,
     ListServicesUseCase,
     GetServiceUseCase,
     CreateServiceUseCase,
@@ -23,6 +27,8 @@ import { Module } from '@nestjs/common';
   ],
   exports: [
     ServiceRepository,
+    ServiceInputNormalizer,
+    ServiceCategoryValidator,
     ListServicesUseCase,
     GetServiceUseCase,
     CreateServiceUseCase,

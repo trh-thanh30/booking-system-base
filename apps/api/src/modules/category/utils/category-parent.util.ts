@@ -1,5 +1,6 @@
 import { BadRequestError } from '@/common/response';
 import { CategoryRepository } from '@/modules/category/repository/category.repository';
+import { Injectable } from '@nestjs/common';
 import { category_status, category_type } from '@prisma/client';
 
 type ParentValidationInput = {
@@ -10,51 +11,53 @@ type ParentValidationInput = {
   currentCategoryId?: string;
 };
 
-export async function validateCategoryParent(
-  categoryRepository: CategoryRepository,
-  input: ParentValidationInput,
-) {
-  if (!input.parentId) {
-    return;
-  }
+@Injectable()
+export class CategoryParentValidator {
+  constructor(private readonly categoryRepository: CategoryRepository) {}
 
-  if (input.parentId === input.currentCategoryId) {
-    throw new BadRequestError('Category cannot be its own parent');
-  }
+  async validate(input: ParentValidationInput) {
+    if (!input.parentId) {
+      return;
+    }
 
-  const parent = await categoryRepository.findByIdInBusiness(
-    input.tenantId,
-    input.businessId,
-    input.parentId,
-  );
+    if (input.parentId === input.currentCategoryId) {
+      throw new BadRequestError('Category cannot be its own parent');
+    }
 
-  if (!parent) {
-    throw new BadRequestError('Parent category was not found');
-  }
+    const parent = await this.categoryRepository.findByIdInBusiness(
+      input.tenantId,
+      input.businessId,
+      input.parentId,
+    );
 
-  if (parent.type !== input.type) {
-    throw new BadRequestError('Parent category must have the same type');
-  }
+    if (!parent) {
+      throw new BadRequestError('Parent category was not found');
+    }
 
-  if (parent.status === category_status.ARCHIVED) {
-    throw new BadRequestError('Parent category is archived');
-  }
+    if (parent.type !== input.type) {
+      throw new BadRequestError('Parent category must have the same type');
+    }
 
-  if (!input.currentCategoryId) {
-    return;
-  }
+    if (parent.status === category_status.ARCHIVED) {
+      throw new BadRequestError('Parent category is archived');
+    }
 
-  const parentChain = await categoryRepository.findParentChain(
-    input.tenantId,
-    input.businessId,
-    parent.id,
-  );
+    if (!input.currentCategoryId) {
+      return;
+    }
 
-  const createsCycle = parentChain.some(
-    (category) => category.id === input.currentCategoryId,
-  );
+    const parentChain = await this.categoryRepository.findParentChain(
+      input.tenantId,
+      input.businessId,
+      parent.id,
+    );
 
-  if (createsCycle) {
-    throw new BadRequestError('Category parent would create a cycle');
+    const createsCycle = parentChain.some(
+      (category) => category.id === input.currentCategoryId,
+    );
+
+    if (createsCycle) {
+      throw new BadRequestError('Category parent would create a cycle');
+    }
   }
 }

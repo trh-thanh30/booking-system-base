@@ -3,6 +3,8 @@ import { CreateServiceUseCase } from '@/modules/service/use-cases/create-service
 import { GetServiceUseCase } from '@/modules/service/use-cases/get-service.use-case';
 import { ListServicesUseCase } from '@/modules/service/use-cases/list-services.use-case';
 import { UpdateServiceUseCase } from '@/modules/service/use-cases/update-service.use-case';
+import { ServiceCategoryValidator } from '@/modules/service/utils/service-category.util';
+import { ServiceInputNormalizer } from '@/modules/service/utils/service-input.util';
 import { category_status, category_type, service_status } from '@prisma/client';
 
 const tenantId = 'tenant-1';
@@ -89,6 +91,28 @@ function categoryRepository(overrides: Record<string, unknown> = {}) {
   };
 }
 
+function createServiceUseCase(
+  repo: ReturnType<typeof serviceRepository>,
+  categories = categoryRepository(),
+) {
+  return new CreateServiceUseCase(
+    repo as any,
+    new ServiceInputNormalizer(),
+    new ServiceCategoryValidator(categories as any),
+  );
+}
+
+function updateServiceUseCase(
+  repo: ReturnType<typeof serviceRepository>,
+  categories = categoryRepository(),
+) {
+  return new UpdateServiceUseCase(
+    repo as any,
+    new ServiceInputNormalizer(),
+    new ServiceCategoryValidator(categories as any),
+  );
+}
+
 describe('Service use cases', () => {
   it('lists services in the current business and excludes archived by default', async () => {
     const repo = serviceRepository();
@@ -143,18 +167,14 @@ describe('Service use cases', () => {
     const categories = categoryRepository();
 
     await expect(
-      new CreateServiceUseCase(repo as any, categories as any).execute(
-        tenantId,
-        businessId,
-        {
-          category_id: 'category-1',
-          name: '  Deep Tissue Massage ',
-          duration_minutes: 60,
-          buffer_after_minutes: 10,
-          price_amount: 500000,
-          currency: 'vnd',
-        } as any,
-      ),
+      createServiceUseCase(repo, categories).execute(tenantId, businessId, {
+        category_id: 'category-1',
+        name: '  Deep Tissue Massage ',
+        duration_minutes: 60,
+        buffer_after_minutes: 10,
+        price_amount: 500000,
+        currency: 'vnd',
+      } as any),
     ).resolves.toMatchObject({
       id: 'service-created',
       name: 'Deep Tissue Massage',
@@ -184,10 +204,7 @@ describe('Service use cases', () => {
     });
 
     await expect(
-      new CreateServiceUseCase(
-        repo as any,
-        categoryRepository() as any,
-      ).execute(tenantId, businessId, {
+      createServiceUseCase(repo).execute(tenantId, businessId, {
         name: 'Deep Tissue Massage',
         duration_minutes: 60,
         price_amount: 500000,
@@ -199,13 +216,13 @@ describe('Service use cases', () => {
 
   it('rejects non-service and archived categories', async () => {
     await expect(
-      new CreateServiceUseCase(
-        serviceRepository() as any,
+      createServiceUseCase(
+        serviceRepository(),
         categoryRepository({
           findByIdInBusiness: jest
             .fn()
             .mockResolvedValue(makeCategory({ type: category_type.PRODUCT })),
-        }) as any,
+        }),
       ).execute(tenantId, businessId, {
         category_id: 'category-1',
         name: 'Massage',
@@ -215,15 +232,15 @@ describe('Service use cases', () => {
     ).rejects.toThrow('Category must be a SERVICE category');
 
     await expect(
-      new CreateServiceUseCase(
-        serviceRepository() as any,
+      createServiceUseCase(
+        serviceRepository(),
         categoryRepository({
           findByIdInBusiness: jest.fn().mockResolvedValue(
             makeCategory({
               status: category_status.ARCHIVED,
             }),
           ),
-        }) as any,
+        }),
       ).execute(tenantId, businessId, {
         category_id: 'category-1',
         name: 'Massage',
@@ -240,10 +257,7 @@ describe('Service use cases', () => {
         .mockResolvedValueOnce(makeService({ id: 'service-2' }))
         .mockResolvedValueOnce(null),
     });
-    const useCase = new UpdateServiceUseCase(
-      repo as any,
-      categoryRepository() as any,
-    );
+    const useCase = updateServiceUseCase(repo);
 
     await expect(
       useCase.execute(tenantId, businessId, 'service-1', {

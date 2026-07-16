@@ -2,12 +2,12 @@ import { BadRequestError } from '@/common/response';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
-export class CategoryInputNormalizer {
+export class ServiceInputNormalizer {
   normalizeName(name: string) {
     const normalized = name.trim().replace(/\s+/g, ' ');
 
     if (!normalized) {
-      throw new BadRequestError('Category name is required');
+      throw new BadRequestError('Service name is required');
     }
 
     return normalized;
@@ -23,9 +23,13 @@ export class CategoryInputNormalizer {
       .replace(/^-+|-+$/g, '');
 
     if (!slug) {
-      throw new BadRequestError('Category slug is required');
+      throw new BadRequestError('Service slug is required');
     }
 
     return slug;
+  }
+
+  normalizeCurrency(value: string | undefined) {
+    return (value?.trim() || 'VND').toUpperCase();
   }
 }
