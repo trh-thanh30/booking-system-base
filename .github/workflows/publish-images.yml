@@ -1,0 +1,236 @@
+name: Build, Scan, and Push Images
+
+on:
+  workflow_run:
+    workflows:
+      - CI
+    branches:
+      - main
+    types:
+      - completed
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: Optional immutable image tag. Defaults to the commit SHA.
+        required: false
+        type: string
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: publish-images-${{ github.event.workflow_run.head_sha || github.sha }}
+  cancel-in-progress: false
+
+env:
+  REGISTRY: ghcr.io
+
+jobs:
+  metadata:
+    name: Resolve Image Metadata
+    if: >-
+      ${{
+        github.event_name == 'workflow_dispatch' ||
+        (
+          github.event.workflow_run.conclusion == 'success' &&
+          github.event.workflow_run.event == 'push' &&
+          github.event.workflow_run.head_branch == 'main'
+        )
+      }}
+    runs-on: ubuntu-latest
+    outputs:
+      image_prefix: ${{ steps.metadata.outputs.image_prefix }}
+      image_tag: ${{ steps.metadata.outputs.image_tag }}
+      image_channel: ${{ steps.metadata.outputs.image_channel }}
+      source_sha: ${{ steps.metadata.outputs.source_sha }}
+    steps:
+      - name: Resolve registry paths and tags
+        id: metadata
+        env:
+          DISPATCH_IMAGE_TAG: ${{ inputs.image_tag }}
+          SOURCE_BRANCH: ${{ github.event.workflow_run.head_branch || github.ref_name }}
+          WORKFLOW_RUN_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          set -eu
+
+          image_prefix="${REGISTRY}/${GITHUB_REPOSITORY}"
+          image_prefix="$(printf '%s' "$image_prefix" | tr '[:upper:]' '[:lower:]')"
+          source_sha="${WORKFLOW_RUN_SHA:-$GITHUB_SHA}"
+          image_tag="${DISPATCH_IMAGE_TAG:-$source_sha}"
+          image_channel="$(printf '%s' "$SOURCE_BRANCH" \
+            | tr '[:upper:]' '[:lower:]' \
+            | sed -E 's/[^a-z0-9_.-]+/-/g; s/^[.-]+//; s/[.-]+$//' \
+            | cut -c1-128)"
+
+          if ! printf '%s' "$image_tag" | grep -Eq '^[A-Za-z0-9_][A-Za-z0-9_.-]{0,127}$'; then
+            echo "Invalid Docker image tag: $image_tag"
+            exit 1
+          fi
+          if [ -z "$image_channel" ]; then
+            echo "Unable to derive a Docker image channel from branch: $SOURCE_BRANCH"
+            exit 1
+          fi
+
+          echo "image_prefix=$image_prefix" >> "$GITHUB_OUTPUT"
+          echo "image_tag=$image_tag" >> "$GITHUB_OUTPUT"
+          echo "image_channel=$image_channel" >> "$GITHUB_OUTPUT"
+          echo "source_sha=$source_sha" >> "$GITHUB_OUTPUT"
+
+  build-scan-push:
+    name: Build, Scan, and Push ${{ matrix.service }}
+    needs: metadata
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - service: api
+            dockerfile: apps/api/Dockerfile
+            target: runner
+          - service: web
+            dockerfile: apps/web/Dockerfile
+            target: runner
+          - service: admin
+            dockerfile: apps/admin/Dockerfile
+            target: runner
+          - service: platform-admin
+            dockerfile: apps/platform-admin/Dockerfile
+            target: runner
+    steps:
+      - name: Checkout code that passed CI
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.metadata.outputs.source_sha }}
+
+      - name: Resolve image reference
+        id: image
+        env:
+          IMAGE_PREFIX: ${{ needs.metadata.outputs.image_prefix }}
+          IMAGE_TAG: ${{ needs.metadata.outputs.image_tag }}
+          SERVICE: ${{ matrix.service }}
+        run: |
+          set -eu
+          repository="${IMAGE_PREFIX}-${SERVICE}"
+          echo "repository=$repository" >> "$GITHUB_OUTPUT"
+          echo "immutable=$repository:$IMAGE_TAG" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build image locally for security scan
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ${{ matrix.dockerfile }}
+          target: ${{ matrix.target }}
+          load: true
+          pull: true
+          push: false
+          tags: ${{ steps.image.outputs.immutable }}
+          cache-from: type=gha,scope=${{ matrix.service }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.service }}
+
+      - name: Report HIGH and CRITICAL image vulnerabilities
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: ${{ steps.image.outputs.immutable }}
+          scanners: vuln
+          vuln-type: os,library
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          format: table
+          output: trivy-image-${{ matrix.service }}.txt
+          exit-code: "0"
+
+      - name: Print image vulnerability report
+        if: always() && hashFiles(format('trivy-image-{0}.txt', matrix.service)) != ''
+        run: cat "trivy-image-${{ matrix.service }}.txt"
+
+      - name: Upload image vulnerability report
+        if: always() && hashFiles(format('trivy-image-{0}.txt', matrix.service)) != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-image-${{ matrix.service }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: trivy-image-${{ matrix.service }}.txt
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Block fixable CRITICAL image vulnerabilities
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: ${{ steps.image.outputs.immutable }}
+          scanners: vuln
+          vuln-type: os,library
+          severity: CRITICAL
+          ignore-unfixed: true
+          format: table
+          exit-code: "1"
+          skip-setup-trivy: true
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push scanned image
+        env:
+          IMMUTABLE_IMAGE: ${{ steps.image.outputs.immutable }}
+        run: |
+          set -eu
+          docker push "$IMMUTABLE_IMAGE"
+
+      - name: Record image security policy
+        if: always()
+        run: |
+          echo "### ${{ matrix.service }} image security policy" >> "$GITHUB_STEP_SUMMARY"
+          echo "- HIGH vulnerabilities are reported and do not block publishing." >> "$GITHUB_STEP_SUMMARY"
+          echo "- Fixable CRITICAL vulnerabilities block publishing." >> "$GITHUB_STEP_SUMMARY"
+          echo "- Images are pushed only after the CRITICAL gate passes." >> "$GITHUB_STEP_SUMMARY"
+
+  promote-channel:
+    name: Promote Scanned Images to ${{ needs.metadata.outputs.image_channel }}
+    needs:
+      - metadata
+      - build-scan-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Promote immutable images
+        env:
+          IMAGE_PREFIX: ${{ needs.metadata.outputs.image_prefix }}
+          IMAGE_TAG: ${{ needs.metadata.outputs.image_tag }}
+          IMAGE_CHANNEL: ${{ needs.metadata.outputs.image_channel }}
+        run: |
+          set -eu
+          for service in api web admin platform-admin; do
+            repository="${IMAGE_PREFIX}-${service}"
+            docker buildx imagetools create \
+              --tag "${repository}:${IMAGE_CHANNEL}" \
+              "${repository}:${IMAGE_TAG}"
+          done
+
+          echo "Promoted all scanned images to channel: $IMAGE_CHANNEL" >> "$GITHUB_STEP_SUMMARY"
+
+  deploy-production:
+    name: Deploy Production
+    if: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_branch == 'main' }}
+    needs:
+      - metadata
+      - promote-channel
+    uses: ./.github/workflows/deploy.yml
+    with:
+      image_tag: ${{ needs.metadata.outputs.image_tag }}
+      source_sha: ${{ needs.metadata.outputs.source_sha }}
+    secrets: inherit

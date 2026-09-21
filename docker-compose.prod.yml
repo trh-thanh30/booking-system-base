@@ -79,6 +79,31 @@ services:
       minio:
         condition: service_started
 
+  migrate:
+    image: ${API_IMAGE:-booking-api}:${IMAGE_TAG:-latest}
+    profiles: ["tools"]
+    restart: "no"
+    env_file:
+      - path: .env.production
+        required: false
+    environment:
+      NODE_ENV: production
+      DB_HOST: db
+      DB_PORT: 5432
+      DATABASE_URL: postgresql://${DB_USER:-booking_base_user}:${DB_PASSWORD:-booking_base_password}@db:5432/${DB_NAME:-booking_base}?schema=${DB_SCHEMA:-public}
+    command:
+      [
+        "node",
+        "node_modules/prisma/build/index.js",
+        "migrate",
+        "deploy",
+        "--schema",
+        "prisma/schema.prisma",
+      ]
+    depends_on:
+      db:
+        condition: service_healthy
+
   api:
     image: ${API_IMAGE:-booking-api}:${IMAGE_TAG:-latest}
     container_name: booking-api
