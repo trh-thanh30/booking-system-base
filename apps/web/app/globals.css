@@ -3,14 +3,123 @@
 
 @source "../../../packages/ui/src/**/*.{ts,tsx}";
 
+@theme {
+  --color-brand-blue: #006AFF;
+  --color-brand-blue-hover: #0055CC;
+  --color-brand-blue-active: #005AD9;
+  
+  --color-bg-primary: #FFFFFF;
+  --color-bg-secondary: #F7F6F5;
+  
+  --color-text-primary: #000000;
+  --color-text-secondary: #1A1A1A;
+  --color-text-tertiary: #333333;
+  --color-text-muted: #666666;
+  
+  --color-border-gray: #707070;
+  --color-border-light: #D9D9D9;
+
+  --font-sans: var(--font-plus-jakarta-sans), sans-serif;
+
+  --color-success: #10B981;
+  --color-success-bg: rgba(16, 185, 129, 0.08);
+  --color-success-border: rgba(16, 185, 129, 0.25);
+
+  --color-warning: #F59E0B;
+  --color-warning-bg: rgba(245, 158, 11, 0.08);
+
+  --color-danger: #EF4444;
+  --color-danger-bg: rgba(239, 68, 68, 0.08);
+  --color-danger-border: rgba(239, 68, 68, 0.25);
+
+  --animate-pulse-success: pulseSuccess 1s ease-out;
+  --animate-pulse-danger: pulseDanger 1s ease-out;
+  --animate-panel-in: panelIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-row-in: rowIn 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-chip-in: chipIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes pulseSuccess {
+  0%   { box-shadow: 0 0 0 4px var(--color-success-bg); }
+  50%  { box-shadow: 0 0 0 10px transparent; }
+  100% { box-shadow: 0 0 0 4px var(--color-success-bg); }
+}
+
+@keyframes pulseDanger {
+  0%   { box-shadow: 0 0 0 4px var(--color-danger-bg); }
+  50%  { box-shadow: 0 0 0 10px transparent; }
+  100% { box-shadow: 0 0 0 4px var(--color-danger-bg); }
+}
+
+@keyframes panelIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-3px) rotate(-3deg); }
+  75% { transform: translateX(3px) rotate(3deg); }
+}
+
+@keyframes rowIn {
+  from { opacity: 0; transform: translateY(-8px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes chipIn {
+  from { opacity: 0; transform: scale(0.7); }
+  to { opacity: 1; transform: scale(1); }
+}
+
 :root {
   color-scheme: light;
 }
 
 body {
   margin: 0;
-  background: #f8fafc;
-  color: #020617;
-  font-family:
-    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+}
+
+/* Custom status utilities for NoShow workflow */
+.bg-success-bg { background-color: rgba(16, 185, 129, 0.08); }
+.border-success-border { border-color: rgba(16, 185, 129, 0.25); }
+.bg-danger-bg { background-color: rgba(239, 68, 68, 0.08); }
+.border-danger-border { border-color: rgba(239, 68, 68, 0.25); }
+.bg-warning-bg { background-color: rgba(245, 158, 11, 0.08); }
+
+.bg-success { background-color: #10B981; }
+.bg-danger { background-color: #EF4444; }
+.text-success { color: #10B981; }
+.text-danger { color: #EF4444; }
+.border-success { border-color: #10B981; }
+.border-danger { border-color: #EF4444; }
+
+/* Custom Thin Scrollbar Utility */
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+}
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: #d9d9d9;
+  border-radius: 999px;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: #b3b3b3;
+}
+
+/* Carousel Autoplay Progress Bar Animation */
+@keyframes progress {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+.animate-progress-bar {
+  animation-name: progress;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
 }

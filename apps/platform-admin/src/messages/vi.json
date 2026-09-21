@@ -1,0 +1,61 @@
+{
+  "App": {
+    "title": "Platform Admin",
+    "description": "Cổng super admin cho nền tảng đặt lịch"
+  },
+  "Auth": {
+    "fields": {
+      "usernameOrEmail": "Email hoặc tên đăng nhập",
+      "password": "Mật khẩu"
+    },
+    "login": {
+      "title": "Đăng nhập Platform",
+      "description": "Dùng tài khoản super admin để quản lý tenant, người dùng nội bộ và vận hành hệ thống.",
+      "submit": "Đăng nhập",
+      "submitting": "Đang đăng nhập",
+      "success": "Đăng nhập thành công",
+      "failed": "Đăng nhập thất bại"
+    }
+  },
+  "Platform": {
+    "brandDescription": "Super Admin",
+    "sections": {
+      "platform": "Nền tảng",
+      "operations": "Vận hành"
+    },
+    "items": {
+      "dashboard": "Tổng quan",
+      "tenants": "Tenants",
+      "users": "Người dùng platform",
+      "system": "Hệ thống",
+      "signOut": "Đăng xuất"
+    },
+    "dashboard": {
+      "title": "Tổng quan platform",
+      "description": "Theo dõi tenant, sức khỏe hệ thống và rủi ro vận hành trong một bề mặt quản trị.",
+      "tenantCard": "Tenants",
+      "tenantDescription": "Doanh nghiệp trên nền tảng",
+      "userCard": "Người dùng platform",
+      "userDescription": "Tài khoản vận hành nội bộ",
+      "systemCard": "Sức khỏe hệ thống",
+      "systemDescription": "Trạng thái hạ tầng"
+    },
+    "tenants": {
+      "title": "Tenants",
+      "description": "Kiểm tra business, trạng thái vòng đời và quyền kiểm soát cấp platform."
+    },
+    "users": {
+      "title": "Người dùng platform",
+      "description": "Quản lý quyền truy cập super admin và operator nội bộ."
+    },
+    "system": {
+      "title": "Hệ thống",
+      "description": "Kiểm tra sức khỏe platform, cấu hình và background jobs."
+    }
+  },
+  "Common": {
+    "collapseSidebar": "Thu gọn thanh bên",
+    "openNavigation": "Mở điều hướng",
+    "toggleSidebar": "Ẩn/hiện thanh bên"
+  }
+}

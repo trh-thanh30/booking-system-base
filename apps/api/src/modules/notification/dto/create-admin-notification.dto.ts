@@ -11,8 +11,12 @@ import {
   IsUUID,
   ValidateIf,
 } from 'class-validator';
+import type {
+  CreateAdminNotificationInput,
+  CreateSystemNotificationInput,
+} from '@repo/shared';
 
-export class CreateAdminNotificationDto {
+export class CreateAdminNotificationDto implements CreateAdminNotificationInput {
   @IsString()
   @IsNotEmpty()
   title: string;
@@ -53,7 +57,7 @@ export class CreateAdminNotificationDto {
   metadata?: Record<string, unknown>;
 }
 
-export class CreateSystemNotificationDto {
+export class CreateSystemNotificationDto implements CreateSystemNotificationInput {
   @IsString()
   @IsNotEmpty()
   title: string;

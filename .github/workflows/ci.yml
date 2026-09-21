@@ -10,6 +10,10 @@ permissions:
   contents: read
   actions: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
 jobs:
   packages:
     name: Packages
@@ -80,6 +84,79 @@ jobs:
       - run: pnpm typecheck:admin
       - run: pnpm build:admin
 
+  platform-admin:
+    name: Platform Admin
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.0.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint:platform-admin
+      - run: pnpm typecheck:platform-admin
+      - run: pnpm build:platform-admin
+
+  dependency-security:
+    name: Dependency Security
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Report HIGH and CRITICAL dependency vulnerabilities
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          scanners: vuln
+          vuln-type: library
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          format: table
+          output: trivy-dependencies.txt
+          exit-code: "0"
+
+      - name: Print dependency vulnerability report
+        if: always() && hashFiles('trivy-dependencies.txt') != ''
+        run: cat trivy-dependencies.txt
+
+      - name: Upload dependency vulnerability report
+        if: always() && hashFiles('trivy-dependencies.txt') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-dependencies-${{ github.run_id }}-${{ github.run_attempt }}
+          path: trivy-dependencies.txt
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Block fixable CRITICAL dependency vulnerabilities
+        if: always()
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          scanners: vuln
+          vuln-type: library
+          severity: CRITICAL
+          ignore-unfixed: true
+          format: table
+          exit-code: "1"
+          skip-setup-trivy: true
+
+      - name: Record dependency security policy
+        if: always()
+        run: |
+          echo "### Dependency security policy" >> "$GITHUB_STEP_SUMMARY"
+          echo "- HIGH vulnerabilities are reported and do not block CI." >> "$GITHUB_STEP_SUMMARY"
+          echo "- Fixable CRITICAL vulnerabilities block CI." >> "$GITHUB_STEP_SUMMARY"
+
   notify:
     name: Send Webhook Notification
     runs-on: ubuntu-latest
@@ -88,6 +165,8 @@ jobs:
       - api
       - web
       - admin
+      - platform-admin
+      - dependency-security
     if: always()
     steps:
       - uses: actions/checkout@v4
@@ -138,7 +217,7 @@ jobs:
             --message "$CI_COMMIT_MESSAGE" \
             --author "${{ github.actor }}" \
             --workflow "${{ github.workflow }}" \
-            --job "Packages, API, Web, Admin" \
+            --job "Packages, API, Web, Admin, Platform Admin, Dependency Security" \
             --jobs-json "$JOBS_JSON" \
             --passed "$PASSED" \
             --failed "$FAILED" \

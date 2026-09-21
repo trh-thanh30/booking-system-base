@@ -1,7 +1,8 @@
 import { Match } from '@/common/decorators';
 import { IsNotEmpty, MinLength } from 'class-validator';
+import type { ChangePasswordInput } from '@repo/shared';
 
-export class ChangePasswordDto {
+export class ChangePasswordDto implements ChangePasswordInput {
   @IsNotEmpty()
   currentPassword: string;
 

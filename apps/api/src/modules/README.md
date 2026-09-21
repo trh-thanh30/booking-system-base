@@ -48,7 +48,7 @@ export class CreateUserDto {
   @IsEmail()
   email: string;
 
-  @IsEnum(['ADMIN', 'STAFF', 'USER'])
+  @IsEnum(['SUPER_ADMIN', 'OWNER', 'STAFF', 'CUSTOMER'])
   role: user_role;
 }
 ```

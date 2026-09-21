@@ -1,7 +1,8 @@
 import { IsOptional, IsEnum, IsString, IsBoolean } from 'class-validator';
 import { user_role, user_status } from '@prisma/client';
+import type { UpdateUserInput } from '@repo/shared';
 
-export class UpdateUserDto {
+export class UpdateUserDto implements UpdateUserInput {
   @IsOptional()
   @IsString()
   username?: string;

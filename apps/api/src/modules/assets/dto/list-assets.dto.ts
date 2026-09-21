@@ -8,8 +8,9 @@ import {
   IsUUID,
   Min,
 } from 'class-validator';
+import type { ListAssetsQuery } from '@repo/shared';
 
-export class ListAssetsDto {
+export class ListAssetsDto implements ListAssetsQuery {
   @IsOptional()
   @IsInt()
   @Type(() => Number)

@@ -3,10 +3,12 @@
 import { PanelLeft, Search, Settings } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Button } from "@repo/ui";
+import { BusinessSwitcher } from "@/src/components/business-switcher";
 import { CommandMenu } from "@/src/components/command-menu";
 import { MobileSidebar } from "@/src/components/layout/mobile-sidebar";
 import { ThemeToggle } from "@/src/components/theme-toggle";
 import { UserMenu } from "@/src/components/user-menu";
+import { useAuth } from "@/src/app/providers";
 import { useAdminUiStore } from "@/src/app/stores/ui.store";
 import { getDashboardConfig } from "@/src/config/dashboard.config";
 import { LanguageSwitcher } from "@/src/components/language-switcher";
@@ -16,8 +18,12 @@ export function Header() {
   const t = useTranslations("DashboardConfig");
   const tCommon = useTranslations("Common");
   const dashboardConfig = getDashboardConfig(t);
+  const { can } = useAuth();
   const setCommandOpen = useAdminUiStore((state) => state.setCommandOpen);
   const toggleSidebar = useAdminUiStore((state) => state.toggleSidebar);
+  const topNavigation = dashboardConfig.topNavigation.filter(
+    (item) => !item.permission || can(item.permission),
+  );
 
   return (
     <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-slate-200 bg-white/95 px-4 backdrop-blur dark:border-slate-800 dark:bg-slate-950/95 lg:px-6">
@@ -34,7 +40,7 @@ export function Header() {
         </Button>
         <div className="hidden h-6 w-px bg-slate-200 dark:bg-slate-800 lg:block" />
         <nav className="hidden items-center gap-6 lg:flex">
-          {dashboardConfig.topNavigation.map((item) => (
+          {topNavigation.map((item) => (
             <Link
               className="text-sm font-medium text-slate-500 transition-colors hover:text-slate-950 first:text-slate-950 dark:text-slate-400 dark:hover:text-slate-50 dark:first:text-slate-50"
               href={item.href}
@@ -46,6 +52,7 @@ export function Header() {
         </nav>
       </div>
       <div className="flex items-center gap-2">
+        <BusinessSwitcher />
         <Button
           className="hidden w-64 justify-start text-slate-500 md:inline-flex"
           onClick={() => setCommandOpen(true)}

@@ -1,7 +1,8 @@
 import { Match } from '@/common/decorators/match.decorator';
 import { IsNotEmpty, MinLength } from 'class-validator';
+import type { ResetPasswordInput } from '@repo/shared';
 
-export class ResetPasswordDto {
+export class ResetPasswordDto implements ResetPasswordInput {
   @IsNotEmpty()
   sessionId: string;
 

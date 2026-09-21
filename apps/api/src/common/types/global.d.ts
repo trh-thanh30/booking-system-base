@@ -1,4 +1,6 @@
 import { User } from '@prisma/client';
+import type { BusinessContext } from '@repo/shared';
+import type { TenantContext } from '@/common/types/tenant-context.types';
 
 declare global {
   namespace Express {
@@ -7,6 +9,8 @@ declare global {
       session?: any;
       user?: User;
       guestId?: string;
+      tenant?: TenantContext;
+      business?: BusinessContext;
     }
   }
 }

@@ -7,7 +7,7 @@ function user(overrides: Record<string, unknown> = {}) {
     email: 'user@example.com',
     username: 'user',
     password: 'hashed-password',
-    role: user_role.USER,
+    role: user_role.CUSTOMER,
     status: user_status.ACTIVE,
     is_verified: true,
     ...overrides,
@@ -41,7 +41,7 @@ describe('LoginUserUseCase', () => {
         { comparePassword: jest.fn() } as any,
         baseTokenService as any,
         sessionService as any,
-      ).execute(dto, user_role.ADMIN),
+      ).execute(dto, user_role.OWNER),
     ).rejects.toThrow('Invalid email/username or password');
 
     await expect(
@@ -114,6 +114,32 @@ describe('LoginUserUseCase', () => {
     expect(prisma.user.update).toHaveBeenCalledWith({
       where: { id: 'user-1' },
       data: { refresh_token: 'refresh-token' },
+    });
+  });
+
+  it('accepts any role in the allowed role list', async () => {
+    const prisma = {
+      user: {
+        findFirst: jest.fn().mockResolvedValue(user({ role: user_role.STAFF })),
+        update: jest.fn().mockResolvedValue(undefined),
+      },
+    };
+
+    await expect(
+      new LoginUserUseCase(
+        prisma as any,
+        { comparePassword: jest.fn().mockResolvedValue(true) } as any,
+        {
+          generateTokenPair: jest.fn().mockReturnValue({
+            access_token: 'access-token',
+            refresh_token: 'refresh-token',
+          }),
+        } as any,
+        { createSession: jest.fn() } as any,
+      ).execute(dto, [user_role.OWNER, user_role.STAFF]),
+    ).resolves.toMatchObject({
+      access_token: 'access-token',
+      refresh_token: 'refresh-token',
     });
   });
 });

@@ -1,6 +1,7 @@
 import { IsNotEmpty, MinLength } from 'class-validator';
+import type { VerifyEmailInput } from '@repo/shared';
 
-export class VerifyEmailDto {
+export class VerifyEmailDto implements VerifyEmailInput {
   @IsNotEmpty()
   sessionId: string;
 

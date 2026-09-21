@@ -56,7 +56,10 @@ export class ResetPasswordUseCase implements BaseUseCase<
     // Update user password
     await this.prismaService.user.update({
       where: { email },
-      data: { password: hashedPassword },
+      data: {
+        password: hashedPassword,
+        refresh_token: null,
+      },
     });
 
     // Delete verification session after successful reset

@@ -1,4 +1,5 @@
 import type { AxiosError, AxiosInstance, AxiosRequestConfig } from "axios";
+import type { ApiResponse, PaginatedApiResponse } from "../types/index.ts";
 
 export type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
@@ -7,9 +8,14 @@ export type TokenResolver = () =>
   | string
   | undefined;
 
+export type HeaderResolver = () =>
+  | Promise<Record<string, string | undefined> | undefined>
+  | Record<string, string | undefined>
+  | undefined;
+
 export type UnauthorizedHandler = (
   error: HttpClientError,
-) => Promise<void> | void;
+) => Promise<string | false | void> | string | false | void;
 
 export type CreateHttpClientOptions = {
   baseURL?: string;
@@ -17,10 +23,33 @@ export type CreateHttpClientOptions = {
   timeout?: number;
   withCredentials?: boolean;
   getAccessToken?: TokenResolver;
+  getHeaders?: HeaderResolver;
   onUnauthorized?: UnauthorizedHandler;
 };
 
 export type HttpClient = AxiosInstance;
+
+export type ApiClient = {
+  request<T>(config: HttpRequestConfig): Promise<ApiResponse<T>>;
+  get<T>(url: string, config?: HttpRequestConfig): Promise<ApiResponse<T>>;
+  delete<T>(url: string, config?: HttpRequestConfig): Promise<ApiResponse<T>>;
+  post<T>(
+    url: string,
+    data?: unknown,
+    config?: HttpRequestConfig,
+  ): Promise<ApiResponse<T>>;
+  put<T>(
+    url: string,
+    data?: unknown,
+    config?: HttpRequestConfig,
+  ): Promise<ApiResponse<T>>;
+  patch<T>(
+    url: string,
+    data?: unknown,
+    config?: HttpRequestConfig,
+  ): Promise<ApiResponse<T>>;
+  paginated<T>(config: HttpRequestConfig): Promise<PaginatedApiResponse<T>>;
+};
 
 export type HttpRequestConfig = AxiosRequestConfig;
 

@@ -1,0 +1,280 @@
+name: Deploy Production
+
+on:
+  workflow_call:
+    inputs:
+      image_tag:
+        description: Immutable GHCR image tag that passed the image security gate.
+        required: true
+        type: string
+      source_sha:
+        description: Git commit containing the deployment configuration.
+        required: true
+        type: string
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: Immutable GHCR image tag to deploy.
+        required: true
+        type: string
+      source_sha:
+        description: Optional commit containing the deployment configuration.
+        required: false
+        type: string
+
+permissions:
+  contents: read
+  packages: read
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+env:
+  REGISTRY: ghcr.io
+
+jobs:
+  deploy:
+    name: Deploy with Docker Compose
+    runs-on: ubuntu-latest
+    environment: production
+    outputs:
+      image_tag: ${{ steps.metadata.outputs.image_tag }}
+      source_sha: ${{ steps.metadata.outputs.source_sha }}
+    steps:
+      - name: Resolve deployment metadata
+        id: metadata
+        env:
+          INPUT_IMAGE_TAG: ${{ inputs.image_tag }}
+          INPUT_SOURCE_SHA: ${{ inputs.source_sha }}
+        run: |
+          set -eu
+
+          image_tag="$INPUT_IMAGE_TAG"
+          source_sha="${INPUT_SOURCE_SHA:-$GITHUB_SHA}"
+          image_prefix="${REGISTRY}/${GITHUB_REPOSITORY}"
+          image_prefix="$(printf '%s' "$image_prefix" | tr '[:upper:]' '[:lower:]')"
+
+          if ! printf '%s' "$image_tag" | grep -Eq '^[A-Za-z0-9_][A-Za-z0-9_.-]{0,127}$'; then
+            echo "Invalid Docker image tag: $image_tag"
+            exit 1
+          fi
+          if ! printf '%s' "$source_sha" | grep -Eq '^[0-9a-fA-F]{40}$'; then
+            echo "source_sha must be a full 40-character Git commit SHA."
+            exit 1
+          fi
+
+          echo "image_tag=$image_tag" >> "$GITHUB_OUTPUT"
+          echo "source_sha=$source_sha" >> "$GITHUB_OUTPUT"
+          echo "api_image=$image_prefix-api" >> "$GITHUB_OUTPUT"
+          echo "web_image=$image_prefix-web" >> "$GITHUB_OUTPUT"
+          echo "admin_image=$image_prefix-admin" >> "$GITHUB_OUTPUT"
+          echo "platform_admin_image=$image_prefix-platform-admin" >> "$GITHUB_OUTPUT"
+
+      - name: Validate production configuration
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_API_HEALTH_URL: ${{ secrets.DEPLOY_API_HEALTH_URL }}
+        run: |
+          set -eu
+          missing=""
+          for name in DEPLOY_HOST DEPLOY_PATH DEPLOY_SSH_KEY DEPLOY_USER DEPLOY_API_HEALTH_URL; do
+            eval "value=\${$name:-}"
+            if [ -z "$value" ]; then
+              missing="$missing $name"
+            fi
+          done
+
+          if [ -n "$missing" ]; then
+            echo "Missing production secrets:$missing"
+            exit 1
+          fi
+
+      - name: Checkout deployment configuration
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.metadata.outputs.source_sha }}
+
+      - name: Synchronize production files
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          port: ${{ secrets.DEPLOY_PORT || 22 }}
+          source: docker-compose.prod.yml
+          target: ${{ secrets.DEPLOY_PATH }}
+          overwrite: true
+
+      - name: Deploy over SSH
+        uses: appleboy/ssh-action@v1.2.0
+        env:
+          API_IMAGE: ${{ steps.metadata.outputs.api_image }}
+          WEB_IMAGE: ${{ steps.metadata.outputs.web_image }}
+          ADMIN_IMAGE: ${{ steps.metadata.outputs.admin_image }}
+          PLATFORM_ADMIN_IMAGE: ${{ steps.metadata.outputs.platform_admin_image }}
+          IMAGE_TAG: ${{ steps.metadata.outputs.image_tag }}
+          GHCR_USERNAME: ${{ secrets.GHCR_USERNAME || github.repository_owner }}
+          GHCR_TOKEN: ${{ secrets.GHCR_READ_TOKEN || github.token }}
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          port: ${{ secrets.DEPLOY_PORT || 22 }}
+          envs: API_IMAGE,WEB_IMAGE,ADMIN_IMAGE,PLATFORM_ADMIN_IMAGE,IMAGE_TAG,GHCR_USERNAME,GHCR_TOKEN
+          script_stop: true
+          script: |
+            set -eu
+            cd "${{ secrets.DEPLOY_PATH }}"
+
+            if [ ! -f .env.production ]; then
+              echo "Missing ${{ secrets.DEPLOY_PATH }}/.env.production on the production server."
+              exit 1
+            fi
+            if [ -z "$GHCR_USERNAME" ] || [ -z "$GHCR_TOKEN" ]; then
+              echo "GHCR credentials are required to pull application images."
+              exit 1
+            fi
+
+            compose() {
+              docker compose -f docker-compose.prod.yml --env-file .env.production "$@"
+            }
+
+            set_env_value() {
+              key="$1"
+              value="$2"
+              if grep -q "^${key}=" .env.production; then
+                sed -i "s#^${key}=.*#${key}=${value}#" .env.production
+              else
+                printf '%s=%s\n' "$key" "$value" >> .env.production
+              fi
+            }
+
+            rollback() {
+              echo "Deployment failed; restoring the previous application images."
+              cp .deploy/env-before-deploy .env.production
+              unset API_IMAGE WEB_IMAGE ADMIN_IMAGE PLATFORM_ADMIN_IMAGE IMAGE_TAG
+              compose pull api worker-email web admin platform-admin || true
+              compose up -d --remove-orphans api worker-email web admin platform-admin || true
+              compose ps
+            }
+
+            mkdir -p .deploy
+            cp .env.production .deploy/env-before-deploy
+            previous_tag="$(grep -E '^IMAGE_TAG=' .env.production | tail -1 | cut -d '=' -f 2- || true)"
+            if [ -n "$previous_tag" ]; then
+              printf '%s\n' "$previous_tag" > .deploy/previous-image-tag
+            fi
+
+            printf '%s' "$GHCR_TOKEN" | docker login ghcr.io --username "$GHCR_USERNAME" --password-stdin
+
+            export API_IMAGE WEB_IMAGE ADMIN_IMAGE PLATFORM_ADMIN_IMAGE IMAGE_TAG
+
+            if ! docker compose -f docker-compose.prod.yml --env-file .env.production --profile tools config --services | grep -qx migrate; then
+              echo "Production Compose configuration does not define the migrate service."
+              exit 1
+            fi
+
+            if ! compose --profile tools pull migrate api worker-email web admin platform-admin; then
+              echo "Unable to pull the requested application images."
+              exit 1
+            fi
+
+            if ! compose --profile tools run --rm migrate; then
+              echo "Prisma migration failed; application containers were not updated."
+              exit 1
+            fi
+
+            set_env_value API_IMAGE "$API_IMAGE"
+            set_env_value WEB_IMAGE "$WEB_IMAGE"
+            set_env_value ADMIN_IMAGE "$ADMIN_IMAGE"
+            set_env_value PLATFORM_ADMIN_IMAGE "$PLATFORM_ADMIN_IMAGE"
+            set_env_value IMAGE_TAG "$IMAGE_TAG"
+
+            if ! compose run --rm minio-init; then
+              rollback
+              exit 1
+            fi
+
+            if ! compose up -d --remove-orphans; then
+              rollback
+              exit 1
+            fi
+
+            api_healthy=false
+            for attempt in $(seq 1 36); do
+              api_container="$(compose ps -q api)"
+              if [ -n "$api_container" ]; then
+                api_status="$(docker inspect --format '{{if .State.Health}}{{.State.Health.Status}}{{else}}{{.State.Status}}{{end}}' "$api_container" 2>/dev/null || true)"
+                if [ "$api_status" = "healthy" ]; then
+                  api_healthy=true
+                  break
+                fi
+                if [ "$api_status" = "unhealthy" ] || [ "$api_status" = "exited" ] || [ "$api_status" = "dead" ]; then
+                  break
+                fi
+              fi
+              sleep 5
+            done
+
+            if [ "$api_healthy" != "true" ]; then
+              compose logs --tail=200 api
+              rollback
+              exit 1
+            fi
+
+            printf '%s\n' "$IMAGE_TAG" > .deploy/current-image-tag
+            compose ps
+
+  health-check:
+    name: Verify Public Endpoints
+    needs: deploy
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Checkout health-check script
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.deploy.outputs.source_sha }}
+
+      - name: Check production endpoints
+        env:
+          DEPLOY_API_HEALTH_URL: ${{ secrets.DEPLOY_API_HEALTH_URL }}
+          DEPLOY_WEB_URL: ${{ secrets.DEPLOY_WEB_URL }}
+          DEPLOY_ADMIN_URL: ${{ secrets.DEPLOY_ADMIN_URL }}
+          DEPLOY_PLATFORM_ADMIN_URL: ${{ secrets.DEPLOY_PLATFORM_ADMIN_URL }}
+        run: bash scripts/check-deployment-endpoints.sh
+
+  rollback-on-health-failure:
+    name: Roll Back Failed Production Health Check
+    needs:
+      - deploy
+      - health-check
+    if: ${{ always() && needs.deploy.result == 'success' && needs.health-check.result == 'failure' }}
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Restore previous images over SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          port: ${{ secrets.DEPLOY_PORT || 22 }}
+          script_stop: true
+          script: |
+            set -eu
+            cd "${{ secrets.DEPLOY_PATH }}"
+
+            if [ ! -f .deploy/env-before-deploy ]; then
+              echo "Previous production environment snapshot is unavailable."
+              exit 1
+            fi
+
+            cp .deploy/env-before-deploy .env.production
+            docker compose -f docker-compose.prod.yml --env-file .env.production pull api worker-email web admin platform-admin
+            docker compose -f docker-compose.prod.yml --env-file .env.production up -d --remove-orphans
+            docker compose -f docker-compose.prod.yml --env-file .env.production ps

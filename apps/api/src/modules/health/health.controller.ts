@@ -50,6 +50,24 @@ export class HealthController {
     return this.healthService.liveness();
   }
 
+  @Get('liveness')
+  @ApiSuccess('Application is alive')
+  @HealthCheck()
+  async livenessAlias() {
+    return this.healthService.liveness();
+  }
+
+  @Get('readiness')
+  @ApiSuccess('Application is ready')
+  @HealthCheck()
+  async readiness() {
+    if (!this.isHealthEndpointAllowed()) {
+      throw new Error('Health endpoint not available in production');
+    }
+
+    return this.healthService.readiness();
+  }
+
   /**
    * Comprehensive health check - checks database and system
    * Only available when HEALTH_ENDPOINTS_ENABLED=true or in development

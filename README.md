@@ -156,15 +156,26 @@ pnpm install
 cp .env.example .env.development
 ```
 
-Các port mặc định trong `.env.example` đã được đổi sang dải riêng để hạn chế đụng với dự án khác:
+Các port mặc định trong `.env.example`:
 
-| Dịch vụ    | Biến môi trường | Mặc định |
-| :--------- | :-------------- | :------- |
-| API        | `API_PORT`      | `4100`   |
-| Web        | `WEB_PORT`      | `4101`   |
-| Admin      | `ADMIN_PORT`    | `4102`   |
-| PostgreSQL | `DEV_DB_PORT`   | `15432`  |
-| Redis      | `REDIS_DB_PORT` | `16379`  |
+| Dịch vụ        | Biến môi trường       | Mặc định |
+| :------------- | :-------------------- | :------- |
+| API            | `API_PORT`            | `3000`   |
+| Web            | `WEB_PORT`            | `3001`   |
+| Business Admin | `ADMIN_PORT`          | `3002`   |
+| Platform Admin | `PLATFORM_ADMIN_PORT` | `3003`   |
+| PostgreSQL     | `DEV_DB_PORT`         | `15432`  |
+| Redis          | `REDIS_DB_PORT`       | `16379`  |
+
+Nếu cần override riêng theo từng frontend app, có thể copy file mẫu app-local:
+
+```bash
+cp apps/web/.env.example apps/web/.env.local
+cp apps/admin/.env.example apps/admin/.env.local
+cp apps/platform-admin/.env.example apps/platform-admin/.env.local
+```
+
+Các file app-local này không bắt buộc khi đã dùng root `.env.development`.
 
 ### 3. Chạy Hạ Tầng Phát Triển
 
@@ -351,11 +362,12 @@ pnpm infra:dev:down
 - `worker-email`
 - `web`
 - `admin`
+- `platform-admin`
 
 Compose giống sản xuất dùng Docker image, không mount mã nguồn:
 
 ```bash
-API_IMAGE=booking-api WEB_IMAGE=booking-web ADMIN_IMAGE=booking-admin IMAGE_TAG=latest \
+API_IMAGE=booking-api WEB_IMAGE=booking-web ADMIN_IMAGE=booking-admin PLATFORM_ADMIN_IMAGE=booking-platform-admin IMAGE_TAG=latest \
 pnpm infra:prod:up
 ```
 
@@ -378,7 +390,7 @@ Các nhóm biến quan trọng:
 - **Database**: `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`, `DATABASE_URL`
 - **Redis**: `REDIS_HOST`, `REDIS_DEV_PORT`, `REDIS_PASSWORD`, `REDIS_URL`
 - **Storage**: `STORAGE_DRIVER`, `STORAGE_ROOT_DIR`, `ASSET_CDN_URL`
-- **Web/Admin**: `WEB_PORT`, `ADMIN_PORT`, `NEXT_PUBLIC_API_URL`
+- **Web/Admin/Platform Admin**: `WEB_PORT`, `ADMIN_PORT`, `PLATFORM_ADMIN_PORT`, `NEXT_PUBLIC_API_URL`
 - **Telegram CI/CD**: `CI_TELEGRAM_BOT_TOKEN`, `CI_TELEGRAM_CHAT_ID`
 
 Không commit `.env.development`, `.env.production` hoặc bất kỳ file nào chứa secret thật.

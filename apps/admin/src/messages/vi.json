@@ -1,10 +1,10 @@
 {
   "App": {
-    "title": "Booking Admin",
-    "description": "Bảng điều hành cho nền tảng đặt lịch"
+    "title": "Business Admin",
+    "description": "Workspace cho chủ doanh nghiệp và nhân sự"
   },
   "DashboardConfig": {
-    "brandDescription": "Next + Turborepo",
+    "brandDescription": "Tenant workspace",
     "sections": {
       "general": "Tổng quan",
       "pages": "Trang",
@@ -14,6 +14,7 @@
       "dashboard": "Bảng điều khiển",
       "bookings": "Đặt lịch",
       "users": "Người dùng",
+      "businesses": "Cơ sở",
       "chats": "Trò chuyện",
       "securedByAuth": "Bảo vệ bởi Auth",
       "auth": "Xác thực",
@@ -109,6 +110,56 @@
       "confirmed": "Đã xác nhận",
       "completed": "Hoàn tất",
       "cancelled": "Đã hủy"
+    }
+  },
+  "Auth": {
+    "backToLogin": "Quay lại đăng nhập",
+    "fields": {
+      "code": "Mã xác minh",
+      "confirmPassword": "Xác nhận mật khẩu",
+      "email": "Email",
+      "fullName": "Họ tên",
+      "password": "Mật khẩu",
+      "sessionId": "Session ID",
+      "username": "Tên đăng nhập",
+      "usernameOrEmail": "Email hoặc tên đăng nhập"
+    },
+    "login": {
+      "description": "Dùng tài khoản admin hoặc nhân sự để vào workspace của tenant.",
+      "failed": "Đăng nhập thất bại",
+      "forgotPassword": "Quên mật khẩu?",
+      "submit": "Đăng nhập",
+      "submitting": "Đang đăng nhập",
+      "success": "Đăng nhập thành công",
+      "title": "Đăng nhập"
+    },
+    "forgot": {
+      "description": "Yêu cầu mã đặt lại mật khẩu cho tài khoản admin.",
+      "failed": "Không thể yêu cầu đặt lại mật khẩu",
+      "sessionTitle": "Reset session",
+      "submit": "Gửi mã đặt lại",
+      "submitting": "Đang gửi mã",
+      "success": "Đã yêu cầu mã đặt lại",
+      "title": "Quên mật khẩu"
+    },
+    "reset": {
+      "description": "Nhập reset session, mã xác minh và mật khẩu mới.",
+      "failed": "Không thể đặt lại mật khẩu",
+      "submit": "Đặt lại mật khẩu",
+      "submitting": "Đang đặt lại",
+      "success": "Đặt lại mật khẩu thành công",
+      "title": "Đặt lại mật khẩu"
+    },
+    "invitation": {
+      "description": "Chấp nhận lời mời tenant và tạo tài khoản nhân sự.",
+      "failed": "Không thể chấp nhận lời mời",
+      "notFoundDescription": "Lời mời không hợp lệ, hết hạn hoặc đã được chấp nhận.",
+      "notFoundTitle": "Lời mời không khả dụng",
+      "submit": "Chấp nhận lời mời",
+      "submitting": "Đang tạo tài khoản",
+      "success": "Đã chấp nhận lời mời. Bạn có thể đăng nhập.",
+      "title": "Chấp nhận lời mời",
+      "unavailable": "Không khả dụng"
     }
   },
   "Home": {
