@@ -159,6 +159,7 @@ model Tenant {
   businesses       Business[]
   business_memberships BusinessMembership[]
   categories       Category[]
+  services         Service[]
   users            User[]
   assets           Asset[]
   notifications    Notification[]
@@ -187,6 +188,7 @@ model Business {
 
   tenant      Tenant               @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
   categories  Category[]
+  services    Service[]
   memberships BusinessMembership[]
 
   @@unique([tenant_id, slug])
@@ -231,12 +233,42 @@ model Category {
   business Business?  @relation(fields: [business_id], references: [id], onDelete: Cascade)
   parent   Category?  @relation("CategoryTree", fields: [parent_id], references: [id], onDelete: SetNull)
   children Category[] @relation("CategoryTree")
+  services Service[]
 
   @@unique([tenant_id, business_id, type, slug])
   @@index([tenant_id, business_id, type])
   @@index([type, status])
   @@index([parent_id])
   @@map("category")
+}
+
+model Service {
+  id                    String         @id @default(uuid()) @db.Uuid
+  tenant_id             String         @db.Uuid
+  business_id           String         @db.Uuid
+  category_id           String?        @db.Uuid
+  name                  String
+  slug                  String
+  description           String?
+  duration_minutes      Int
+  buffer_before_minutes Int            @default(0)
+  buffer_after_minutes  Int            @default(0)
+  price_amount          Int
+  currency              String         @default("VND")
+  status                service_status @default(ACTIVE)
+  sort_order            Int            @default(0)
+  created_at            DateTime       @default(now())
+  updated_at            DateTime       @updatedAt
+
+  tenant   Tenant    @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
+  business Business  @relation(fields: [business_id], references: [id], onDelete: Cascade)
+  category Category? @relation(fields: [category_id], references: [id], onDelete: SetNull)
+
+  @@unique([tenant_id, business_id, slug])
+  @@index([tenant_id, business_id])
+  @@index([business_id, category_id])
+  @@index([business_id, status])
+  @@map("service")
 }
 
 model Permission {
@@ -429,6 +461,12 @@ enum category_type {
 }
 
 enum category_status {
+  ACTIVE
+  INACTIVE
+  ARCHIVED
+}
+
+enum service_status {
   ACTIVE
   INACTIVE
   ARCHIVED

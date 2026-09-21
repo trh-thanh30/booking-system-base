@@ -2,24 +2,25 @@ import { ConflictError } from '@/common/response';
 import { CreateCategoryDto } from '@/modules/category/dto/create-category.dto';
 import { CategoryRepository } from '@/modules/category/repository/category.repository';
 import { toCategorySummary } from '@/modules/category/types/category.types';
-import {
-  normalizeCategoryName,
-  normalizeCategorySlug,
-} from '@/modules/category/utils/category-input.util';
-import { validateCategoryParent } from '@/modules/category/utils/category-parent.util';
+import { CategoryInputNormalizer } from '@/modules/category/utils/category-input.util';
+import { CategoryParentValidator } from '@/modules/category/utils/category-parent.util';
 import { Injectable } from '@nestjs/common';
 import { category_status, type Prisma } from '@prisma/client';
 
 @Injectable()
 export class CreateCategoryUseCase {
-  constructor(private readonly categoryRepository: CategoryRepository) {}
+  constructor(
+    private readonly categoryRepository: CategoryRepository,
+    private readonly categoryInputNormalizer: CategoryInputNormalizer,
+    private readonly categoryParentValidator: CategoryParentValidator,
+  ) {}
 
   async execute(tenantId: string, businessId: string, dto: CreateCategoryDto) {
-    const name = normalizeCategoryName(dto.name);
-    const slug = normalizeCategorySlug(dto.slug ?? name);
+    const name = this.categoryInputNormalizer.normalizeName(dto.name);
+    const slug = this.categoryInputNormalizer.normalizeSlug(dto.slug ?? name);
     const status = dto.status ?? category_status.ACTIVE;
 
-    await validateCategoryParent(this.categoryRepository, {
+    await this.categoryParentValidator.validate({
       tenantId,
       businessId,
       parentId: dto.parent_id,

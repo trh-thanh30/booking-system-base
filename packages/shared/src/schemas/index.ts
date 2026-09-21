@@ -4,5 +4,6 @@ export * from "./category.schema.ts";
 export * from "./notification.schema.ts";
 export * from "./pagination.schema.ts";
 export * from "./permission.schema.ts";
+export * from "./service.schema.ts";
 export * from "./tenant.schema.ts";
 export * from "./user.schema.ts";

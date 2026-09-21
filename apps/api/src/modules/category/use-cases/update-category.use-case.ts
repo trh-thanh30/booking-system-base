@@ -2,17 +2,18 @@ import { ConflictError, NotFoundError } from '@/common/response';
 import { UpdateCategoryDto } from '@/modules/category/dto/update-category.dto';
 import { CategoryRepository } from '@/modules/category/repository/category.repository';
 import { toCategorySummary } from '@/modules/category/types/category.types';
-import {
-  normalizeCategoryName,
-  normalizeCategorySlug,
-} from '@/modules/category/utils/category-input.util';
-import { validateCategoryParent } from '@/modules/category/utils/category-parent.util';
+import { CategoryInputNormalizer } from '@/modules/category/utils/category-input.util';
+import { CategoryParentValidator } from '@/modules/category/utils/category-parent.util';
 import { Injectable } from '@nestjs/common';
 import { type Prisma } from '@prisma/client';
 
 @Injectable()
 export class UpdateCategoryUseCase {
-  constructor(private readonly categoryRepository: CategoryRepository) {}
+  constructor(
+    private readonly categoryRepository: CategoryRepository,
+    private readonly categoryInputNormalizer: CategoryInputNormalizer,
+    private readonly categoryParentValidator: CategoryParentValidator,
+  ) {}
 
   async execute(
     tenantId: string,
@@ -31,7 +32,9 @@ export class UpdateCategoryUseCase {
     }
 
     const nextSlug =
-      dto.slug !== undefined ? normalizeCategorySlug(dto.slug) : undefined;
+      dto.slug !== undefined
+        ? this.categoryInputNormalizer.normalizeSlug(dto.slug)
+        : undefined;
 
     if (nextSlug && nextSlug !== current.slug) {
       const existing =
@@ -49,7 +52,7 @@ export class UpdateCategoryUseCase {
     }
 
     if (dto.parent_id !== undefined) {
-      await validateCategoryParent(this.categoryRepository, {
+      await this.categoryParentValidator.validate({
         tenantId,
         businessId,
         parentId: dto.parent_id,
@@ -60,7 +63,7 @@ export class UpdateCategoryUseCase {
 
     const data: Prisma.CategoryUncheckedUpdateInput = {
       ...(dto.name !== undefined
-        ? { name: normalizeCategoryName(dto.name) }
+        ? { name: this.categoryInputNormalizer.normalizeName(dto.name) }
         : {}),
       ...(nextSlug ? { slug: nextSlug } : {}),
       ...(dto.description !== undefined

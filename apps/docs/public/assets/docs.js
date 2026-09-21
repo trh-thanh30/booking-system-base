@@ -36,6 +36,12 @@ const docs = [
     file: "./content/categories.md",
   },
   {
+    id: "services",
+    title: "Services API",
+    eyebrow: "api module",
+    file: "./content/services.md",
+  },
+  {
     id: "users",
     title: "Users API",
     eyebrow: "api module",
