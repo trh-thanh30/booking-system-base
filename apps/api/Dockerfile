@@ -37,6 +37,10 @@ ENV PORT=3000
 RUN addgroup --system --gid 1001 nodejs \
   && adduser --system --uid 1001 nestjs
 
+# The production container executes Node directly; package managers are not needed.
+RUN rm -rf /usr/local/lib/node_modules/npm \
+  && rm -f /usr/local/bin/npm /usr/local/bin/npx
+
 COPY --from=builder --chown=nestjs:nodejs /prod/api ./
 
 RUN mkdir -p logs storage \

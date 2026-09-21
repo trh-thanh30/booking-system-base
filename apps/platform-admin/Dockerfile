@@ -36,6 +36,10 @@ ENV PORT=3003
 RUN addgroup --system --gid 1001 nodejs \
   && adduser --system --uid 1001 nextjs
 
+# The production container executes Node directly; package managers are not needed.
+RUN rm -rf /usr/local/lib/node_modules/npm \
+  && rm -f /usr/local/bin/npm /usr/local/bin/npx
+
 COPY --from=builder --chown=nextjs:nodejs /app/apps/platform-admin/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/apps/platform-admin/.next/static ./apps/platform-admin/.next/static
 
