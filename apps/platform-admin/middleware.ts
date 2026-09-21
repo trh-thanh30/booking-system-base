@@ -15,7 +15,7 @@ function resolveRouteSegment(pathname: string) {
   return pathname.split("/").filter(Boolean)[1];
 }
 
-export default function proxy(request: NextRequest) {
+export default function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const locale = resolveLocale(pathname);
   const routeSegment = resolveRouteSegment(pathname);

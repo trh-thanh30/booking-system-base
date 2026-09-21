@@ -4,8 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "node ../../scripts/next-port.mjs dev WEB_PORT 3001",
-    "build": "next build",
+    "dev": "node ../../scripts/next-port.mjs dev WEB_PORT 3001 --turbopack",
+    "build": "next build --turbopack",
     "start": "node ../../scripts/next-port.mjs start WEB_PORT 3001",
     "lint": "eslint . --max-warnings 0",
     "check-types": "next typegen && tsc --noEmit"
@@ -22,7 +22,7 @@
     "embla-carousel-react": "^8.6.0",
     "framer-motion": "^12.40.0",
     "lucide-react": "^0.575.0",
-    "next": "16.1.5",
+    "next": "15.5.24",
     "next-intl": "^4.13.0",
     "qrcode": "^1.5.4",
     "react": "^19.2.0",
