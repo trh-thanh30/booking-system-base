@@ -150,12 +150,20 @@ jobs:
           exit-code: "1"
           skip-setup-trivy: true
 
+      - name: Review dependency changes
+        if: always() && github.event_name == 'pull_request'
+        uses: actions/dependency-review-action@v5
+        with:
+          fail-on-severity: critical
+          show-patched-versions: true
+
       - name: Record dependency security policy
         if: always()
         run: |
           echo "### Dependency security policy" >> "$GITHUB_STEP_SUMMARY"
           echo "- HIGH vulnerabilities are reported and do not block CI." >> "$GITHUB_STEP_SUMMARY"
           echo "- Fixable CRITICAL vulnerabilities block CI." >> "$GITHUB_STEP_SUMMARY"
+          echo "- Pull requests are checked for newly introduced CRITICAL dependencies." >> "$GITHUB_STEP_SUMMARY"
 
   notify:
     name: Send Webhook Notification
