@@ -13,7 +13,6 @@ import {
   NotFoundError,
   UnauthorizedError,
 } from '@/common/response';
-import { cookieConfig } from '@/config';
 import { AssetsService } from '@/modules/assets/assets.service';
 import { AssetAccessTypeDto } from '@/modules/assets/dto/upload-asset.dto';
 import { AcceptInvitationDto } from '@/modules/auth/dto/accept-invitation.dto';
@@ -26,6 +25,9 @@ import { RequestVerificationDto } from '@/modules/auth/dto/request-verification.
 import { ResetPasswordDto } from '@/modules/auth/dto/reset-password.dto';
 import { UpdateProfileDto } from '@/modules/auth/dto/update-profile.dto';
 import { VerifyEmailDto } from '@/modules/auth/dto/verify-email.dto';
+import type { AuthContext } from '@/modules/auth/auth.types';
+import { AuthCookieService } from '@/modules/auth/service/auth-cookie.service';
+import { AuthProfileService } from '@/modules/auth/service/auth-profile.service';
 import { AcceptInvitationUseCase } from '@/modules/auth/use-cases/accept-invitation.usecase';
 import { ChangePasswordUseCase } from '@/modules/auth/use-cases/change-password.usecase';
 import { CreateInvitationUseCase } from '@/modules/auth/use-cases/create-invitation.usecase';
@@ -38,19 +40,13 @@ import { RequestVerificationUseCase } from '@/modules/auth/use-cases/request-ver
 import { ResendVerificationUseCase } from '@/modules/auth/use-cases/resend-verification.usecase';
 import { ResetPasswordUseCase } from '@/modules/auth/use-cases/reset-password.usecase';
 import { VerifyAccountUseCase } from '@/modules/auth/use-cases/verify-account.usecase';
-import {
-  ALL_PERMISSIONS,
-  PERMISSIONS,
-} from '@/modules/permission/constants/permission.constants';
-import { toBusinessSummary } from '@/modules/business/business.types';
-import { GetUserPermissionsUseCase } from '@/modules/permission/use-cases/get-user-permissions.use-case';
+import { PERMISSIONS } from '@/modules/permission/constants/permission.constants';
 import { UsersService } from '@/modules/user/user.service';
 import {
   Body,
   Controller,
   Get,
   Headers,
-  Inject,
   Param,
   Patch,
   Post,
@@ -59,14 +55,11 @@ import {
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
-import { type ConfigType } from '@nestjs/config';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { user_role, type User as CurrentUser } from '@prisma/client';
 import express from 'express';
 
 type AuthRequestUser = CurrentUser;
-type AuthContext = 'platform' | 'admin' | 'client';
-
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -82,11 +75,10 @@ export class AuthController {
     private readonly createInvitationUseCase: CreateInvitationUseCase,
     private readonly getInvitationUseCase: GetInvitationUseCase,
     private readonly acceptInvitationUseCase: AcceptInvitationUseCase,
-    private readonly getUserPermissionsUseCase: GetUserPermissionsUseCase,
     private readonly usersService: UsersService,
     private readonly assetsService: AssetsService,
-    @Inject(cookieConfig.KEY)
-    private readonly configCookie: ConfigType<typeof cookieConfig>,
+    private readonly authCookieService: AuthCookieService,
+    private readonly authProfileService: AuthProfileService,
   ) {}
 
   @Public()
@@ -110,30 +102,15 @@ export class AuthController {
       dto,
       this.getRequiredRoles('admin'),
     );
-    this.setRefreshCookies(res, 'admin', result.refresh_token);
-
-    return {
-      access_token: result.access_token,
-      user: await this.toAuthUser(result.user.id),
-    };
-  }
-
-  @Public()
-  @Post('login-platform')
-  @ApiSuccess('Platform login successful')
-  async loginPlatform(
-    @Body() dto: LoginDto,
-    @Res({ passthrough: true }) res: express.Response,
-  ) {
-    const result = await this.loginUserUseCase.execute(
-      dto,
-      this.getRequiredRoles('platform'),
+    this.authCookieService.setRefreshCookies(
+      res,
+      'admin',
+      result.refresh_token,
     );
-    this.setRefreshCookies(res, 'platform', result.refresh_token);
 
     return {
       access_token: result.access_token,
-      user: await this.toAuthUser(result.user.id),
+      user: await this.authProfileService.getByUserId(result.user.id),
     };
   }
 
@@ -148,11 +125,15 @@ export class AuthController {
       dto,
       this.getRequiredRoles('client'),
     );
-    this.setRefreshCookies(res, 'client', result.refresh_token);
+    this.authCookieService.setRefreshCookies(
+      res,
+      'client',
+      result.refresh_token,
+    );
 
     return {
       access_token: result.access_token,
-      user: await this.toAuthUser(result.user.id),
+      user: await this.authProfileService.getByUserId(result.user.id),
     };
   }
 
@@ -164,11 +145,8 @@ export class AuthController {
     @Req() req: express.Request,
     @Res({ passthrough: true }) res: express.Response,
   ): Promise<{ access_token: string }> {
-    const context = this.resolveAuthContext(authContext);
-    const cookieNames = this.getRefreshCookieNames(context);
-    const refreshToken = (req.cookies as Record<string, string>)?.[
-      cookieNames.refreshToken
-    ];
+    const context = this.resolveLegacySessionContext(authContext);
+    const refreshToken = this.authCookieService.getRefreshToken(req, context);
 
     try {
       const result = await this.refreshTokenUseCase.execute(
@@ -176,13 +154,17 @@ export class AuthController {
         this.getRequiredRoles(context),
       );
 
-      this.setRefreshCookies(res, context, result.refresh_token);
+      this.authCookieService.setRefreshCookies(
+        res,
+        context,
+        result.refresh_token,
+      );
 
       return {
         access_token: result.access_token,
       };
     } catch (error) {
-      this.clearRefreshCookies(res, context);
+      this.authCookieService.clearRefreshCookies(res, context);
       throw error;
     }
   }
@@ -203,7 +185,7 @@ export class AuthController {
       throw new NotFoundError('User not found');
     }
 
-    return this.toAuthUser(profile.id);
+    return this.authProfileService.getByUserId(profile.id);
   }
 
   @Patch('me')
@@ -220,7 +202,7 @@ export class AuthController {
     await this.assertProfileIsUnique(user.id, dto);
 
     await this.usersService.update(user.id, dto);
-    return this.toAuthUser(user.id);
+    return this.authProfileService.getByUserId(user.id);
   }
 
   @Patch('me/avatar')
@@ -251,7 +233,7 @@ export class AuthController {
       avatar_url: asset.url,
     });
 
-    return this.toAuthUser(user.id);
+    return this.authProfileService.getByUserId(user.id);
   }
 
   @Patch('change-password')
@@ -267,7 +249,7 @@ export class AuthController {
 
     const { success } = await this.changePasswordUseCase.execute(user.id, dto);
     if (success) {
-      this.clearRefreshCookies(res, context);
+      this.authCookieService.clearRefreshCookies(res, context);
     }
   }
 
@@ -279,17 +261,14 @@ export class AuthController {
     @Req() req: express.Request,
     @Res({ passthrough: true }) res: express.Response,
   ) {
-    const context = this.resolveAuthContext(authContext);
-    const cookieNames = this.getRefreshCookieNames(context);
-    const refreshToken = (req.cookies as Record<string, string>)?.[
-      cookieNames.refreshToken
-    ];
+    const context = this.resolveLegacySessionContext(authContext);
+    const refreshToken = this.authCookieService.getRefreshToken(req, context);
 
     await this.refreshTokenUseCase.revoke(
       refreshToken,
       this.getRequiredRoles(context),
     );
-    this.clearRefreshCookies(res, context);
+    this.authCookieService.clearRefreshCookies(res, context);
   }
 
   @Public()
@@ -384,44 +363,6 @@ export class AuthController {
     }
   }
 
-  private async toAuthUser(userId: string) {
-    const user = await this.usersService.findAuthProfileById(userId);
-    if (!user) {
-      throw new NotFoundError('User not found');
-    }
-
-    return {
-      id: user.id,
-      tenant_id: user.tenant_id,
-      email: user.email,
-      username: user.username,
-      full_name: user.full_name,
-      phone: user.phone,
-      avatar_url: user.avatar_url,
-      role: user.role,
-      status: user.status,
-      is_verified: user.is_verified,
-      tenant: user.tenant
-        ? {
-            id: user.tenant.id,
-            slug: user.tenant.slug,
-            name: user.tenant.name,
-            status: user.tenant.status,
-            timezone: user.tenant.timezone,
-            locale: user.tenant.locale,
-          }
-        : null,
-      businesses: this.resolveAuthBusinesses(user),
-      permissions: await this.resolveUserPermissions(
-        user.id,
-        user.tenant_id,
-        user.role,
-      ),
-      created_at: user.created_at,
-      updated_at: user.updated_at,
-    };
-  }
-
   private resolveAuthContext(authContext?: string): AuthContext {
     if (authContext === 'platform') {
       return 'platform';
@@ -430,25 +371,13 @@ export class AuthController {
     return authContext === 'admin' ? 'admin' : 'client';
   }
 
-  private getRefreshCookieNames(context: AuthContext) {
+  private resolveLegacySessionContext(authContext?: string): AuthContext {
+    const context = this.resolveAuthContext(authContext);
     if (context === 'platform') {
-      return {
-        refreshToken: 'platform_refresh_token',
-        refreshFlag: 'platform_has_rt',
-      };
+      throw new UnauthorizedError('Invalid session for this app');
     }
 
-    if (context === 'admin') {
-      return {
-        refreshToken: 'admin_refresh_token',
-        refreshFlag: 'admin_has_rt',
-      };
-    }
-
-    return {
-      refreshToken: 'client_refresh_token',
-      refreshFlag: 'client_has_rt',
-    };
+    return context;
   }
 
   private getRequiredRoles(context: AuthContext): user_role[] {
@@ -468,130 +397,5 @@ export class AuthController {
     if (!this.getRequiredRoles(context).includes(user.role)) {
       throw new UnauthorizedError('Invalid session for this app');
     }
-  }
-
-  private async resolveUserPermissions(
-    userId: string,
-    tenantId: string | null,
-    role: user_role,
-  ) {
-    if (role === user_role.SUPER_ADMIN || role === user_role.OWNER) {
-      return [ALL_PERMISSIONS];
-    }
-
-    if (!tenantId) {
-      return [];
-    }
-
-    return this.getUserPermissionsUseCase.execute(userId, tenantId);
-  }
-
-  private resolveAuthBusinesses(
-    user: NonNullable<Awaited<ReturnType<UsersService['findAuthProfileById']>>>,
-  ) {
-    if (user.role === user_role.SUPER_ADMIN || !user.tenant_id) {
-      return [];
-    }
-
-    if (user.role === user_role.OWNER) {
-      return (user.tenant?.businesses ?? []).map(toBusinessSummary);
-    }
-
-    return user.business_memberships
-      .map((membership) => membership.business)
-      .map(toBusinessSummary);
-  }
-
-  private setRefreshCookies(
-    res: express.Response,
-    context: AuthContext,
-    refreshToken: string,
-  ) {
-    const cookieNames = this.getRefreshCookieNames(context);
-    this.clearPartitionedRefreshCookies(res, context);
-
-    res.cookie(cookieNames.refreshToken, refreshToken, {
-      httpOnly: this.configCookie.httpOnly,
-      secure: this.configCookie.secure,
-      sameSite: this.configCookie.sameSite,
-      domain: this.configCookie.domain,
-      path: this.configCookie.path,
-      maxAge: this.configCookie.maxAge,
-      partitioned: this.configCookie.partitioned,
-    });
-    res.cookie(cookieNames.refreshFlag, '1', {
-      httpOnly: false,
-      secure: this.configCookie.secure,
-      sameSite: this.configCookie.sameSite,
-      domain: this.configCookie.domain,
-      path: this.configCookie.path,
-      maxAge: this.configCookie.maxAge,
-    });
-
-    this.clearLegacyRefreshCookies(res);
-  }
-
-  private clearPartitionedRefreshCookies(
-    res: express.Response,
-    context: AuthContext,
-  ) {
-    const cookieNames = this.getRefreshCookieNames(context);
-
-    res.clearCookie(cookieNames.refreshToken, {
-      httpOnly: this.configCookie.httpOnly,
-      secure: this.configCookie.secure,
-      sameSite: this.configCookie.sameSite,
-      domain: this.configCookie.domain,
-      path: this.configCookie.path,
-      partitioned: true,
-    });
-    res.clearCookie(cookieNames.refreshFlag, {
-      httpOnly: false,
-      secure: this.configCookie.secure,
-      sameSite: this.configCookie.sameSite,
-      domain: this.configCookie.domain,
-      path: this.configCookie.path,
-      partitioned: true,
-    });
-  }
-
-  private clearRefreshCookies(res: express.Response, context: AuthContext) {
-    const cookieNames = this.getRefreshCookieNames(context);
-
-    res.clearCookie(cookieNames.refreshToken, {
-      httpOnly: this.configCookie.httpOnly,
-      secure: this.configCookie.secure,
-      sameSite: this.configCookie.sameSite,
-      domain: this.configCookie.domain,
-      path: this.configCookie.path,
-      partitioned: this.configCookie.partitioned,
-    });
-    res.clearCookie(cookieNames.refreshFlag, {
-      httpOnly: false,
-      secure: this.configCookie.secure,
-      sameSite: this.configCookie.sameSite,
-      domain: this.configCookie.domain,
-      path: this.configCookie.path,
-    });
-
-    this.clearLegacyRefreshCookies(res);
-  }
-
-  private clearLegacyRefreshCookies(res: express.Response) {
-    res.clearCookie('refresh_token', {
-      httpOnly: this.configCookie.httpOnly,
-      secure: this.configCookie.secure,
-      sameSite: this.configCookie.sameSite,
-      domain: this.configCookie.domain,
-      path: this.configCookie.path,
-      partitioned: this.configCookie.partitioned,
-    });
-    res.clearCookie('has_rt', {
-      httpOnly: false,
-      secure: this.configCookie.secure,
-      sameSite: this.configCookie.sameSite,
-      domain: this.configCookie.domain,
-      path: this.configCookie.path,
-    });
   }
 }

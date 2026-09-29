@@ -5,6 +5,9 @@ import { PrismaService } from '@/database/prisma/prisma.service';
 import { RedisModule } from '@/database/redis/redis.module';
 import { AssetsModule } from '@/modules/assets/assets.module';
 import { AuthController } from '@/modules/auth/auth.controller';
+import { PlatformAuthController } from '@/modules/auth/platform-auth.controller';
+import { AuthCookieService } from '@/modules/auth/service/auth-cookie.service';
+import { AuthProfileService } from '@/modules/auth/service/auth-profile.service';
 import { AuthTokenService } from '@/modules/auth/service/auth-token.service';
 import { VerificationSessionService } from '@/modules/auth/service/verification-session.service';
 import { AcceptInvitationUseCase } from '@/modules/auth/use-cases/accept-invitation.usecase';
@@ -27,7 +30,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  controllers: [AuthController],
+  controllers: [AuthController, PlatformAuthController],
   providers: [
     RegisterUserUseCase,
     LoginUserUseCase,
@@ -46,6 +49,8 @@ import { ConfigModule } from '@nestjs/config';
     VerificationSessionService,
     BcryptService,
     ChangePasswordUseCase,
+    AuthCookieService,
+    AuthProfileService,
   ],
   imports: [
     AssetsModule,

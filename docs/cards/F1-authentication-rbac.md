@@ -30,7 +30,9 @@ Bảo vệ dữ liệu doanh nghiệp, cho phép mỗi nhóm người dùng ch�
 
 - `POST /auth/login`
 - `POST /auth/login-admin`
-- `POST /auth/login-platform`
+- `POST /auth/platform/login`
+- `POST /auth/platform/refresh`
+- `POST /auth/platform/logout`
 - `POST /auth/refresh`
 - `POST /auth/logout`
 - `POST /auth/forgot-password`
@@ -109,7 +111,8 @@ Không thêm `sessions` table trong F1. Refresh/session state dùng `users.refre
 ### Phase 1 - API
 
 - Cập nhật `/auth/me` trả user, tenant và permissions.
-- Thêm `POST /auth/login-platform` cho `SUPER_ADMIN`.
+- Tách `PlatformAuthController` với login/refresh/logout riêng cho
+  `SUPER_ADMIN`.
 - Chuẩn hóa login/refresh/logout dựa trên `User.refresh_token`.
 - Clear refresh token khi logout, đổi mật khẩu hoặc reset mật khẩu.
 - Gắn permission guard vào API quản trị.
@@ -125,7 +128,8 @@ Không thêm `sessions` table trong F1. Refresh/session state dùng `users.refre
 
 ### Phase 3 - Platform Admin FE
 
-- Platform Admin dùng `/auth/login-platform` và `x-auth-context: platform`.
+- Platform Admin dùng `/auth/platform/login`, `/auth/platform/refresh` và
+  `/auth/platform/logout` mà không phụ thuộc `x-auth-context` cho session flow.
 - Tenant registry đọc `GET /platform/tenants`.
 - Super Admin tạo tenant thủ công bằng `POST /platform/tenants`.
 - Dashboard platform hiển thị tenant/user totals từ tenant registry API.
