@@ -120,7 +120,11 @@ describe('LoginUserUseCase', () => {
   it('accepts any role in the allowed role list', async () => {
     const prisma = {
       user: {
-        findFirst: jest.fn().mockResolvedValue(user({ role: user_role.STAFF })),
+        findFirst: jest
+          .fn()
+          .mockResolvedValue(
+            user({ role: user_role.STAFF, tenant_id: 'tenant-1' }),
+          ),
         update: jest.fn().mockResolvedValue(undefined),
       },
     };
@@ -141,5 +145,29 @@ describe('LoginUserUseCase', () => {
       access_token: 'access-token',
       refresh_token: 'refresh-token',
     });
+  });
+
+  it('rejects an Owner or Staff account that is not assigned to a tenant', async () => {
+    const prisma = {
+      user: {
+        findFirst: jest
+          .fn()
+          .mockResolvedValue(user({ role: user_role.OWNER, tenant_id: null })),
+        update: jest.fn(),
+      },
+    };
+    const tokenService = { generateTokenPair: jest.fn() };
+
+    await expect(
+      new LoginUserUseCase(
+        prisma as any,
+        { comparePassword: jest.fn().mockResolvedValue(true) } as any,
+        tokenService as any,
+        { createSession: jest.fn() } as any,
+      ).execute(dto, [user_role.OWNER, user_role.STAFF]),
+    ).rejects.toThrow('Invalid email/username or password');
+
+    expect(tokenService.generateTokenPair).not.toHaveBeenCalled();
+    expect(prisma.user.update).not.toHaveBeenCalled();
   });
 });

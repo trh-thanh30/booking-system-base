@@ -1,6 +1,6 @@
 import { NotFoundError } from '@/common/response/client-errors/not-found';
 import { ForgotPasswordDto } from '@/modules/auth/dto/forgot-password.dto';
-import { VerificationSessionService } from '@/modules/auth/service/verification-session.service';
+import { VerificationSessionService } from '@/modules/auth/services/verification-session.service';
 import { SendForgotPasswordEmailUseCase } from '@/modules/email/use-cases/send-forgot-password-email.usecase';
 import { UsersService } from '@/modules/user/user.service';
 import { VerificationService } from '@/modules/verification/verification.service';

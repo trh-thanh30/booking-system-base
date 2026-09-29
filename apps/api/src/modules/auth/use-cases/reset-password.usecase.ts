@@ -4,7 +4,7 @@ import { NotFoundError } from '@/common/response/client-errors/not-found';
 import { UnauthorizedError } from '@/common/response/client-errors/unauthorized';
 import { PrismaService } from '@/database/prisma/prisma.service';
 import { ResetPasswordDto } from '@/modules/auth/dto/reset-password.dto';
-import { VerificationSessionService } from '@/modules/auth/service/verification-session.service';
+import { VerificationSessionService } from '@/modules/auth/services/verification-session.service';
 import { VerificationService } from '@/modules/verification/verification.service';
 import { BaseUseCase } from '@/shared/interfaces/base-usecase.interface';
 import { Injectable } from '@nestjs/common';

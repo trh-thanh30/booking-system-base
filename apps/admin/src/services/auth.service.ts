@@ -42,7 +42,7 @@ export type CreatedInvitation = {
 export const authService = {
   async loginAdmin(input: LoginInput) {
     return unwrapApiData(
-      await apiClient.post<AuthSession>("/auth/login-admin", input),
+      await apiClient.post<AuthSession>("/auth/admin/login", input),
     );
   },
 
@@ -52,12 +52,12 @@ export const authService = {
 
   async refresh() {
     return unwrapApiData(
-      await apiClient.post<{ access_token: string }>("/auth/refresh"),
+      await apiClient.post<{ access_token: string }>("/auth/admin/refresh"),
     );
   },
 
   async logout() {
-    await apiClient.post<void>("/auth/logout");
+    await apiClient.post<void>("/auth/admin/logout");
   },
 
   async forgotPassword(input: EmailRequestInput) {

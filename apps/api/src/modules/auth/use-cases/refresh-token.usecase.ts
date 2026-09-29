@@ -1,6 +1,6 @@
 import { UnauthorizedError } from '@/common/response/client-errors/unauthorized';
 import { PrismaService } from '@/database/prisma/prisma.service';
-import { AuthTokenService } from '@/modules/auth/service/auth-token.service';
+import { AuthTokenService } from '@/modules/auth/services/auth-token.service';
 import { BaseUseCase } from '@/shared/interfaces/base-usecase.interface';
 import { Injectable } from '@nestjs/common';
 import { user_role } from '@prisma/client';
@@ -60,6 +60,12 @@ export class RefreshTokenUseCase extends BaseUseCase<
       }
 
       if (requiredRole && !this.isAllowedRole(user.role, requiredRole)) {
+        throw new UnauthorizedError('Invalid refresh token for this app');
+      }
+
+      const isBusinessAdmin =
+        user.role === user_role.OWNER || user.role === user_role.STAFF;
+      if (isBusinessAdmin && !user.tenant_id) {
         throw new UnauthorizedError('Invalid refresh token for this app');
       }
 

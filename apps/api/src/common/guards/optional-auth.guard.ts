@@ -1,6 +1,6 @@
 // common/guards/optional-auth.guard.ts
 import { IS_OPTIONAL_AUTH_KEY } from '@/common/decorators/option-auth.decorator';
-import { AuthTokenService } from '@/modules/auth/service/auth-token.service';
+import { AuthTokenService } from '@/modules/auth/services/auth-token.service';
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 

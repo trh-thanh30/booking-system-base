@@ -29,12 +29,14 @@ Bảo vệ dữ liệu doanh nghiệp, cho phép mỗi nhóm người dùng ch�
 ## API Endpoints
 
 - `POST /auth/login`
-- `POST /auth/login-admin`
+- `POST /auth/admin/login`
 - `POST /auth/platform/login`
 - `POST /auth/platform/refresh`
 - `POST /auth/platform/logout`
-- `POST /auth/refresh`
-- `POST /auth/logout`
+- `POST /auth/admin/refresh`
+- `POST /auth/admin/logout`
+- `POST /auth/refresh` (Client)
+- `POST /auth/logout` (Client)
 - `POST /auth/forgot-password`
 - `POST /auth/reset-password`
 - `GET /auth/me`
@@ -113,6 +115,8 @@ Không thêm `sessions` table trong F1. Refresh/session state dùng `users.refre
 - Cập nhật `/auth/me` trả user, tenant và permissions.
 - Tách `PlatformAuthController` với login/refresh/logout riêng cho
   `SUPER_ADMIN`.
+- Tách `AdminAuthController` với login/refresh/logout riêng cho `OWNER` và
+  `STAFF`; không phụ thuộc `x-auth-context` trong session flow.
 - Chuẩn hóa login/refresh/logout dựa trên `User.refresh_token`.
 - Clear refresh token khi logout, đổi mật khẩu hoặc reset mật khẩu.
 - Gắn permission guard vào API quản trị.
