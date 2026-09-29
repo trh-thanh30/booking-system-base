@@ -1,4 +1,4 @@
-import { createApiClient } from "@repo/shared";
+import { createApiClient, createSessionRefresh } from "@repo/shared";
 import { useAdminUiStore } from "@/src/app/stores/ui.store";
 import {
   clearAccessToken,
@@ -26,58 +26,42 @@ function clearAdminSession() {
   }
 }
 
-let refreshPromise: Promise<string | false> | undefined;
+const apiBaseUrl =
+  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000/api/v1";
+const adminSessionPaths = [
+  "/auth/admin/login",
+  "/auth/admin/refresh",
+  "/auth/admin/logout",
+];
+const refreshApiClient = createApiClient({
+  baseURL: apiBaseUrl,
+  withCredentials: true,
+});
 
-async function refreshAccessToken(): Promise<string | false> {
-  if (!hasAdminRefreshCookie()) {
-    clearAdminSession();
-    return false;
-  }
-
-  refreshPromise ??= fetch(
-    `${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000/api/v1"}/auth/admin/refresh`,
-    {
-      body: JSON.stringify({}),
-      credentials: "include",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      method: "POST",
-    },
-  )
-    .then(async (response) => {
-      if (!response.ok) {
-        clearAdminSession();
-        return false as const;
-      }
-
-      const payload = (await response.json()) as {
-        data?: { access_token?: string };
-      };
-      const accessToken = payload.data?.access_token;
-
-      if (!accessToken) {
-        clearAdminSession();
-        return false as const;
-      }
-
-      setAccessToken(accessToken);
-      return accessToken;
-    })
-    .catch(() => {
-      clearAdminSession();
-      return false as const;
-    })
-    .finally(() => {
-      refreshPromise = undefined;
-    });
-
-  return refreshPromise;
+function isAdminSessionRequest(url?: string) {
+  const path = url?.split("?")[0];
+  return path
+    ? adminSessionPaths.some((sessionPath) => path.endsWith(sessionPath))
+    : false;
 }
 
+async function requestAdminAccessToken(): Promise<string | undefined> {
+  const response = await refreshApiClient.post<{ access_token?: string }>(
+    "/auth/admin/refresh",
+    {},
+  );
+  return response.data?.access_token;
+}
+
+const refreshAccessToken = createSessionRefresh({
+  hasRefreshMarker: hasAdminRefreshCookie,
+  onAccessToken: setAccessToken,
+  onSessionExpired: clearAdminSession,
+  requestAccessToken: requestAdminAccessToken,
+});
+
 export const apiClient = createApiClient({
-  baseURL: process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000/api/v1",
+  baseURL: apiBaseUrl,
   getHeaders: () => {
     const tenantId = getTenantId();
     const businessId = useAdminUiStore.getState().activeBusinessId;
@@ -92,5 +76,6 @@ export const apiClient = createApiClient({
   },
   getAccessToken,
   onUnauthorized: refreshAccessToken,
+  shouldHandleUnauthorized: (config) => !isAdminSessionRequest(config.url),
   withCredentials: true,
 });

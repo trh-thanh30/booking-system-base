@@ -25,6 +25,7 @@ export type CreateHttpClientOptions = {
   getAccessToken?: TokenResolver;
   getHeaders?: HeaderResolver;
   onUnauthorized?: UnauthorizedHandler;
+  shouldHandleUnauthorized?: (config: HttpRequestConfig) => boolean;
 };
 
 export type HttpClient = AxiosInstance;
