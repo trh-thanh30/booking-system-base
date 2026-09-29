@@ -15,6 +15,10 @@ import {
   getAccessToken,
   setAccessToken,
 } from "@/src/lib/auth-token";
+import {
+  hasPlatformRefreshCookie,
+  PLATFORM_SESSION_EXPIRED_EVENT,
+} from "@/src/lib/api-client";
 import { authService } from "@/src/services/auth.service";
 
 type AuthContextValue = {
@@ -27,19 +31,23 @@ type AuthContextValue = {
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
-function hasPlatformRefreshCookie() {
-  if (typeof document === "undefined") {
-    return false;
-  }
-
-  return document.cookie
-    .split(";")
-    .some((cookie) => cookie.trim().startsWith("platform_has_rt="));
-}
-
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<CurrentAuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const handleSessionExpired = () => setUser(null);
+
+    window.addEventListener(
+      PLATFORM_SESSION_EXPIRED_EVENT,
+      handleSessionExpired,
+    );
+    return () =>
+      window.removeEventListener(
+        PLATFORM_SESSION_EXPIRED_EVENT,
+        handleSessionExpired,
+      );
+  }, []);
 
   useEffect(() => {
     let mounted = true;

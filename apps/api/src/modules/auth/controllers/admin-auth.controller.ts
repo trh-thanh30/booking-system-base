@@ -27,7 +27,11 @@ export class AdminAuthController {
     @Body() dto: LoginDto,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const result = await this.loginUserUseCase.execute(dto, ADMIN_ROLES);
+    const result = await this.loginUserUseCase.execute(
+      dto,
+      ADMIN_ROLES,
+      'admin',
+    );
     this.authCookieService.setRefreshCookies(
       res,
       'admin',
@@ -52,13 +56,8 @@ export class AdminAuthController {
       const result = await this.refreshTokenUseCase.execute(
         refreshToken,
         ADMIN_ROLES,
-      );
-      this.authCookieService.setRefreshCookies(
-        res,
         'admin',
-        result.refresh_token,
       );
-
       return { access_token: result.access_token };
     } catch (error) {
       this.authCookieService.clearRefreshCookies(res, 'admin');
@@ -70,7 +69,7 @@ export class AdminAuthController {
   @ApiSuccess('Admin logged out successfully')
   async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     const refreshToken = this.authCookieService.getRefreshToken(req, 'admin');
-    await this.refreshTokenUseCase.revoke(refreshToken, ADMIN_ROLES);
+    await this.refreshTokenUseCase.revoke(refreshToken, ADMIN_ROLES, 'admin');
     this.authCookieService.clearRefreshCookies(res, 'admin');
   }
 }

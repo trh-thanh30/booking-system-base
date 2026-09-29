@@ -93,13 +93,23 @@ export class UsersService {
    * @returns Updated user
    */
   async update(id: string, dto: UpdateUserDto): Promise<User> {
-    if (dto.password) {
-      dto.password = await this.bcryptService.hashPassword(dto.password);
+    const data = { ...dto };
+    const passwordChanged = Boolean(data.password);
+    if (data.password) {
+      data.password = await this.bcryptService.hashPassword(data.password);
     }
-    return this.usersRepository.update(id, dto);
+
+    if (passwordChanged || data.status === 'INACTIVE') {
+      return this.usersRepository.update(id, {
+        ...data,
+        refresh_token_hash: null,
+      });
+    }
+
+    return this.usersRepository.update(id, data);
   }
 
-  async updatePasswordAndClearRefreshToken(
+  async updatePasswordAndRevokeSession(
     id: string,
     password: string,
   ): Promise<User> {
@@ -107,12 +117,12 @@ export class UsersService {
 
     return this.usersRepository.update(id, {
       password: hashedPassword,
-      refresh_token: null,
+      refresh_token_hash: null,
     });
   }
 
-  async clearRefreshToken(id: string): Promise<User> {
-    return this.usersRepository.update(id, { refresh_token: null });
+  async revokeSession(id: string): Promise<User> {
+    return this.usersRepository.update(id, { refresh_token_hash: null });
   }
 
   /**

@@ -4,9 +4,33 @@ import { clearAccessToken, getAccessToken, setAccessToken } from "./auth-token";
 const apiBaseUrl =
   process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000/api/v1";
 
+export const PLATFORM_SESSION_EXPIRED_EVENT =
+  "booking:platform-session-expired";
+
+export function hasPlatformRefreshCookie() {
+  return (
+    typeof document !== "undefined" &&
+    document.cookie
+      .split(";")
+      .some((cookie) => cookie.trim().startsWith("platform_has_rt="))
+  );
+}
+
+function clearPlatformSession() {
+  clearAccessToken();
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new Event(PLATFORM_SESSION_EXPIRED_EVENT));
+  }
+}
+
 let refreshPromise: Promise<string | false> | undefined;
 
 async function refreshAccessToken(): Promise<string | false> {
+  if (!hasPlatformRefreshCookie()) {
+    clearPlatformSession();
+    return false;
+  }
+
   refreshPromise ??= fetch(`${apiBaseUrl}/auth/platform/refresh`, {
     body: JSON.stringify({}),
     credentials: "include",
@@ -18,7 +42,7 @@ async function refreshAccessToken(): Promise<string | false> {
   })
     .then(async (response) => {
       if (!response.ok) {
-        clearAccessToken();
+        clearPlatformSession();
         return false as const;
       }
 
@@ -28,7 +52,7 @@ async function refreshAccessToken(): Promise<string | false> {
       const accessToken = payload.data?.access_token;
 
       if (!accessToken) {
-        clearAccessToken();
+        clearPlatformSession();
         return false as const;
       }
 
@@ -36,7 +60,7 @@ async function refreshAccessToken(): Promise<string | false> {
       return accessToken;
     })
     .catch(() => {
-      clearAccessToken();
+      clearPlatformSession();
       return false as const;
     })
     .finally(() => {

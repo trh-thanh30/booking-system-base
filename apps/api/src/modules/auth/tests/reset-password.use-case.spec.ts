@@ -64,7 +64,7 @@ describe('ResetPasswordUseCase', () => {
       where: { email: 'user@example.com' },
       data: {
         password: 'hashed-new',
-        refresh_token: null,
+        refresh_token_hash: null,
       },
     });
     expect(sessions.deleteSession).toHaveBeenCalledWith('session-1');

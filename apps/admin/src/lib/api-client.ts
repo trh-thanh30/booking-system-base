@@ -7,9 +7,33 @@ import {
   setAccessToken,
 } from "./auth-token";
 
+export const ADMIN_SESSION_EXPIRED_EVENT = "booking:admin-session-expired";
+
+export function hasAdminRefreshCookie() {
+  return (
+    typeof document !== "undefined" &&
+    document.cookie
+      .split(";")
+      .some((cookie) => cookie.trim().startsWith("admin_has_rt="))
+  );
+}
+
+function clearAdminSession() {
+  clearAccessToken();
+  useAdminUiStore.getState().setActiveBusinessId(null);
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new Event(ADMIN_SESSION_EXPIRED_EVENT));
+  }
+}
+
 let refreshPromise: Promise<string | false> | undefined;
 
 async function refreshAccessToken(): Promise<string | false> {
+  if (!hasAdminRefreshCookie()) {
+    clearAdminSession();
+    return false;
+  }
+
   refreshPromise ??= fetch(
     `${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000/api/v1"}/auth/admin/refresh`,
     {
@@ -24,7 +48,7 @@ async function refreshAccessToken(): Promise<string | false> {
   )
     .then(async (response) => {
       if (!response.ok) {
-        clearAccessToken();
+        clearAdminSession();
         return false as const;
       }
 
@@ -34,7 +58,7 @@ async function refreshAccessToken(): Promise<string | false> {
       const accessToken = payload.data?.access_token;
 
       if (!accessToken) {
-        clearAccessToken();
+        clearAdminSession();
         return false as const;
       }
 
@@ -42,7 +66,7 @@ async function refreshAccessToken(): Promise<string | false> {
       return accessToken;
     })
     .catch(() => {
-      clearAccessToken();
+      clearAdminSession();
       return false as const;
     })
     .finally(() => {

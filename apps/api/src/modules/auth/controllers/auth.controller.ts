@@ -101,6 +101,7 @@ export class AuthController {
     const result = await this.loginUserUseCase.execute(
       dto,
       this.getRequiredRoles('client'),
+      'client',
     );
     this.authCookieService.setRefreshCookies(
       res,
@@ -129,12 +130,7 @@ export class AuthController {
       const result = await this.refreshTokenUseCase.execute(
         refreshToken,
         this.getRequiredRoles(context),
-      );
-
-      this.authCookieService.setRefreshCookies(
-        res,
         context,
-        result.refresh_token,
       );
 
       return {
@@ -244,6 +240,7 @@ export class AuthController {
     await this.refreshTokenUseCase.revoke(
       refreshToken,
       this.getRequiredRoles(context),
+      context,
     );
     this.authCookieService.clearRefreshCookies(res, context);
   }

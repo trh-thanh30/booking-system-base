@@ -58,7 +58,7 @@ export class ResetPasswordUseCase implements BaseUseCase<
       where: { email },
       data: {
         password: hashedPassword,
-        refresh_token: null,
+        refresh_token_hash: null,
       },
     });
 

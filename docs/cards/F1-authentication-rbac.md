@@ -24,7 +24,7 @@ Bảo vệ dữ liệu doanh nghiệp, cho phép mỗi nhóm người dùng ch�
 - Guard theo permission cho từng API/action.
 - Đổi mật khẩu, quên mật khẩu qua email.
 - Invite user nội bộ cho doanh nghiệp.
-- Logout và revoke refresh token hiện tại trên `User.refresh_token`.
+- Logout và revoke refresh token hiện tại trên `User.refresh_token_hash`.
 
 ## API Endpoints
 
@@ -54,7 +54,7 @@ Bảo vệ dữ liệu doanh nghiệp, cho phép mỗi nhóm người dùng ch�
 - `user_permission`
 - `user_invitations`
 
-Không thêm `sessions` table trong F1. Refresh/session state dùng `users.refresh_token`.
+Không thêm `sessions` table trong F1. Refresh/session state dùng `users.refresh_token_hash`.
 
 ## Auth Contexts
 
@@ -65,6 +65,18 @@ Không thêm `sessions` table trong F1. Refresh/session state dùng `users.refre
 | `client`   | `apps/web`            | `CUSTOMER`       | `client_refresh_token`, `client_has_rt`     |
 
 `SUPER_ADMIN` là global role, không cần `tenant_id`. `OWNER` và `STAFF` là tenant-scoped roles. Tenant là account/organization; business/branch/location nằm trong `Business`.
+
+## Session Hardening
+
+- Database chỉ lưu SHA-256 hash của refresh token trong `User.refresh_token_hash`; raw token chỉ tồn tại trong HttpOnly cookie.
+- Mỗi user có một active refresh session. Login mới thay hash hiện tại và revoke session cũ.
+- Refresh token không rotate trong F1; refresh chỉ cấp access token mới.
+- JWT dùng audience theo context: `platform`, `admin` hoặc `client`.
+- Refresh luôn đọc lại user để kiểm tra status, verification, role, tenant và token hash.
+- Logout, đổi/reset mật khẩu và chuyển account sang `INACTIVE` đều revoke session.
+- Refresh cookie dùng path riêng theo context; marker cookie không chứa token.
+- `SameSite=None` bị chặn cho đến khi có CSRF protection.
+- Migration sang `refresh_token_hash` đặt các giá trị raw cũ về `NULL`, vì vậy tất cả session cũ phải đăng nhập lại.
 
 ## Frontend Screens
 
@@ -117,8 +129,10 @@ Không thêm `sessions` table trong F1. Refresh/session state dùng `users.refre
   `SUPER_ADMIN`.
 - Tách `AdminAuthController` với login/refresh/logout riêng cho `OWNER` và
   `STAFF`; không phụ thuộc `x-auth-context` trong session flow.
-- Chuẩn hóa login/refresh/logout dựa trên `User.refresh_token`.
-- Clear refresh token khi logout, đổi mật khẩu hoặc reset mật khẩu.
+- Chuẩn hóa login/refresh/logout dựa trên hash trong `User.refresh_token_hash`.
+- Revoke session khi logout, đổi/reset mật khẩu hoặc account bị inactive.
+- Cô lập refresh token bằng JWT audience và cookie path theo auth context.
+- Chống refresh loop/storm bằng marker cookie và một shared refresh promise trên frontend.
 - Gắn permission guard vào API quản trị.
 - Thêm backend invitation flow.
 - Bổ sung unit tests cho auth, permission và invitation use cases.

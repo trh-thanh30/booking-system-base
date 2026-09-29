@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { ConfigType } from '@nestjs/config';
 import { jwtConfig } from '@/config';
+import type { AuthContext } from '@/modules/auth/auth.types';
 import { UnauthorizedError } from '@/common/response/client-errors/unauthorized';
 import { randomUUID } from 'crypto';
 import jwt, { SignOptions } from 'jsonwebtoken';
@@ -15,6 +16,7 @@ export interface IUserTokenPayload {
   username: string;
   role: string;
   status: string;
+  auth_context: AuthContext;
 }
 
 /**
@@ -27,8 +29,7 @@ export class AuthTokenService {
   private readonly refreshSecret: string;
   private readonly accessExpiresIn: string;
   private readonly refreshExpiresIn: string;
-  private readonly issuer: string = 'myapp'; // Example issuer
-  private readonly audience: string = 'myapp'; // Example audience
+  private readonly issuer = 'booking-system';
 
   /**
    * Constructor injects JWT configuration
@@ -42,12 +43,24 @@ export class AuthTokenService {
     this.refreshSecret = this.jwtCfg.refreshSecret;
     this.accessExpiresIn = this.jwtCfg.accessExpiresIn;
     this.refreshExpiresIn = this.jwtCfg.refreshExpiresIn;
+  }
 
-    const mask = (s: string) =>
-      s.substring(0, 3) + '...' + s.substring(s.length - 3);
-    console.log(
-      `[AuthTokenService] Instance created. RefreshSecret: ${mask(this.refreshSecret)}`,
-    );
+  generateAccessToken(
+    userPayload: Omit<IUserTokenPayload, 'auth_context'>,
+    authContext: AuthContext,
+  ): string {
+    const fullPayload: JWTTokenPayload<IUserTokenPayload> = {
+      payload: { ...userPayload, auth_context: authContext },
+      iss: this.issuer,
+      sub: userPayload.id,
+      aud: this.getAudience(authContext),
+      jti: randomUUID(),
+    };
+
+    return jwt.sign(fullPayload, this.accessSecret, {
+      expiresIn: this.accessExpiresIn,
+      algorithm: 'HS256',
+    } as SignOptions);
   }
 
   /**
@@ -55,23 +68,23 @@ export class AuthTokenService {
    * @param userPayload User information to include in token
    * @returns Object containing access_token and refresh_token
    */
-  generateTokenPair(userPayload: IUserTokenPayload): {
+  generateTokenPair(
+    userPayload: Omit<IUserTokenPayload, 'auth_context'>,
+    authContext: AuthContext,
+  ): {
     access_token: string;
     refresh_token: string;
   } {
     const fullPayload: JWTTokenPayload<IUserTokenPayload> = {
-      payload: userPayload,
+      payload: { ...userPayload, auth_context: authContext },
       iss: this.issuer,
       sub: userPayload.id,
-      aud: this.audience,
+      aud: this.getAudience(authContext),
       jti: randomUUID(),
       // exp, iat, nbf will be set by jwt.sign
     };
 
-    const access_token = jwt.sign(fullPayload, this.accessSecret, {
-      expiresIn: this.accessExpiresIn,
-      algorithm: 'HS256',
-    } as SignOptions);
+    const access_token = this.generateAccessToken(userPayload, authContext);
 
     const refresh_token = jwt.sign(fullPayload, this.refreshSecret, {
       expiresIn: this.refreshExpiresIn,
@@ -91,6 +104,12 @@ export class AuthTokenService {
     try {
       const decoded = jwt.verify(token, this.accessSecret, {
         algorithms: ['HS256'],
+        audience: [
+          this.getAudience('platform'),
+          this.getAudience('admin'),
+          this.getAudience('client'),
+        ],
+        issuer: this.issuer,
       }) as JWTTokenPayload<IUserTokenPayload>;
       if (typeof decoded === 'string') {
         throw new UnauthorizedError('Invalid or expired access token.');
@@ -107,22 +126,29 @@ export class AuthTokenService {
    * @returns Decoded token payload
    * @throws UnauthorizedError if token is invalid or expired
    */
-  verifyRefreshToken(token: string): JWTTokenPayload<IUserTokenPayload> {
+  verifyRefreshToken(
+    token: string,
+    expectedContext: AuthContext,
+  ): JWTTokenPayload<IUserTokenPayload> {
     try {
       const decoded = jwt.verify(token, this.refreshSecret, {
         algorithms: ['HS256'],
+        audience: this.getAudience(expectedContext),
+        issuer: this.issuer,
       }) as JWTTokenPayload<IUserTokenPayload>;
-      if (typeof decoded === 'string') {
-        throw new UnauthorizedError('Invalid or expired refresh token.');
+      if (
+        typeof decoded === 'string' ||
+        decoded.payload.auth_context !== expectedContext
+      ) {
+        throw new UnauthorizedError('Invalid or expired refresh token');
       }
       return decoded;
-    } catch (error) {
-      // Include original error in details for debugging
-      throw new UnauthorizedError(
-        'Invalid or expired refresh token.',
-      ).addDetails({
-        originalError: error instanceof Error ? error.message : String(error),
-      });
+    } catch {
+      throw new UnauthorizedError('Invalid or expired refresh token');
     }
+  }
+
+  private getAudience(context: AuthContext): string {
+    return 'booking-system:' + context;
   }
 }

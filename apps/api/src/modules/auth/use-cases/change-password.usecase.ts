@@ -37,7 +37,7 @@ export class ChangePasswordUseCase {
       );
     }
 
-    await this.usersService.updatePasswordAndClearRefreshToken(
+    await this.usersService.updatePasswordAndRevokeSession(
       currentUser.id,
       dto.password,
     );

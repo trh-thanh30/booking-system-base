@@ -27,7 +27,11 @@ export class PlatformAuthController {
     @Body() dto: LoginDto,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const result = await this.loginUserUseCase.execute(dto, PLATFORM_ROLES);
+    const result = await this.loginUserUseCase.execute(
+      dto,
+      PLATFORM_ROLES,
+      'platform',
+    );
     this.authCookieService.setRefreshCookies(
       res,
       'platform',
@@ -55,13 +59,8 @@ export class PlatformAuthController {
       const result = await this.refreshTokenUseCase.execute(
         refreshToken,
         PLATFORM_ROLES,
-      );
-      this.authCookieService.setRefreshCookies(
-        res,
         'platform',
-        result.refresh_token,
       );
-
       return { access_token: result.access_token };
     } catch (error) {
       this.authCookieService.clearRefreshCookies(res, 'platform');
@@ -76,7 +75,11 @@ export class PlatformAuthController {
       req,
       'platform',
     );
-    await this.refreshTokenUseCase.revoke(refreshToken, PLATFORM_ROLES);
+    await this.refreshTokenUseCase.revoke(
+      refreshToken,
+      PLATFORM_ROLES,
+      'platform',
+    );
     this.authCookieService.clearRefreshCookies(res, 'platform');
   }
 }

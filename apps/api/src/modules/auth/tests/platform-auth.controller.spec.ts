@@ -67,7 +67,7 @@ describe('PlatformAuthController', () => {
       role: user_role.SUPER_ADMIN,
       status: user_status.ACTIVE,
       is_verified: true,
-      refresh_token: null,
+      refresh_token_hash: null,
       created_at: new Date('2026-01-01T00:00:00.000Z'),
       updated_at: new Date('2026-01-01T00:00:00.000Z'),
     };
@@ -116,6 +116,7 @@ describe('PlatformAuthController', () => {
         password: 'correct-password',
       },
       [user_role.SUPER_ADMIN],
+      'platform',
     );
     expect(authCookieService.setRefreshCookies).toHaveBeenCalledWith(
       expect.anything(),
@@ -128,7 +129,6 @@ describe('PlatformAuthController', () => {
     authCookieService.getRefreshToken.mockReturnValue('platform-refresh-token');
     refreshTokenUseCase.execute.mockResolvedValue({
       access_token: 'new-platform-access-token',
-      refresh_token: 'platform-refresh-token',
     });
 
     await request(httpServer)
@@ -143,12 +143,9 @@ describe('PlatformAuthController', () => {
     expect(refreshTokenUseCase.execute).toHaveBeenCalledWith(
       'platform-refresh-token',
       [user_role.SUPER_ADMIN],
-    );
-    expect(authCookieService.setRefreshCookies).toHaveBeenCalledWith(
-      expect.anything(),
       'platform',
-      'platform-refresh-token',
     );
+    expect(authCookieService.setRefreshCookies).not.toHaveBeenCalled();
   });
 
   it('clears only the platform cookies when refresh fails', async () => {
@@ -174,6 +171,7 @@ describe('PlatformAuthController', () => {
     expect(refreshTokenUseCase.revoke).toHaveBeenCalledWith(
       'platform-refresh-token',
       [user_role.SUPER_ADMIN],
+      'platform',
     );
     expect(authCookieService.clearRefreshCookies).toHaveBeenCalledWith(
       expect.anything(),
