@@ -18,6 +18,10 @@ import {
   setAccessToken,
 } from "@/src/lib/auth-token";
 import { useAdminUiStore } from "@/src/app/stores/ui.store";
+import {
+  ADMIN_SESSION_EXPIRED_EVENT,
+  hasAdminRefreshCookie,
+} from "@/src/lib/api-client";
 
 type AuthContextValue = {
   can: (permission: string) => boolean;
@@ -32,16 +36,6 @@ type AuthContextValue = {
 };
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
-
-function hasAdminRefreshCookie() {
-  if (typeof document === "undefined") {
-    return false;
-  }
-
-  return document.cookie
-    .split(";")
-    .some((cookie) => cookie.trim().startsWith("admin_has_rt="));
-}
 
 function canByManagePermission(permissions: string[], permission: string) {
   const [resource, action] = permission.split(":");
@@ -64,6 +58,20 @@ function resolveDefaultBusinessId(user: CurrentAuthUser | null) {
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<CurrentAuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const handleSessionExpired = () => {
+      setUser(null);
+      useAdminUiStore.getState().setActiveBusinessId(null);
+    };
+
+    window.addEventListener(ADMIN_SESSION_EXPIRED_EVENT, handleSessionExpired);
+    return () =>
+      window.removeEventListener(
+        ADMIN_SESSION_EXPIRED_EVENT,
+        handleSessionExpired,
+      );
+  }, []);
 
   const refreshCurrentUser = useCallback(async () => {
     try {

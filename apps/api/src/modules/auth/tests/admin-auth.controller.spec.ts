@@ -67,7 +67,7 @@ describe('AdminAuthController', () => {
       role: user_role.OWNER,
       status: user_status.ACTIVE,
       is_verified: true,
-      refresh_token: null,
+      refresh_token_hash: null,
       created_at: new Date('2026-01-01T00:00:00.000Z'),
       updated_at: new Date('2026-01-01T00:00:00.000Z'),
     };
@@ -116,6 +116,7 @@ describe('AdminAuthController', () => {
         password: 'correct-password',
       },
       [user_role.OWNER, user_role.STAFF],
+      'admin',
     );
     expect(authCookieService.setRefreshCookies).toHaveBeenCalledWith(
       expect.anything(),
@@ -128,7 +129,6 @@ describe('AdminAuthController', () => {
     authCookieService.getRefreshToken.mockReturnValue('admin-refresh-token');
     refreshTokenUseCase.execute.mockResolvedValue({
       access_token: 'new-admin-access-token',
-      refresh_token: 'admin-refresh-token',
     });
 
     await request(httpServer)
@@ -143,12 +143,9 @@ describe('AdminAuthController', () => {
     expect(refreshTokenUseCase.execute).toHaveBeenCalledWith(
       'admin-refresh-token',
       [user_role.OWNER, user_role.STAFF],
-    );
-    expect(authCookieService.setRefreshCookies).toHaveBeenCalledWith(
-      expect.anything(),
       'admin',
-      'admin-refresh-token',
     );
+    expect(authCookieService.setRefreshCookies).not.toHaveBeenCalled();
   });
 
   it('clears only the admin cookies when refresh fails', async () => {
@@ -174,6 +171,24 @@ describe('AdminAuthController', () => {
     expect(refreshTokenUseCase.revoke).toHaveBeenCalledWith(
       'admin-refresh-token',
       [user_role.OWNER, user_role.STAFF],
+      'admin',
+    );
+    expect(authCookieService.clearRefreshCookies).toHaveBeenCalledWith(
+      expect.anything(),
+      'admin',
+    );
+  });
+
+  it('keeps logout idempotent when the admin cookie is missing', async () => {
+    authCookieService.getRefreshToken.mockReturnValue('');
+    refreshTokenUseCase.revoke.mockResolvedValue(undefined);
+
+    await request(httpServer).post('/auth/admin/logout').expect(201);
+
+    expect(refreshTokenUseCase.revoke).toHaveBeenCalledWith(
+      '',
+      [user_role.OWNER, user_role.STAFF],
+      'admin',
     );
     expect(authCookieService.clearRefreshCookies).toHaveBeenCalledWith(
       expect.anything(),

@@ -4,8 +4,10 @@ import {
   ValidationError,
 } from '@/common/response/client-errors';
 import { PrismaService } from '@/database/prisma/prisma.service';
+import type { AuthContext } from '@/modules/auth/auth.types';
 import { LoginDto } from '@/modules/auth/dto/login.dto';
 import { AuthTokenService } from '@/modules/auth/services/auth-token.service';
+import { RefreshTokenSessionService } from '@/modules/auth/services/refresh-token-session.service';
 import { VerificationSessionService } from '@/modules/auth/services/verification-session.service';
 import { BaseUseCase } from '@/shared/interfaces/base-usecase.interface';
 import { Injectable } from '@nestjs/common';
@@ -31,11 +33,13 @@ export class LoginUserUseCase implements BaseUseCase<LoginDto, AuthResponse> {
     private readonly bcryptService: BcryptService,
     private readonly tokenService: AuthTokenService,
     private readonly verificationSessionService: VerificationSessionService,
+    private readonly refreshTokenSessionService: RefreshTokenSessionService = new RefreshTokenSessionService(),
   ) {}
 
   async execute(
     dto: LoginDto,
     requiredRole?: user_role | user_role[],
+    authContext: AuthContext = 'client',
   ): Promise<AuthResponse> {
     // Find user by email or username
     const user = await this.prismaService.user.findFirst({
@@ -89,13 +93,16 @@ export class LoginUserUseCase implements BaseUseCase<LoginDto, AuthResponse> {
     this.validateUserCanLogin(user);
 
     // Generate tokens
-    const tokens = this.tokenService.generateTokenPair({
-      id: user.id,
-      email: user.email,
-      role: user.role,
-      status: user.status,
-      username: user.username,
-    });
+    const tokens = this.tokenService.generateTokenPair(
+      {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        status: user.status,
+        username: user.username,
+      },
+      authContext,
+    );
 
     // Update refresh token in database
     await this.updateUserRefreshToken(user.id, tokens.refresh_token);
@@ -126,7 +133,9 @@ export class LoginUserUseCase implements BaseUseCase<LoginDto, AuthResponse> {
   ): Promise<void> {
     await this.prismaService.user.update({
       where: { id: userId },
-      data: { refresh_token: refreshToken },
+      data: {
+        refresh_token_hash: this.refreshTokenSessionService.hash(refreshToken),
+      },
     });
   }
 }

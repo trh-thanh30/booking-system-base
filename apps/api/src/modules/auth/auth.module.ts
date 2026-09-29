@@ -17,6 +17,7 @@ import { CreateInvitationUseCase } from '@/modules/auth/use-cases/create-invitat
 import { ForgotPasswordUseCase } from '@/modules/auth/use-cases/forgot-password.usecase';
 import { GetInvitationUseCase } from '@/modules/auth/use-cases/get-invitation.usecase';
 import { LoginUserUseCase } from '@/modules/auth/use-cases/login-user.usecase';
+import { RefreshTokenSessionService } from '@/modules/auth/services/refresh-token-session.service';
 import { RefreshTokenUseCase } from '@/modules/auth/use-cases/refresh-token.usecase';
 import { RegisterUserUseCase } from '@/modules/auth/use-cases/register-user.usecase';
 import { RequestVerificationUseCase } from '@/modules/auth/use-cases/request-verification.usecase';
@@ -40,6 +41,7 @@ import { ConfigModule } from '@nestjs/config';
     ForgotPasswordUseCase,
     ResetPasswordUseCase,
     RefreshTokenUseCase,
+    RefreshTokenSessionService,
     RequestVerificationUseCase,
     CreateInvitationUseCase,
     GetInvitationUseCase,

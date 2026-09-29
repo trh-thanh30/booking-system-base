@@ -9,6 +9,11 @@ describe('AuthCookieService', () => {
     maxAge: 60_000,
     partitioned: false,
     path: '/',
+    refreshPaths: {
+      admin: '/api/v1/auth/admin',
+      client: '/api/v1/auth',
+      platform: '/api/v1/auth/platform',
+    },
     sameSite: 'lax' as const,
     secure: false,
   };
@@ -42,7 +47,10 @@ describe('AuthCookieService', () => {
     expect(cookie).toHaveBeenCalledWith(
       'platform_refresh_token',
       'platform-token',
-      expect.objectContaining({ httpOnly: true }),
+      expect.objectContaining({
+        httpOnly: true,
+        path: '/api/v1/auth/platform',
+      }),
     );
     expect(cookie).toHaveBeenCalledWith(
       'platform_has_rt',
@@ -56,7 +64,7 @@ describe('AuthCookieService', () => {
     );
     expect(clearCookie).toHaveBeenCalledWith(
       'platform_refresh_token',
-      expect.anything(),
+      expect.objectContaining({ path: '/api/v1/auth/platform' }),
     );
     expect(clearCookie).toHaveBeenCalledWith(
       'platform_has_rt',

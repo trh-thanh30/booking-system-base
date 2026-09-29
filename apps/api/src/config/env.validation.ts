@@ -124,9 +124,9 @@ export const envSchema = z
     // Cookie Configuration
     COOKIE_DOMAIN: z.string().default('localhost'),
     COOKIE_SECURE: z.coerce.boolean().default(false),
-    COOKIE_HTTP_ONLY: z.coerce.boolean().default(true),
     COOKIE_MAX_AGE: z.coerce.number().int().positive().default(604800000),
     COOKIE_PATH: z.string().default('/'),
+    COOKIE_AUTH_PATH_PREFIX: z.string().default('/api/v1/auth'),
 
     // Client Configuration
     POSTCODES_API: z.string().default('https://api.postcodes.io'),

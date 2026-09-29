@@ -3,6 +3,7 @@ import { NotFoundError } from '@/common/response';
 import { UpdateUserDto } from '@/modules/user/dto/update-user.dto';
 import { UsersRepository } from '@/modules/user/repository/users.repository';
 import { Injectable } from '@nestjs/common';
+import { user_status } from '@prisma/client';
 
 @Injectable()
 export class UpdateUserUseCase {
@@ -18,11 +19,15 @@ export class UpdateUserUseCase {
     }
 
     const data = { ...dto };
+    const passwordChanged = Boolean(data.password);
     if (data.password) {
       data.password = await this.bcryptService.hashPassword(data.password);
+    }
+
+    if (passwordChanged || data.status === user_status.INACTIVE) {
       return this.usersRepository.update(userId, {
         ...data,
-        refresh_token: null,
+        refresh_token_hash: null,
       });
     }
 

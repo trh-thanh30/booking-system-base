@@ -113,8 +113,11 @@ describe('LoginUserUseCase', () => {
 
     expect(prisma.user.update).toHaveBeenCalledWith({
       where: { id: 'user-1' },
-      data: { refresh_token: 'refresh-token' },
+      data: { refresh_token_hash: expect.stringMatching(/^[a-f0-9]{64}/) },
     });
+    expect(
+      prisma.user.update.mock.calls[0]?.[0].data.refresh_token_hash,
+    ).not.toBe('refresh-token');
   });
 
   it('accepts any role in the allowed role list', async () => {

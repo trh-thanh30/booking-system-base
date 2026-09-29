@@ -21,6 +21,10 @@ export class AuthCookieService {
     );
   }
 
+  private getRefreshPath(context: AuthContext): string {
+    return this.configCookie.refreshPaths[context];
+  }
+
   setRefreshCookies(
     res: CookieResponse,
     context: AuthContext,
@@ -34,7 +38,7 @@ export class AuthCookieService {
       secure: this.configCookie.secure,
       sameSite: this.configCookie.sameSite,
       domain: this.configCookie.domain,
-      path: this.configCookie.path,
+      path: this.getRefreshPath(context),
       maxAge: this.configCookie.maxAge,
       partitioned: this.configCookie.partitioned,
     });
@@ -58,7 +62,7 @@ export class AuthCookieService {
       secure: this.configCookie.secure,
       sameSite: this.configCookie.sameSite,
       domain: this.configCookie.domain,
-      path: this.configCookie.path,
+      path: this.getRefreshPath(context),
       partitioned: this.configCookie.partitioned,
     });
     res.clearCookie(cookieNames.refreshFlag, {
@@ -104,7 +108,7 @@ export class AuthCookieService {
       secure: this.configCookie.secure,
       sameSite: this.configCookie.sameSite,
       domain: this.configCookie.domain,
-      path: this.configCookie.path,
+      path: this.getRefreshPath(context),
       partitioned: true,
     });
     res.clearCookie(cookieNames.refreshFlag, {

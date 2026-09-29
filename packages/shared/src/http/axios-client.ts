@@ -58,10 +58,17 @@ export function createHttpClient(
         const retryConfig = originalConfig as
           | (HttpRequestConfig & { _retry?: boolean })
           | undefined;
-        const nextToken = await options.onUnauthorized?.(httpError);
-
-        if (nextToken && retryConfig && !retryConfig._retry) {
+        if (
+          retryConfig &&
+          !retryConfig._retry &&
+          (options.shouldHandleUnauthorized?.(retryConfig) ?? true)
+        ) {
           retryConfig._retry = true;
+          const nextToken = await options.onUnauthorized?.(httpError);
+
+          if (!nextToken) {
+            throw httpError;
+          }
           retryConfig.headers = new AxiosHeaders(
             retryConfig.headers as ConstructorParameters<
               typeof AxiosHeaders
