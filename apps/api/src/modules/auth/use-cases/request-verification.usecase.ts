@@ -1,7 +1,7 @@
 import { BadRequestError } from '@/common/response/client-errors/bad-request';
 import { NotFoundError } from '@/common/response/client-errors/not-found';
 import { RequestVerificationDto } from '@/modules/auth/dto/request-verification.dto';
-import { VerificationSessionService } from '@/modules/auth/service/verification-session.service';
+import { VerificationSessionService } from '@/modules/auth/services/verification-session.service';
 import { SendVerificationEmailUseCase } from '@/modules/email/use-cases/send-verification-email.usecase';
 import { UsersService } from '@/modules/user/user.service';
 import { VerificationService } from '@/modules/verification/verification.service';

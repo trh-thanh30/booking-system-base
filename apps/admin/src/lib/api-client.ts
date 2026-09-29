@@ -11,14 +11,13 @@ let refreshPromise: Promise<string | false> | undefined;
 
 async function refreshAccessToken(): Promise<string | false> {
   refreshPromise ??= fetch(
-    `${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000/api/v1"}/auth/refresh`,
+    `${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000/api/v1"}/auth/admin/refresh`,
     {
       body: JSON.stringify({}),
       credentials: "include",
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
-        "x-auth-context": "admin",
       },
       method: "POST",
     },

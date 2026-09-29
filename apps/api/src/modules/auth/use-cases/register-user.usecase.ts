@@ -2,7 +2,7 @@ import { BcryptService } from '@/common/helpers/bcrypt.util';
 import { ConflictError } from '@/common/response/client-errors/conflict';
 import { PrismaService } from '@/database/prisma/prisma.service';
 import { RegisterDto } from '@/modules/auth/dto/register.dto';
-import { VerificationSessionService } from '@/modules/auth/service/verification-session.service';
+import { VerificationSessionService } from '@/modules/auth/services/verification-session.service';
 import { SendVerificationEmailUseCase } from '@/modules/email/use-cases/send-verification-email.usecase';
 import { UsersService } from '@/modules/user/user.service';
 import { VerificationService } from '@/modules/verification/verification.service';

@@ -5,13 +5,13 @@ import request from 'supertest';
 import type { App } from 'supertest/types';
 
 import { UnauthorizedError } from '@/common/response';
-import { PlatformAuthController } from '@/modules/auth/controllers/platform-auth.controller';
+import { AdminAuthController } from '@/modules/auth/controllers/admin-auth.controller';
 import { AuthCookieService } from '@/modules/auth/services/auth-cookie.service';
 import { AuthProfileService } from '@/modules/auth/services/auth-profile.service';
 import { LoginUserUseCase } from '@/modules/auth/use-cases/login-user.usecase';
 import { RefreshTokenUseCase } from '@/modules/auth/use-cases/refresh-token.usecase';
 
-describe('PlatformAuthController', () => {
+describe('AdminAuthController', () => {
   let app: INestApplication<App>;
   let httpServer: App;
 
@@ -35,7 +35,7 @@ describe('PlatformAuthController', () => {
     jest.clearAllMocks();
 
     const moduleRef = await Test.createTestingModule({
-      controllers: [PlatformAuthController],
+      controllers: [AdminAuthController],
       providers: [
         { provide: LoginUserUseCase, useValue: loginUserUseCase },
         { provide: RefreshTokenUseCase, useValue: refreshTokenUseCase },
@@ -54,17 +54,17 @@ describe('PlatformAuthController', () => {
     await app.close();
   });
 
-  it('logs a Super Admin in through the platform-specific route', async () => {
+  it('logs an Owner or Staff user in through the admin-specific route', async () => {
     const user = {
-      id: 'platform-user-id',
-      email: 'platform@example.com',
-      username: 'platform-admin',
+      id: 'owner-user-id',
+      email: 'owner@example.com',
+      username: 'business-owner',
       password: 'hashed-password',
-      full_name: 'Platform Admin',
+      full_name: 'Business Owner',
       phone: null,
       avatar_url: null,
-      tenant_id: null,
-      role: user_role.SUPER_ADMIN,
+      tenant_id: 'tenant-id',
+      role: user_role.OWNER,
       status: user_status.ACTIVE,
       is_verified: true,
       refresh_token: null,
@@ -82,7 +82,7 @@ describe('PlatformAuthController', () => {
       role: user.role,
       status: user.status,
       is_verified: user.is_verified,
-      tenant: null,
+      tenant: { id: 'tenant-id', name: 'Demo tenant', slug: 'demo-tenant' },
       businesses: [],
       permissions: ['*'],
       created_at: user.created_at.toISOString(),
@@ -90,94 +90,94 @@ describe('PlatformAuthController', () => {
     };
 
     loginUserUseCase.execute.mockResolvedValue({
-      access_token: 'platform-access-token',
-      refresh_token: 'platform-refresh-token',
+      access_token: 'admin-access-token',
+      refresh_token: 'admin-refresh-token',
       user,
     });
     authProfileService.getByUserId.mockResolvedValue(authUser);
 
     await request(httpServer)
-      .post('/auth/platform/login')
+      .post('/auth/admin/login')
       .send({
-        usernameOrEmail: 'platform@example.com',
+        usernameOrEmail: 'owner@example.com',
         password: 'correct-password',
       })
       .expect(201)
       .expect(({ body }) => {
         expect(body).toEqual({
-          access_token: 'platform-access-token',
+          access_token: 'admin-access-token',
           user: authUser,
         });
       });
 
     expect(loginUserUseCase.execute).toHaveBeenCalledWith(
       {
-        usernameOrEmail: 'platform@example.com',
+        usernameOrEmail: 'owner@example.com',
         password: 'correct-password',
       },
-      [user_role.SUPER_ADMIN],
+      [user_role.OWNER, user_role.STAFF],
     );
     expect(authCookieService.setRefreshCookies).toHaveBeenCalledWith(
       expect.anything(),
-      'platform',
-      'platform-refresh-token',
+      'admin',
+      'admin-refresh-token',
     );
   });
 
-  it('refreshes only through the platform cookie and Super Admin role', async () => {
-    authCookieService.getRefreshToken.mockReturnValue('platform-refresh-token');
+  it('refreshes only through the admin cookie and Owner or Staff roles', async () => {
+    authCookieService.getRefreshToken.mockReturnValue('admin-refresh-token');
     refreshTokenUseCase.execute.mockResolvedValue({
-      access_token: 'new-platform-access-token',
-      refresh_token: 'platform-refresh-token',
+      access_token: 'new-admin-access-token',
+      refresh_token: 'admin-refresh-token',
     });
 
     await request(httpServer)
-      .post('/auth/platform/refresh')
+      .post('/auth/admin/refresh')
       .expect(201)
-      .expect({ access_token: 'new-platform-access-token' });
+      .expect({ access_token: 'new-admin-access-token' });
 
     expect(authCookieService.getRefreshToken).toHaveBeenCalledWith(
       expect.anything(),
-      'platform',
+      'admin',
     );
     expect(refreshTokenUseCase.execute).toHaveBeenCalledWith(
-      'platform-refresh-token',
-      [user_role.SUPER_ADMIN],
+      'admin-refresh-token',
+      [user_role.OWNER, user_role.STAFF],
     );
     expect(authCookieService.setRefreshCookies).toHaveBeenCalledWith(
       expect.anything(),
-      'platform',
-      'platform-refresh-token',
+      'admin',
+      'admin-refresh-token',
     );
   });
 
-  it('clears only the platform cookies when refresh fails', async () => {
+  it('clears only the admin cookies when refresh fails', async () => {
     authCookieService.getRefreshToken.mockReturnValue('expired-token');
     refreshTokenUseCase.execute.mockRejectedValue(
       new UnauthorizedError('Invalid or expired refresh token'),
     );
 
-    await request(httpServer).post('/auth/platform/refresh').expect(401);
+    await request(httpServer).post('/auth/admin/refresh').expect(401);
 
     expect(authCookieService.clearRefreshCookies).toHaveBeenCalledWith(
       expect.anything(),
-      'platform',
+      'admin',
     );
   });
 
-  it('revokes the platform session and clears only platform cookies on logout', async () => {
-    authCookieService.getRefreshToken.mockReturnValue('platform-refresh-token');
+  it('revokes the admin session and clears only admin cookies on logout', async () => {
+    authCookieService.getRefreshToken.mockReturnValue('admin-refresh-token');
     refreshTokenUseCase.revoke.mockResolvedValue(undefined);
 
-    await request(httpServer).post('/auth/platform/logout').expect(201);
+    await request(httpServer).post('/auth/admin/logout').expect(201);
 
     expect(refreshTokenUseCase.revoke).toHaveBeenCalledWith(
-      'platform-refresh-token',
-      [user_role.SUPER_ADMIN],
+      'admin-refresh-token',
+      [user_role.OWNER, user_role.STAFF],
     );
     expect(authCookieService.clearRefreshCookies).toHaveBeenCalledWith(
       expect.anything(),
-      'platform',
+      'admin',
     );
   });
 });

@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 
-import { AuthCookieService } from '@/modules/auth/service/auth-cookie.service';
+import { AuthCookieService } from '@/modules/auth/services/auth-cookie.service';
 
 describe('AuthCookieService', () => {
   const cookieConfig = {

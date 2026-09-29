@@ -4,12 +4,13 @@ import { cookieConfig } from '@/config';
 import { PrismaService } from '@/database/prisma/prisma.service';
 import { RedisModule } from '@/database/redis/redis.module';
 import { AssetsModule } from '@/modules/assets/assets.module';
-import { AuthController } from '@/modules/auth/auth.controller';
-import { PlatformAuthController } from '@/modules/auth/platform-auth.controller';
-import { AuthCookieService } from '@/modules/auth/service/auth-cookie.service';
-import { AuthProfileService } from '@/modules/auth/service/auth-profile.service';
-import { AuthTokenService } from '@/modules/auth/service/auth-token.service';
-import { VerificationSessionService } from '@/modules/auth/service/verification-session.service';
+import { AdminAuthController } from '@/modules/auth/controllers/admin-auth.controller';
+import { AuthController } from '@/modules/auth/controllers/auth.controller';
+import { PlatformAuthController } from '@/modules/auth/controllers/platform-auth.controller';
+import { AuthCookieService } from '@/modules/auth/services/auth-cookie.service';
+import { AuthProfileService } from '@/modules/auth/services/auth-profile.service';
+import { AuthTokenService } from '@/modules/auth/services/auth-token.service';
+import { VerificationSessionService } from '@/modules/auth/services/verification-session.service';
 import { AcceptInvitationUseCase } from '@/modules/auth/use-cases/accept-invitation.usecase';
 import { ChangePasswordUseCase } from '@/modules/auth/use-cases/change-password.usecase';
 import { CreateInvitationUseCase } from '@/modules/auth/use-cases/create-invitation.usecase';
@@ -30,7 +31,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  controllers: [AuthController, PlatformAuthController],
+  controllers: [AuthController, AdminAuthController, PlatformAuthController],
   providers: [
     RegisterUserUseCase,
     LoginUserUseCase,

@@ -5,8 +5,8 @@ import {
 } from '@/common/response/client-errors';
 import { PrismaService } from '@/database/prisma/prisma.service';
 import { LoginDto } from '@/modules/auth/dto/login.dto';
-import { AuthTokenService } from '@/modules/auth/service/auth-token.service';
-import { VerificationSessionService } from '@/modules/auth/service/verification-session.service';
+import { AuthTokenService } from '@/modules/auth/services/auth-token.service';
+import { VerificationSessionService } from '@/modules/auth/services/verification-session.service';
 import { BaseUseCase } from '@/shared/interfaces/base-usecase.interface';
 import { Injectable } from '@nestjs/common';
 import { User, user_role, user_status } from '@prisma/client';
@@ -49,6 +49,12 @@ export class LoginUserUseCase implements BaseUseCase<LoginDto, AuthResponse> {
 
     // Check role if required
     if (requiredRole && !this.isAllowedRole(user.role, requiredRole)) {
+      throw new UnauthorizedError(this.errorMessages.INVALID_CREDENTIALS);
+    }
+
+    const isBusinessAdmin =
+      user.role === user_role.OWNER || user.role === user_role.STAFF;
+    if (isBusinessAdmin && !user.tenant_id) {
       throw new UnauthorizedError(this.errorMessages.INVALID_CREDENTIALS);
     }
 

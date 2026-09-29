@@ -26,8 +26,8 @@ import { ResetPasswordDto } from '@/modules/auth/dto/reset-password.dto';
 import { UpdateProfileDto } from '@/modules/auth/dto/update-profile.dto';
 import { VerifyEmailDto } from '@/modules/auth/dto/verify-email.dto';
 import type { AuthContext } from '@/modules/auth/auth.types';
-import { AuthCookieService } from '@/modules/auth/service/auth-cookie.service';
-import { AuthProfileService } from '@/modules/auth/service/auth-profile.service';
+import { AuthCookieService } from '@/modules/auth/services/auth-cookie.service';
+import { AuthProfileService } from '@/modules/auth/services/auth-profile.service';
 import { AcceptInvitationUseCase } from '@/modules/auth/use-cases/accept-invitation.usecase';
 import { ChangePasswordUseCase } from '@/modules/auth/use-cases/change-password.usecase';
 import { CreateInvitationUseCase } from '@/modules/auth/use-cases/create-invitation.usecase';
@@ -89,29 +89,6 @@ export class AuthController {
   async register(@Body() dto: RegisterDto) {
     const result = await this.registerUserUseCase.execute(dto);
     return result;
-  }
-
-  @Public()
-  @Post('login-admin')
-  @ApiSuccess('Login successful')
-  async loginAdmin(
-    @Body() dto: LoginDto,
-    @Res({ passthrough: true }) res: express.Response,
-  ) {
-    const result = await this.loginUserUseCase.execute(
-      dto,
-      this.getRequiredRoles('admin'),
-    );
-    this.authCookieService.setRefreshCookies(
-      res,
-      'admin',
-      result.refresh_token,
-    );
-
-    return {
-      access_token: result.access_token,
-      user: await this.authProfileService.getByUserId(result.user.id),
-    };
   }
 
   @Public()
@@ -373,7 +350,7 @@ export class AuthController {
 
   private resolveLegacySessionContext(authContext?: string): AuthContext {
     const context = this.resolveAuthContext(authContext);
-    if (context === 'platform') {
+    if (context !== 'client') {
       throw new UnauthorizedError('Invalid session for this app');
     }
 

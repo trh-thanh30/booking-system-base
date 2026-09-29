@@ -147,4 +147,31 @@ describe('RefreshTokenUseCase', () => {
 
     expect(prisma.user.update).not.toHaveBeenCalled();
   });
+
+  it('rejects an Owner or Staff refresh after the account loses its tenant', async () => {
+    const tokenService = {
+      verifyRefreshToken: jest
+        .fn()
+        .mockReturnValue({ payload: { id: 'user-1' } }),
+      generateTokenPair: jest.fn(),
+    };
+    const useCase = new RefreshTokenUseCase(
+      {
+        user: {
+          findUnique: jest
+            .fn()
+            .mockResolvedValue(
+              user({ role: user_role.OWNER, tenant_id: null }),
+            ),
+        },
+      } as any,
+      tokenService as any,
+    );
+
+    await expect(
+      useCase.execute('refresh-token', [user_role.OWNER, user_role.STAFF]),
+    ).rejects.toThrow('Invalid refresh token for this app');
+
+    expect(tokenService.generateTokenPair).not.toHaveBeenCalled();
+  });
 });
