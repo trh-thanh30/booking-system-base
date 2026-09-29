@@ -7,13 +7,12 @@ const apiBaseUrl =
 let refreshPromise: Promise<string | false> | undefined;
 
 async function refreshAccessToken(): Promise<string | false> {
-  refreshPromise ??= fetch(`${apiBaseUrl}/auth/refresh`, {
+  refreshPromise ??= fetch(`${apiBaseUrl}/auth/platform/refresh`, {
     body: JSON.stringify({}),
     credentials: "include",
     headers: {
       Accept: "application/json",
       "Content-Type": "application/json",
-      "x-auth-context": "platform",
     },
     method: "POST",
   })

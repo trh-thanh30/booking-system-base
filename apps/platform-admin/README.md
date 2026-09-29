@@ -18,7 +18,9 @@ Current scope:
 Backend dependency:
 
 - `x-auth-context: platform`
-- `POST /auth/login-platform`
+- `POST /auth/platform/login`
+- `POST /auth/platform/refresh`
+- `POST /auth/platform/logout`
 - platform refresh/logout cookies: `platform_refresh_token`, `platform_has_rt`
 - a dedicated super admin role, recommended as `SUPER_ADMIN`
 
