@@ -52,6 +52,7 @@ Các API nghiệp vụ phải giữ chuỗi phụ thuộc: `controller -> use ca
 - Xác thực email/password: đăng ký, đăng nhập theo context, refresh token, đăng xuất, xác minh email, đổi/quên/đặt lại mật khẩu.
 - Tenant resolution, tenant context, business context và cô lập dữ liệu nền.
 - Luồng đăng ký tạo tenant, owner và default business.
+- Backend Google OAuth cho Owner hiện có: identity linking, state/nonce/PKCE và admin refresh session.
 - RBAC/permission core, invitation và quản lý user theo tenant.
 - Asset upload qua local/MinIO.
 - Notification core và email queue/worker nền.
@@ -61,15 +62,15 @@ Các API nghiệp vụ phải giữ chuỗi phụ thuộc: `controller -> use ca
 
 ### 4.2 Đã có một phần nhưng chưa đủ điều kiện nghiệm thu
 
-| Hạng mục              | Hiện trạng                                                                 | Phần còn thiếu                                                                                          |
-| --------------------- | -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| Landing page          | Có giao diện và nội dung minh họa.                                         | Pricing động, policy động, contact form thật và dữ liệu công bố từ Platform Admin.                      |
-| Đăng ký doanh nghiệp  | Đã tạo tenant, owner, default business.                                    | Google OAuth, chọn ngành nghề, policy consent, bước chọn/bỏ qua subscription và xử lý trạng thái trial. |
-| Business Admin        | Có auth, dashboard, bookings, users, businesses, settings dưới dạng shell. | Thay mock data bằng domain/API thật; bổ sung toàn bộ màn hình vận hành.                                 |
-| Platform Admin        | Có auth, dashboard, tenant/users/system shell và một phần tenant API.      | Tenant lifecycle đầy đủ, ngành nghề, template, subscription, policy, contact inbox và dashboard thật.   |
-| Category/Service      | API CRUD và unit test đã có.                                               | Admin UI, ảnh, staff assignment, Excel, quyền và public query.                                          |
-| Notification          | Có model, API đọc/đánh dấu và scheduler nền.                               | Event từ booking, email xác nhận/thay đổi/hủy/nhắc lịch và liên kết notification với appointment.       |
-| TenantDomain/Settings | Đã có model nền.                                                           | Quy trình kiểm tra subdomain, publish template/theme và trạng thái không khả dụng.                      |
+| Hạng mục              | Hiện trạng                                                                      | Phần còn thiếu                                                                                          |
+| --------------------- | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| Landing page          | Có giao diện và nội dung minh họa.                                              | Pricing động, policy động, contact form thật và dữ liệu công bố từ Platform Admin.                      |
+| Đăng ký doanh nghiệp  | Đã tạo tenant, owner, default business; backend Google login cho Owner hiện có. | Google-first onboarding, UI Google login, ngành nghề, policy consent, subscription và trạng thái trial. |
+| Business Admin        | Có auth, dashboard, bookings, users, businesses, settings dưới dạng shell.      | Thay mock data bằng domain/API thật; bổ sung toàn bộ màn hình vận hành.                                 |
+| Platform Admin        | Có auth, dashboard, tenant/users/system shell và một phần tenant API.           | Tenant lifecycle đầy đủ, ngành nghề, template, subscription, policy, contact inbox và dashboard thật.   |
+| Category/Service      | API CRUD và unit test đã có.                                                    | Admin UI, ảnh, staff assignment, Excel, quyền và public query.                                          |
+| Notification          | Có model, API đọc/đánh dấu và scheduler nền.                                    | Event từ booking, email xác nhận/thay đổi/hủy/nhắc lịch và liên kết notification với appointment.       |
+| TenantDomain/Settings | Đã có model nền.                                                                | Quy trình kiểm tra subdomain, publish template/theme và trạng thái không khả dụng.                      |
 
 ### 4.3 Chưa có domain hoàn chỉnh
 
@@ -181,7 +182,7 @@ Availability, appointment và Stripe webhook là ba vùng có rủi ro cao; khô
 
 **Tuần 2: Auth/onboarding/settings**
 
-- Google OAuth cho Business Admin.
+- Google OAuth cho Business Admin (backend F1-006 hoàn tất; frontend được tách sang task sau).
 - Policy consent trong đăng ký.
 - Onboarding chọn ngành nghề, tạo default business và chọn/bỏ qua gói.
 - Business profile, giờ hoạt động, ngày nghỉ, logo và ảnh bìa.

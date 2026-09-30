@@ -14,6 +14,38 @@ export class AuthCookieService {
     private readonly configCookie: ConfigType<typeof cookieConfig>,
   ) {}
 
+  getGoogleOAuthStateCookie(req: CookieRequest): string {
+    return (
+      (req.cookies as Record<string, string> | undefined)
+        ?.admin_google_oauth_state ?? ''
+    );
+  }
+
+  setGoogleOAuthStateCookie(
+    res: CookieResponse,
+    state: string,
+    ttlSeconds: number,
+  ): void {
+    res.cookie('admin_google_oauth_state', state, {
+      httpOnly: true,
+      secure: this.configCookie.secure,
+      sameSite: 'lax',
+      domain: this.configCookie.domain,
+      path: this.configCookie.oauthCallbackPath,
+      maxAge: ttlSeconds * 1000,
+    });
+  }
+
+  clearGoogleOAuthStateCookie(res: CookieResponse): void {
+    res.clearCookie('admin_google_oauth_state', {
+      httpOnly: true,
+      secure: this.configCookie.secure,
+      sameSite: 'lax',
+      domain: this.configCookie.domain,
+      path: this.configCookie.oauthCallbackPath,
+    });
+  }
+
   getRefreshToken(req: CookieRequest, context: AuthContext) {
     const { refreshToken } = this.getRefreshCookieNames(context);
     return (

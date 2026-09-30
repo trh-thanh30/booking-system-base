@@ -7,6 +7,7 @@ export { default as clientConfig } from '@/config/client.config';
 export { default as cookieConfig } from '@/config/cookie.config';
 export { default as databaseConfig } from '@/config/database.config';
 export { default as emailConfig } from '@/config/email.config';
+export { default as googleOAuthConfig } from '@/config/google-oauth.config';
 export * from '@/config/env.validation';
 export { default as jobsConfig } from '@/config/jobs.config';
 export { default as jwtConfig } from '@/config/jwt.config';
