@@ -78,6 +78,7 @@ export class LoginUserUseCase implements BaseUseCase<LoginDto, AuthResponse> {
     if (!user.is_verified) {
       const sessionId = await this.verificationSessionService.createSession(
         user.email,
+        'email_verification',
       );
       throw new ValidationError(
         this.errorMessages.EMAIL_NOT_VERIFIED,

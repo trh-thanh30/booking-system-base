@@ -1,4 +1,4 @@
-import { IsNotEmpty, MinLength } from 'class-validator';
+import { IsNotEmpty, Matches } from 'class-validator';
 import type { VerifyEmailInput } from '@repo/shared';
 
 export class VerifyEmailDto implements VerifyEmailInput {
@@ -6,6 +6,6 @@ export class VerifyEmailDto implements VerifyEmailInput {
   sessionId: string;
 
   @IsNotEmpty()
-  @MinLength(6)
+  @Matches(/^[0-9]{6}$/, { message: 'Code must contain exactly 6 digits' })
   code: string;
 }

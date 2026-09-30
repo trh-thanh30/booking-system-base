@@ -128,6 +128,8 @@
       "description": "Dùng tài khoản admin hoặc nhân sự để vào workspace của tenant.",
       "failed": "Đăng nhập thất bại",
       "forgotPassword": "Quên mật khẩu?",
+      "verificationRequired": "Hãy xác minh email để tiếp tục",
+      "verifyEmail": "Xác minh email",
       "submit": "Đăng nhập",
       "submitting": "Đang đăng nhập",
       "success": "Đăng nhập thành công",
@@ -149,6 +151,23 @@
       "submitting": "Đang đặt lại",
       "success": "Đặt lại mật khẩu thành công",
       "title": "Đặt lại mật khẩu"
+    },
+    "verify": {
+      "codeHint": "Nhập mã gồm 6 chữ số đã gửi tới email của bạn. Mã có hiệu lực trong 15 phút.",
+      "description": "Xác nhận email trước khi đăng nhập vào workspace của doanh nghiệp.",
+      "failed": "Không thể xác minh email",
+      "request": "Gửi mã xác minh",
+      "requestFailed": "Không thể yêu cầu mã xác minh",
+      "requesting": "Đang gửi mã xác minh",
+      "requestSuccess": "Nếu tài khoản cần xác minh, mã đã được gửi tới email",
+      "resend": "Gửi mã mới",
+      "resendFailed": "Không thể gửi lại mã xác minh",
+      "resending": "Đang gửi mã mới",
+      "resendSuccess": "Mã xác minh mới đã được gửi",
+      "submit": "Xác minh email",
+      "submitting": "Đang xác minh",
+      "success": "Email đã được xác minh. Bạn có thể đăng nhập.",
+      "title": "Xác minh email"
     },
     "invitation": {
       "description": "Chấp nhận lời mời tenant và tạo tài khoản nhân sự.",

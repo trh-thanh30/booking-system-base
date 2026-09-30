@@ -1,5 +1,3 @@
-import { BadRequestError } from '@/common/response/client-errors/bad-request';
-import { NotFoundError } from '@/common/response/client-errors/not-found';
 import { RequestVerificationDto } from '@/modules/auth/dto/request-verification.dto';
 import { VerificationSessionService } from '@/modules/auth/services/verification-session.service';
 import { SendVerificationEmailUseCase } from '@/modules/email/use-cases/send-verification-email.usecase';
@@ -21,27 +19,28 @@ export class RequestVerificationUseCase implements BaseUseCase<
   ) {}
 
   async execute(dto: RequestVerificationDto): Promise<{ sessionId: string }> {
-    const { email } = dto;
-
-    // Find user by email
+    const email = dto.email.trim().toLowerCase();
     const user = await this.usersService.findByEmail(email);
-    if (!user) {
-      throw new NotFoundError('User not found');
+    const sessionId = await this.verificationSessionService.createSession(
+      email,
+      'email_verification',
+    );
+
+    // Keep the public response identical to prevent account enumeration.
+    if (!user || user.is_verified) {
+      return { sessionId };
     }
 
-    // Check if user is already verified
-    if (user.is_verified) {
-      throw new BadRequestError('Account is already verified');
+    try {
+      await this.sendVerificationCode(email);
+      return { sessionId };
+    } catch (error) {
+      await this.verificationSessionService.deleteSession(
+        sessionId,
+        'email_verification',
+      );
+      throw error;
     }
-
-    // Create verification session
-    const sessionId =
-      await this.verificationSessionService.createSession(email);
-
-    // Generate and send verification code
-    await this.sendVerificationCode(email);
-
-    return { sessionId };
   }
 
   private async sendVerificationCode(email: string): Promise<void> {

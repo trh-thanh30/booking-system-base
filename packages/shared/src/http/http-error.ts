@@ -1,9 +1,18 @@
 import { AxiosError } from "axios";
 import { HttpClientError, type HttpClientAxiosError } from "./http.types.ts";
 
+function getApiError(error: HttpClientAxiosError) {
+  const apiError = error.response?.data?.error;
+  return typeof apiError === "object" && apiError !== null
+    ? apiError
+    : undefined;
+}
+
 function resolveMessage(error: HttpClientAxiosError): string {
   const data = error.response?.data;
+  const apiError = getApiError(error);
 
+  if (typeof apiError?.message === "string") return apiError.message;
   if (typeof data?.message === "string") return data.message;
   if (typeof data?.error === "string") return data.error;
   if (error.message) return error.message;
@@ -20,8 +29,11 @@ export function toHttpClientError(error: unknown): HttpClientError {
     return new HttpClientError({
       message: resolveMessage(axiosError),
       status: axiosError.response?.status,
-      code: axiosError.code,
-      details: axiosError.response?.data?.details ?? axiosError.response?.data,
+      code: getApiError(axiosError)?.code ?? axiosError.code,
+      details:
+        getApiError(axiosError)?.details ??
+        axiosError.response?.data?.details ??
+        axiosError.response?.data,
       isNetworkError: !axiosError.response,
       cause: error,
     });

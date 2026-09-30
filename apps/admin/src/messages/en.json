@@ -128,6 +128,8 @@
       "description": "Use an admin or staff account to access the tenant workspace.",
       "failed": "Login failed",
       "forgotPassword": "Forgot password?",
+      "verificationRequired": "Verify your email to continue",
+      "verifyEmail": "Verify email",
       "submit": "Sign in",
       "submitting": "Signing in",
       "success": "Signed in successfully",
@@ -149,6 +151,23 @@
       "submitting": "Resetting password",
       "success": "Password reset successfully",
       "title": "Reset password"
+    },
+    "verify": {
+      "codeHint": "Enter the 6-digit code sent to your email. The code expires after 15 minutes.",
+      "description": "Confirm your email before signing in to the tenant workspace.",
+      "failed": "Could not verify email",
+      "request": "Send verification code",
+      "requestFailed": "Could not request a verification code",
+      "requesting": "Sending verification code",
+      "requestSuccess": "If the account requires verification, a code has been sent",
+      "resend": "Send a new code",
+      "resendFailed": "Could not resend verification code",
+      "resending": "Sending a new code",
+      "resendSuccess": "A new verification code has been sent",
+      "submit": "Verify email",
+      "submitting": "Verifying email",
+      "success": "Email verified. You can now sign in.",
+      "title": "Verify email"
     },
     "invitation": {
       "description": "Accept your tenant invitation and create your staff account.",

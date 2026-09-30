@@ -11,9 +11,14 @@ import { Link, useRouter } from "@/src/i18n/navigation";
 import { authService } from "@/src/services/auth.service";
 import { AuthShell } from "./components/auth-shell";
 
-export function ResetPasswordView() {
+export function ResetPasswordView({
+  initialSessionId = "",
+}: {
+  initialSessionId?: string;
+}) {
   const t = useTranslations("Auth");
   const router = useRouter();
+  const sessionId = initialSessionId;
   const {
     formState: { errors, isSubmitting },
     handleSubmit,
@@ -24,7 +29,7 @@ export function ResetPasswordView() {
       code: "",
       confirmPassword: "",
       password: "",
-      sessionId: "",
+      sessionId,
     },
   });
 
@@ -54,13 +59,17 @@ export function ResetPasswordView() {
   return (
     <AuthShell description={t("reset.description")} title={t("reset.title")}>
       <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
-        <FormField
-          error={errors.sessionId?.message}
-          htmlFor="sessionId"
-          label={t("fields.sessionId")}
-        >
-          <Input id="sessionId" {...register("sessionId")} />
-        </FormField>
+        {sessionId ? (
+          <input type="hidden" {...register("sessionId")} />
+        ) : (
+          <FormField
+            error={errors.sessionId?.message}
+            htmlFor="sessionId"
+            label={t("fields.sessionId")}
+          >
+            <Input id="sessionId" {...register("sessionId")} />
+          </FormField>
+        )}
         <FormField
           error={errors.code?.message}
           htmlFor="code"
@@ -68,7 +77,14 @@ export function ResetPasswordView() {
         >
           <div className="relative">
             <KeyRound className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-            <Input className="pl-9" id="code" {...register("code")} />
+            <Input
+              autoComplete="one-time-code"
+              className="pl-9 tracking-[0.3em]"
+              id="code"
+              inputMode="numeric"
+              maxLength={6}
+              {...register("code")}
+            />
           </div>
         </FormField>
         <FormField

@@ -1,15 +1,21 @@
 import { ForgotPasswordUseCase } from '@/modules/auth/use-cases/forgot-password.usecase';
 
 describe('ForgotPasswordUseCase', () => {
-  it('rejects unknown emails', async () => {
+  it('does not disclose whether an email exists', async () => {
+    const verification = { generate: jest.fn() };
+    const emailUseCase = { execute: jest.fn() };
+
     await expect(
       new ForgotPasswordUseCase(
         { findByEmail: jest.fn().mockResolvedValue(null) } as any,
-        { generate: jest.fn() } as any,
-        { createSession: jest.fn() } as any,
-        { execute: jest.fn() } as any,
-      ).execute({ email: 'missing@example.com' }),
-    ).rejects.toThrow('User with this email not found');
+        verification as any,
+        { createSession: jest.fn().mockResolvedValue('opaque-session') } as any,
+        emailUseCase as any,
+      ).execute({ email: 'missing.com' }),
+    ).resolves.toBe('opaque-session');
+
+    expect(verification.generate).not.toHaveBeenCalled();
+    expect(emailUseCase.execute).not.toHaveBeenCalled();
   });
 
   it('creates a reset session and sends a reset email', async () => {
