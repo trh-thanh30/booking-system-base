@@ -3,11 +3,18 @@ import { notFound } from "next/navigation";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
 import NextTopLoader from "nextjs-toploader";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import { AuthProvider, QueryProvider } from "@/src/app/providers";
 import { ThemeProvider } from "@/src/app/providers/theme-provider";
 import { routing } from "@/src/i18n/routing";
-import { Toaster } from "sonner";
+import { Toaster } from "@repo/ui/sonner";
 import "../globals.css";
+
+const plusJakartaSans = Plus_Jakarta_Sans({
+  subsets: ["latin", "vietnamese"],
+  weight: ["300", "400", "500", "600", "700", "800"],
+  variable: "--font-plus-jakarta-sans",
+});
 
 export const metadata: Metadata = {
   title: "Business Admin",
@@ -34,24 +41,28 @@ export default async function LocaleLayout({
   const messages = await getMessages();
 
   return (
-    <html lang={locale} suppressHydrationWarning>
+    <html
+      className={plusJakartaSans.variable}
+      lang={locale}
+      suppressHydrationWarning
+    >
       <body>
         <NextIntlClientProvider messages={messages}>
           <ThemeProvider>
             <QueryProvider>
               <AuthProvider>
                 <NextTopLoader
-                  color="#2563eb"
+                  color="var(--color-primary)"
                   crawlSpeed={180}
                   easing="ease-out"
                   height={3}
-                  shadow="0 0 10px rgba(37, 99, 235, 0.35)"
+                  shadow="0 0 10px color-mix(in srgb, var(--color-primary) 35%, transparent)"
                   showSpinner={false}
                   speed={220}
                   zIndex={2147483647}
                 />
                 {children}
-                <Toaster richColors />
+                <Toaster />
               </AuthProvider>
             </QueryProvider>
           </ThemeProvider>

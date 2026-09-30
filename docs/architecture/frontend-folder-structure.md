@@ -7,6 +7,10 @@ Tài liệu này mô tả đầy đủ vai trò, chức năng và rule sử dụ
 
 Mục tiêu là giữ cấu trúc đủ rõ để làm boilerplate cho nhiều dự án Next.js khác, đồng thời tránh việc code UI, API, type và helper bị trộn lẫn.
 
+Quy ước màu sắc, typography, theme và shared UI primitives được định nghĩa tại
+[`frontend-design-system.md`](./frontend-design-system.md). Mọi frontend phải dùng
+token từ `@repo/ui/styles.css`, không duy trì brand palette riêng trong từng app.
+
 ## Cây Folder Chuẩn
 
 ```txt

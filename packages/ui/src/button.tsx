@@ -4,19 +4,19 @@ import type { ButtonHTMLAttributes } from "react";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 dark:focus-visible:ring-slate-300",
+  "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:bg-disabled disabled:text-disabled-foreground disabled:opacity-100",
   {
     variants: {
       variant: {
         primary:
-          "bg-slate-950 text-white hover:bg-slate-800 dark:bg-slate-50 dark:text-slate-950 dark:hover:bg-slate-200",
+          "bg-primary text-primary-foreground hover:bg-primary-hover active:bg-primary-active",
         secondary:
-          "border border-slate-300 bg-white text-slate-950 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-50 dark:hover:bg-slate-900",
-        ghost:
-          "text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-900",
+          "border border-border bg-secondary text-secondary-foreground hover:bg-secondary-hover",
+        ghost: "text-foreground hover:bg-muted-hover",
         outline:
-          "border border-slate-300 bg-transparent text-slate-950 hover:bg-slate-100 dark:border-slate-700 dark:text-slate-50 dark:hover:bg-slate-900",
-        destructive: "bg-red-600 text-white hover:bg-red-700",
+          "border border-border bg-transparent text-foreground hover:bg-muted",
+        destructive:
+          "bg-destructive text-destructive-foreground hover:bg-destructive-hover active:bg-danger-800",
       },
       size: {
         sm: "h-9 px-3 gap-1.5",
