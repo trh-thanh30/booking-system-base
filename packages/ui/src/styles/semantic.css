@@ -1,0 +1,170 @@
+:root {
+  color-scheme: light;
+
+  --ds-background: var(--color-neutral-50);
+  --ds-foreground: var(--color-neutral-950);
+  --ds-surface: #ffffff;
+  --ds-surface-raised: #ffffff;
+  --ds-card: #ffffff;
+  --ds-card-foreground: var(--color-neutral-950);
+  --ds-popover: #ffffff;
+  --ds-popover-foreground: var(--color-neutral-950);
+
+  --ds-primary: var(--color-primary-600);
+  --ds-primary-hover: var(--color-primary-700);
+  --ds-primary-active: var(--color-primary-800);
+  --ds-primary-foreground: #ffffff;
+
+  --ds-secondary: var(--color-neutral-100);
+  --ds-secondary-hover: var(--color-neutral-200);
+  --ds-secondary-foreground: var(--color-neutral-900);
+  --ds-muted: var(--color-neutral-100);
+  --ds-muted-hover: var(--color-neutral-200);
+  --ds-muted-foreground: var(--color-neutral-600);
+  --ds-accent: var(--color-primary-50);
+  --ds-accent-foreground: var(--color-primary-800);
+
+  --ds-border: var(--color-neutral-200);
+  --ds-input: var(--color-neutral-300);
+  --ds-ring: var(--color-primary-500);
+  --ds-overlay: rgb(2 6 23 / 45%);
+
+  --ds-success: var(--color-success-600);
+  --ds-success-foreground: #ffffff;
+  --ds-success-surface: var(--color-success-50);
+  --ds-success-surface-foreground: var(--color-success-900);
+  --ds-success-border: var(--color-success-200);
+  --ds-warning: var(--color-warning-600);
+  --ds-warning-foreground: var(--color-neutral-950);
+  --ds-warning-surface: var(--color-warning-50);
+  --ds-warning-surface-foreground: var(--color-warning-900);
+  --ds-warning-border: var(--color-warning-200);
+  --ds-danger: var(--color-danger-600);
+  --ds-danger-hover: var(--color-danger-700);
+  --ds-danger-foreground: #ffffff;
+  --ds-danger-surface: var(--color-danger-50);
+  --ds-danger-surface-foreground: var(--color-danger-900);
+  --ds-danger-border: var(--color-danger-200);
+  --ds-info: var(--color-info-600);
+  --ds-info-foreground: #ffffff;
+  --ds-info-surface: var(--color-info-50);
+  --ds-info-surface-foreground: var(--color-info-900);
+  --ds-info-border: var(--color-info-200);
+
+  --ds-disabled: var(--color-neutral-200);
+  --ds-disabled-foreground: var(--color-neutral-600);
+}
+
+.dark {
+  color-scheme: dark;
+
+  --ds-background: var(--color-neutral-950);
+  --ds-foreground: var(--color-neutral-50);
+  --ds-surface: var(--color-neutral-900);
+  --ds-surface-raised: var(--color-neutral-800);
+  --ds-card: var(--color-neutral-900);
+  --ds-card-foreground: var(--color-neutral-50);
+  --ds-popover: var(--color-neutral-900);
+  --ds-popover-foreground: var(--color-neutral-50);
+
+  --ds-primary: var(--color-primary-500);
+  --ds-primary-hover: var(--color-primary-400);
+  --ds-primary-active: var(--color-primary-300);
+  --ds-primary-foreground: var(--color-neutral-950);
+
+  --ds-secondary: var(--color-neutral-800);
+  --ds-secondary-hover: var(--color-neutral-700);
+  --ds-secondary-foreground: var(--color-neutral-50);
+  --ds-muted: var(--color-neutral-800);
+  --ds-muted-hover: var(--color-neutral-700);
+  --ds-muted-foreground: var(--color-neutral-400);
+  --ds-accent: var(--color-primary-950);
+  --ds-accent-foreground: var(--color-primary-200);
+
+  --ds-border: var(--color-neutral-800);
+  --ds-input: var(--color-neutral-700);
+  --ds-ring: var(--color-primary-400);
+  --ds-overlay: rgb(2 6 23 / 70%);
+
+  --ds-success-surface: var(--color-success-950);
+  --ds-success-surface-foreground: var(--color-success-200);
+  --ds-success-border: var(--color-success-800);
+  --ds-warning-surface: var(--color-warning-950);
+  --ds-warning-surface-foreground: var(--color-warning-200);
+  --ds-warning-border: var(--color-warning-800);
+  --ds-danger-surface: var(--color-danger-950);
+  --ds-danger-surface-foreground: var(--color-danger-200);
+  --ds-danger-border: var(--color-danger-800);
+  --ds-info-surface: var(--color-info-950);
+  --ds-info-surface-foreground: var(--color-info-200);
+  --ds-info-border: var(--color-info-800);
+
+  --ds-disabled: var(--color-neutral-800);
+  --ds-disabled-foreground: var(--color-neutral-400);
+}
+
+@theme inline {
+  --color-background: var(--ds-background);
+  --color-foreground: var(--ds-foreground);
+  --color-surface: var(--ds-surface);
+  --color-surface-raised: var(--ds-surface-raised);
+  --color-card: var(--ds-card);
+  --color-card-foreground: var(--ds-card-foreground);
+  --color-popover: var(--ds-popover);
+  --color-popover-foreground: var(--ds-popover-foreground);
+  --color-primary: var(--ds-primary);
+  --color-primary-hover: var(--ds-primary-hover);
+  --color-primary-active: var(--ds-primary-active);
+  --color-primary-foreground: var(--ds-primary-foreground);
+  --color-secondary: var(--ds-secondary);
+  --color-secondary-hover: var(--ds-secondary-hover);
+  --color-secondary-foreground: var(--ds-secondary-foreground);
+  --color-muted: var(--ds-muted);
+  --color-muted-hover: var(--ds-muted-hover);
+  --color-muted-foreground: var(--ds-muted-foreground);
+  --color-accent: var(--ds-accent);
+  --color-accent-foreground: var(--ds-accent-foreground);
+  --color-border: var(--ds-border);
+  --color-input: var(--ds-input);
+  --color-ring: var(--ds-ring);
+  --color-overlay: var(--ds-overlay);
+  --color-success: var(--ds-success);
+  --color-success-foreground: var(--ds-success-foreground);
+  --color-success-surface: var(--ds-success-surface);
+  --color-success-surface-foreground: var(--ds-success-surface-foreground);
+  --color-success-border: var(--ds-success-border);
+  --color-warning: var(--ds-warning);
+  --color-warning-foreground: var(--ds-warning-foreground);
+  --color-warning-surface: var(--ds-warning-surface);
+  --color-warning-surface-foreground: var(--ds-warning-surface-foreground);
+  --color-warning-border: var(--ds-warning-border);
+  --color-danger: var(--ds-danger);
+  --color-danger-hover: var(--ds-danger-hover);
+  --color-danger-foreground: var(--ds-danger-foreground);
+  --color-danger-surface: var(--ds-danger-surface);
+  --color-danger-surface-foreground: var(--ds-danger-surface-foreground);
+  --color-danger-border: var(--ds-danger-border);
+  --color-destructive: var(--ds-danger);
+  --color-destructive-hover: var(--ds-danger-hover);
+  --color-destructive-foreground: var(--ds-danger-foreground);
+  --color-info: var(--ds-info);
+  --color-info-foreground: var(--ds-info-foreground);
+  --color-info-surface: var(--ds-info-surface);
+  --color-info-surface-foreground: var(--ds-info-surface-foreground);
+  --color-info-border: var(--ds-info-border);
+  --color-disabled: var(--ds-disabled);
+  --color-disabled-foreground: var(--ds-disabled-foreground);
+
+  /* Temporary aliases for the existing Landing vocabulary. */
+  --color-brand-blue: var(--color-primary-600);
+  --color-brand-blue-hover: var(--color-primary-700);
+  --color-brand-blue-active: var(--color-primary-800);
+  --color-bg-primary: var(--ds-surface);
+  --color-bg-secondary: var(--ds-background);
+  --color-text-primary: var(--ds-foreground);
+  --color-text-secondary: var(--color-neutral-800);
+  --color-text-tertiary: var(--color-neutral-700);
+  --color-text-muted: var(--ds-muted-foreground);
+  --color-border-gray: var(--color-neutral-500);
+  --color-border-light: var(--ds-border);
+}

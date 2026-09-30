@@ -9,7 +9,8 @@
     "./auth": "./src/auth/index.ts",
     "./browser": "./src/browser/index.ts",
     "./data": "./src/data/index.ts",
-    "./state": "./src/state/index.ts"
+    "./state": "./src/state/index.ts",
+    "./toast": "./src/use-toast.ts"
   },
   "scripts": {
     "build": "tsc --noEmit && node -e \"fs.mkdirSync('dist', { recursive: true }); fs.writeFileSync('dist/.build', '')\"",
@@ -26,5 +27,8 @@
   },
   "peerDependencies": {
     "react": ">=18"
+  },
+  "dependencies": {
+    "sonner": "^2.0.7"
   }
 }

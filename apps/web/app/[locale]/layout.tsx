@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
 import { Plus_Jakarta_Sans } from "next/font/google";
+import { Toaster } from "@repo/ui/sonner";
 import { routing } from "@/src/i18n/routing";
 import "../globals.css";
 
@@ -44,6 +45,7 @@ export default async function LocaleLayout({
       <body>
         <NextIntlClientProvider messages={messages}>
           {children}
+          <Toaster />
         </NextIntlClientProvider>
       </body>
     </html>
