@@ -63,6 +63,10 @@ export class LoginUserUseCase implements BaseUseCase<LoginDto, AuthResponse> {
     }
 
     // Validate password
+    if (!user.password) {
+      throw new UnauthorizedError(this.errorMessages.INVALID_CREDENTIALS);
+    }
+
     const isPasswordValid = await this.bcryptService.comparePassword(
       dto.password,
       user.password,

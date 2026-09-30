@@ -46,6 +46,38 @@ export class AuthCookieService {
     });
   }
 
+  getGoogleOnboardingCookie(req: CookieRequest): string {
+    return (
+      (req.cookies as Record<string, string> | undefined)
+        ?.admin_google_onboarding ?? ''
+    );
+  }
+
+  setGoogleOnboardingCookie(
+    res: CookieResponse,
+    token: string,
+    ttlSeconds: number,
+  ): void {
+    res.cookie('admin_google_onboarding', token, {
+      httpOnly: true,
+      secure: this.configCookie.secure,
+      sameSite: 'lax',
+      domain: this.configCookie.domain,
+      path: this.configCookie.googleOnboardingPath,
+      maxAge: ttlSeconds * 1000,
+    });
+  }
+
+  clearGoogleOnboardingCookie(res: CookieResponse): void {
+    res.clearCookie('admin_google_onboarding', {
+      httpOnly: true,
+      secure: this.configCookie.secure,
+      sameSite: 'lax',
+      domain: this.configCookie.domain,
+      path: this.configCookie.googleOnboardingPath,
+    });
+  }
+
   getRefreshToken(req: CookieRequest, context: AuthContext) {
     const { refreshToken } = this.getRefreshCookieNames(context);
     return (

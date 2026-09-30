@@ -6,6 +6,7 @@ import {
   tenant_status,
   user_role,
   user_status,
+  identity_provider,
   type Prisma,
 } from '@prisma/client';
 
@@ -90,9 +91,16 @@ export class TenantRepository {
     owner: {
       email: string;
       username: string;
-      password: string;
+      password: string | null;
       full_name?: string;
       phone?: string;
+      avatar_url?: string;
+      isVerified?: boolean;
+      identity?: {
+        provider: identity_provider;
+        providerAccountId: string;
+        providerEmail: string;
+      };
     };
   }) {
     return this.prisma.$transaction(async (tx) => {
@@ -152,9 +160,19 @@ export class TenantRepository {
           password: input.owner.password,
           full_name: input.owner.full_name,
           phone: input.owner.phone,
+          avatar_url: input.owner.avatar_url,
           role: user_role.OWNER,
           status: user_status.ACTIVE,
-          is_verified: false,
+          is_verified: input.owner.isVerified ?? false,
+          identities: input.owner.identity
+            ? {
+                create: {
+                  provider: input.owner.identity.provider,
+                  provider_account_id: input.owner.identity.providerAccountId,
+                  provider_email: input.owner.identity.providerEmail,
+                },
+              }
+            : undefined,
         },
       });
 

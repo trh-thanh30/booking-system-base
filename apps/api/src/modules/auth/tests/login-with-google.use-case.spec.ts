@@ -1,4 +1,4 @@
-import { ConflictError, UnauthorizedError } from '@/common/response';
+import { ConflictError } from '@/common/response';
 import { LoginWithGoogleUseCase } from '@/modules/auth/use-cases/login-with-google.usecase';
 import { identity_provider, user_role, user_status } from '@prisma/client';
 
@@ -69,6 +69,8 @@ function createSubject(options?: {
   };
   const prisma = {
     $transaction: jest.fn((callback) => callback(transaction)),
+    user: transaction.user,
+    userIdentity: transaction.userIdentity,
   };
   const stateService = {
     consume: jest.fn().mockResolvedValue(oauthSession),
@@ -85,9 +87,16 @@ function createSubject(options?: {
   const refreshTokenSessionService = {
     hash: jest.fn().mockReturnValue('refresh-token-hash'),
   };
+  const onboardingSessionService = {
+    create: jest.fn().mockResolvedValue({
+      token: 'onboarding-token',
+      ttlSeconds: 900,
+    }),
+  };
 
   return {
     googleOAuthProvider,
+    onboardingSessionService,
     prisma,
     stateService,
     subject: new LoginWithGoogleUseCase(
@@ -96,6 +105,7 @@ function createSubject(options?: {
       stateService as any,
       tokenService as any,
       refreshTokenSessionService as any,
+      onboardingSessionService as any,
     ),
     tokenService,
     transaction,
@@ -179,8 +189,10 @@ describe('LoginWithGoogleUseCase', () => {
     });
   });
 
-  it('does not create an account when no existing Owner matches the Google email', async () => {
-    const { subject, transaction } = createSubject({ user: null });
+  it('starts onboarding when no existing Owner matches the verified Google email', async () => {
+    const { subject, transaction, onboardingSessionService } = createSubject({
+      user: null,
+    });
 
     await expect(
       subject.execute({
@@ -188,9 +200,21 @@ describe('LoginWithGoogleUseCase', () => {
         state: 'oauth-state',
         stateCookie: 'oauth-state',
       }),
-    ).rejects.toMatchObject({
-      code: 'GOOGLE_ACCOUNT_NOT_REGISTERED',
-    } satisfies Partial<UnauthorizedError>);
+    ).resolves.toMatchObject({
+      locale: 'vi',
+      returnTo: '/dashboard',
+      status: 'onboarding_required',
+      onboardingToken: 'onboarding-token',
+      onboardingTtlSeconds: 900,
+    });
+    expect(onboardingSessionService.create).toHaveBeenCalledWith({
+      avatarUrl: 'https://example.com/avatar.png',
+      email: 'owner@example.com',
+      fullName: 'Business Owner',
+      locale: 'vi',
+      providerAccountId: 'google-subject',
+      returnTo: '/dashboard',
+    });
 
     expect(transaction.userIdentity.create).not.toHaveBeenCalled();
     expect(transaction.user.update).not.toHaveBeenCalled();

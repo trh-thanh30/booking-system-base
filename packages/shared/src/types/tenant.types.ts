@@ -66,6 +66,12 @@ export type TenantListItem = TenantContext & {
   users_count: number;
 };
 
+export type GoogleOwnerOnboardingProfile = {
+  avatar_url: string | null;
+  email: string;
+  full_name: string | null;
+};
+
 export type RegisterOwnerResult = {
   tenant: TenantContext;
   business: BusinessContext;

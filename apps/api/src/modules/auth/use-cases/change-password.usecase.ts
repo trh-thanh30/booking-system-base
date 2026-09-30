@@ -17,6 +17,10 @@ export class ChangePasswordUseCase {
       throw new UnauthorizedError('User not found');
     }
 
+    if (!currentUser.password) {
+      throw new UnauthorizedError('Current password is not configured');
+    }
+
     const isPasswordValid = await this.bcryptService.comparePassword(
       dto.currentPassword,
       currentUser.password,

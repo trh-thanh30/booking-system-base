@@ -25,6 +25,12 @@ export const envSchema = z
       .min(60)
       .max(1800)
       .default(600),
+    GOOGLE_ONBOARDING_TTL_SECONDS: z.coerce
+      .number()
+      .int()
+      .min(300)
+      .max(3600)
+      .default(900),
     ADMIN_URL: z.string().url().optional(),
     NEXT_PUBLIC_ADMIN_URL: z.string().url().optional(),
 
