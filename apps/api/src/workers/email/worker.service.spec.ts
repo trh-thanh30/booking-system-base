@@ -5,9 +5,11 @@ import type { SendMailOptions } from 'nodemailer';
 
 import { WorkerEmailService } from '@/workers/email/worker.service';
 
-const mockSendMail =
-  jest.fn<(message: SendMailOptions) => Promise<{ messageId: string }>>();
-const mockVerify = jest.fn<() => Promise<boolean>>();
+const mockSendMail = jest.fn<
+  Promise<{ messageId: string }>,
+  [SendMailOptions]
+>();
+const mockVerify = jest.fn<Promise<boolean>, []>();
 let sentMessage: SendMailOptions | undefined;
 
 jest.mock('nodemailer', () => ({
