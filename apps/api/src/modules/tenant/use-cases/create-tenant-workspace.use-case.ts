@@ -3,6 +3,7 @@ import { toBusinessContext } from '@/modules/business/business.types';
 import { TenantRepository } from '@/modules/tenant/repository/tenant.repository';
 import { normalizeHost, toTenantContext } from '@/modules/tenant/tenant.types';
 import { Injectable } from '@nestjs/common';
+import type { identity_provider } from '@prisma/client';
 
 export interface CreateTenantWorkspaceInput {
   tenant: {
@@ -18,9 +19,16 @@ export interface CreateTenantWorkspaceInput {
   owner: {
     email: string;
     username: string;
-    password: string;
+    password: string | null;
     full_name?: string;
     phone?: string;
+    avatar_url?: string;
+    isVerified?: boolean;
+    identity?: {
+      provider: identity_provider;
+      providerAccountId: string;
+      providerEmail: string;
+    };
   };
 }
 

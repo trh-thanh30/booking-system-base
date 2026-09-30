@@ -12,10 +12,12 @@ import { GoogleOAuthProvider } from '@/modules/auth/providers/google-oauth.provi
 import { AuthCookieService } from '@/modules/auth/services/auth-cookie.service';
 import { AuthProfileService } from '@/modules/auth/services/auth-profile.service';
 import { AuthTokenService } from '@/modules/auth/services/auth-token.service';
+import { GoogleOnboardingSessionService } from '@/modules/auth/services/google-onboarding-session.service';
 import { GoogleOAuthStateService } from '@/modules/auth/services/google-oauth-state.service';
 import { VerificationSessionService } from '@/modules/auth/services/verification-session.service';
 import { AcceptInvitationUseCase } from '@/modules/auth/use-cases/accept-invitation.usecase';
 import { ChangePasswordUseCase } from '@/modules/auth/use-cases/change-password.usecase';
+import { CompleteGoogleOwnerOnboardingUseCase } from '@/modules/auth/use-cases/complete-google-owner-onboarding.usecase';
 import { CreateInvitationUseCase } from '@/modules/auth/use-cases/create-invitation.usecase';
 import { ForgotPasswordUseCase } from '@/modules/auth/use-cases/forgot-password.usecase';
 import { GetInvitationUseCase } from '@/modules/auth/use-cases/get-invitation.usecase';
@@ -65,8 +67,10 @@ import { ConfigModule } from '@nestjs/config';
     VerificationSessionService,
     BcryptService,
     ChangePasswordUseCase,
+    CompleteGoogleOwnerOnboardingUseCase,
     AuthCookieService,
     AuthProfileService,
+    GoogleOnboardingSessionService,
     GoogleOAuthStateService,
     GoogleOAuthProvider,
   ],

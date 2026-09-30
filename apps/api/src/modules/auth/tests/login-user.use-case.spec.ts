@@ -84,6 +84,27 @@ describe('LoginUserUseCase', () => {
     ).rejects.toThrow('Please verify your email before logging in');
   });
 
+  it('rejects OAuth-only accounts without calling the password comparer', async () => {
+    const comparePassword = jest.fn();
+    const tokenService = { generateTokenPair: jest.fn() };
+
+    await expect(
+      new LoginUserUseCase(
+        {
+          user: {
+            findFirst: jest.fn().mockResolvedValue(user({ password: null })),
+          },
+        } as any,
+        { comparePassword } as any,
+        tokenService as any,
+        { createSession: jest.fn() } as any,
+      ).execute(dto),
+    ).rejects.toThrow('Invalid email/username or password');
+
+    expect(comparePassword).not.toHaveBeenCalled();
+    expect(tokenService.generateTokenPair).not.toHaveBeenCalled();
+  });
+
   it('returns tokens and updates the stored refresh token for a valid login', async () => {
     const prisma = {
       user: {

@@ -2,6 +2,7 @@ import { ConflictError, UnauthorizedError } from '@/common/response';
 import { PrismaService } from '@/database/prisma/prisma.service';
 import { GoogleOAuthProvider } from '@/modules/auth/providers/google-oauth.provider';
 import { AuthTokenService } from '@/modules/auth/services/auth-token.service';
+import { GoogleOnboardingSessionService } from '@/modules/auth/services/google-onboarding-session.service';
 import { GoogleOAuthStateService } from '@/modules/auth/services/google-oauth-state.service';
 import { RefreshTokenSessionService } from '@/modules/auth/services/refresh-token-session.service';
 import { Injectable } from '@nestjs/common';
@@ -28,6 +29,7 @@ export class LoginWithGoogleUseCase {
     private readonly stateService: GoogleOAuthStateService,
     private readonly tokenService: AuthTokenService,
     private readonly refreshTokenSessionService: RefreshTokenSessionService,
+    private readonly onboardingSessionService: GoogleOnboardingSessionService,
   ) {}
 
   async execute(input: GoogleCallbackInput) {
@@ -54,35 +56,43 @@ export class LoginWithGoogleUseCase {
       codeVerifier: oauthSession.codeVerifier,
       nonce: oauthSession.nonce,
     });
+    const existingIdentity = await this.prismaService.userIdentity.findUnique({
+      where: {
+        provider_provider_account_id: {
+          provider: identity_provider.GOOGLE,
+          provider_account_id: profile.subject,
+        },
+      },
+      include: { user: true },
+    });
+    const user =
+      existingIdentity?.user ??
+      (await this.prismaService.user.findUnique({
+        where: { email: profile.email },
+      }));
+
+    if (!user) {
+      const onboarding = await this.onboardingSessionService.create({
+        avatarUrl: profile.picture,
+        email: profile.email,
+        fullName: profile.name,
+        locale: oauthSession.locale,
+        providerAccountId: profile.subject,
+        returnTo: oauthSession.returnTo,
+      });
+      return {
+        locale: oauthSession.locale,
+        onboardingToken: onboarding.token,
+        onboardingTtlSeconds: onboarding.ttlSeconds,
+        returnTo: oauthSession.returnTo,
+        status: 'onboarding_required' as const,
+      };
+    }
+
+    this.assertOwnerCanLogin(user);
 
     try {
       return await this.prismaService.$transaction(async (transaction) => {
-        const existingIdentity = await transaction.userIdentity.findUnique({
-          where: {
-            provider_provider_account_id: {
-              provider: identity_provider.GOOGLE,
-              provider_account_id: profile.subject,
-            },
-          },
-          include: { user: true },
-        });
-
-        let user: User | null = existingIdentity?.user ?? null;
-        if (!user) {
-          user = await transaction.user.findUnique({
-            where: { email: profile.email },
-          });
-        }
-
-        if (!user) {
-          throw new UnauthorizedError(
-            'Create an Owner account before using Google login',
-            'GOOGLE_ACCOUNT_NOT_REGISTERED',
-          );
-        }
-
-        this.assertOwnerCanLogin(user);
-
         if (existingIdentity) {
           await transaction.userIdentity.update({
             where: { id: existingIdentity.id },
@@ -101,7 +111,6 @@ export class LoginWithGoogleUseCase {
               'GOOGLE_IDENTITY_CONFLICT',
             );
           }
-
           await transaction.userIdentity.create({
             data: {
               provider: identity_provider.GOOGLE,
@@ -136,6 +145,7 @@ export class LoginWithGoogleUseCase {
 
         return {
           ...tokens,
+          status: 'authenticated' as const,
           locale: oauthSession.locale,
           returnTo: oauthSession.returnTo,
           user: updatedUser,

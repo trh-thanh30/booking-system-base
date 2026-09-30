@@ -27,6 +27,24 @@ describe('ChangePasswordUseCase', () => {
     ).rejects.toThrow('Current password is incorrect');
   });
 
+  it('rejects password changes for an OAuth-only account', async () => {
+    const comparePassword = jest.fn();
+
+    await expect(
+      new ChangePasswordUseCase(
+        {
+          findById: jest.fn().mockResolvedValue({
+            id: 'user-1',
+            password: null,
+          }),
+        } as any,
+        { comparePassword } as any,
+      ).execute('user-1', dto),
+    ).rejects.toThrow('Current password is not configured');
+
+    expect(comparePassword).not.toHaveBeenCalled();
+  });
+
   it('rejects when new password matches current password', async () => {
     const useCase = new ChangePasswordUseCase(
       {

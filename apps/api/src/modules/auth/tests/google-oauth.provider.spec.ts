@@ -18,6 +18,7 @@ describe('GoogleOAuthProvider', () => {
     clientSecret: 'google-client-secret',
     redirectUri: 'http://localhost:3000/api/v1/auth/admin/google/callback',
     stateTtlSeconds: 600,
+    onboardingTtlSeconds: 900,
   };
 
   beforeEach(() => {

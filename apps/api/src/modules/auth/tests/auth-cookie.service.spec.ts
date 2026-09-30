@@ -10,6 +10,7 @@ describe('AuthCookieService', () => {
     partitioned: false,
     path: '/',
     oauthCallbackPath: '/api/v1/auth/admin/google/callback',
+    googleOnboardingPath: '/api/v1/auth/admin/google/onboarding',
     refreshPaths: {
       admin: '/api/v1/auth/admin',
       client: '/api/v1/auth',
@@ -106,6 +107,39 @@ describe('AuthCookieService', () => {
       'admin_google_oauth_state',
       expect.objectContaining({
         path: '/api/v1/auth/admin/google/callback',
+      }),
+    );
+  });
+  it('binds Google onboarding to a short-lived endpoint-only cookie', () => {
+    const service = new AuthCookieService(cookieConfig);
+    const clearCookie = jest.fn();
+    const cookie = jest.fn();
+    const res: Pick<Response, 'clearCookie' | 'cookie'> = {
+      clearCookie,
+      cookie,
+    };
+    const req: Pick<Request, 'cookies'> = {
+      cookies: { admin_google_onboarding: 'onboarding-token' },
+    };
+
+    expect(service.getGoogleOnboardingCookie(req)).toBe('onboarding-token');
+    service.setGoogleOnboardingCookie(res, 'onboarding-token', 900);
+    service.clearGoogleOnboardingCookie(res);
+
+    expect(cookie).toHaveBeenCalledWith(
+      'admin_google_onboarding',
+      'onboarding-token',
+      expect.objectContaining({
+        httpOnly: true,
+        maxAge: 900_000,
+        path: '/api/v1/auth/admin/google/onboarding',
+        sameSite: 'lax',
+      }),
+    );
+    expect(clearCookie).toHaveBeenCalledWith(
+      'admin_google_onboarding',
+      expect.objectContaining({
+        path: '/api/v1/auth/admin/google/onboarding',
       }),
     );
   });
