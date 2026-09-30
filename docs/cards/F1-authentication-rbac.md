@@ -78,11 +78,23 @@ Không thêm `sessions` table trong F1. Refresh/session state dùng `users.refre
 - `SameSite=None` bị chặn cho đến khi có CSRF protection.
 - Migration sang `refresh_token_hash` đặt các giá trị raw cũ về `NULL`, vì vậy tất cả session cũ phải đăng nhập lại.
 
+## Email Verification & Password Recovery
+
+- Public request endpoints trả phản hồi đồng nhất để không tiết lộ email có tồn tại hoặc đã xác thực.
+- Verification session có TTL 15 phút và được cô lập theo purpose: `email_verification` hoặc `password_reset`.
+- OTP gồm đúng 6 chữ số; rate-limit trả lỗi HTTP 429 có type rõ ràng.
+- OTP chỉ bị consume và session chỉ bị xóa sau khi database update thành công.
+- Reset password xóa `refresh_token_hash`, buộc user đăng nhập lại bằng mật khẩu mới.
+- Password tối thiểu 8 ký tự được áp dụng thống nhất ở shared schema và API DTO.
+- Admin giữ domain error `EMAIL_NOT_VERIFIED` cùng `sessionId` để chuyển sang màn hình verify email.
+- Forgot password tự chuyển `sessionId` sang reset password; không yêu cầu user sao chép thủ công.
+
 ## Frontend Screens
 
 - Login.
 - Forgot password.
 - Reset password.
+- Verify email và resend OTP.
 - Accept invitation.
 
 ## Admin Screens

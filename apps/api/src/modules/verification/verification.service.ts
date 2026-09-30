@@ -1,4 +1,5 @@
 // src/application/verification/verification.service.ts
+import { RateLimitError } from '@/common/response/client-errors';
 import { Injectable } from '@nestjs/common';
 import * as argon2 from 'argon2';
 import Redis from 'ioredis';
@@ -65,7 +66,9 @@ export class VerificationService {
       await this.redis.expire(rateKey, rateLimitWindowSec);
     }
     if (current > rateLimitMax) {
-      throw new Error('Too many requests. Please try again later.');
+      throw new RateLimitError(
+        'Too many verification requests. Please try again later.',
+      );
     }
 
     const code = this.randomNumeric(length);

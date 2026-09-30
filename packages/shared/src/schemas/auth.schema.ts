@@ -2,7 +2,7 @@ import { z } from "zod";
 import { permissionKeySchema } from "./permission.schema.ts";
 import { BUSINESS_USER_ROLES } from "../constants/index.ts";
 
-const passwordSchema = z.string().min(6);
+const passwordSchema = z.string().min(8);
 const optionalTextSchema = z
   .string()
   .trim()
@@ -42,15 +42,21 @@ export type RequestVerificationInput = EmailRequestInput;
 
 export const verifyEmailSchema = z.object({
   sessionId: z.string().min(1),
-  code: z.string().min(6),
+  code: z.string().regex(/^[0-9]{6}$/, "Code must contain exactly 6 digits"),
 });
 
 export type VerifyEmailInput = z.infer<typeof verifyEmailSchema>;
 
+export const resendVerificationSchema = z.object({
+  sessionId: z.string().min(1),
+});
+
+export type ResendVerificationInput = z.infer<typeof resendVerificationSchema>;
+
 export const resetPasswordSchema = z
   .object({
     sessionId: z.string().min(1),
-    code: z.string().min(1),
+    code: z.string().regex(/^[0-9]{6}$/, "Code must contain exactly 6 digits"),
     password: passwordSchema,
     confirmPassword: z.string().min(1),
   })

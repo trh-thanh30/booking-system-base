@@ -2,6 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { RedisService } from '@/database/redis/redis.service';
 import { randomBytes } from 'crypto';
 
+export type VerificationSessionPurpose =
+  | 'email_verification'
+  | 'password_reset';
+
 /**
  * Service for managing verification sessions
  * Uses random session IDs instead of email as keys for security
@@ -18,13 +22,20 @@ export class VerificationSessionService {
    * @param email User's email address
    * @returns Session ID (random, not email-based)
    */
-  async createSession(email: string): Promise<string> {
+  async createSession(
+    email: string,
+    purpose: VerificationSessionPurpose,
+  ): Promise<string> {
     // Generate random session ID (looks like a session token)
     const sessionId = randomBytes(32).toString('hex');
-    const key = `${this.SESSION_PREFIX}:${sessionId}`;
+    const key = this.getSessionKey(sessionId, purpose);
 
     // Store email in Redis with session ID as key
-    await this.redisService.set(key, email, this.SESSION_TTL);
+    await this.redisService.set(
+      key,
+      email.trim().toLowerCase(),
+      this.SESSION_TTL,
+    );
 
     return sessionId;
   }
@@ -34,8 +45,11 @@ export class VerificationSessionService {
    * @param sessionId Session ID from cookie
    * @returns Email address or null if not found/expired
    */
-  async getEmail(sessionId: string): Promise<string | null> {
-    const key = `${this.SESSION_PREFIX}:${sessionId}`;
+  async getEmail(
+    sessionId: string,
+    purpose: VerificationSessionPurpose,
+  ): Promise<string | null> {
+    const key = this.getSessionKey(sessionId, purpose);
     const email = await this.redisService.get(key);
     return email;
   }
@@ -44,8 +58,11 @@ export class VerificationSessionService {
    * Delete verification session
    * @param sessionId Session ID to delete
    */
-  async deleteSession(sessionId: string): Promise<void> {
-    const key = `${this.SESSION_PREFIX}:${sessionId}`;
+  async deleteSession(
+    sessionId: string,
+    purpose: VerificationSessionPurpose,
+  ): Promise<void> {
+    const key = this.getSessionKey(sessionId, purpose);
     await this.redisService.del(key);
   }
 
@@ -53,8 +70,18 @@ export class VerificationSessionService {
    * Extend session TTL (for resend scenarios)
    * @param sessionId Session ID to extend
    */
-  async extendSession(sessionId: string): Promise<void> {
-    const key = `${this.SESSION_PREFIX}:${sessionId}`;
+  async extendSession(
+    sessionId: string,
+    purpose: VerificationSessionPurpose,
+  ): Promise<void> {
+    const key = this.getSessionKey(sessionId, purpose);
     await this.redisService.expire(key, this.SESSION_TTL);
+  }
+
+  private getSessionKey(
+    sessionId: string,
+    purpose: VerificationSessionPurpose,
+  ): string {
+    return `${this.SESSION_PREFIX}:${purpose}:${sessionId}`;
   }
 }

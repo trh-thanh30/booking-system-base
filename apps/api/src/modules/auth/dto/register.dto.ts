@@ -10,7 +10,7 @@ export class RegisterDto implements RegisterInput {
   email: string;
 
   @IsNotEmpty()
-  @MinLength(6)
+  @MinLength(8)
   password: string;
 
   @IsNotEmpty()

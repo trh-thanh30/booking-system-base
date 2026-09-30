@@ -140,3 +140,37 @@ test("the final Axios error is exposed as HttpClientError", async () => {
     return true;
   });
 });
+
+test("nested API errors preserve domain code and details", async () => {
+  const client = createHttpClient();
+  client.defaults.adapter = async (config) => {
+    throw new AxiosError(
+      "Request failed",
+      "ERR_BAD_REQUEST",
+      config,
+      undefined,
+      {
+        config,
+        data: {
+          success: false,
+          error: {
+            code: "EMAIL_NOT_VERIFIED",
+            message: "Please verify your email before logging in",
+            details: { sessionId: "verify-session" },
+          },
+        },
+        headers: {},
+        status: 422,
+        statusText: "Unprocessable Entity",
+      },
+    );
+  };
+
+  await assert.rejects(client.post("/auth/admin/login"), (error) => {
+    assert.ok(error instanceof HttpClientError);
+    assert.equal(error.code, "EMAIL_NOT_VERIFIED");
+    assert.equal(error.message, "Please verify your email before logging in");
+    assert.deepEqual(error.details, { sessionId: "verify-session" });
+    return true;
+  });
+});

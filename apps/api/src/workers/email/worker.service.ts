@@ -13,7 +13,6 @@ const emailSchema = z.string().email();
 
 type EmailTemplate = {
   render: HandlebarsTemplateDelegate;
-  engine: 'html' | 'mjml';
 };
 
 @Injectable()
@@ -60,61 +59,34 @@ export class WorkerEmailService implements OnModuleInit {
 
   private getCompiledTemplate(templateName: string): EmailTemplate {
     if (!this.templateCache.has(templateName)) {
-      const mjmlTemplatePath = path.join(
+      const templateFileName = `${templateName}.mjml.hbs`;
+      const configuredTemplatePath = path.resolve(
         process.cwd(),
         this.emailConfig.templatesPath,
-        `${templateName}.mjml.hbs`,
+        templateFileName,
       );
-      let templatePath = mjmlTemplatePath;
-      let engine: EmailTemplate['engine'] = 'mjml';
+      const compiledTemplatePath = path.resolve(
+        __dirname,
+        '..',
+        '..',
+        'modules',
+        'email',
+        'templates',
+        templateFileName,
+      );
+      const templatePath = [configuredTemplatePath, compiledTemplatePath].find(
+        (candidate) => fs.existsSync(candidate),
+      );
 
-      if (!fs.existsSync(templatePath)) {
-        templatePath = path.join(
-          process.cwd(),
-          this.emailConfig.templatesPath,
-          `${templateName}.hbs`,
+      if (!templatePath) {
+        throw new Error(
+          `MJML email template "${templateFileName}" not found at ${configuredTemplatePath} or ${compiledTemplatePath}`,
         );
-        engine = 'html';
-      }
-
-      if (!fs.existsSync(templatePath)) {
-        // Fallback for production where we might be running from dist/workers/email.
-        const fallbackPath = path.join(
-          __dirname,
-          '..',
-          '..',
-          'module',
-          'email',
-          'templates',
-          `${templateName}.${engine === 'mjml' ? 'mjml.hbs' : 'hbs'}`,
-        );
-        if (fs.existsSync(fallbackPath)) {
-          templatePath = fallbackPath;
-        } else {
-          const legacyFallbackPath = path.join(
-            __dirname,
-            '..',
-            '..',
-            'module',
-            'email',
-            'templates',
-            `${templateName}.hbs`,
-          );
-          if (fs.existsSync(legacyFallbackPath)) {
-            templatePath = legacyFallbackPath;
-            engine = 'html';
-          } else {
-            throw new Error(
-              `Email template '${templateName}' not found at ${templatePath}, ${fallbackPath}, or ${legacyFallbackPath}`,
-            );
-          }
-        }
       }
 
       const templateSource = fs.readFileSync(templatePath, 'utf8');
       this.templateCache.set(templateName, {
         render: Handlebars.compile(templateSource),
-        engine,
       });
     }
     return this.templateCache.get(templateName)!;
@@ -126,13 +98,8 @@ export class WorkerEmailService implements OnModuleInit {
   ) {
     const output = template.render(context);
 
-    if (template.engine === 'html') {
-      return output;
-    }
-
     const result = await mjml2html(output, {
-      minify: true,
-      validationLevel: 'soft',
+      validationLevel: 'strict',
     });
 
     if (result.errors.length > 0) {

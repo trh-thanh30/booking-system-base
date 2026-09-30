@@ -7,7 +7,7 @@ export class ChangePasswordDto implements ChangePasswordInput {
   currentPassword: string;
 
   @IsNotEmpty()
-  @MinLength(6)
+  @MinLength(8)
   password: string;
 
   @IsNotEmpty()

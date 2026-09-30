@@ -4,7 +4,7 @@ import { Lock, LogIn, Mail } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { loginSchema, type LoginInput } from "@repo/shared";
+import { HttpClientError, loginSchema, type LoginInput } from "@repo/shared";
 import { Button, Input } from "@repo/ui";
 import { FormField } from "@/src/components/common/form-field";
 import { useAuth } from "@/src/app/providers";
@@ -46,6 +46,28 @@ export function LoginView() {
       toast.success(t("login.success"));
       router.replace("/dashboard");
     } catch (error) {
+      if (
+        error instanceof HttpClientError &&
+        error.code === "EMAIL_NOT_VERIFIED"
+      ) {
+        const details = error.details;
+        const sessionId =
+          typeof details === "object" &&
+          details !== null &&
+          "sessionId" in details &&
+          typeof details.sessionId === "string"
+            ? details.sessionId
+            : undefined;
+
+        toast.info(t("login.verificationRequired"));
+        router.replace(
+          sessionId
+            ? "/verify-email?sessionId=" + encodeURIComponent(sessionId)
+            : "/verify-email",
+        );
+        return;
+      }
+
       toast.error(error instanceof Error ? error.message : t("login.failed"));
     }
   }
@@ -85,6 +107,12 @@ export function LoginView() {
           </div>
         </FormField>
         <div className="flex items-center justify-between">
+          <Link
+            className="text-sm font-medium text-slate-600 underline-offset-4 hover:underline dark:text-slate-300"
+            href="/verify-email"
+          >
+            {t("login.verifyEmail")}
+          </Link>
           <Link
             className="text-sm font-medium text-slate-600 underline-offset-4 hover:underline dark:text-slate-300"
             href="/forgot-password"

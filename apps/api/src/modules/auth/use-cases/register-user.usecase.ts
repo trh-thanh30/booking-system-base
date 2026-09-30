@@ -54,6 +54,7 @@ export class RegisterUserUseCase implements BaseUseCase<
     // Create verification session (random ID, not email-based)
     const sessionId = await this.verificationSessionService.createSession(
       dto.email,
+      'email_verification',
     );
 
     // Send verification email asynchronously

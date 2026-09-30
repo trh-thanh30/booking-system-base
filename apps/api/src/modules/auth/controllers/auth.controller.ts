@@ -23,6 +23,7 @@ import { LoginDto } from '@/modules/auth/dto/login.dto';
 import { RegisterDto } from '@/modules/auth/dto/register.dto';
 import { RequestVerificationDto } from '@/modules/auth/dto/request-verification.dto';
 import { ResetPasswordDto } from '@/modules/auth/dto/reset-password.dto';
+import { ResendVerificationDto } from '@/modules/auth/dto/resend-verification.dto';
 import { UpdateProfileDto } from '@/modules/auth/dto/update-profile.dto';
 import { VerifyEmailDto } from '@/modules/auth/dto/verify-email.dto';
 import type { AuthContext } from '@/modules/auth/auth.types';
@@ -270,8 +271,8 @@ export class AuthController {
   @Public()
   @Post('resend-verification')
   @ApiSuccess('Verification code resent successfully.')
-  async resendVerification(@Body('sessionId') sessionId: string) {
-    await this.resendVerificationUseCase.execute({ sessionId });
+  async resendVerification(@Body() dto: ResendVerificationDto) {
+    await this.resendVerificationUseCase.execute(dto);
   }
 
   @Public()

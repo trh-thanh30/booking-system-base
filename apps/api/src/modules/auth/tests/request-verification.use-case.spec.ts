@@ -1,30 +1,25 @@
 import { RequestVerificationUseCase } from '@/modules/auth/use-cases/request-verification.usecase';
 
 describe('RequestVerificationUseCase', () => {
-  it('rejects missing or already verified users', async () => {
+  it('does not disclose missing or already verified accounts', async () => {
     const verification = { generate: jest.fn() };
-    const sessions = { createSession: jest.fn() };
     const emailUseCase = { execute: jest.fn() };
 
-    await expect(
-      new RequestVerificationUseCase(
-        { findByEmail: jest.fn().mockResolvedValue(null) } as any,
-        verification as any,
-        sessions as any,
-        emailUseCase as any,
-      ).execute({ email: 'user@example.com' }),
-    ).rejects.toThrow('User not found');
+    for (const user of [null, { is_verified: true }]) {
+      await expect(
+        new RequestVerificationUseCase(
+          { findByEmail: jest.fn().mockResolvedValue(user) } as any,
+          verification as any,
+          {
+            createSession: jest.fn().mockResolvedValue('opaque-session'),
+          } as any,
+          emailUseCase as any,
+        ).execute({ email: 'user.com' }),
+      ).resolves.toEqual({ sessionId: 'opaque-session' });
+    }
 
-    await expect(
-      new RequestVerificationUseCase(
-        {
-          findByEmail: jest.fn().mockResolvedValue({ is_verified: true }),
-        } as any,
-        verification as any,
-        sessions as any,
-        emailUseCase as any,
-      ).execute({ email: 'user@example.com' }),
-    ).rejects.toThrow('Account is already verified');
+    expect(verification.generate).not.toHaveBeenCalled();
+    expect(emailUseCase.execute).not.toHaveBeenCalled();
   });
 
   it('creates a session and sends a verification code', async () => {

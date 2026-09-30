@@ -1,4 +1,3 @@
-import { NotFoundError } from '@/common/response/client-errors/not-found';
 import { ForgotPasswordDto } from '@/modules/auth/dto/forgot-password.dto';
 import { VerificationSessionService } from '@/modules/auth/services/verification-session.service';
 import { SendForgotPasswordEmailUseCase } from '@/modules/email/use-cases/send-forgot-password-email.usecase';
@@ -20,17 +19,17 @@ export class ForgotPasswordUseCase implements BaseUseCase<
   ) {}
 
   async execute(dto: ForgotPasswordDto): Promise<string> {
-    const { email } = dto;
-
-    // Find user by email
+    const email = dto.email.trim().toLowerCase();
     const user = await this.usersService.findByEmail(email);
-    if (!user) {
-      throw new NotFoundError('User with this email not found');
-    }
+    const sessionId = await this.verificationSessionService.createSession(
+      email,
+      'password_reset',
+    );
 
-    // Create verification session (random ID, not email-based)
-    const sessionId =
-      await this.verificationSessionService.createSession(email);
+    // Always return an opaque session so callers cannot enumerate accounts.
+    if (!user) {
+      return sessionId;
+    }
 
     try {
       // Generate a reset code and its expiration time
@@ -54,7 +53,10 @@ export class ForgotPasswordUseCase implements BaseUseCase<
 
       return sessionId;
     } catch (error) {
-      console.error('Failed to generate or send password reset code:', error);
+      await this.verificationSessionService.deleteSession(
+        sessionId,
+        'password_reset',
+      );
       throw error;
     }
   }

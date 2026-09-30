@@ -120,7 +120,7 @@ SMTP_SECURE=false
 SMTP_USER=your-email@gmail.com
 SMTP_PASS=your-app-password
 EMAIL_FROM="${APP_NAME} <${SMTP_USER}>"
-EMAIL_TEMPLATES_PATH=src/module/email/templates
+EMAIL_TEMPLATES_PATH=src/modules/email/templates
 
 # Rate Limiting
 RATE_LIMIT_TTL=60

@@ -5,7 +5,10 @@ import type {
   CurrentAuthUser,
   EmailRequestInput,
   LoginInput,
+  RequestVerificationInput,
+  ResendVerificationInput,
   ResetPasswordInput,
+  VerifyEmailInput,
 } from "@repo/shared";
 import { unwrapApiData } from "@repo/shared";
 import { apiClient } from "@/src/lib/api-client";
@@ -71,6 +74,23 @@ export const authService = {
 
   async resetPassword(input: ResetPasswordInput) {
     await apiClient.post<void>("/auth/reset-password", input);
+  },
+
+  async requestVerification(input: RequestVerificationInput) {
+    return unwrapApiData(
+      await apiClient.post<{ sessionId: string }>(
+        "/auth/request-verification",
+        input,
+      ),
+    );
+  },
+
+  async verifyEmail(input: VerifyEmailInput) {
+    await apiClient.post<void>("/auth/verify", input);
+  },
+
+  async resendVerification(input: ResendVerificationInput) {
+    await apiClient.post<void>("/auth/resend-verification", input);
   },
 
   async createInvitation(input: CreateInvitationInput) {

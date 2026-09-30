@@ -1,3 +1,4 @@
+import { RateLimitError } from '@/common/response/client-errors';
 import { ResendVerificationUseCase } from '@/modules/auth/use-cases/resend-verification.usecase';
 
 describe('ResendVerificationUseCase', () => {
@@ -64,7 +65,10 @@ describe('ResendVerificationUseCase', () => {
     expect(emailUseCase.execute).toHaveBeenCalledWith(
       expect.objectContaining({ to: 'user@example.com', code: '123456' }),
     );
-    expect(sessions.extendSession).toHaveBeenCalledWith('session-1');
+    expect(sessions.extendSession).toHaveBeenCalledWith(
+      'session-1',
+      'email_verification',
+    );
   });
 
   it('maps verification rate limit errors to too many requests', async () => {
@@ -76,7 +80,9 @@ describe('ResendVerificationUseCase', () => {
         {
           generate: jest
             .fn()
-            .mockRejectedValue(new Error('rate limit exceeded')),
+            .mockRejectedValue(
+              new RateLimitError('Too many verification requests'),
+            ),
         } as any,
         { getEmail: jest.fn().mockResolvedValue('user@example.com') } as any,
         { execute: jest.fn() } as any,
