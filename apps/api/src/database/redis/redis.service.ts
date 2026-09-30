@@ -53,6 +53,10 @@ export class RedisService implements OnModuleDestroy {
     return this.client.get(key);
   }
 
+  async getdel(key: string): Promise<string | null> {
+    return this.client.getdel(key);
+  }
+
   async set(key: string, value: string, ttl?: number): Promise<'OK'> {
     if (ttl) {
       return this.client.setex(key, ttl, value);

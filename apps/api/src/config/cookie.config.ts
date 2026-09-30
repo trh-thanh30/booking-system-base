@@ -53,6 +53,7 @@ export default registerAs('cookie', () => {
       admin: refreshBasePath + '/admin',
       platform: refreshBasePath + '/platform',
     },
+    oauthCallbackPath: refreshBasePath + '/admin/google/callback',
     // Only enable CHIPS/Partitioned cookies for true third-party embeds.
     // Admin/API run under the same site in production, so regular cross-subdomain
     // cookies are more reliable.

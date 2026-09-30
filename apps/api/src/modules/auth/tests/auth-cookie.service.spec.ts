@@ -9,6 +9,7 @@ describe('AuthCookieService', () => {
     maxAge: 60_000,
     partitioned: false,
     path: '/',
+    oauthCallbackPath: '/api/v1/auth/admin/google/callback',
     refreshPaths: {
       admin: '/api/v1/auth/admin',
       client: '/api/v1/auth',
@@ -73,6 +74,39 @@ describe('AuthCookieService', () => {
     expect(clearCookie).not.toHaveBeenCalledWith(
       'admin_refresh_token',
       expect.anything(),
+    );
+  });
+  it('binds Google OAuth state to a short-lived callback-only cookie', () => {
+    const service = new AuthCookieService(cookieConfig);
+    const clearCookie = jest.fn();
+    const cookie = jest.fn();
+    const res: Pick<Response, 'clearCookie' | 'cookie'> = {
+      clearCookie,
+      cookie,
+    };
+    const req: Pick<Request, 'cookies'> = {
+      cookies: { admin_google_oauth_state: 'oauth-state' },
+    };
+
+    expect(service.getGoogleOAuthStateCookie(req)).toBe('oauth-state');
+    service.setGoogleOAuthStateCookie(res, 'oauth-state', 600);
+    service.clearGoogleOAuthStateCookie(res);
+
+    expect(cookie).toHaveBeenCalledWith(
+      'admin_google_oauth_state',
+      'oauth-state',
+      expect.objectContaining({
+        httpOnly: true,
+        maxAge: 600_000,
+        path: '/api/v1/auth/admin/google/callback',
+        sameSite: 'lax',
+      }),
+    );
+    expect(clearCookie).toHaveBeenCalledWith(
+      'admin_google_oauth_state',
+      expect.objectContaining({
+        path: '/api/v1/auth/admin/google/callback',
+      }),
     );
   });
 });

@@ -15,6 +15,19 @@ export const envSchema = z
     PUPPETEER_EXECUTABLE_PATH: z.string().optional(),
     SENTRY_DSN: z.string().optional(),
 
+    // Google OAuth
+    GOOGLE_CLIENT_ID: z.string().optional(),
+    GOOGLE_CLIENT_SECRET: z.string().optional(),
+    GOOGLE_REDIRECT_URI: z.string().url().optional(),
+    GOOGLE_OAUTH_STATE_TTL_SECONDS: z.coerce
+      .number()
+      .int()
+      .min(60)
+      .max(1800)
+      .default(600),
+    ADMIN_URL: z.string().url().optional(),
+    NEXT_PUBLIC_ADMIN_URL: z.string().url().optional(),
+
     // Database
     DB_HOST: z.string().default('localhost'),
     DB_PORT: z.coerce.number().int().min(1).max(65535).default(5432),
