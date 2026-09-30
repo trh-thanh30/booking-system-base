@@ -46,20 +46,6 @@ export class TenantRepository {
     });
   }
 
-  findUserIdentity(email: string, username: string, phone?: string | null) {
-    return this.prisma.user.findFirst({
-      where: {
-        OR: [{ email }, { username }, ...(phone ? [{ phone }] : [])],
-      },
-      select: {
-        id: true,
-        email: true,
-        username: true,
-        phone: true,
-      },
-    });
-  }
-
   listTenants() {
     return this.prisma.tenant.findMany({
       include: {
@@ -150,6 +136,14 @@ export class TenantRepository {
         },
       });
 
+      const defaultBusiness = tenant.businesses.find(
+        (business) => business.is_default,
+      );
+
+      if (!defaultBusiness) {
+        throw new Error('Default business was not created');
+      }
+
       const owner = await tx.user.create({
         data: {
           tenant_id: tenant.id,
@@ -160,23 +154,17 @@ export class TenantRepository {
           phone: input.owner.phone,
           role: user_role.OWNER,
           status: user_status.ACTIVE,
-          is_verified: true,
+          is_verified: false,
         },
       });
 
-      const defaultBusiness = tenant.businesses.find(
-        (business) => business.is_default,
-      );
-
-      if (defaultBusiness) {
-        await tx.businessMembership.create({
-          data: {
-            tenant_id: tenant.id,
-            business_id: defaultBusiness.id,
-            user_id: owner.id,
-          },
-        });
-      }
+      await tx.businessMembership.create({
+        data: {
+          tenant_id: tenant.id,
+          business_id: defaultBusiness.id,
+          user_id: owner.id,
+        },
+      });
 
       return { tenant, business: defaultBusiness, owner };
     });

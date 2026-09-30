@@ -1,14 +1,15 @@
 "use client";
 
 import { useMutation } from "@tanstack/react-query";
+import { useLocale } from "next-intl";
 import { ArrowLeft, Building2, CheckCircle2, ExternalLink } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { signupTenantSchema, type SignupTenantInput } from "@repo/shared";
+import { registerOwnerSchema, type RegisterOwnerInput } from "@repo/shared";
 import { Button, Input, Label } from "@repo/ui";
 import { Link } from "@/src/i18n/navigation";
-import { tenantsService } from "@/src/services/tenants.service";
+import { authService } from "@/src/services/auth.service";
 
 function Field({
   error,
@@ -31,17 +32,18 @@ function Field({
 }
 
 export function SignupBusinessView() {
-  const [adminUrl, setAdminUrl] = useState<string | null>(null);
+  const locale = useLocale();
+  const [verificationUrl, setVerificationUrl] = useState<string | null>(null);
   const {
     formState: { errors },
     handleSubmit,
     register,
     setError,
-  } = useForm<SignupTenantInput>({
+  } = useForm<RegisterOwnerInput>({
     defaultValues: {
       default_business_name: "",
       default_business_slug: "",
-      locale: "vi",
+      locale,
       name: "",
       owner: {
         confirmPassword: "",
@@ -58,11 +60,13 @@ export function SignupBusinessView() {
     },
   });
   const signupMutation = useMutation({
-    mutationFn: tenantsService.signupTenant,
+    mutationFn: authService.registerOwner,
     onSuccess(result) {
       const adminBaseUrl =
         process.env.NEXT_PUBLIC_ADMIN_URL ?? "http://localhost:3002";
-      setAdminUrl(`${adminBaseUrl}/vi/login`);
+      setVerificationUrl(
+        `${adminBaseUrl}/${locale}/verify-email?sessionId=${encodeURIComponent(result.sessionId)}`,
+      );
       toast.success(`${result.tenant.name} workspace created`);
     },
     onError(error) {
@@ -107,24 +111,22 @@ export function SignupBusinessView() {
                 Owner role ready
               </div>
               <div className="rounded-md border border-slate-200 bg-white p-4">
-                Admin login enabled
+                Email verification
               </div>
             </div>
           </section>
           <section className="rounded-md border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-            {adminUrl ? (
+            {verificationUrl ? (
               <div className="flex min-h-96 flex-col justify-center text-center">
                 <CheckCircle2 className="mx-auto h-10 w-10 text-emerald-600" />
-                <h2 className="mt-4 text-xl font-semibold">
-                  Workspace is ready
-                </h2>
+                <h2 className="mt-4 text-xl font-semibold">Check your email</h2>
                 <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-slate-600">
-                  Use the owner account you just created to log in to the
-                  business admin portal.
+                  Your workspace and default business are ready. Verify the
+                  owner email before signing in to the business admin portal.
                 </p>
                 <Button asChild className="mx-auto mt-6">
-                  <a href={adminUrl}>
-                    Open admin
+                  <a href={verificationUrl}>
+                    Verify email
                     <ExternalLink className="h-4 w-4" />
                   </a>
                 </Button>
@@ -133,7 +135,7 @@ export function SignupBusinessView() {
               <form
                 className="space-y-5"
                 onSubmit={handleSubmit((input) => {
-                  const parsed = signupTenantSchema.safeParse({
+                  const parsed = registerOwnerSchema.safeParse({
                     ...input,
                     default_business_name:
                       input.default_business_name?.trim() || undefined,
@@ -158,7 +160,7 @@ export function SignupBusinessView() {
                         message: issue.message,
                       });
                     } else if (root) {
-                      setError(String(root) as keyof SignupTenantInput, {
+                      setError(String(root) as keyof RegisterOwnerInput, {
                         message: issue?.message,
                       });
                     }

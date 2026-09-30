@@ -17,20 +17,6 @@ export const loginSchema = z.object({
 
 export type LoginInput = z.infer<typeof loginSchema>;
 
-export const registerSchema = z
-  .object({
-    username: z.string().min(1),
-    email: z.string().email(),
-    password: passwordSchema,
-    confirmPassword: z.string().min(1),
-  })
-  .refine((input) => input.password === input.confirmPassword, {
-    path: ["confirmPassword"],
-    message: "Confirm password does not match",
-  });
-
-export type RegisterInput = z.infer<typeof registerSchema>;
-
 export const emailRequestSchema = z.object({
   email: z.string().email(),
 });

@@ -1,6 +1,9 @@
-import type { SignupTenantInput } from '@repo/shared';
+import { Match } from '@/common/decorators/match.decorator';
+import type { RegisterOwnerInput } from '@repo/shared';
+import { Type } from 'class-transformer';
 import {
   IsEmail,
+  IsNotEmpty,
   IsObject,
   IsOptional,
   IsString,
@@ -8,9 +11,8 @@ import {
   MinLength,
   ValidateNested,
 } from 'class-validator';
-import { Type } from 'class-transformer';
 
-class SignupTenantOwnerDto {
+class RegisterOwnerIdentityDto {
   @IsString()
   @MinLength(1)
   @MaxLength(80)
@@ -21,11 +23,12 @@ class SignupTenantOwnerDto {
   email: string;
 
   @IsString()
-  @MinLength(6)
+  @MinLength(8)
   password: string;
 
   @IsString()
-  @MinLength(1)
+  @IsNotEmpty()
+  @Match('password', { message: 'Confirm password does not match' })
   confirmPassword: string;
 
   @IsOptional()
@@ -39,7 +42,7 @@ class SignupTenantOwnerDto {
   phone?: string;
 }
 
-export class SignupTenantDto implements SignupTenantInput {
+export class RegisterOwnerDto implements RegisterOwnerInput {
   @IsString()
   @MinLength(2)
   @MaxLength(80)
@@ -80,6 +83,6 @@ export class SignupTenantDto implements SignupTenantInput {
   settings?: Record<string, unknown>;
 
   @ValidateNested()
-  @Type(() => SignupTenantOwnerDto)
-  owner: SignupTenantOwnerDto;
+  @Type(() => RegisterOwnerIdentityDto)
+  owner: RegisterOwnerIdentityDto;
 }

@@ -20,7 +20,7 @@ import { ChangePasswordDto } from '@/modules/auth/dto/change-password.dto';
 import { CreateInvitationDto } from '@/modules/auth/dto/create-invitation.dto';
 import { ForgotPasswordDto } from '@/modules/auth/dto/forgot-password.dto';
 import { LoginDto } from '@/modules/auth/dto/login.dto';
-import { RegisterDto } from '@/modules/auth/dto/register.dto';
+import { RegisterOwnerDto } from '@/modules/auth/dto/register-owner.dto';
 import { RequestVerificationDto } from '@/modules/auth/dto/request-verification.dto';
 import { ResetPasswordDto } from '@/modules/auth/dto/reset-password.dto';
 import { ResendVerificationDto } from '@/modules/auth/dto/resend-verification.dto';
@@ -36,7 +36,7 @@ import { ForgotPasswordUseCase } from '@/modules/auth/use-cases/forgot-password.
 import { GetInvitationUseCase } from '@/modules/auth/use-cases/get-invitation.usecase';
 import { LoginUserUseCase } from '@/modules/auth/use-cases/login-user.usecase';
 import { RefreshTokenUseCase } from '@/modules/auth/use-cases/refresh-token.usecase';
-import { RegisterUserUseCase } from '@/modules/auth/use-cases/register-user.usecase';
+import { RegisterOwnerUseCase } from '@/modules/auth/use-cases/register-owner.usecase';
 import { RequestVerificationUseCase } from '@/modules/auth/use-cases/request-verification.usecase';
 import { ResendVerificationUseCase } from '@/modules/auth/use-cases/resend-verification.usecase';
 import { ResetPasswordUseCase } from '@/modules/auth/use-cases/reset-password.usecase';
@@ -64,7 +64,7 @@ type AuthRequestUser = CurrentUser;
 @Controller('auth')
 export class AuthController {
   constructor(
-    private readonly registerUserUseCase: RegisterUserUseCase,
+    private readonly registerOwnerUseCase: RegisterOwnerUseCase,
     private readonly loginUserUseCase: LoginUserUseCase,
     private readonly verifyAccountUseCase: VerifyAccountUseCase,
     private readonly forgotPasswordUseCase: ForgotPasswordUseCase,
@@ -87,8 +87,8 @@ export class AuthController {
   @ApiSuccess(
     'Account registered successfully. Please check your email for verification.',
   )
-  async register(@Body() dto: RegisterDto) {
-    const result = await this.registerUserUseCase.execute(dto);
+  async register(@Body() dto: RegisterOwnerDto) {
+    const result = await this.registerOwnerUseCase.execute(dto);
     return result;
   }
 
