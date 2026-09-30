@@ -43,7 +43,7 @@ Bảo vệ dữ liệu doanh nghiệp, cho phép mỗi nhóm người dùng ch�
 - `POST /auth/invitations`
 - `GET /auth/invitations/:token`
 - `POST /auth/invitations/accept`
-- `POST /tenants/signup`
+- `POST /auth/register`
 - `GET /platform/tenants`
 - `POST /platform/tenants`
 
@@ -79,6 +79,9 @@ Không thêm `sessions` table trong F1. Refresh/session state dùng `users.refre
 - Migration sang `refresh_token_hash` đặt các giá trị raw cũ về `NULL`, vì vậy tất cả session cũ phải đăng nhập lại.
 
 ## Email Verification & Password Recovery
+
+- Public Business signup tạo Owner chưa xác thực, default Business và membership trong một transaction.
+- Signup trả `sessionId` và chuyển Owner sang Business Admin verify-email trước khi cho phép đăng nhập.
 
 - Public request endpoints trả phản hồi đồng nhất để không tiết lộ email có tồn tại hoặc đã xác thực.
 - Verification session có TTL 15 phút và được cô lập theo purpose: `email_verification` hoặc `password_reset`.
@@ -131,6 +134,7 @@ Không thêm `sessions` table trong F1. Refresh/session state dùng `users.refre
 - `resource:manage` cover các action cùng resource.
 - Không hardcode quyền trong UI; API vẫn là nguồn kiểm soát cuối.
 - F1 triển khai permission engine dùng chung; các feature sau chỉ khai báo permission cụ thể theo module.
+- Public Owner registration thuộc Auth; Auth gọi Tenant provisioning qua interface hẹp. Tenant không phụ thuộc ngược vào Auth, Verification hoặc Email.
 
 ## Delivery Phases
 
@@ -167,8 +171,8 @@ Không thêm `sessions` table trong F1. Refresh/session state dùng `users.refre
 ### Phase 4 - Public Business Signup
 
 - Web route `/{locale}/signup-business`.
-- Tạo tenant + owner account bằng `POST /tenants/signup`.
-- Sau signup, owner đi tới Business Admin login.
+- Tạo tenant + owner account bằng `POST /auth/register`.
+- Sau signup, owner đi tới Business Admin verify-email bằng `sessionId`; chỉ đăng nhập sau khi xác thực thành công.
 
 ### Phase 5 - Migration & Docs
 

@@ -25,10 +25,10 @@ FE Business Admin dùng module này cho:
 
 FE Web dùng module này cho:
 
-- Customer register/login.
+- Owner registration qua `POST /auth/register`.
 - Email verification.
 - Forgot/reset password.
-- Business signup route `/signup-business` gọi tenant signup rồi owner đăng nhập bằng admin context.
+- Business signup route `/signup-business` tạo tenant và default Business, sau đó chuyển Owner sang xác thực email trước khi đăng nhập bằng admin context.
 
 ## Trạng thái triển khai
 
@@ -36,7 +36,7 @@ Status: `partial`
 
 Đã hỗ trợ:
 
-- Register user thường.
+- Register Owner đồng thời provision Tenant, default Business và membership.
 - Login platform/admin/client theo `x-auth-context`.
 - Refresh access token bằng refresh cookie.
 - Logout và revoke `User.refresh_token`.
@@ -50,6 +50,7 @@ Status: `partial`
 
 Chưa hỗ trợ:
 
+- Public Customer registration; `CUSTOMER` được giữ cho phase sau.
 - Không có `Session` model riêng.
 - Không có danh sách session hoặc logout-all.
 - Invitation hiện trả raw token trong response, chưa gửi email invitation tự động.
@@ -176,60 +177,62 @@ Business context behavior:
 
 ## POST /api/v1/auth/register
 
-Dùng cho: Customer/web register.
+Dùng cho: Public Web đăng ký workspace. Đây là public registration duy nhất trong phase hiện tại và luôn tạo `OWNER`; client không được chọn role.
 
 Auth: public.
 
 Body:
 
 ```ts
-type RegisterBody = {
-  username: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
+type RegisterOwnerInput = {
+  slug: string;
+  name: string;
+  default_business_name?: string;
+  default_business_slug?: string;
+  primary_domain?: string;
+  timezone?: string;
+  locale?: string;
+  settings?: Record<string, unknown>;
+  owner: {
+    username: string;
+    email: string;
+    password: string;
+    confirmPassword: string;
+    full_name?: string;
+    phone?: string;
+  };
 };
 ```
 
 Validation:
 
-- `username`: required.
-- `email`: email hợp lệ.
-- `password`: tối thiểu 6 ký tự.
+- Tenant slug/domain và Owner email/username/phone phải unique.
+- `password`: tối thiểu 8 ký tự.
 - `confirmPassword`: phải khớp `password`.
+- Role, status, tenant id, verification state và default-business flag do server quyết định.
 
-Response chính:
-
-```ts
-type RegisterResponse = {
-  user: {
-    id: string;
-    email: string;
-    username: string;
-    is_verified: boolean;
-  };
-  sessionId: string;
-};
-```
+Response chính là `RegisterOwnerResult`, gồm Tenant, default Business, Owner `ACTIVE` chưa xác thực và `sessionId`. Response không chứa access token hoặc refresh token.
 
 BE behavior:
 
-- Kiểm tra email/username chưa tồn tại.
-- Hash password.
-- Tạo user chưa verified.
-- Tạo verification session trong Redis.
-- Gửi verification code qua email.
+- Auth normalize identity, kiểm tra uniqueness, hash password và tạo email-verification session.
+- Auth gọi Tenant provisioning operation để tạo Tenant, settings, optional domain, default Business, Owner và BusinessMembership trong một transaction.
+- Tenant provisioning không phụ thuộc Auth, OTP hoặc Email. Chiều dependency là Auth → Tenant.
+- Auth phát OTP 6 chữ số và queue verification email sau khi workspace được tạo.
+- Nếu transaction lỗi, verification session được xóa. Nếu email queue lỗi, workspace vẫn được giữ để Owner resend OTP.
+- Owner phải verify email rồi đăng nhập qua Admin Auth; registration không tự login.
 
 Error thường gặp:
 
 - `409 An account with this email already exists`.
 - `409 Username is already taken`.
+- `409 Tenant slug is already taken`.
 
 FE states:
 
-- Success: chuyển tới verification screen và giữ `sessionId`.
+- Success: chuyển tới Admin verification screen theo locale hiện tại và giữ `sessionId`.
 - Error: hiển thị message từ API.
-- Không tự login sau register vì user chưa verified.
+- Không tự login sau register vì Owner chưa verified.
 
 ## POST /api/v1/auth/login-platform
 

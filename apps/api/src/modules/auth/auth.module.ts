@@ -19,7 +19,8 @@ import { GetInvitationUseCase } from '@/modules/auth/use-cases/get-invitation.us
 import { LoginUserUseCase } from '@/modules/auth/use-cases/login-user.usecase';
 import { RefreshTokenSessionService } from '@/modules/auth/services/refresh-token-session.service';
 import { RefreshTokenUseCase } from '@/modules/auth/use-cases/refresh-token.usecase';
-import { RegisterUserUseCase } from '@/modules/auth/use-cases/register-user.usecase';
+import { RegisterOwnerUseCase } from '@/modules/auth/use-cases/register-owner.usecase';
+import { TenantModule } from '@/modules/tenant/tenant.module';
 import { RequestVerificationUseCase } from '@/modules/auth/use-cases/request-verification.usecase';
 import { ResendVerificationUseCase } from '@/modules/auth/use-cases/resend-verification.usecase';
 import { ResetPasswordUseCase } from '@/modules/auth/use-cases/reset-password.usecase';
@@ -34,7 +35,7 @@ import { ConfigModule } from '@nestjs/config';
 @Module({
   controllers: [AuthController, AdminAuthController, PlatformAuthController],
   providers: [
-    RegisterUserUseCase,
+    RegisterOwnerUseCase,
     LoginUserUseCase,
     VerifyAccountUseCase,
     ResendVerificationUseCase,
@@ -61,11 +62,12 @@ import { ConfigModule } from '@nestjs/config';
     PermissionModule,
     EmailModule,
     VerificationModule,
+    TenantModule,
     RedisModule,
     ConfigModule.forFeature(cookieConfig),
   ],
   exports: [
-    RegisterUserUseCase,
+    RegisterOwnerUseCase,
     LoginUserUseCase,
     VerifyAccountUseCase,
     ResendVerificationUseCase,

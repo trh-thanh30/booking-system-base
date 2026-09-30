@@ -66,7 +66,7 @@ export type TenantListItem = TenantContext & {
   users_count: number;
 };
 
-export type TenantSignupResult = {
+export type RegisterOwnerResult = {
   tenant: TenantContext;
   business: BusinessContext;
   owner: {
@@ -79,4 +79,5 @@ export type TenantSignupResult = {
     status: "ACTIVE" | "INACTIVE";
     is_verified: boolean;
   };
+  sessionId: string;
 };
