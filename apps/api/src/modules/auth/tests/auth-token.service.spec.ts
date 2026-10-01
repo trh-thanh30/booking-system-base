@@ -9,6 +9,7 @@ describe('AuthTokenService', () => {
   });
   const user = {
     id: 'user-1',
+    tenant_id: 'tenant-1',
     email: 'owner@example.com',
     username: 'owner',
     role: 'OWNER',
@@ -24,5 +25,24 @@ describe('AuthTokenService', () => {
     expect(() =>
       service.verifyRefreshToken(tokens.refresh_token, 'platform'),
     ).toThrow('Invalid or expired refresh token');
+  });
+
+  it('binds access and refresh tokens to the authenticated tenant and context', () => {
+    const tokens = service.generateTokenPair(user, 'admin');
+
+    expect(
+      service.verifyAccessToken(tokens.access_token).payload,
+    ).toMatchObject({
+      auth_context: 'admin',
+      id: 'user-1',
+      tenant_id: 'tenant-1',
+    });
+    expect(
+      service.verifyRefreshToken(tokens.refresh_token, 'admin').payload,
+    ).toMatchObject({
+      auth_context: 'admin',
+      id: 'user-1',
+      tenant_id: 'tenant-1',
+    });
   });
 });

@@ -142,6 +142,9 @@ Không thêm `sessions` table trong F1. Refresh/session state dùng `users.refre
 - Không hardcode quyền trong UI; API vẫn là nguồn kiểm soát cuối.
 - F1 triển khai permission engine dùng chung; các feature sau chỉ khai báo permission cụ thể theo module.
 - Public Owner registration thuộc Auth; Auth gọi Tenant provisioning qua interface hẹp. Tenant không phụ thuộc ngược vào Auth, Verification hoặc Email.
+- Access/refresh JWT mang `tenant_id` và `auth_context`; refresh bị revoke nếu account đổi Tenant.
+- Route `()` chỉ nhận Admin context của `OWNER`/`STAFF` và bắt buộc Tenant header trùng JWT.
+- Owner được truy cập toàn bộ Business trong Tenant; Staff chỉ truy cập Business có membership cùng Tenant.
 - Google OAuth account mới chỉ nhận Redis onboarding session tại callback; Tenant/Business/Owner chỉ được tạo khi hoàn tất onboarding.
 - Google onboarding token chỉ nằm trong HttpOnly cookie, không truyền qua URL; email và Google subject luôn lấy từ verified provider profile.
 - Backend F1-007 cung cấp contract onboarding; UI `/{locale}/onboarding/business` thuộc task frontend riêng.

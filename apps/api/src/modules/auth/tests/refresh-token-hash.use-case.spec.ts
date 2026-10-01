@@ -24,7 +24,7 @@ describe('RefreshTokenUseCase hash lifecycle', () => {
       generateAccessToken: jest.fn().mockReturnValue('new-access-token'),
       verifyRefreshToken: jest
         .fn()
-        .mockReturnValue({ payload: { id: 'owner-1' } }),
+        .mockReturnValue({ payload: { id: 'owner-1', tenant_id: 'tenant-1' } }),
     };
     const useCase = new RefreshTokenUseCase(
       prisma as never,
@@ -72,9 +72,9 @@ describe('RefreshTokenUseCase hash lifecycle', () => {
       prisma as never,
       {
         generateAccessToken: jest.fn(),
-        verifyRefreshToken: jest
-          .fn()
-          .mockReturnValue({ payload: { id: 'staff-1' } }),
+        verifyRefreshToken: jest.fn().mockReturnValue({
+          payload: { id: 'staff-1', tenant_id: 'tenant-1' },
+        }),
       } as never,
       sessions,
     );

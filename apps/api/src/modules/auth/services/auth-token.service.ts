@@ -12,6 +12,7 @@ import { JWTTokenPayload } from '@/shared/interfaces/token.interface';
  */
 export interface IUserTokenPayload {
   id: string;
+  tenant_id: string | null;
   email: string;
   username: string;
   role: string;

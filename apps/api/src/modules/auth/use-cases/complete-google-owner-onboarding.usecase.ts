@@ -63,6 +63,7 @@ export class CompleteGoogleOwnerOnboardingUseCase {
     const tokens = this.tokenService.generateTokenPair(
       {
         id: workspace.owner.id,
+        tenant_id: workspace.owner.tenant_id,
         email: workspace.owner.email,
         role: workspace.owner.role,
         status: workspace.owner.status,
