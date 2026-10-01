@@ -19,9 +19,11 @@ export class AuthProfileService {
       throw new NotFoundError('User not found');
     }
 
+    const isPlatformUser = user.role === user_role.SUPER_ADMIN;
+
     return {
       id: user.id,
-      tenant_id: user.tenant_id,
+      tenant_id: isPlatformUser ? null : user.tenant_id,
       email: user.email,
       username: user.username,
       full_name: user.full_name,
@@ -30,16 +32,17 @@ export class AuthProfileService {
       role: user.role,
       status: user.status,
       is_verified: user.is_verified,
-      tenant: user.tenant
-        ? {
-            id: user.tenant.id,
-            slug: user.tenant.slug,
-            name: user.tenant.name,
-            status: user.tenant.status,
-            timezone: user.tenant.timezone,
-            locale: user.tenant.locale,
-          }
-        : null,
+      tenant:
+        !isPlatformUser && user.tenant
+          ? {
+              id: user.tenant.id,
+              slug: user.tenant.slug,
+              name: user.tenant.name,
+              status: user.tenant.status,
+              timezone: user.tenant.timezone,
+              locale: user.tenant.locale,
+            }
+          : null,
       businesses: this.resolveAuthBusinesses(user),
       permissions: await this.resolveUserPermissions(
         user.id,
@@ -79,6 +82,11 @@ export class AuthProfileService {
     }
 
     return user.business_memberships
+      .filter(
+        (membership) =>
+          membership.tenant_id === user.tenant_id &&
+          membership.business.tenant_id === user.tenant_id,
+      )
       .map((membership) => membership.business)
       .map(toBusinessSummary);
   }

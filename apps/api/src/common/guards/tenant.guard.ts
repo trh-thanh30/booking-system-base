@@ -2,7 +2,7 @@ import { REQUIRE_TENANT_KEY } from '@/common/decorators/require-tenant.decorator
 import { ForbiddenError, BadRequestError } from '@/common/response';
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { tenant_status } from '@prisma/client';
+import { tenant_status, user_role } from '@prisma/client';
 
 @Injectable()
 export class TenantGuard implements CanActivate {
@@ -23,6 +23,16 @@ export class TenantGuard implements CanActivate {
 
     if (!tenant) {
       throw new BadRequestError('Tenant context is required');
+    }
+
+    const user = request.user;
+    const authContext =
+      user && 'auth_context' in user ? user.auth_context : undefined;
+    const isBusinessAdmin =
+      authContext === 'admin' &&
+      (user?.role === user_role.OWNER || user?.role === user_role.STAFF);
+    if (!isBusinessAdmin || !user?.tenant_id || user.tenant_id !== tenant.id) {
+      throw new ForbiddenError('Tenant is not accessible');
     }
 
     if (tenant.status !== tenant_status.ACTIVE) {

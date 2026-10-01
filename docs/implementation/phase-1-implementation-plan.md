@@ -53,6 +53,7 @@ Các API nghiệp vụ phải giữ chuỗi phụ thuộc: `controller -> use ca
 - Tenant resolution, tenant context, business context và cô lập dữ liệu nền.
 - Luồng đăng ký tạo tenant, owner và default business.
 - Backend Google OAuth cho Owner hiện có và Google-first onboarding: identity linking, state/nonce/PKCE, onboarding session và admin refresh session.
+- Auth profile và Business access đã phân tách theo context: Owner xem toàn Tenant, Staff theo membership, Platform không nhận Tenant context.
 - RBAC/permission core, invitation và quản lý user theo tenant.
 - Asset upload qua local/MinIO.
 - Notification core và email queue/worker nền.

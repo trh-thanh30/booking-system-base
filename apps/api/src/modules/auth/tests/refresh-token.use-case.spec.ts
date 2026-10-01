@@ -23,7 +23,7 @@ describe('RefreshTokenUseCase', () => {
     const tokenService = {
       verifyRefreshToken: jest
         .fn()
-        .mockReturnValue({ payload: { id: 'user-1' } }),
+        .mockReturnValue({ payload: { id: 'user-1', tenant_id: null } }),
       generateAccessToken: jest.fn(),
     } as any;
 
@@ -64,11 +64,44 @@ describe('RefreshTokenUseCase', () => {
     ).rejects.toThrow('Invalid or expired refresh token');
   });
 
+  it('rejects a refresh token after the account moves to another tenant', async () => {
+    const tokenService = {
+      verifyRefreshToken: jest.fn().mockReturnValue({
+        payload: { id: 'user-1', tenant_id: 'tenant-old' },
+      }),
+      generateAccessToken: jest.fn(),
+    };
+    const useCase = new RefreshTokenUseCase(
+      {
+        user: {
+          findUnique: jest.fn().mockResolvedValue(
+            user({
+              role: user_role.OWNER,
+              tenant_id: 'tenant-new',
+            }),
+          ),
+          update: jest.fn().mockResolvedValue(undefined),
+        },
+      } as any,
+      tokenService as any,
+    );
+
+    await expect(
+      useCase.execute(
+        'refresh-token',
+        [user_role.OWNER, user_role.STAFF],
+        'admin',
+      ),
+    ).rejects.toThrow('Invalid or expired refresh token');
+
+    expect(tokenService.generateAccessToken).not.toHaveBeenCalled();
+  });
+
   it('returns a new access token while preserving refresh token', async () => {
     const tokenService = {
       verifyRefreshToken: jest
         .fn()
-        .mockReturnValue({ payload: { id: 'user-1' } }),
+        .mockReturnValue({ payload: { id: 'user-1', tenant_id: null } }),
       generateAccessToken: jest.fn().mockReturnValue('new-access-token'),
     } as any;
     const prisma = {
@@ -119,7 +152,7 @@ describe('RefreshTokenUseCase', () => {
       {
         verifyRefreshToken: jest
           .fn()
-          .mockReturnValue({ payload: { id: 'user-1' } }),
+          .mockReturnValue({ payload: { id: 'user-1', tenant_id: null } }),
       } as any,
     );
 
@@ -143,7 +176,7 @@ describe('RefreshTokenUseCase', () => {
       {
         verifyRefreshToken: jest
           .fn()
-          .mockReturnValue({ payload: { id: 'user-1' } }),
+          .mockReturnValue({ payload: { id: 'user-1', tenant_id: null } }),
       } as any,
     );
 
@@ -156,7 +189,7 @@ describe('RefreshTokenUseCase', () => {
     const tokenService = {
       verifyRefreshToken: jest
         .fn()
-        .mockReturnValue({ payload: { id: 'user-1' } }),
+        .mockReturnValue({ payload: { id: 'user-1', tenant_id: null } }),
       generateAccessToken: jest.fn(),
     };
     const useCase = new RefreshTokenUseCase(

@@ -49,6 +49,14 @@ export class RefreshTokenUseCase extends BaseUseCase<
         throw new UnauthorizedError('Invalid or expired refresh token');
       }
 
+      if (decoded.payload.tenant_id !== user.tenant_id) {
+        await this.prismaService.user.update({
+          where: { id: user.id },
+          data: { refresh_token_hash: null },
+        });
+        throw new UnauthorizedError('Invalid or expired refresh token');
+      }
+
       if (
         !this.refreshTokenSessionService.matches(
           refreshToken,
@@ -86,6 +94,7 @@ export class RefreshTokenUseCase extends BaseUseCase<
       const accessToken = this.tokenService.generateAccessToken(
         {
           id: user.id,
+          tenant_id: user.tenant_id,
           email: user.email,
           username: user.username,
           role: user.role,

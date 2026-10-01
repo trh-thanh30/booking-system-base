@@ -33,6 +33,7 @@ export class BusinessRepository {
               memberships: {
                 some: {
                   user_id: userId,
+                  tenant_id: tenantId,
                 },
               },
             }),
@@ -62,6 +63,7 @@ export class BusinessRepository {
         memberships: {
           some: {
             user_id: userId,
+            tenant_id: tenantId,
           },
         },
       },

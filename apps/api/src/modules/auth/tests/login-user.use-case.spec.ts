@@ -141,6 +141,39 @@ describe('LoginUserUseCase', () => {
     ).not.toBe('refresh-token');
   });
 
+  it('binds an Admin token to the Owner tenant', async () => {
+    const owner = user({
+      role: user_role.OWNER,
+      tenant_id: 'tenant-1',
+    });
+    const tokenService = {
+      generateTokenPair: jest.fn().mockReturnValue({
+        access_token: 'access-token',
+        refresh_token: 'refresh-token',
+      }),
+    };
+
+    await new LoginUserUseCase(
+      {
+        user: {
+          findFirst: jest.fn().mockResolvedValue(owner),
+          update: jest.fn().mockResolvedValue(undefined),
+        },
+      } as any,
+      { comparePassword: jest.fn().mockResolvedValue(true) } as any,
+      tokenService as any,
+      { createSession: jest.fn() } as any,
+    ).execute(dto, [user_role.OWNER, user_role.STAFF], 'admin');
+
+    expect(tokenService.generateTokenPair).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: 'user-1',
+        tenant_id: 'tenant-1',
+      }),
+      'admin',
+    );
+  });
+
   it('accepts any role in the allowed role list', async () => {
     const prisma = {
       user: {
