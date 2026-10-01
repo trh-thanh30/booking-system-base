@@ -184,6 +184,8 @@ Availability, appointment và Stripe webhook là ba vùng có rủi ro cao; khô
 **Tuần 2: Auth/onboarding/settings**
 
 - Google OAuth và Google-first Business onboarding (backend F1-006/F1-007 hoàn tất; frontend được tách sang task sau).
+- F1-009 Business Admin: Owner password login, memory-only session, refresh/bootstrap,
+  Auth Profile, Business context và permission navigation đã triển khai; specs chạy trong CI.
 - Policy consent trong đăng ký.
 - Onboarding chọn ngành nghề, tạo default business và chọn/bỏ qua gói.
 - Business profile, giờ hoạt động, ngày nghỉ, logo và ảnh bìa.

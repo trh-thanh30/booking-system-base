@@ -27,13 +27,13 @@ import {
 } from "@repo/ui";
 import { FormField } from "@/src/components/common/form-field";
 import { StatePanel } from "@/src/components/common/state-panel";
-import { getBookingColumns } from "@/src/views/bookings/bookings.columns";
+import { getBookingColumns } from "@/src/views/bookings/columns/bookings.columns";
 import {
   bookings,
   bookingStatusFilters,
-} from "@/src/views/bookings/bookings.constants";
-import type { BookingStatusFilter } from "@/src/views/bookings/bookings.types";
-import { getBookingStatusFilterLabel } from "@/src/views/bookings/bookings.utils";
+} from "@/src/views/bookings/constants/bookings.constants";
+import type { BookingStatusFilter } from "@/src/views/bookings/types/bookings.types";
+import { getBookingStatusFilterLabel } from "@/src/views/bookings/utils/bookings.utils";
 
 export function BookingsTable() {
   const t = useTranslations("Bookings");

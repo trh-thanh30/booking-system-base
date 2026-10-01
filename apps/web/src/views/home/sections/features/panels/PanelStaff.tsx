@@ -1,6 +1,6 @@
 "use client";
 
-import { STAFF_MEMBERS } from "../features.constants";
+import { STAFF_MEMBERS } from "../constants/features.constants";
 
 export function PanelStaff() {
   return (

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { BRANDED_MOCK_SLOTS } from "../features.constants";
+import { BRANDED_MOCK_SLOTS } from "../constants/features.constants";
 
 export function PanelBrandedPage() {
   const [brandName, setBrandName] = useState("Glow Salon");

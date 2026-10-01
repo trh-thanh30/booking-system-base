@@ -1,5 +1,8 @@
 import { motion } from "framer-motion";
-import { WebsiteTemplate, TemplateService } from "@/src/views/home/home.types";
+import {
+  WebsiteTemplate,
+  TemplateService,
+} from "@/src/views/home/types/home.types";
 
 interface MobileMockupProps {
   activeTemplateIdx: number;

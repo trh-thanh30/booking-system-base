@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Building2, Plus, RefreshCw, Store } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
-import { toast } from "sonner";
+import { useToast } from "@repo/hooks";
 import {
   createBusinessSchema,
   type BusinessContext,
@@ -47,6 +47,7 @@ function CreateBusinessDialog({
   onOpenChange: (open: boolean) => void;
   open: boolean;
 }) {
+  const { toast } = useToast();
   const queryClient = useQueryClient();
   const {
     formState: { errors },

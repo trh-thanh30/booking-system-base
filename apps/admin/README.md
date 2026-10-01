@@ -4,11 +4,49 @@ This admin application is built as a highly customizable, configuration-driven b
 
 ## Tech Stack
 
-- **Framework**: Next.js 16 (App Router)
+- **Framework**: Next.js 15.5 (App Router)
 - **UI & Components**: Tailwind CSS v4, Radix UI primitives, Lucide Icons
 - **State Management**: Zustand
 - **Animations**: Framer Motion
 - **Interactions**: Command menu (`cmdk`) search & keyboard shortcuts
+
+## Business Admin Authentication (F1-009)
+
+Login uses `POST /auth/admin/login`, then reads `GET /auth/me` as the source of
+the current user, Tenant, Businesses and permissions. Platform profiles are
+rejected. Owner bypass is restricted to the user's own workspace; API guards
+remain authoritative for all access checks.
+
+Access tokens and Tenant IDs are held in memory. Previously persisted Admin
+credentials are removed on bootstrap/logout. Reload restores the access token
+through `POST /auth/admin/refresh` when the readable `admin_has_rt=1` marker is
+present; the refresh token itself stays in an HttpOnly cookie.
+
+Bootstrap and Axios interceptor share one refresh operation. A request retries
+once; a rejected refreshed token clears the local session. Responses arriving
+after logout cannot restore credentials or overwrite a newer login.
+
+Middleware uses the marker only for an early redirect. DashboardShell waits for
+AuthProvider to validate the actual session before rendering protected content.
+Public routes include login, verify-email, forgot/reset-password, invitations,
+and the reserved Google onboarding path. An authenticated Owner visiting login
+is redirected after session validation, avoiding loops caused by stale markers.
+
+`returnTo` accepts local dashboard routes only and preserves their filters.
+Business selection is validated against `/auth/me`; changing Business resets
+cached business data. Logout clears tokens, profile, query cache and Business
+context even if the network request fails. If server logout cannot be confirmed,
+the UI reports this; the server-side cookie may still be valid on a later reload.
+
+API and Admin must share a cookie-compatible host/domain with `SameSite=Lax`.
+For local development, both use `localhost` with different ports. Production
+uses the existing cookie-domain configuration for API/Admin subdomains.
+
+Run `pnpm test:admin`, `pnpm lint:admin`, `pnpm typecheck:admin` and
+`pnpm build:admin` from the repository root. Admin specs use Node's built-in test
+runner and a TypeScript loader compatible with the CI Node 20 runtime. Specs
+exercise session behavior, safe redirects, error messages and the real Axios
+interceptor with a simulated API adapter. They do not require a database.
 
 ---
 

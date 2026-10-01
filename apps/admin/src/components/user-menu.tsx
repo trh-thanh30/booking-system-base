@@ -17,6 +17,8 @@ import { cn } from "@repo/ui/lib/utils";
 import { useAuth } from "@/src/app/providers";
 import { Link } from "@/src/i18n/navigation";
 import { useRouter } from "@/src/i18n/navigation";
+import { useState } from "react";
+import { useToast } from "@repo/hooks";
 
 function getInitials(name: string) {
   return name
@@ -29,11 +31,14 @@ function getInitials(name: string) {
 }
 
 export function UserMenu() {
+  const { toast } = useToast();
   const t = useTranslations("DashboardConfig");
   const router = useRouter();
   const { logout, user } = useAuth();
+  const tAuth = useTranslations("Auth");
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const displayName = user?.full_name ?? user?.username ?? "Admin";
-  const email = user?.email ?? "admin@example.com";
+  const email = user?.email ?? "";
   const initials = getInitials(displayName) || "AD";
   const menuItems = [
     {
@@ -49,8 +54,16 @@ export function UserMenu() {
   ];
 
   async function handleLogout() {
-    await logout();
-    router.replace("/login");
+    if (isLoggingOut) return;
+    setIsLoggingOut(true);
+    try {
+      await logout();
+    } catch {
+      toast.error(tAuth("logoutFailed"));
+    } finally {
+      router.replace("/login");
+      setIsLoggingOut(false);
+    }
   }
 
   return (
@@ -87,6 +100,7 @@ export function UserMenu() {
           );
         })}
         <DropdownMenuItem
+          disabled={isLoggingOut}
           className="flex cursor-pointer items-center gap-2 rounded-sm px-2 py-2 text-sm text-red-600 outline-none transition-colors hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/50"
           onSelect={(event) => {
             event.preventDefault();

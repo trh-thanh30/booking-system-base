@@ -4,7 +4,7 @@ import { ArrowLeft, Mail, RefreshCw, ShieldCheck } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { toast } from "sonner";
+import { useToast } from "@repo/hooks";
 import {
   emailRequestSchema,
   verifyEmailSchema,
@@ -22,6 +22,7 @@ export function VerifyEmailView({
 }: {
   initialSessionId?: string;
 }) {
+  const { toast } = useToast();
   const t = useTranslations("Auth");
   const router = useRouter();
   const [sessionId, setSessionId] = useState(initialSessionId);

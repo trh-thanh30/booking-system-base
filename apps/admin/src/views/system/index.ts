@@ -1,3 +1,3 @@
 export * from "./system.view";
-export * from "./system.constants";
-export * from "./system.types";
+export * from "./constants/system.constants";
+export * from "./types/system.types";

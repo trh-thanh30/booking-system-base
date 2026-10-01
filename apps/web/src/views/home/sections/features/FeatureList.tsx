@@ -2,7 +2,7 @@
 
 import { ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import type { FeatureMeta, FeatureTab } from "./features.types";
+import type { FeatureMeta, FeatureTab } from "./types/features.types";
 import { useScrollToActive } from "./hooks/useScrollToActive";
 
 interface Props {

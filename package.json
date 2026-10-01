@@ -53,6 +53,7 @@
     "test": "turbo run test",
     "test:all": "turbo run test",
     "test:api": "pnpm --filter @repo/api test",
+    "test:admin": "pnpm --filter @repo/shared build && pnpm --filter @repo/admin test",
     "test:api:dev": "pnpm --filter @repo/api test:dev",
     "test:api:prod": "pnpm --filter @repo/api test:prod",
     "test:api:watch": "pnpm --filter @repo/api test:watch",

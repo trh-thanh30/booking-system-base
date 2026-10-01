@@ -1,4 +1,4 @@
-import { WebsiteTemplate } from "./home.types";
+import { WebsiteTemplate } from "../types/home.types";
 import {
   Users,
   CreditCard,

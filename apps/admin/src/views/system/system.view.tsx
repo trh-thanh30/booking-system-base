@@ -15,7 +15,7 @@ import {
   connectivityNotes,
   services,
   systemStats,
-} from "@/src/views/system/system.constants";
+} from "@/src/views/system/constants/system.constants";
 
 export function SystemView() {
   return (

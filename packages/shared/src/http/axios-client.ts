@@ -58,6 +58,9 @@ export function createHttpClient(
         const retryConfig = originalConfig as
           | (HttpRequestConfig & { _retry?: boolean })
           | undefined;
+        if (retryConfig?._retry) {
+          options.onUnauthorizedRetryFailed?.();
+        }
         if (
           retryConfig &&
           !retryConfig._retry &&

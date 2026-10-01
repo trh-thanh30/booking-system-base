@@ -69,3 +69,29 @@ test("a failed concurrent refresh expires the session once", async () => {
   assert.equal(requests, 1);
   assert.equal(expired, 1);
 });
+
+test("a late refresh cannot overwrite or expire a newer login", async () => {
+  let version = 0;
+  let release;
+  let expired = 0;
+  const tokens = [];
+  const refresh = createSessionRefresh({
+    hasRefreshMarker: () => true,
+    getSessionVersion: () => version,
+    requestAccessToken: () =>
+      new Promise((resolve) => {
+        release = resolve;
+      }),
+    onAccessToken: (token) => tokens.push(token),
+    onSessionExpired: () => {
+      expired++;
+    },
+  });
+  const pending = refresh();
+  await Promise.resolve();
+  version++;
+  release("old-session-token");
+  assert.equal(await pending, false);
+  assert.deepEqual(tokens, []);
+  assert.equal(expired, 0);
+});

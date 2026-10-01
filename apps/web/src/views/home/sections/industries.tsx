@@ -7,7 +7,7 @@ import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { RepeatReveal } from "@/src/components/motion/RepeatReveal";
 import { MotionCard } from "@/src/components/motion/MotionCard";
-import { INDUSTRIES } from "../home.constants";
+import { INDUSTRIES } from "../constants/home.constants";
 
 interface IndustriesProps {
   activeTemplateIdx: number;

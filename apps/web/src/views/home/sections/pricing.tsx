@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { Check, ChevronDown, Lock, X, Globe } from "lucide-react";
-import { toast } from "sonner";
+import { useToast } from "@repo/hooks";
 import { RepeatReveal } from "@/src/components/motion/RepeatReveal";
 import { RepeatStaggerReveal } from "@/src/components/motion/RepeatStaggerReveal";
 import { RepeatStaggerItem } from "@/src/components/motion/RepeatStaggerItem";
@@ -256,6 +256,7 @@ const COMPARISONS: ComparisonGroup[] = [
 ];
 
 export function Pricing() {
+  const { toast } = useToast();
   const [billing, setBilling] = useState<"monthly" | "annual">("monthly");
   const [currency, setCurrency] = useState<"USD" | "EUR" | "VND">("USD");
   const [isCompareOpen, setIsCompareOpen] = useState(false);

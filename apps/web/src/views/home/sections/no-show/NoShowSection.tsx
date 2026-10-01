@@ -13,8 +13,8 @@ import {
   STEPS_WITHOUT,
   OUTCOME_WITH,
   OUTCOME_WITHOUT,
-} from "./NoShowSection.data";
-import type { Mode } from "./NoShowSection.types";
+} from "./data/NoShowSection.data";
+import type { Mode } from "./types/NoShowSection.types";
 
 const STEP_DURATION_MS = 1300;
 

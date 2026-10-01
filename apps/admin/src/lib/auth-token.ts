@@ -1,67 +1,39 @@
-const ACCESS_TOKEN_KEY = "booking_admin_access_token";
-const TENANT_ID_KEY = "booking_admin_tenant_id";
-
 let memoryAccessToken: string | undefined;
 let memoryTenantId: string | undefined;
+let sessionRevision = 0;
 
-function canUseStorage() {
-  return typeof window !== "undefined" && typeof localStorage !== "undefined";
+export function getSessionRevision() {
+  return sessionRevision;
 }
 
 export function getAccessToken() {
-  if (memoryAccessToken) {
-    return memoryAccessToken;
-  }
-
-  if (!canUseStorage()) {
-    return undefined;
-  }
-
-  memoryAccessToken = localStorage.getItem(ACCESS_TOKEN_KEY) ?? undefined;
   return memoryAccessToken;
 }
 
 export function setAccessToken(token: string) {
+  sessionRevision++;
   memoryAccessToken = token;
-
-  if (canUseStorage()) {
-    localStorage.setItem(ACCESS_TOKEN_KEY, token);
-  }
 }
 
 export function clearAccessToken() {
+  sessionRevision++;
   memoryAccessToken = undefined;
   memoryTenantId = undefined;
 
-  if (canUseStorage()) {
-    localStorage.removeItem(ACCESS_TOKEN_KEY);
-    localStorage.removeItem(TENANT_ID_KEY);
+  if (typeof window !== "undefined") {
+    try {
+      localStorage.removeItem("booking_admin_access_token");
+      localStorage.removeItem("booking_admin_tenant_id");
+    } catch {
+      // Storage may be disabled; the active session is memory-only.
+    }
   }
 }
 
 export function getTenantId() {
-  if (memoryTenantId) {
-    return memoryTenantId;
-  }
-
-  if (!canUseStorage()) {
-    return undefined;
-  }
-
-  memoryTenantId = localStorage.getItem(TENANT_ID_KEY) ?? undefined;
   return memoryTenantId;
 }
 
 export function setTenantId(tenantId: string | null | undefined) {
   memoryTenantId = tenantId ?? undefined;
-
-  if (!canUseStorage()) {
-    return;
-  }
-
-  if (tenantId) {
-    localStorage.setItem(TENANT_ID_KEY, tenantId);
-  } else {
-    localStorage.removeItem(TENANT_ID_KEY);
-  }
 }

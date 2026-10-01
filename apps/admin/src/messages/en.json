@@ -113,6 +113,14 @@
     }
   },
   "Auth": {
+    "checkingSession": "Checking your session…",
+    "logoutFailed": "The session was cleared on this device, but server logout could not be confirmed. Please retry when connected.",
+    "accessDenied": "You do not have permission to access this page.",
+    "shell": {
+      "workspace": "Business workspace",
+      "title": "Manage your bookings, team, and locations.",
+      "description": "Sign in to manage your business operations in one workspace."
+    },
     "backToLogin": "Back to login",
     "fields": {
       "code": "Verification code",
@@ -125,6 +133,11 @@
       "usernameOrEmail": "Email or username"
     },
     "login": {
+      "invalidCredentials": "Incorrect email, username, or password.",
+      "inactive": "Your account is inactive. Please contact support.",
+      "invalidWorkspace": "This account cannot access this business workspace.",
+      "networkError": "Could not connect to the server. Please try again.",
+      "rateLimited": "Too many attempts. Please try again later.",
       "description": "Use an admin or staff account to access the tenant workspace.",
       "failed": "Login failed",
       "forgotPassword": "Forgot password?",

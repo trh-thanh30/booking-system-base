@@ -1,5 +1,5 @@
 import type { BookingSummary } from "@repo/shared";
-import type { BookingStatusFilter } from "@/src/views/bookings/bookings.types";
+import type { BookingStatusFilter } from "@/src/views/bookings/types/bookings.types";
 
 export const bookingStatusFilters: BookingStatusFilter[] = [
   "all",

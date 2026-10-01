@@ -6,7 +6,7 @@ import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { useScrollHeader } from "@/src/hooks/useScrollHeader";
 import { useActiveSection } from "@/src/hooks/useActiveSection";
 import { MotionButton } from "@/src/components/motion/MotionButton";
-import { NAV_ITEMS } from "../home.constants";
+import { NAV_ITEMS } from "../constants/home.constants";
 
 const LANGUAGES = [
   { code: "en", label: "English", flag: "🇺🇸" },

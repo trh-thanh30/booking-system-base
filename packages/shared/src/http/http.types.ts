@@ -25,6 +25,7 @@ export type CreateHttpClientOptions = {
   getAccessToken?: TokenResolver;
   getHeaders?: HeaderResolver;
   onUnauthorized?: UnauthorizedHandler;
+  onUnauthorizedRetryFailed?: () => void;
   shouldHandleUnauthorized?: (config: HttpRequestConfig) => boolean;
 };
 

@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import {
   DEPOSIT_TRANSACTIONS,
   DEPOSIT_DAILY_REVENUE,
-} from "../features.constants";
+} from "../constants/features.constants";
 
 export function PanelDeposits() {
   return (

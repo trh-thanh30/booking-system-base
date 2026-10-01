@@ -1,7 +1,7 @@
 "use client";
 
 import { Check, X } from "lucide-react";
-import type { OutcomeData } from "./NoShowSection.types";
+import type { OutcomeData } from "./types/NoShowSection.types";
 
 interface Props {
   outcome: OutcomeData;

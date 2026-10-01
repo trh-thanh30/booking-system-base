@@ -5,6 +5,7 @@ import {
   getAccessToken,
   getTenantId,
   setAccessToken,
+  getSessionRevision,
 } from "./auth-token";
 
 export const ADMIN_SESSION_EXPIRED_EVENT = "booking:admin-session-expired";
@@ -14,7 +15,7 @@ export function hasAdminRefreshCookie() {
     typeof document !== "undefined" &&
     document.cookie
       .split(";")
-      .some((cookie) => cookie.trim().startsWith("admin_has_rt="))
+      .some((cookie) => cookie.trim() === "admin_has_rt=1")
   );
 }
 
@@ -35,6 +36,7 @@ const adminSessionPaths = [
 ];
 const refreshApiClient = createApiClient({
   baseURL: apiBaseUrl,
+  timeout: 15_000,
   withCredentials: true,
 });
 
@@ -53,7 +55,8 @@ async function requestAdminAccessToken(): Promise<string | undefined> {
   return response.data?.access_token;
 }
 
-const refreshAccessToken = createSessionRefresh({
+export const refreshAdminAccessToken = createSessionRefresh({
+  getSessionVersion: getSessionRevision,
   hasRefreshMarker: hasAdminRefreshCookie,
   onAccessToken: setAccessToken,
   onSessionExpired: clearAdminSession,
@@ -62,6 +65,7 @@ const refreshAccessToken = createSessionRefresh({
 
 export const apiClient = createApiClient({
   baseURL: apiBaseUrl,
+  timeout: 15_000,
   getHeaders: () => {
     const tenantId = getTenantId();
     const businessId = useAdminUiStore.getState().activeBusinessId;
@@ -75,7 +79,9 @@ export const apiClient = createApiClient({
     "x-auth-context": "admin",
   },
   getAccessToken,
-  onUnauthorized: refreshAccessToken,
-  shouldHandleUnauthorized: (config) => !isAdminSessionRequest(config.url),
+  onUnauthorized: refreshAdminAccessToken,
+  onUnauthorizedRetryFailed: clearAdminSession,
+  shouldHandleUnauthorized: (config) =>
+    !isAdminSessionRequest(config.url) && Boolean(getAccessToken()),
   withCredentials: true,
 });

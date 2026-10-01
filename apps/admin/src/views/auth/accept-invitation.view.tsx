@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, KeyRound, UserPlus } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
-import { toast } from "sonner";
+import { useToast } from "@repo/hooks";
 import {
   acceptInvitationSchema,
   type AcceptInvitationInput,
@@ -17,6 +17,7 @@ import { authService } from "@/src/services/auth.service";
 import { AuthShell } from "./components/auth-shell";
 
 export function AcceptInvitationView({ token }: { token: string }) {
+  const { toast } = useToast();
   const t = useTranslations("Auth");
   const router = useRouter();
   const invitationQuery = useQuery({

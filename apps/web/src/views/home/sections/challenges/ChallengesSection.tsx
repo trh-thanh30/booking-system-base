@@ -7,8 +7,8 @@ import { useRepeatReveal } from "@/src/hooks/useRepeatReveal";
 import { ChallengeCards } from "./ChallengeCards";
 import { ComparisonTable } from "./ComparisonTable";
 import { TourControl } from "./TourControl";
-import { CHALLENGES, COMPARISONS } from "./Challenges.data";
-import type { ChallengeId } from "./Challenges.types";
+import { CHALLENGES, COMPARISONS } from "./data/Challenges.data";
+import type { ChallengeId } from "./types/Challenges.types";
 
 export function ChallengesSection() {
   const [activeId, setActiveId] = useState<ChallengeId | null>(null);

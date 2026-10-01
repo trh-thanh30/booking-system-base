@@ -19,7 +19,7 @@ import { StatsCard } from "@/src/components/common/stats-card";
 import {
   getDashboardStats,
   getDashboardTabs,
-} from "@/src/views/dashboard/dashboard.constants";
+} from "@/src/views/dashboard/constants/dashboard.constants";
 import { DashboardOverviewChart } from "@/src/views/dashboard/components/dashboard-overview-chart";
 import { RecentSales } from "@/src/views/dashboard/components/recent-sales";
 

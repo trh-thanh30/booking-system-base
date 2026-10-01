@@ -5,7 +5,7 @@ import { useLocale } from "next-intl";
 import { ArrowLeft, Building2, CheckCircle2, ExternalLink } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { toast } from "sonner";
+import { useToast } from "@repo/hooks";
 import { registerOwnerSchema, type RegisterOwnerInput } from "@repo/shared";
 import { Button, Input, Label } from "@repo/ui";
 import { Link } from "@/src/i18n/navigation";
@@ -32,6 +32,7 @@ function Field({
 }
 
 export function SignupBusinessView() {
+  const { toast } = useToast();
   const locale = useLocale();
   const [verificationUrl, setVerificationUrl] = useState<string | null>(null);
   const {

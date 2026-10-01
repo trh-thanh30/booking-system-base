@@ -12,6 +12,7 @@ import type {
 } from "@repo/shared";
 import { unwrapApiData } from "@repo/shared";
 import { apiClient } from "@/src/lib/api-client";
+import { refreshAdminAccessToken } from "@/src/lib/api-client";
 
 export type InvitationPreview = {
   id: string;
@@ -54,9 +55,9 @@ export const authService = {
   },
 
   async refresh() {
-    return unwrapApiData(
-      await apiClient.post<{ access_token: string }>("/auth/admin/refresh"),
-    );
+    const access_token = await refreshAdminAccessToken();
+    if (!access_token) throw new Error("ADMIN_SESSION_EXPIRED");
+    return { access_token };
   },
 
   async logout() {

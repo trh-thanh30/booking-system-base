@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
-import { toast } from "sonner";
+import { useToast } from "@repo/hooks";
 import {
   createInvitationSchema,
   PERMISSIONS,
@@ -81,6 +81,7 @@ function InviteUserDialog({
   onOpenChange: (open: boolean) => void;
   open: boolean;
 }) {
+  const { toast } = useToast();
   const queryClient = useQueryClient();
   const [createdInvitation, setCreatedInvitation] =
     useState<CreatedInvitation | null>(null);

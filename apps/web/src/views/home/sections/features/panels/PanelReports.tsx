@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { REPORT_KPIS, REPORT_SERVICES } from "../features.constants";
+import { REPORT_KPIS, REPORT_SERVICES } from "../constants/features.constants";
 
 export function PanelReports() {
   return (

@@ -6,7 +6,7 @@ import {
   AVAILABILITY_SLOTS,
   AVAILABILITY_LEGENDS,
   AVAILABILITY_RULES,
-} from "../features.constants";
+} from "../constants/features.constants";
 
 export function PanelAvailability() {
   return (

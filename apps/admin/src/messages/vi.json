@@ -113,6 +113,14 @@
     }
   },
   "Auth": {
+    "checkingSession": "Đang kiểm tra phiên đăng nhập…",
+    "logoutFailed": "Đã xóa phiên trên thiết bị này, nhưng chưa thể xác nhận đăng xuất với máy chủ. Vui lòng thử lại khi có kết nối.",
+    "accessDenied": "Bạn không có quyền truy cập trang này.",
+    "shell": {
+      "workspace": "Không gian quản lý doanh nghiệp",
+      "title": "Quản lý lịch hẹn, đội ngũ và cơ sở của bạn.",
+      "description": "Đăng nhập để quản lý hoạt động doanh nghiệp trong một không gian chung."
+    },
     "backToLogin": "Quay lại đăng nhập",
     "fields": {
       "code": "Mã xác minh",
@@ -125,6 +133,11 @@
       "usernameOrEmail": "Email hoặc tên đăng nhập"
     },
     "login": {
+      "invalidCredentials": "Email, tên đăng nhập hoặc mật khẩu không đúng.",
+      "inactive": "Tài khoản đang bị vô hiệu hóa. Vui lòng liên hệ hỗ trợ.",
+      "invalidWorkspace": "Tài khoản không có quyền truy cập không gian doanh nghiệp này.",
+      "networkError": "Không thể kết nối máy chủ. Vui lòng thử lại.",
+      "rateLimited": "Bạn đã thử quá nhiều lần. Vui lòng thử lại sau.",
       "description": "Dùng tài khoản admin hoặc nhân sự để vào workspace của tenant.",
       "failed": "Đăng nhập thất bại",
       "forgotPassword": "Quên mật khẩu?",

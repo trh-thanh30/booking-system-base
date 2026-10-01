@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { toast } from "sonner";
+import { useToast } from "@repo/hooks";
 import {
   Check,
   Lock,
@@ -70,6 +70,7 @@ function CountUp({
 }
 
 export function EarlyAccess() {
+  const { toast } = useToast();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
 

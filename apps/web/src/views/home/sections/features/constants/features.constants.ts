@@ -7,7 +7,11 @@ import {
   BarChart3,
   CalendarDays,
 } from "lucide-react";
-import type { FeatureMeta, BookingItem, StaffSlotMeta } from "./features.types";
+import type {
+  FeatureMeta,
+  BookingItem,
+  StaffSlotMeta,
+} from "../types/features.types";
 
 export const FEATURE_ITEMS: FeatureMeta[] = [
   {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { StepData, Mode } from "./NoShowSection.types";
+import type { StepData, Mode } from "./types/NoShowSection.types";
 
 interface Props {
   steps: StepData[];

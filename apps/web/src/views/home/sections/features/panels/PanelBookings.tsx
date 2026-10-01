@@ -2,13 +2,13 @@
 
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import type { BookingItem, StaffSlotMeta } from "../features.types";
+import type { BookingItem, StaffSlotMeta } from "../types/features.types";
 import {
   BOOKINGS_INITIAL_DATA,
   BOOKINGS_SERVICES,
   BOOKINGS_STAFF_NAMES,
   BOOKINGS_INITIAL_STAFF_SLOTS,
-} from "../features.constants";
+} from "../constants/features.constants";
 
 export function PanelBookings({ isActive }: { isActive: boolean }) {
   const [bookings, setBookings] = useState<BookingItem[]>(

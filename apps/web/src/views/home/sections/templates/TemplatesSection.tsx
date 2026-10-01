@@ -4,8 +4,8 @@ import { useState } from "react";
 import { Check, ArrowDown } from "lucide-react";
 import { AnimatePresence, useReducedMotion } from "framer-motion";
 import { RepeatReveal } from "@/src/components/motion/RepeatReveal";
-import { WEBSITE_TEMPLATES } from "../../home.constants";
-import { TEMPLATE_COLORS, FILTERS } from "./templates.constants";
+import { WEBSITE_TEMPLATES } from "../../constants/home.constants";
+import { TEMPLATE_COLORS, FILTERS } from "./constants/templates.constants";
 import { DesktopBrowserMockup } from "./components/DesktopBrowserMockup";
 import { MobileMockup } from "./components/MobileMockup";
 

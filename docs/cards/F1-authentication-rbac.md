@@ -168,6 +168,11 @@ Không thêm `sessions` table trong F1. Refresh/session state dùng `users.refre
 
 ### Phase 2 - Business Admin FE
 
+- F1-009: Owner password login/session đã nối với `/auth/me`; token chỉ giữ trong memory.
+- Bootstrap/interceptor dùng chung refresh promise; session hết hạn xóa cache và Business context.
+- Dashboard đợi xác thực, safe `returnTo`, permission navigation và Business selection hợp lệ.
+- Specs Admin được chạy trong từng task qua `pnpm test:admin` và CI.
+
 - Login, forgot password, reset password và accept invitation screens.
 - Current user state đọc từ `/auth/me`.
 - Sidebar/navigation/action visibility dựa trên permissions từ API.

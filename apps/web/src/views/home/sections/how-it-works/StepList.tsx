@@ -7,7 +7,7 @@ import {
   Link2,
   LayoutGrid,
 } from "lucide-react";
-import type { StepMeta, StepId } from "./HowItWorksSection.types";
+import type { StepMeta, StepId } from "./types/HowItWorksSection.types";
 
 const ICON_MAP = {
   list: ListChecks,

@@ -135,10 +135,14 @@ Ví dụ:
 ```txt
 src/views/bookings/
 ├── bookings.view.tsx
-├── bookings.constants.ts
-├── bookings.types.ts
-├── bookings.utils.ts
-├── bookings.columns.tsx
+├── constants/
+│   └── bookings.constants.ts
+├── types/
+│   └── bookings.types.ts
+├── utils/
+│   └── bookings.utils.ts
+├── columns/
+│   └── bookings.columns.tsx
 ├── components/
 │   ├── booking-status-badge.tsx
 │   └── bookings-table.tsx
@@ -158,6 +162,10 @@ Vai trò từng file:
 
 Rule:
 
+- File `*.view.tsx` nằm ở cấp feature. File hỗ trợ phải đặt trong folder theo hậu tố chức năng, kể cả khi chỉ có một file: `*.constants.ts` → `constants/`, `*.types.ts` → `types/`, `*.utils.ts` → `utils/`, `*.columns.tsx` → `columns/`, `*.data.ts` → `data/`.
+- Với hậu tố khác, tạo folder theo vai trò tương ứng: `schemas/`, `services/`, `tests/`, `hooks/`. Hook giữ tên `use-*`; component riêng đặt trong `components/`, không gom component vào folder theo đuôi `.tsx`.
+- Áp dụng cùng quy tắc cho feature con và section trong `views`, ví dụ `views/home/sections/features/constants/features.constants.ts`.
+- `index.ts` là ngoại lệ ở cấp feature nếu có public re-export thật; cập nhật export/import sau khi di chuyển file, không giữ bản sao ở đường dẫn cũ.
 - Feature component không dùng ở nơi khác thì để trong `src/views/<feature>/components`.
 - Không đưa type API/domain DTO vào `<feature>.types.ts`.
 - Không import trực tiếp component private của feature khác.
@@ -296,7 +304,7 @@ Ví dụ:
 Rule:
 
 - API response type, shared domain type, DTO dùng lại giữa app/API phải nằm trong `packages/shared/src/types`.
-- Type chỉ phục vụ một view thì đặt trong `src/views/<feature>/<feature>.types.ts`.
+- Type chỉ phục vụ một view thì đặt trong `src/views/<feature>/types/<feature>.types.ts`.
 - Không gom tất cả type vào một file lớn.
 
 ### `src/utils/`
@@ -312,7 +320,7 @@ Ví dụ:
 
 Rule:
 
-- Utility chỉ dùng trong một feature thì đặt trong `src/views/<feature>/<feature>.utils.ts`.
+- Utility chỉ dùng trong một feature thì đặt trong `src/views/<feature>/utils/<feature>.utils.ts`.
 - Utility dùng nhiều app nên cân nhắc đưa vào `packages/shared/src/utils`.
 
 ## Quan Hệ Với `packages/*`
@@ -354,7 +362,7 @@ Phù hợp:
 Rule quan trọng:
 
 - Type có hình dạng dữ liệu từ API hoặc domain contract phải đặt trong `packages/shared/src/types`.
-- `src/views/<feature>/<feature>.types.ts` chỉ chứa type phục vụ view/local UI state.
+- `src/views/<feature>/types/<feature>.types.ts` chỉ chứa type phục vụ view/local UI state.
 - Không đặt React hook vào `packages/shared`; hook dùng chung nằm ở `packages/hooks`.
 
 Ví dụ:
@@ -371,7 +379,7 @@ export type BookingSummary = {
 ```
 
 ```ts
-// apps/admin/src/views/bookings/bookings.types.ts
+// apps/admin/src/views/bookings/types/bookings.types.ts
 import type { BookingStatus } from "@repo/shared";
 
 export type BookingStatusFilter = "all" | BookingStatus;
@@ -416,6 +424,7 @@ Không viết business logic, React component implementation, constant lớn ho�
 - Trong app dùng alias `@/src/...`.
 - Import primitive từ `@repo/ui`.
 - Import shared type/schema/helper từ `@repo/shared`.
+- Notification trong component/hook frontend dùng `const { toast } = useToast()` từ `@repo/hooks`. Không import `toast` trực tiếp từ `sonner` trong Admin/Web; chỉ wrapper `packages/hooks` và Toaster primitive `packages/ui` phụ thuộc Sonner trực tiếp.
 - View được import bởi `app/**/page.tsx`.
 - View có thể import `src/components/common`, `src/components/layout`, `src/hooks`, `src/services`, `src/utils`, `src/constants`.
 - `src/components/common` không import ngược vào `src/views`.
@@ -439,11 +448,11 @@ Không viết business logic, React component implementation, constant lớn ho�
 2. Tạo view trong `src/views/<feature>/<feature>.view.tsx`.
 3. `page.tsx` chỉ render view.
 4. Component riêng của feature đặt trong `src/views/<feature>/components`.
-5. Static config/mock data/filter/tab đặt trong `<feature>.constants.ts`.
-6. View-only type đặt trong `<feature>.types.ts`.
+5. Static config/filter/tab đặt trong `constants/<feature>.constants.ts`; fixture/mock data riêng đặt trong `data/`.
+6. View-only type đặt trong `types/<feature>.types.ts`.
 7. API/domain type đặt trong `packages/shared/src/types`.
-8. Table columns đặt trong `<feature>.columns.tsx`.
-9. Helper chỉ dùng trong feature đặt trong `<feature>.utils.ts`.
+8. Table columns đặt trong `columns/<feature>.columns.tsx`.
+9. Helper chỉ dùng trong feature đặt trong `utils/<feature>.utils.ts`.
 10. Component dùng lại nhiều feature đưa vào `src/components/common`.
 11. API/query function đặt trong `src/services`.
 12. Chạy typecheck/lint/build trước khi hoàn tất.

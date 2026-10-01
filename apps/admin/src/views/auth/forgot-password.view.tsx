@@ -3,7 +3,7 @@
 import { ArrowLeft, Mail, Send } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
-import { toast } from "sonner";
+import { useToast } from "@repo/hooks";
 import { emailRequestSchema, type EmailRequestInput } from "@repo/shared";
 import { Button, Input } from "@repo/ui";
 import { FormField } from "@/src/components/common/form-field";
@@ -12,6 +12,7 @@ import { authService } from "@/src/services/auth.service";
 import { AuthShell } from "./components/auth-shell";
 
 export function ForgotPasswordView() {
+  const { toast } = useToast();
   const t = useTranslations("Auth");
   const router = useRouter();
   const {
