@@ -3,18 +3,29 @@
 import { Lock, LogIn, Mail } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
-import { toast } from "sonner";
+import { useEffect, useState } from "react";
+import { useMutation } from "@tanstack/react-query";
+import { useToast } from "@repo/hooks";
 import { HttpClientError, loginSchema, type LoginInput } from "@repo/shared";
 import { Button, Input } from "@repo/ui";
 import { FormField } from "@/src/components/common/form-field";
 import { useAuth } from "@/src/app/providers";
 import { Link, useRouter } from "@/src/i18n/navigation";
 import { AuthShell } from "./components/auth-shell";
+import { getSafeReturnTo } from "@/src/lib/auth-routing";
+import { getLoginErrorKey } from "./utils/auth.utils";
 
-export function LoginView() {
+export function LoginView({ returnTo }: { returnTo?: string }) {
   const t = useTranslations("Auth");
   const router = useRouter();
-  const { login } = useAuth();
+  const { login, isLoading, isAuthenticated } = useAuth();
+  const { toast } = useToast();
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const loginMutation = useMutation({ mutationFn: login, retry: false });
+  const destination = getSafeReturnTo(returnTo);
+  useEffect(() => {
+    if (!isLoading && isAuthenticated) router.replace(destination);
+  }, [destination, isAuthenticated, isLoading, router]);
   const {
     formState: { errors, isSubmitting },
     handleSubmit,
@@ -28,6 +39,7 @@ export function LoginView() {
   });
 
   async function onSubmit(input: LoginInput) {
+    setSubmitError(null);
     const parsed = loginSchema.safeParse(input);
 
     if (!parsed.success) {
@@ -42,9 +54,9 @@ export function LoginView() {
     }
 
     try {
-      await login(parsed.data);
+      await loginMutation.mutateAsync(parsed.data);
       toast.success(t("login.success"));
-      router.replace("/dashboard");
+      router.replace(destination);
     } catch (error) {
       if (
         error instanceof HttpClientError &&
@@ -60,71 +72,103 @@ export function LoginView() {
             : undefined;
 
         toast.info(t("login.verificationRequired"));
+        const verificationUrl = sessionId
+          ? "/verify-email?sessionId=" + encodeURIComponent(sessionId)
+          : "/verify-email";
         router.replace(
-          sessionId
-            ? "/verify-email?sessionId=" + encodeURIComponent(sessionId)
-            : "/verify-email",
+          verificationUrl +
+            (sessionId ? "&" : "?") +
+            "returnTo=" +
+            encodeURIComponent(destination),
         );
         return;
       }
 
-      toast.error(error instanceof Error ? error.message : t("login.failed"));
+      setSubmitError(t(getLoginErrorKey(error)));
     }
   }
 
   return (
     <AuthShell description={t("login.description")} title={t("login.title")}>
-      <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
-        <FormField
-          error={errors.usernameOrEmail?.message}
-          htmlFor="usernameOrEmail"
-          label={t("fields.usernameOrEmail")}
-        >
-          <div className="relative">
-            <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-            <Input
-              autoComplete="username"
-              className="pl-9"
-              id="usernameOrEmail"
-              {...register("usernameOrEmail")}
-            />
-          </div>
-        </FormField>
-        <FormField
-          error={errors.password?.message}
-          htmlFor="password"
-          label={t("fields.password")}
-        >
-          <div className="relative">
-            <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-            <Input
-              autoComplete="current-password"
-              className="pl-9"
-              id="password"
-              type="password"
-              {...register("password")}
-            />
-          </div>
-        </FormField>
-        <div className="flex items-center justify-between">
-          <Link
-            className="text-sm font-medium text-slate-600 underline-offset-4 hover:underline dark:text-slate-300"
-            href="/verify-email"
+      {isLoading || isAuthenticated ? (
+        <p role="status" className="text-muted-foreground">
+          {t("checkingSession")}
+        </p>
+      ) : (
+        <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
+          {submitError ? (
+            <p
+              role="alert"
+              className="rounded-md border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive"
+            >
+              {submitError}
+            </p>
+          ) : null}
+          <FormField
+            error={errors.usernameOrEmail?.message}
+            htmlFor="usernameOrEmail"
+            label={t("fields.usernameOrEmail")}
           >
-            {t("login.verifyEmail")}
-          </Link>
-          <Link
-            className="text-sm font-medium text-slate-600 underline-offset-4 hover:underline dark:text-slate-300"
-            href="/forgot-password"
+            <div className="relative">
+              <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                aria-invalid={Boolean(errors.usernameOrEmail)}
+                aria-describedby={
+                  errors.usernameOrEmail ? "usernameOrEmail-error" : undefined
+                }
+                disabled={isSubmitting}
+                autoComplete="username"
+                className="pl-9"
+                id="usernameOrEmail"
+                {...register("usernameOrEmail")}
+              />
+            </div>
+          </FormField>
+          <FormField
+            error={errors.password?.message}
+            htmlFor="password"
+            label={t("fields.password")}
           >
-            {t("login.forgotPassword")}
-          </Link>
-        </div>
-        <Button className="w-full" disabled={isSubmitting} type="submit">
-          <LogIn className="h-4 w-4" />
-          {isSubmitting ? t("login.submitting") : t("login.submit")}
-        </Button>
-      </form>
+            <div className="relative">
+              <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                aria-invalid={Boolean(errors.password)}
+                aria-describedby={
+                  errors.password ? "password-error" : undefined
+                }
+                disabled={isSubmitting}
+                autoComplete="current-password"
+                className="pl-9"
+                id="password"
+                type="password"
+                {...register("password")}
+              />
+            </div>
+          </FormField>
+          <div className="flex items-center justify-between">
+            <Link
+              className="text-sm font-medium text-muted-foreground underline-offset-4 hover:text-primary hover:underline"
+              href="/verify-email"
+            >
+              {t("login.verifyEmail")}
+            </Link>
+            <Link
+              className="text-sm font-medium text-muted-foreground underline-offset-4 hover:text-primary hover:underline"
+              href="/forgot-password"
+            >
+              {t("login.forgotPassword")}
+            </Link>
+          </div>
+          <Button
+            className="w-full"
+            disabled={isSubmitting || loginMutation.isPending}
+            type="submit"
+          >
+            <LogIn className="h-4 w-4" />
+            {isSubmitting ? t("login.submitting") : t("login.submit")}
+          </Button>
+        </form>
+      )}
     </AuthShell>
   );
 }

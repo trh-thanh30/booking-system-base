@@ -138,6 +138,9 @@ toast.error("Không thể lưu", { description: "Vui lòng thử lại." });
 
 Hook giữ nguyên toàn bộ Sonner API, bao gồm `promise`, `loading`, `dismiss`, action
 và custom toast. `Toaster` dùng semantic status token nên tự thích nghi light/dark mode.
+Component và feature hook phải lấy `toast` qua `useToast`; chỉ shared wrapper và
+Toaster primitive được import Sonner trực tiếp. Nhờ đó frontend dùng một API
+notification thống nhất và có thể thay provider tại shared package.
 
 ## Component Rules
 

@@ -11,9 +11,12 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { RepeatReveal } from "@/src/components/motion/RepeatReveal";
-import { formatSlug, getHexColorValue, isHexColor } from "../home.utils";
-import { CustomizationProps, ToastMsg } from "../home.types";
-import { COLOR_SWATCHES, TYPOGRAPHY_PRESETS } from "../home.constants";
+import { formatSlug, getHexColorValue, isHexColor } from "../utils/home.utils";
+import { CustomizationProps, ToastMsg } from "../types/home.types";
+import {
+  COLOR_SWATCHES,
+  TYPOGRAPHY_PRESETS,
+} from "../constants/home.constants";
 
 export function Customization({
   customColor,

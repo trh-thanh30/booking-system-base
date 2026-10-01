@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import type { FeatureTab } from "./features.types";
+import type { FeatureTab } from "./types/features.types";
 import { PanelBookings } from "./panels/PanelBookings";
 import { PanelBrandedPage } from "./panels/PanelBrandedPage";
 import { PanelAvailability } from "./panels/PanelAvailability";

@@ -5,10 +5,12 @@ export type CreateSessionRefreshOptions = {
   requestAccessToken: () => Promise<string | undefined>;
   onAccessToken: (accessToken: string) => void;
   onSessionExpired: () => void;
+  getSessionVersion?: () => unknown;
 };
 
 export function createSessionRefresh(options: CreateSessionRefreshOptions) {
   return createSingleFlight(async (): Promise<string | false> => {
+    const version = options.getSessionVersion?.();
     if (!options.hasRefreshMarker()) {
       options.onSessionExpired();
       return false;
@@ -16,6 +18,7 @@ export function createSessionRefresh(options: CreateSessionRefreshOptions) {
 
     try {
       const accessToken = await options.requestAccessToken();
+      if (options.getSessionVersion?.() !== version) return false;
 
       if (!accessToken) {
         options.onSessionExpired();
@@ -25,7 +28,7 @@ export function createSessionRefresh(options: CreateSessionRefreshOptions) {
       options.onAccessToken(accessToken);
       return accessToken;
     } catch {
-      options.onSessionExpired();
+      if (options.getSessionVersion?.() === version) options.onSessionExpired();
       return false;
     }
   });

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { BookingSeed } from "../HowItWorksSection.types";
+import type { BookingSeed } from "../types/HowItWorksSection.types";
 
 const SEED: BookingSeed[] = [
   {

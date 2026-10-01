@@ -1,6 +1,6 @@
 "use client";
 
-import type { ComparisonPair, ChallengeId } from "./Challenges.types";
+import type { ComparisonPair, ChallengeId } from "./types/Challenges.types";
 
 interface Props {
   comparisons: ComparisonPair[];

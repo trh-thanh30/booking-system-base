@@ -4,10 +4,10 @@ import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { Play, Square, ArrowDown } from "lucide-react";
 import { useRepeatReveal } from "@/src/hooks/useRepeatReveal";
-import { FEATURE_ITEMS } from "./features.constants";
+import { FEATURE_ITEMS } from "./constants/features.constants";
 import { FeatureList } from "./FeatureList";
 import { CommandCenterDemo } from "./CommandCenterDemo";
-import type { FeatureTab } from "./features.types";
+import type { FeatureTab } from "./types/features.types";
 
 export function FeaturesSection() {
   const [activeTab, setActiveTab] = useState<FeatureTab>("bookings");

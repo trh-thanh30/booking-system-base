@@ -1,7 +1,7 @@
 "use client";
 
 import { Calendar, CreditCard, MessageSquare, Users } from "lucide-react";
-import type { ChallengeMeta, ChallengeId } from "./Challenges.types";
+import type { ChallengeMeta, ChallengeId } from "./types/Challenges.types";
 
 const ICON_MAP = {
   calendar: Calendar,

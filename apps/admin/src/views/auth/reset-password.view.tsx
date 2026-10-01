@@ -3,7 +3,7 @@
 import { ArrowLeft, KeyRound, LockKeyhole } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
-import { toast } from "sonner";
+import { useToast } from "@repo/hooks";
 import { resetPasswordSchema, type ResetPasswordInput } from "@repo/shared";
 import { Button, Input } from "@repo/ui";
 import { FormField } from "@/src/components/common/form-field";
@@ -16,6 +16,7 @@ export function ResetPasswordView({
 }: {
   initialSessionId?: string;
 }) {
+  const { toast } = useToast();
   const t = useTranslations("Auth");
   const router = useRouter();
   const sessionId = initialSessionId;

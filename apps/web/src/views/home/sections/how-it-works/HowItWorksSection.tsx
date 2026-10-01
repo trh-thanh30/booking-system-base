@@ -6,7 +6,7 @@ import { ArrowDown } from "lucide-react";
 import { useRepeatReveal } from "@/src/hooks/useRepeatReveal";
 import { StepList } from "./StepList";
 import { DemoPanel } from "./DemoPanel";
-import type { StepMeta, StepId } from "./HowItWorksSection.types";
+import type { StepMeta, StepId } from "./types/HowItWorksSection.types";
 
 export const STEPS: StepMeta[] = [
   {

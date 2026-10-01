@@ -4,7 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 import { Reveal } from "@/src/components/motion/Reveal";
-import { FAQ_GROUPS } from "../home.constants";
+import { FAQ_GROUPS } from "../constants/home.constants";
 
 export function FAQ() {
   const [openFaqKey, setOpenFaqKey] = useState<string | null>("coding-skills");

@@ -1,7 +1,7 @@
 "use client";
 
 import { Check, X } from "lucide-react";
-import type { Mode } from "./NoShowSection.types";
+import type { Mode } from "./types/NoShowSection.types";
 
 interface Props {
   mode: Mode;

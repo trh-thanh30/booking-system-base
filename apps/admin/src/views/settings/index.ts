@@ -1,2 +1,2 @@
 export * from "./settings.view";
-export * from "./settings.constants";
+export * from "./constants/settings.constants";

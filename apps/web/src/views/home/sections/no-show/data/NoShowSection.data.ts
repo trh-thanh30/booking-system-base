@@ -1,4 +1,4 @@
-import type { StepData, OutcomeData } from "./NoShowSection.types";
+import type { StepData, OutcomeData } from "../types/NoShowSection.types";
 
 export const STEPS_WITH: StepData[] = [
   {

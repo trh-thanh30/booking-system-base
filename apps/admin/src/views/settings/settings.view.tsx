@@ -20,7 +20,7 @@ import {
   notificationSettings,
   securitySettings,
   settingsTabs,
-} from "@/src/views/settings/settings.constants";
+} from "@/src/views/settings/constants/settings.constants";
 
 export function SettingsView() {
   return (

@@ -17,10 +17,10 @@ import {
   Copy,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { toast } from "sonner";
+import { useToast } from "@repo/hooks";
 import QRCode from "qrcode";
 import { RepeatReveal } from "@/src/components/motion/RepeatReveal";
-import { formatSlug, getHexColorValue } from "../home.utils";
+import { formatSlug, getHexColorValue } from "../utils/home.utils";
 
 interface ChannelsProps {
   customColor: string;
@@ -76,6 +76,7 @@ export function Channels({
   customBusinessName,
   setCustomBusinessName,
 }: ChannelsProps) {
+  const { toast } = useToast();
   const hexColor = getHexColorValue(customColor);
   const slug = formatSlug(customBusinessName) || "lumiere";
 

@@ -11,26 +11,11 @@ import {
 } from "@repo/ui";
 import { useAuth } from "@/src/app/providers";
 import { useAdminUiStore } from "@/src/app/stores/ui.store";
-import { useEffect } from "react";
 
 export function BusinessSwitcher() {
-  const { user } = useAuth();
+  const { user, selectBusiness } = useAuth();
   const businesses = user?.businesses ?? [];
   const activeBusinessId = useAdminUiStore((state) => state.activeBusinessId);
-  const setActiveBusinessId = useAdminUiStore(
-    (state) => state.setActiveBusinessId,
-  );
-
-  const defaultBusinessId =
-    businesses.find((business) => business.is_default)?.id ??
-    businesses[0]?.id ??
-    null;
-
-  useEffect(() => {
-    if (!activeBusinessId && defaultBusinessId) {
-      setActiveBusinessId(defaultBusinessId);
-    }
-  }, [activeBusinessId, defaultBusinessId, setActiveBusinessId]);
 
   if (businesses.length === 0) {
     return null;
@@ -49,7 +34,7 @@ export function BusinessSwitcher() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
-          className="hidden max-w-60 justify-start px-3 md:inline-flex"
+          className="max-w-32 justify-start px-3 md:max-w-60"
           variant="secondary"
         >
           <Building2 className="h-4 w-4 shrink-0" />
@@ -66,7 +51,7 @@ export function BusinessSwitcher() {
             <DropdownMenuItem
               className="gap-2"
               key={business.id}
-              onSelect={() => setActiveBusinessId(business.id)}
+              onSelect={() => selectBusiness(business.id)}
             >
               <Building2 className="h-4 w-4 text-slate-500" />
               <div className="min-w-0 flex-1">

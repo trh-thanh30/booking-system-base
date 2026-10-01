@@ -4,8 +4,8 @@ import { useState, useMemo, useEffect } from "react";
 import { Search, ChevronDown, Map, List, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { RepeatReveal } from "@/src/components/motion/RepeatReveal";
-import { WEBSITE_TEMPLATES } from "../home.constants";
-import { toast } from "sonner";
+import { WEBSITE_TEMPLATES } from "../constants/home.constants";
+import { useToast } from "@repo/hooks";
 
 interface MarketplaceProps {
   activeTemplateIdx: number;
@@ -354,6 +354,7 @@ export function Marketplace({
   setActiveTemplateIdx,
   customBusinessName,
 }: MarketplaceProps) {
+  const { toast } = useToast();
   // State
   const [marketplaceSearchQuery, setMarketplaceSearchQuery] = useState("");
   const [marketplaceSelectedCategory, setMarketplaceSelectedCategory] =
@@ -385,7 +386,7 @@ export function Marketplace({
         icon: marketplaceVisibility ? "✨" : "🔒",
       },
     );
-  }, [marketplaceVisibility]);
+  }, [marketplaceVisibility, toast]);
 
   const handleSeeWorkflow = (categoryName: string) => {
     const templateIndices: Record<string, number> = {

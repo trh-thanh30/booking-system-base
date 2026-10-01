@@ -1,6 +1,9 @@
 "use client";
 
-import { REMINDER_STATS, REMINDERS_QUEUE } from "../features.constants";
+import {
+  REMINDER_STATS,
+  REMINDERS_QUEUE,
+} from "../constants/features.constants";
 
 export function PanelReminders() {
   return (

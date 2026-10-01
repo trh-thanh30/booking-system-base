@@ -1,4 +1,4 @@
-import { ChallengeMeta, ComparisonPair } from "./Challenges.types";
+import { ChallengeMeta, ComparisonPair } from "../types/Challenges.types";
 
 export const CHALLENGES: ChallengeMeta[] = [
   {

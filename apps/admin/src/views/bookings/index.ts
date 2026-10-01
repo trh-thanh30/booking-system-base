@@ -1,4 +1,4 @@
 export * from "./bookings.view";
-export * from "./bookings.constants";
-export * from "./bookings.types";
-export * from "./bookings.utils";
+export * from "./constants/bookings.constants";
+export * from "./types/bookings.types";
+export * from "./utils/bookings.utils";

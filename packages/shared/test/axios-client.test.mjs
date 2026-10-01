@@ -31,6 +31,21 @@ test("a request that already retried does not trigger another refresh", async ()
   assert.equal(refreshCalls, 1);
 });
 
+test("a rejected refreshed token expires the session instead of leaving stale auth state", async () => {
+  let expired = 0;
+  const client = createHttpClient({
+    onUnauthorized: async () => "new-token",
+    onUnauthorizedRetryFailed: () => {
+      expired++;
+    },
+  });
+  client.defaults.adapter = async (config) => {
+    throw unauthorized(config);
+  };
+  await assert.rejects(client.get("/protected"));
+  assert.equal(expired, 1);
+});
+
 test("an excluded unauthorized request does not start session refresh", async () => {
   let refreshCalls = 0;
   const client = createHttpClient({

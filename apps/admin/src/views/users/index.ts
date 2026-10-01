@@ -1,3 +1,3 @@
 export * from "./users.view";
-export * from "./users.constants";
-export * from "./users.types";
+export * from "./constants/users.constants";
+export * from "./types/users.types";

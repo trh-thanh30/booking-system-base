@@ -21,12 +21,14 @@ export function FormField({
       <Label htmlFor={htmlFor}>{label}</Label>
       {children}
       {description ? (
-        <p className="text-xs leading-5 text-slate-500 dark:text-slate-400">
-          {description}
-        </p>
+        <p className="text-xs leading-5 text-muted-foreground">{description}</p>
       ) : null}
       {error ? (
-        <p className="text-xs leading-5 text-red-600 dark:text-red-400">
+        <p
+          id={`${htmlFor}-error`}
+          role="alert"
+          className="text-xs leading-5 text-destructive"
+        >
           {error}
         </p>
       ) : null}

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { HERO_SLOTS } from "../hero.constants";
+import { HERO_SLOTS } from "../constants/hero.constants";
 
 export function useHeroAutoplay() {
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<string>("15:00");

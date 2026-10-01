@@ -4,7 +4,7 @@ import { PanelServiceForm } from "./panels/PanelServiceForm";
 import { PanelAvailability } from "./panels/PanelAvailability";
 import { PanelShare } from "./panels/PanelShare";
 import { PanelBookings } from "./panels/PanelBookings";
-import type { StepId } from "./HowItWorksSection.types";
+import type { StepId } from "./types/HowItWorksSection.types";
 
 interface Props {
   activeStep: StepId;
