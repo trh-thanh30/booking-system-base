@@ -1,5 +1,3 @@
-import { BadRequestError } from '@/common/response/client-errors/bad-request';
-import { NotFoundError } from '@/common/response/client-errors/not-found';
 import { UnauthorizedError } from '@/common/response/client-errors/unauthorized';
 import { ResendVerificationDto } from '@/modules/auth/dto/resend-verification.dto';
 import { VerificationSessionService } from '@/modules/auth/services/verification-session.service';
@@ -33,20 +31,6 @@ export class ResendVerificationUseCase implements BaseUseCase<
 
     // Find user by email
     const user = await this.usersService.findByEmail(email);
-    if (!user) {
-      throw new NotFoundError('User not found');
-    }
-
-    // Check if user is already verified
-    if (user.is_verified) {
-      // Clean up session
-      await this.verificationSessionService.deleteSession(
-        dto.sessionId,
-        'email_verification',
-      );
-      throw new BadRequestError('Account is already verified');
-    }
-
     // Generate new verification code with rate limit (6 times per day)
     const { expiresAt, code } = await this.verificationService.generate({
       namespace: 'email_verification',
@@ -60,12 +44,14 @@ export class ResendVerificationUseCase implements BaseUseCase<
 
     const ttl = expiresAt - Date.now(); // in milliseconds
 
-    // Send verification email
-    await this.sendVerificationEmailUseCase.execute({
-      to: email,
-      code,
-      ttl,
-    });
+    // A valid opaque session has the same response/quota regardless of account eligibility.
+    if (user && !user.is_verified) {
+      await this.sendVerificationEmailUseCase.execute({
+        to: email,
+        code,
+        ttl,
+      });
+    }
 
     // Extend session TTL
     await this.verificationSessionService.extendSession(

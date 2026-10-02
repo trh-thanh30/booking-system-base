@@ -26,13 +26,8 @@ export class ForgotPasswordUseCase implements BaseUseCase<
       'password_reset',
     );
 
-    // Always return an opaque session so callers cannot enumerate accounts.
-    if (!user) {
-      return sessionId;
-    }
-
     try {
-      // Generate a reset code and its expiration time
+      // Apply the same quota and response for every email, including missing accounts.
       const { expiresAt, code } = await this.verificationService.generate({
         namespace: 'password_reset',
         subject: email,
@@ -42,6 +37,7 @@ export class ForgotPasswordUseCase implements BaseUseCase<
         rateLimitMax: 3,
         rateLimitWindowSec: 60 * 15, // 15 minutes
       });
+      if (!user) return sessionId;
       const ttl = new Date(expiresAt);
 
       // Send forgot password email asynchronously

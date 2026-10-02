@@ -2,7 +2,11 @@ import { RequestVerificationUseCase } from '@/modules/auth/use-cases/request-ver
 
 describe('RequestVerificationUseCase', () => {
   it('does not disclose missing or already verified accounts', async () => {
-    const verification = { generate: jest.fn() };
+    const verification = {
+      generate: jest
+        .fn()
+        .mockResolvedValue({ code: '123456', expiresAt: Date.now() + 1000 }),
+    };
     const emailUseCase = { execute: jest.fn() };
 
     for (const user of [null, { is_verified: true }]) {
@@ -18,8 +22,28 @@ describe('RequestVerificationUseCase', () => {
       ).resolves.toEqual({ sessionId: 'opaque-session' });
     }
 
-    expect(verification.generate).not.toHaveBeenCalled();
+    expect(verification.generate).toHaveBeenCalledTimes(2);
     expect(emailUseCase.execute).not.toHaveBeenCalled();
+  });
+
+  it('applies the same verification quota to missing and existing accounts', async () => {
+    for (const user of [null, { is_verified: false }, { is_verified: true }]) {
+      const email = { execute: jest.fn() };
+      await expect(
+        new RequestVerificationUseCase(
+          { findByEmail: jest.fn().mockResolvedValue(user) } as any,
+          {
+            generate: jest.fn().mockRejectedValue(new Error('quota exceeded')),
+          } as any,
+          {
+            createSession: jest.fn().mockResolvedValue('s'),
+            deleteSession: jest.fn(),
+          } as any,
+          email as any,
+        ).execute({ email: 'owner@example.com' }),
+      ).rejects.toThrow('quota exceeded');
+      expect(email.execute).not.toHaveBeenCalled();
+    }
   });
 
   it('creates a session and sends a verification code', async () => {

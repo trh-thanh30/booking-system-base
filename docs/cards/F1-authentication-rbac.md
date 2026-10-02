@@ -172,6 +172,12 @@ Không thêm `sessions` table trong F1. Refresh/session state dùng `users.refre
 - Bootstrap/interceptor dùng chung refresh promise; session hết hạn xóa cache và Business context.
 - Dashboard đợi xác thực, safe `returnTo`, permission navigation và Business selection hợp lệ.
 - Specs Admin được chạy trong từng task qua `pnpm test:admin` và CI.
+- F1-010: Web đăng ký Owner chuyển sang Admin verification, không tự login;
+  OTP/request/resend và forgot/reset có pending, lỗi inline, rate-limit và expired-session states.
+- Session ID chỉ truyền nội bộ qua URL/API, không có ô nhập hoặc nội dung yêu cầu sao chép.
+- Public request/resend responses và quota không phân biệt email tồn tại/đã verified;
+  Axios public auth client không refresh token khi OTP session hết hạn.
+- Web registration specs chạy qua `pnpm test:web` và CI.
 
 - Login, forgot password, reset password và accept invitation screens.
 - Current user state đọc từ `/auth/me`.

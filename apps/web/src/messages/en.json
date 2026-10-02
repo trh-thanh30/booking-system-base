@@ -9,5 +9,37 @@
     "description": "Start domain work from a vertical slice: API route, shared contract, UI state, and verification.",
     "primaryAction": "Primary action",
     "apiDocs": "API docs"
+  },
+  "SignupBusiness": {
+    "back": "Back",
+    "eyebrow": "Business signup",
+    "title": "Create a booking workspace for your business.",
+    "description": "Create an Owner account, Tenant and default Business. Verify your email before signing in to Business Admin.",
+    "tenantIsolated": "Isolated Tenant data",
+    "ownerReady": "Owner account",
+    "verification": "Email verification",
+    "checkEmail": "Check your email",
+    "success": "Account created. Please verify your email.",
+    "successDescription": "Your workspace is ready. Redirecting to email verification before you sign in.",
+    "verifyEmail": "Verify email",
+    "sameName": "Defaults to Tenant name",
+    "sameSlug": "Defaults to Tenant slug",
+    "submit": "Create business account",
+    "submitting": "Creating account…",
+    "invalidField": "Please check this field.",
+    "failed": "Registration failed. Check your details or try again later; username, email and slug must be available.",
+    "rateLimited": "Too many requests. Please wait and try again.",
+    "fields": {
+      "name": "Tenant / business name",
+      "slug": "Tenant slug",
+      "domain": "Booking domain (optional)",
+      "defaultBusiness": "First Business (optional)",
+      "fullName": "Owner name (optional)",
+      "username": "Username",
+      "email": "Email",
+      "phone": "Phone (optional)",
+      "password": "Password (at least eight characters)",
+      "confirmPassword": "Confirm password"
+    }
   }
 }

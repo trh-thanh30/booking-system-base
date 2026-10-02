@@ -154,11 +154,11 @@
       "sessionTitle": "Reset session",
       "submit": "Send reset code",
       "submitting": "Sending reset code",
-      "success": "Reset code requested",
+      "success": "If the account is eligible, a password reset code has been sent by email.",
       "title": "Forgot password"
     },
     "reset": {
-      "description": "Enter the reset session, code, and a new password.",
+      "description": "Enter the six-digit email code and your new password.",
       "failed": "Could not reset password",
       "submit": "Reset password",
       "submitting": "Resetting password",
@@ -192,6 +192,19 @@
       "success": "Invitation accepted. You can now sign in.",
       "title": "Accept invitation",
       "unavailable": "Unavailable"
+    },
+    "emailFlow": {
+      "failed": "Unable to process the request. Please try again.",
+      "networkError": "Cannot connect to the server. Check your connection and try again.",
+      "sessionExpired": "This session is invalid or expired. Please request a new code.",
+      "invalidCode": "The code is incorrect or expired. Check it or request a new code.",
+      "rateLimited": "Too many requests. Please wait before trying again.",
+      "retryIn": "You can request again in {seconds} seconds.",
+      "requestNewCode": "Request a new code",
+      "invalidEmail": "Enter a valid email address.",
+      "codeFormat": "Enter exactly six digits.",
+      "passwordLength": "Use at least eight characters.",
+      "passwordMismatch": "Password confirmation must match the new password."
     }
   },
   "Home": {

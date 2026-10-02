@@ -17,7 +17,13 @@ test("dashboard middleware redirects a guest to localized login with original fi
 });
 
 test("verification and onboarding stay public without an Admin refresh marker", () => {
-  for (const path of ["/vi/verify-email", "/en/onboarding/business"]) {
+  for (const path of [
+    "/vi/verify-email",
+    "/en/verify-email?sessionId=s",
+    "/vi/forgot-password",
+    "/en/reset-password?sessionId=s",
+    "/en/onboarding/business",
+  ]) {
     const response = middleware(
       new NextRequest(`http://localhost:3002${path}`),
     );

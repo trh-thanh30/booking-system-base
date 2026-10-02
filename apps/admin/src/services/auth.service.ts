@@ -11,7 +11,7 @@ import type {
   VerifyEmailInput,
 } from "@repo/shared";
 import { unwrapApiData } from "@repo/shared";
-import { apiClient } from "@/src/lib/api-client";
+import { apiClient, publicAuthClient } from "@/src/lib/api-client";
 import { refreshAdminAccessToken } from "@/src/lib/api-client";
 
 export type InvitationPreview = {
@@ -66,7 +66,7 @@ export const authService = {
 
   async forgotPassword(input: EmailRequestInput) {
     return unwrapApiData(
-      await apiClient.post<{ sessionId: string }>(
+      await publicAuthClient.post<{ sessionId: string }>(
         "/auth/forgot-password",
         input,
       ),
@@ -74,12 +74,12 @@ export const authService = {
   },
 
   async resetPassword(input: ResetPasswordInput) {
-    await apiClient.post<void>("/auth/reset-password", input);
+    await publicAuthClient.post<void>("/auth/reset-password", input);
   },
 
   async requestVerification(input: RequestVerificationInput) {
     return unwrapApiData(
-      await apiClient.post<{ sessionId: string }>(
+      await publicAuthClient.post<{ sessionId: string }>(
         "/auth/request-verification",
         input,
       ),
@@ -87,11 +87,11 @@ export const authService = {
   },
 
   async verifyEmail(input: VerifyEmailInput) {
-    await apiClient.post<void>("/auth/verify", input);
+    await publicAuthClient.post<void>("/auth/verify", input);
   },
 
   async resendVerification(input: ResendVerificationInput) {
-    await apiClient.post<void>("/auth/resend-verification", input);
+    await publicAuthClient.post<void>("/auth/resend-verification", input);
   },
 
   async createInvitation(input: CreateInvitationInput) {

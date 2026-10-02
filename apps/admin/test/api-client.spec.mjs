@@ -119,3 +119,46 @@ test("a refresh response arriving after logout cannot restore credentials", asyn
   assert.equal(await pending, false);
   assert.equal(getAccessToken(), undefined);
 });
+
+test("public email lifecycle endpoints send only their contracts without session credentials or automatic refresh", async (t) => {
+  browser(t);
+  setAccessToken("stale");
+  setTenantId("tenant-a");
+  useAdminUiStore.getState().setActiveBusinessId("business-a");
+  const calls = [];
+  handle = (config) => {
+    calls.push(config.url);
+    assert.equal(config.headers.get("Authorization"), undefined);
+    assert.equal(config.headers.get("x-tenant-id"), undefined);
+    assert.equal(config.headers.get("x-business-id"), undefined);
+    if (config.url === "/auth/verify") reject401(config);
+    return { sessionId: "opaque-session" };
+  };
+  assert.deepEqual(
+    await authService.requestVerification({ email: "owner@example.com" }),
+    { sessionId: "opaque-session" },
+  );
+  await authService.resendVerification({ sessionId: "opaque-session" });
+  await assert.rejects(
+    authService.verifyEmail({ sessionId: "opaque-session", code: "123456" }),
+    (error) => error.status === 401,
+  );
+  assert.deepEqual(
+    await authService.forgotPassword({ email: "owner@example.com" }),
+    { sessionId: "opaque-session" },
+  );
+  await authService.resetPassword({
+    sessionId: "opaque-session",
+    code: "123456",
+    password: "Password1",
+    confirmPassword: "Password1",
+  });
+  assert.deepEqual(calls, [
+    "/auth/request-verification",
+    "/auth/resend-verification",
+    "/auth/verify",
+    "/auth/forgot-password",
+    "/auth/reset-password",
+  ]);
+  assert.equal(getAccessToken(), "stale");
+});
