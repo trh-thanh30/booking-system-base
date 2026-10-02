@@ -1,6 +1,11 @@
 "use client";
 
-import type { CurrentAuthUser, LoginInput } from "@repo/shared";
+import type {
+  CurrentAuthUser,
+  LoginInput,
+  CompleteGoogleOwnerOnboardingInput,
+  GoogleOwnerOnboardingResult,
+} from "@repo/shared";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   createContext,
@@ -27,6 +32,7 @@ import {
   AUTH_PROFILE_QUERY_KEY,
   canAccess,
   createAdminSession,
+  createGoogleOnboardingCompletion,
 } from "@/src/lib/admin-session";
 import { useAdminUiStore } from "@/src/app/stores/ui.store";
 
@@ -37,6 +43,9 @@ type AuthContextValue = {
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (input: LoginInput) => Promise<CurrentAuthUser>;
+  completeGoogleOnboarding: (
+    input: CompleteGoogleOwnerOnboardingInput,
+  ) => Promise<GoogleOwnerOnboardingResult>;
   logout: () => Promise<void>;
   refreshCurrentUser: () => Promise<CurrentAuthUser | null>;
   selectBusiness: (id: string) => void;
@@ -90,6 +99,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, [session]);
 
+  const completeGoogleOnboarding = useMemo(
+    () =>
+      createGoogleOnboardingCompletion((input) =>
+        session.establishSession(() =>
+          authService.completeGoogleOnboarding(input),
+        ),
+      ),
+    [session],
+  );
+
   const selectBusiness = useCallback(
     (id: string) => {
       if (
@@ -119,12 +138,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       isAuthenticated: Boolean(user),
       isLoading,
       login: session.login,
+      completeGoogleOnboarding,
       logout: session.logout,
       refreshCurrentUser: session.refreshCurrentUser,
       selectBusiness,
       user,
     }),
-    [isLoading, session, selectBusiness, user],
+    [isLoading, session, selectBusiness, user, completeGoogleOnboarding],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

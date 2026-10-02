@@ -3,3 +3,4 @@ export * from "./forgot-password.view";
 export * from "./login.view";
 export * from "./reset-password.view";
 export * from "./verify-email.view";
+export * from "./google-onboarding.view";

@@ -1,6 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { createAdminSession, canAccess } from "../src/lib/admin-session.ts";
+import {
+  createAdminSession,
+  canAccess,
+  createGoogleOnboardingCompletion,
+} from "../src/lib/admin-session.ts";
 
 const owner = {
   id: "owner-a",
@@ -195,4 +199,67 @@ test("Owner bypass, Staff manage permission, and Platform isolation", () => {
     ),
     false,
   );
+});
+
+test("Google onboarding establishes token, Tenant and default Business from the verified API profile without a password login", async () => {
+  const context = setup({
+    login: async () => {
+      throw new Error("must not login with a password");
+    },
+  });
+  const result = await context.session.establishSession(async () => ({
+    access_token: "google-token",
+    user: owner,
+    locale: "en",
+    return_to: "/bookings",
+  }));
+  assert.equal(result.locale, "en");
+  assert.equal(context.token, "google-token");
+  assert.deepEqual(context.profile, owner);
+  assert.equal(context.active, "business-a");
+});
+
+test("concurrent onboarding submits share one creation request", async () => {
+  let calls = 0;
+  let release;
+  const completion = createGoogleOnboardingCompletion(async () => {
+    calls++;
+    return new Promise((resolve) => {
+      release = resolve;
+    });
+  });
+  const first = completion({ owner: { username: "owner" } });
+  const second = completion({ owner: { username: "owner" } });
+  assert.equal(calls, 1);
+  release({ user: owner, access_token: "google-token" });
+  assert.deepEqual(await first, await second);
+});
+
+test("late onboarding response after logout cannot restore an account", async () => {
+  let release;
+  const context = setup();
+  const pending = context.session.establishSession(
+    () =>
+      new Promise((resolve) => {
+        release = resolve;
+      }),
+  );
+  await context.session.logout();
+  release({ access_token: "google-token", user: owner });
+  await assert.rejects(pending, /ADMIN_SESSION_CANCELLED/);
+  assert.equal(context.token, undefined);
+  assert.equal(context.profile, null);
+});
+
+test("invalid onboarding profile clears token and cannot authenticate Platform Admin", async () => {
+  const context = setup();
+  await assert.rejects(
+    context.session.establishSession(async () => ({
+      access_token: "token",
+      user: { ...owner, role: "SUPER_ADMIN" },
+    })),
+    /ADMIN_PROFILE_INVALID/,
+  );
+  assert.equal(context.profile, null);
+  assert.equal(context.token, undefined);
 });

@@ -1,4 +1,24 @@
-import type { AuthSession, CurrentAuthUser, LoginInput } from "@repo/shared";
+import type {
+  AuthSession,
+  CurrentAuthUser,
+  LoginInput,
+  CompleteGoogleOwnerOnboardingInput,
+  GoogleOwnerOnboardingResult,
+} from "@repo/shared";
+
+export function createGoogleOnboardingCompletion(
+  complete: (
+    input: CompleteGoogleOwnerOnboardingInput,
+  ) => Promise<GoogleOwnerOnboardingResult>,
+) {
+  let pending: Promise<GoogleOwnerOnboardingResult> | undefined;
+  return (input: CompleteGoogleOwnerOnboardingInput) => {
+    pending ??= complete(input).finally(() => {
+      pending = undefined;
+    });
+    return pending;
+  };
+}
 
 type SessionOptions = {
   hasRefreshMarker: () => boolean;
@@ -90,6 +110,30 @@ export function createAdminSession(options: SessionOptions) {
     }
   }
 
+  async function authenticate<T extends AuthSession>(
+    request: () => Promise<T>,
+    useResponseProfile: boolean,
+  ) {
+    const requestGeneration = ++generation;
+    const result = await request();
+    if (requestGeneration !== generation)
+      throw new Error("ADMIN_SESSION_CANCELLED");
+    if (typeof result.access_token !== "string" || !result.access_token) {
+      clear();
+      throw new Error("ADMIN_PROFILE_INVALID");
+    }
+    options.setAccessToken(result.access_token);
+    try {
+      const user = useResponseProfile ? result.user : await options.getMe();
+      if (requestGeneration !== generation)
+        throw new Error("ADMIN_SESSION_CANCELLED");
+      return { ...result, user: apply(user) };
+    } catch (error) {
+      if (requestGeneration === generation) clear();
+      throw error;
+    }
+  }
+
   return {
     clear,
     bootstrap() {
@@ -120,20 +164,12 @@ export function createAdminSession(options: SessionOptions) {
       return bootstrapPromise;
     },
     async login(input: LoginInput) {
-      const requestGeneration = ++generation;
-      const result = await options.login(input);
-      if (requestGeneration !== generation)
-        throw new Error("ADMIN_SESSION_CANCELLED");
-      options.setAccessToken(result.access_token);
-      try {
-        const user = await options.getMe();
-        if (requestGeneration !== generation)
-          throw new Error("ADMIN_SESSION_CANCELLED");
-        return apply(user);
-      } catch (error) {
-        if (requestGeneration === generation) clear();
-        throw error;
-      }
+      return (await authenticate(() => options.login(input), false)).user;
+    },
+    // Onboarding returns the same AuthProfileService profile as /auth/me. Adopt it once;
+    // an extra profile request failure must not encourage replaying workspace creation.
+    establishSession<T extends AuthSession>(request: () => Promise<T>) {
+      return authenticate(request, true);
     },
     refreshCurrentUser,
     async logout() {
