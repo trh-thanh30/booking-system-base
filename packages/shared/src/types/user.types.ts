@@ -31,3 +31,14 @@ export type AuthSession = {
   access_token: string;
   user: CurrentAuthUser;
 };
+
+export type GoogleOnboardingProfile = {
+  email: string;
+  full_name: string | null;
+  avatar_url: string | null;
+};
+
+export type GoogleOwnerOnboardingResult = AuthSession & {
+  locale: "vi" | "en";
+  return_to: string;
+};

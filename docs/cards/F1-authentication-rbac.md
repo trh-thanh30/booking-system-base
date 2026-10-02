@@ -147,7 +147,7 @@ Không thêm `sessions` table trong F1. Refresh/session state dùng `users.refre
 - Owner được truy cập toàn bộ Business trong Tenant; Staff chỉ truy cập Business có membership cùng Tenant.
 - Google OAuth account mới chỉ nhận Redis onboarding session tại callback; Tenant/Business/Owner chỉ được tạo khi hoàn tất onboarding.
 - Google onboarding token chỉ nằm trong HttpOnly cookie, không truyền qua URL; email và Google subject luôn lấy từ verified provider profile.
-- Backend F1-007 cung cấp contract onboarding; UI `/{locale}/onboarding/business` thuộc task frontend riêng.
+- Backend F1-007 cung cấp contract onboarding; UI `/{locale}/onboarding/business` được triển khai trong F1-011.
 
 ## Delivery Phases
 
@@ -178,6 +178,9 @@ Không thêm `sessions` table trong F1. Refresh/session state dùng `users.refre
 - Public request/resend responses và quota không phân biệt email tồn tại/đã verified;
   Axios public auth client không refresh token khi OTP session hết hạn.
 - Web registration specs chạy qua `pnpm test:web` và CI.
+- F1-011: Admin Google Login và public Business onboarding đã nối OAuth backend;
+  email Google read-only, không password giả, session/context dùng chung F1-009.
+- OAuth/onboarding specs nằm trong task; Google Account thật cần hoàn tất HITL.
 
 - Login, forgot password, reset password và accept invitation screens.
 - Current user state đọc từ `/auth/me`.

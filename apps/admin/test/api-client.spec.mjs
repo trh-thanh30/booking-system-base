@@ -8,6 +8,7 @@ import {
   setAccessToken,
   setTenantId,
 } from "../src/lib/auth-token.ts";
+import { createAdminSession } from "../src/lib/admin-session.ts";
 
 let handle;
 const previousAdapter = axios.defaults.adapter;
@@ -161,4 +162,90 @@ test("public email lifecycle endpoints send only their contracts without session
     "/auth/reset-password",
   ]);
   assert.equal(getAccessToken(), "stale");
+});
+
+test("Google callback refresh cookie bootstraps existing Owner through refresh and /auth/me, without password login", async (t) => {
+  browser(t);
+  const owner = {
+    id: "owner-google",
+    role: "OWNER",
+    status: "ACTIVE",
+    is_verified: true,
+    tenant_id: "tenant-g",
+    tenant: { id: "tenant-g", status: "ACTIVE" },
+    businesses: [{ id: "business-g", tenant_id: "tenant-g", is_default: true }],
+    permissions: [],
+  };
+  const calls = [];
+  handle = (config) => {
+    calls.push(config.url);
+    if (config.url === "/auth/admin/refresh")
+      return { access_token: "google-access" };
+    assert.equal(config.url, "/auth/me");
+    assert.equal(config.headers.get("Authorization"), "Bearer google-access");
+    return owner;
+  };
+  let context;
+  const session = createAdminSession({
+    hasRefreshMarker: () => true,
+    getAccessToken,
+    refresh: refreshAdminAccessToken,
+    getMe: authService.getMe,
+    login: authService.loginAdmin,
+    logout: authService.logout,
+    setAccessToken,
+    clearCredentials: clearAccessToken,
+    getActiveBusinessId: () => null,
+    clearCache() {},
+    setContext(user, businessId) {
+      context = { user, businessId };
+    },
+  });
+  assert.deepEqual(await session.bootstrap(), owner);
+  assert.deepEqual(calls, ["/auth/admin/refresh", "/auth/me"]);
+  assert.equal(context.businessId, "business-g");
+});
+
+test("Google onboarding uses cookie-based public GET/POST, with one request and no Admin refresh on expired cookie", async (t) => {
+  browser(t);
+  const calls = [];
+  const profile = {
+    email: "owner@example.com",
+    full_name: "Google Owner",
+    avatar_url: "https://lh3.googleusercontent.com/avatar",
+  };
+  handle = (config) => {
+    calls.push(config);
+    assert.equal(config.url, "/auth/admin/google/onboarding");
+    assert.equal(config.withCredentials, true);
+    assert.equal(config.headers.get("Authorization"), undefined);
+    return config.method === "get"
+      ? profile
+      : {
+          access_token: "google-access",
+          user: {},
+          locale: "en",
+          return_to: "/dashboard",
+        };
+  };
+  assert.deepEqual(await authService.getGoogleOnboardingProfile(), profile);
+  const input = {
+    name: "Tenant",
+    slug: "tenant",
+    owner: { username: "owner" },
+    locale: "en",
+    timezone: "Asia/Ho_Chi_Minh",
+  };
+  await authService.completeGoogleOnboarding(input);
+  assert.equal(calls.length, 2);
+  assert.deepEqual(JSON.parse(calls[1].data), input);
+  handle = (config) => {
+    calls.push(config);
+    reject401(config);
+  };
+  await assert.rejects(
+    authService.getGoogleOnboardingProfile(),
+    (error) => error.status === 401,
+  );
+  assert.equal(calls.length, 3);
 });

@@ -49,3 +49,24 @@ export function getSafeReturnTo(value: string | null | undefined): string {
 export function getLoginUrl(returnTo: string) {
   return `/login?returnTo=${encodeURIComponent(getSafeReturnTo(returnTo))}`;
 }
+
+export function buildGoogleLoginUrl(
+  baseUrl: string,
+  locale: string,
+  returnTo?: string,
+) {
+  const url = new URL(baseUrl);
+  if (
+    !["https:", "http:"].includes(url.protocol) ||
+    url.username ||
+    url.password
+  )
+    throw new Error("Invalid API URL");
+  url.pathname = `${url.pathname.replace(/\/$/, "")}/auth/admin/google`;
+  url.search = new URLSearchParams({
+    locale: locale === "en" ? "en" : "vi",
+    returnTo: getSafeReturnTo(returnTo),
+  }).toString();
+  url.hash = "";
+  return url.href;
+}

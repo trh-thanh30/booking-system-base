@@ -46,6 +46,14 @@ try {
       'name="confirmPassword"',
     ],
     ["http://localhost:3102/en/reset-password", "invalid or expired"],
+    [
+      "http://localhost:3102/en/onboarding/business",
+      "Complete your business details",
+    ],
+    [
+      "http://localhost:3102/en/login?oauthError=GOOGLE_AUTH_CANCELLED",
+      "Sign in",
+    ],
   ]) {
     const response = await get(url);
     assert.equal(response.status, 200, url);

@@ -1,5 +1,6 @@
 import { createApiClient, createSessionRefresh } from "@repo/shared";
 import { useAdminUiStore } from "@/src/app/stores/ui.store";
+import { apiConfig } from "@/src/config/api.config";
 import {
   clearAccessToken,
   getAccessToken,
@@ -27,8 +28,7 @@ function clearAdminSession() {
   }
 }
 
-const apiBaseUrl =
-  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000/api/v1";
+const apiBaseUrl = apiConfig.baseUrl;
 // Public account lifecycle requests must not inherit a stale Admin token or refresh an expired OTP session.
 export const publicAuthClient = createApiClient({
   baseURL: apiBaseUrl,

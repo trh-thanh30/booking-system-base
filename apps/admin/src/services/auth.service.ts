@@ -9,10 +9,15 @@ import type {
   ResendVerificationInput,
   ResetPasswordInput,
   VerifyEmailInput,
+  CompleteGoogleOwnerOnboardingInput,
+  GoogleOnboardingProfile,
+  GoogleOwnerOnboardingResult,
 } from "@repo/shared";
 import { unwrapApiData } from "@repo/shared";
 import { apiClient, publicAuthClient } from "@/src/lib/api-client";
 import { refreshAdminAccessToken } from "@/src/lib/api-client";
+import { buildGoogleLoginUrl } from "@/src/lib/auth-routing";
+import { apiConfig } from "@/src/config/api.config";
 
 export type InvitationPreview = {
   id: string;
@@ -44,6 +49,26 @@ export type CreatedInvitation = {
 };
 
 export const authService = {
+  getGoogleLoginUrl(locale: string, returnTo?: string) {
+    return buildGoogleLoginUrl(apiConfig.baseUrl, locale, returnTo);
+  },
+
+  async getGoogleOnboardingProfile() {
+    return unwrapApiData(
+      await publicAuthClient.get<GoogleOnboardingProfile>(
+        "/auth/admin/google/onboarding",
+      ),
+    );
+  },
+
+  async completeGoogleOnboarding(input: CompleteGoogleOwnerOnboardingInput) {
+    return unwrapApiData(
+      await publicAuthClient.post<GoogleOwnerOnboardingResult>(
+        "/auth/admin/google/onboarding",
+        input,
+      ),
+    );
+  },
   async loginAdmin(input: LoginInput) {
     return unwrapApiData(
       await apiClient.post<AuthSession>("/auth/admin/login", input),

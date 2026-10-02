@@ -3,7 +3,7 @@
 import { Lock, LogIn, Mail } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useToast } from "@repo/hooks";
 import { loginSchema, type LoginInput } from "@repo/shared";
@@ -15,13 +15,35 @@ import { AuthShell } from "./components/auth-shell";
 import { getSafeReturnTo } from "@/src/lib/auth-routing";
 import { getLoginErrorKey } from "./utils/auth.utils";
 import { getUnverifiedEmailUrl } from "./utils/email-auth.utils";
+import { getOAuthErrorKey, stripOAuthError } from "./utils/google-auth.utils";
+import { useGoogleLogin } from "./hooks/use-google-login";
 
-export function LoginView({ returnTo }: { returnTo?: string }) {
+export function LoginView({
+  returnTo,
+  oauthError,
+}: {
+  returnTo?: string;
+  oauthError?: string;
+}) {
   const t = useTranslations("Auth");
   const router = useRouter();
   const { login, isLoading, isAuthenticated } = useAuth();
   const { toast } = useToast();
-  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(
+    oauthError ? t(getOAuthErrorKey(oauthError)) : null,
+  );
+  const handledOAuthError = useRef<string | null>(null);
+  const google = useGoogleLogin(returnTo);
+  useEffect(() => {
+    if (!oauthError || handledOAuthError.current === oauthError) return;
+    handledOAuthError.current = oauthError;
+    toast.error(t(getOAuthErrorKey(oauthError)));
+    window.history.replaceState(
+      window.history.state,
+      "",
+      stripOAuthError(window.location.href),
+    );
+  }, [oauthError, t, toast]);
   const loginMutation = useMutation({ mutationFn: login, retry: false });
   const destination = getSafeReturnTo(returnTo);
   useEffect(() => {
@@ -40,6 +62,7 @@ export function LoginView({ returnTo }: { returnTo?: string }) {
   });
 
   async function onSubmit(input: LoginInput) {
+    if (google.isRedirecting || loginMutation.isPending) return;
     setSubmitError(null);
     const parsed = loginSchema.safeParse(input);
 
@@ -98,7 +121,7 @@ export function LoginView({ returnTo }: { returnTo?: string }) {
                 aria-describedby={
                   errors.usernameOrEmail ? "usernameOrEmail-error" : undefined
                 }
-                disabled={isSubmitting}
+                disabled={isSubmitting || google.isRedirecting}
                 autoComplete="username"
                 className="pl-9"
                 id="usernameOrEmail"
@@ -118,7 +141,7 @@ export function LoginView({ returnTo }: { returnTo?: string }) {
                 aria-describedby={
                   errors.password ? "password-error" : undefined
                 }
-                disabled={isSubmitting}
+                disabled={isSubmitting || google.isRedirecting}
                 autoComplete="current-password"
                 className="pl-9"
                 id="password"
@@ -143,11 +166,29 @@ export function LoginView({ returnTo }: { returnTo?: string }) {
           </div>
           <Button
             className="w-full"
-            disabled={isSubmitting || loginMutation.isPending}
+            disabled={
+              isSubmitting || loginMutation.isPending || google.isRedirecting
+            }
             type="submit"
           >
             <LogIn className="h-4 w-4" />
             {isSubmitting ? t("login.submitting") : t("login.submit")}
+          </Button>
+          <div className="flex items-center gap-3 text-sm text-muted-foreground">
+            <span className="h-px flex-1 bg-border" />
+            <span>{t("google.or")}</span>
+            <span className="h-px flex-1 bg-border" />
+          </div>
+          <Button
+            className="w-full"
+            variant="outline"
+            type="button"
+            disabled={
+              isSubmitting || loginMutation.isPending || google.isRedirecting
+            }
+            onClick={google.startGoogleLogin}
+          >
+            {google.isRedirecting ? t("google.redirecting") : t("google.login")}
           </Button>
         </form>
       )}

@@ -10,7 +10,7 @@ Cho phép người dùng Google chưa có tài khoản hoàn tất thông tin do
 2. Google callback xác thực Authorization Code, PKCE, state, nonce và email đã được Google xác minh.
 3. Nếu Google identity hoặc email đã thuộc một Owner hợp lệ, API liên kết identity khi cần và tạo admin session như F1-006.
 4. Nếu email chưa tồn tại, API tạo onboarding session ngắn hạn trong Redis, đặt token vào cookie HttpOnly và chuyển hướng tới `/{locale}/onboarding/business`.
-5. UI tương lai đọc profile đã xác minh qua `GET /auth/admin/google/onboarding`.
+5. UI F1-011 đọc profile đã xác minh qua `GET /auth/admin/google/onboarding`.
 6. UI gửi thông tin Tenant, default Business và Owner qua `POST /auth/admin/google/onboarding`.
 7. API tạo Tenant, TenantSettings, default Business, Owner, BusinessMembership và Google UserIdentity; sau đó cấp admin access/refresh token.
 
