@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useToast } from "@repo/hooks";
-import { HttpClientError, loginSchema, type LoginInput } from "@repo/shared";
+import { loginSchema, type LoginInput } from "@repo/shared";
 import { Button, Input } from "@repo/ui";
 import { FormField } from "@/src/components/common/form-field";
 import { useAuth } from "@/src/app/providers";
@@ -14,6 +14,7 @@ import { Link, useRouter } from "@/src/i18n/navigation";
 import { AuthShell } from "./components/auth-shell";
 import { getSafeReturnTo } from "@/src/lib/auth-routing";
 import { getLoginErrorKey } from "./utils/auth.utils";
+import { getUnverifiedEmailUrl } from "./utils/email-auth.utils";
 
 export function LoginView({ returnTo }: { returnTo?: string }) {
   const t = useTranslations("Auth");
@@ -58,29 +59,10 @@ export function LoginView({ returnTo }: { returnTo?: string }) {
       toast.success(t("login.success"));
       router.replace(destination);
     } catch (error) {
-      if (
-        error instanceof HttpClientError &&
-        error.code === "EMAIL_NOT_VERIFIED"
-      ) {
-        const details = error.details;
-        const sessionId =
-          typeof details === "object" &&
-          details !== null &&
-          "sessionId" in details &&
-          typeof details.sessionId === "string"
-            ? details.sessionId
-            : undefined;
-
+      const verificationUrl = getUnverifiedEmailUrl(error, destination);
+      if (verificationUrl) {
         toast.info(t("login.verificationRequired"));
-        const verificationUrl = sessionId
-          ? "/verify-email?sessionId=" + encodeURIComponent(sessionId)
-          : "/verify-email";
-        router.replace(
-          verificationUrl +
-            (sessionId ? "&" : "?") +
-            "returnTo=" +
-            encodeURIComponent(destination),
-        );
+        router.replace(verificationUrl);
         return;
       }
 

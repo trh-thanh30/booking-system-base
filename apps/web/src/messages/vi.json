@@ -9,5 +9,37 @@
     "description": "Bắt đầu phần domain từ một vertical slice: API route, shared contract, UI state và verification.",
     "primaryAction": "Hành động chính",
     "apiDocs": "Tài liệu API"
+  },
+  "SignupBusiness": {
+    "back": "Quay lại",
+    "eyebrow": "Đăng ký doanh nghiệp",
+    "title": "Tạo không gian đặt lịch cho doanh nghiệp của bạn.",
+    "description": "Tạo tài khoản Owner, Tenant và Business mặc định. Xác minh email trước khi đăng nhập vào trang quản trị doanh nghiệp.",
+    "tenantIsolated": "Dữ liệu Tenant riêng biệt",
+    "ownerReady": "Tài khoản Owner",
+    "verification": "Xác minh email",
+    "checkEmail": "Kiểm tra email của bạn",
+    "success": "Đã tạo tài khoản. Vui lòng xác minh email.",
+    "successDescription": "Doanh nghiệp đã sẵn sàng. Bạn đang được chuyển sang trang xác minh email trước khi đăng nhập.",
+    "verifyEmail": "Xác minh email",
+    "sameName": "Mặc định theo tên Tenant",
+    "sameSlug": "Mặc định theo slug Tenant",
+    "submit": "Tạo tài khoản doanh nghiệp",
+    "submitting": "Đang tạo tài khoản…",
+    "invalidField": "Vui lòng kiểm tra thông tin của trường này.",
+    "failed": "Không thể đăng ký. Kiểm tra thông tin hoặc thử lại sau; username, email và slug cần chưa được sử dụng.",
+    "rateLimited": "Quá nhiều yêu cầu. Vui lòng chờ rồi thử lại.",
+    "fields": {
+      "name": "Tên Tenant / doanh nghiệp",
+      "slug": "Slug Tenant",
+      "domain": "Tên miền đặt lịch (không bắt buộc)",
+      "defaultBusiness": "Business đầu tiên (không bắt buộc)",
+      "fullName": "Họ tên Owner (không bắt buộc)",
+      "username": "Tên đăng nhập",
+      "email": "Email",
+      "phone": "Số điện thoại (không bắt buộc)",
+      "password": "Mật khẩu (ít nhất 8 ký tự)",
+      "confirmPassword": "Xác nhận mật khẩu"
+    }
   }
 }

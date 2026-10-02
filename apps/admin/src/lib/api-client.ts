@@ -29,6 +29,13 @@ function clearAdminSession() {
 
 const apiBaseUrl =
   process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000/api/v1";
+// Public account lifecycle requests must not inherit a stale Admin token or refresh an expired OTP session.
+export const publicAuthClient = createApiClient({
+  baseURL: apiBaseUrl,
+  timeout: 15_000,
+  headers: { "x-auth-context": "admin" },
+  withCredentials: true,
+});
 const adminSessionPaths = [
   "/auth/admin/login",
   "/auth/admin/refresh",

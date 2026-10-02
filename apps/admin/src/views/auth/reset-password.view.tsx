@@ -1,8 +1,8 @@
 "use client";
 
-import { ArrowLeft, KeyRound, LockKeyhole } from "lucide-react";
-import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
+import { useMutation } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
 import { useToast } from "@repo/hooks";
 import { resetPasswordSchema, type ResetPasswordInput } from "@repo/shared";
 import { Button, Input } from "@repo/ui";
@@ -10,6 +10,8 @@ import { FormField } from "@/src/components/common/form-field";
 import { Link, useRouter } from "@/src/i18n/navigation";
 import { authService } from "@/src/services/auth.service";
 import { AuthShell } from "./components/auth-shell";
+import { EmailAuthFeedback } from "./components/email-auth-feedback";
+import { useEmailAuthFeedback } from "./hooks/use-email-auth-feedback";
 
 export function ResetPasswordView({
   initialSessionId = "",
@@ -19,9 +21,13 @@ export function ResetPasswordView({
   const { toast } = useToast();
   const t = useTranslations("Auth");
   const router = useRouter();
-  const sessionId = initialSessionId;
+  const feedback = useEmailAuthFeedback();
+  const reset = useMutation({
+    mutationFn: authService.resetPassword,
+    retry: false,
+  });
   const {
-    formState: { errors, isSubmitting },
+    formState: { errors },
     handleSubmit,
     register,
     setError,
@@ -30,103 +36,137 @@ export function ResetPasswordView({
       code: "",
       confirmPassword: "",
       password: "",
-      sessionId,
+      sessionId: initialSessionId,
     },
   });
 
   async function onSubmit(input: ResetPasswordInput) {
-    const parsed = resetPasswordSchema.safeParse(input);
-
+    if (
+      !initialSessionId ||
+      feedback.expired ||
+      feedback.remaining ||
+      reset.isPending
+    )
+      return;
+    const parsed = resetPasswordSchema.safeParse({
+      ...input,
+      sessionId: initialSessionId,
+    });
     if (!parsed.success) {
-      const issue = parsed.error.issues[0];
-      const field = issue?.path[0] as keyof ResetPasswordInput | undefined;
-
-      if (field && issue) {
-        setError(field, { message: issue.message });
+      for (const issue of parsed.error.issues) {
+        const field = issue.path[0];
+        if (
+          field === "code" ||
+          field === "password" ||
+          field === "confirmPassword"
+        ) {
+          const key =
+            field === "code"
+              ? "codeFormat"
+              : field === "password"
+                ? "passwordLength"
+                : "passwordMismatch";
+          setError(field, { message: t(`emailFlow.${key}`) });
+        }
       }
-
       return;
     }
-
+    feedback.clear();
     try {
-      await authService.resetPassword(parsed.data);
+      await reset.mutateAsync(parsed.data);
       toast.success(t("reset.success"));
       router.replace("/login");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : t("reset.failed"));
+      feedback.fail(error, "otp");
     }
   }
 
+  const expired = !initialSessionId || feedback.expired;
   return (
     <AuthShell description={t("reset.description")} title={t("reset.title")}>
-      <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
-        {sessionId ? (
-          <input type="hidden" {...register("sessionId")} />
+      <div className="space-y-4">
+        <EmailAuthFeedback
+          errorKey={
+            !initialSessionId ? "emailFlow.sessionExpired" : feedback.errorKey
+          }
+          remaining={feedback.remaining}
+        />
+        {expired ? (
+          <Button asChild className="w-full">
+            <Link href="/forgot-password">{t("emailFlow.requestNewCode")}</Link>
+          </Button>
         ) : (
-          <FormField
-            error={errors.sessionId?.message}
-            htmlFor="sessionId"
-            label={t("fields.sessionId")}
-          >
-            <Input id="sessionId" {...register("sessionId")} />
-          </FormField>
+          <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
+            <FormField
+              error={errors.code?.message}
+              htmlFor="code"
+              label={t("fields.code")}
+            >
+              <Input
+                id="code"
+                autoComplete="one-time-code"
+                inputMode="numeric"
+                maxLength={6}
+                className="tracking-[0.3em]"
+                disabled={reset.isPending}
+                aria-invalid={Boolean(errors.code)}
+                aria-describedby={errors.code ? "code-error" : undefined}
+                {...register("code")}
+              />
+            </FormField>
+            <FormField
+              error={errors.password?.message}
+              htmlFor="password"
+              label={t("fields.password")}
+              description={t("emailFlow.passwordLength")}
+            >
+              <Input
+                id="password"
+                type="password"
+                autoComplete="new-password"
+                disabled={reset.isPending}
+                aria-invalid={Boolean(errors.password)}
+                aria-describedby={
+                  errors.password ? "password-error" : undefined
+                }
+                {...register("password")}
+              />
+            </FormField>
+            <FormField
+              error={errors.confirmPassword?.message}
+              htmlFor="confirmPassword"
+              label={t("fields.confirmPassword")}
+            >
+              <Input
+                id="confirmPassword"
+                type="password"
+                autoComplete="new-password"
+                disabled={reset.isPending}
+                aria-invalid={Boolean(errors.confirmPassword)}
+                aria-describedby={
+                  errors.confirmPassword ? "confirmPassword-error" : undefined
+                }
+                {...register("confirmPassword")}
+              />
+            </FormField>
+            <Button
+              className="w-full"
+              disabled={reset.isPending || feedback.remaining > 0}
+              type="submit"
+            >
+              {reset.isPending ? t("reset.submitting") : t("reset.submit")}
+            </Button>
+            <Button asChild className="w-full" variant="outline">
+              <Link href="/forgot-password">
+                {t("emailFlow.requestNewCode")}
+              </Link>
+            </Button>
+          </form>
         )}
-        <FormField
-          error={errors.code?.message}
-          htmlFor="code"
-          label={t("fields.code")}
-        >
-          <div className="relative">
-            <KeyRound className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-            <Input
-              autoComplete="one-time-code"
-              className="pl-9 tracking-[0.3em]"
-              id="code"
-              inputMode="numeric"
-              maxLength={6}
-              {...register("code")}
-            />
-          </div>
-        </FormField>
-        <FormField
-          error={errors.password?.message}
-          htmlFor="password"
-          label={t("fields.password")}
-        >
-          <div className="relative">
-            <LockKeyhole className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-            <Input
-              autoComplete="new-password"
-              className="pl-9"
-              id="password"
-              type="password"
-              {...register("password")}
-            />
-          </div>
-        </FormField>
-        <FormField
-          error={errors.confirmPassword?.message}
-          htmlFor="confirmPassword"
-          label={t("fields.confirmPassword")}
-        >
-          <Input
-            autoComplete="new-password"
-            id="confirmPassword"
-            type="password"
-            {...register("confirmPassword")}
-          />
-        </FormField>
-        <Button className="w-full" disabled={isSubmitting} type="submit">
-          <LockKeyhole className="h-4 w-4" />
-          {isSubmitting ? t("reset.submitting") : t("reset.submit")}
+        <Button asChild className="w-full" variant="ghost">
+          <Link href="/login">{t("backToLogin")}</Link>
         </Button>
-        <Button asChild className="w-full" type="button" variant="ghost">
-          <Link href="/login">
-            <ArrowLeft className="h-4 w-4" />
-            {t("backToLogin")}
-          </Link>
-        </Button>
-      </form>
+      </div>
     </AuthShell>
   );
 }

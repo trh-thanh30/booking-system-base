@@ -1,9 +1,9 @@
 "use client";
 
-import { ArrowLeft, Mail, RefreshCw, ShieldCheck } from "lucide-react";
-import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { useMutation } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
 import { useToast } from "@repo/hooks";
 import {
   emailRequestSchema,
@@ -14,178 +14,193 @@ import {
 import { Button, Input } from "@repo/ui";
 import { FormField } from "@/src/components/common/form-field";
 import { Link, useRouter } from "@/src/i18n/navigation";
+import { getLoginUrl } from "@/src/lib/auth-routing";
 import { authService } from "@/src/services/auth.service";
 import { AuthShell } from "./components/auth-shell";
+import { EmailAuthFeedback } from "./components/email-auth-feedback";
+import { useEmailAuthFeedback } from "./hooks/use-email-auth-feedback";
+import { getSessionUrl } from "./utils/email-auth.utils";
 
 export function VerifyEmailView({
   initialSessionId = "",
+  returnTo,
 }: {
   initialSessionId?: string;
+  returnTo?: string;
 }) {
   const { toast } = useToast();
   const t = useTranslations("Auth");
   const router = useRouter();
   const [sessionId, setSessionId] = useState(initialSessionId);
-  const [isResending, setIsResending] = useState(false);
+  const feedback = useEmailAuthFeedback();
+  const request = useMutation({
+    mutationFn: authService.requestVerification,
+    retry: false,
+  });
+  const verify = useMutation({
+    mutationFn: authService.verifyEmail,
+    retry: false,
+  });
+  const resend = useMutation({
+    mutationFn: authService.resendVerification,
+    retry: false,
+  });
   const requestForm = useForm<EmailRequestInput>({
     defaultValues: { email: "" },
   });
   const verifyForm = useForm<VerifyEmailInput>({
-    defaultValues: {
-      code: "",
-      sessionId,
-    },
+    defaultValues: { code: "", sessionId },
   });
+  const loginUrl = returnTo ? getLoginUrl(returnTo) : "/login";
+  const pending = request.isPending || verify.isPending || resend.isPending;
 
   async function requestCode(input: EmailRequestInput) {
-    const parsed = emailRequestSchema.safeParse(input);
-
+    if (pending || feedback.remaining) return;
+    const parsed = emailRequestSchema.safeParse({ email: input.email.trim() });
     if (!parsed.success) {
-      requestForm.setError("email", {
-        message: parsed.error.issues[0]?.message,
-      });
+      requestForm.setError("email", { message: t("emailFlow.invalidEmail") });
       return;
     }
-
+    feedback.clear();
     try {
-      const result = await authService.requestVerification(parsed.data);
+      const result = await request.mutateAsync(parsed.data);
       setSessionId(result.sessionId);
+      feedback.resetSession();
+      feedback.cooldown();
       verifyForm.reset({ code: "", sessionId: result.sessionId });
-      router.replace(
-        `/verify-email?sessionId=${encodeURIComponent(result.sessionId)}`,
-      );
+      router.replace(getSessionUrl("verify-email", result.sessionId, returnTo));
       toast.success(t("verify.requestSuccess"));
     } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : t("verify.requestFailed"),
-      );
+      feedback.fail(error, "request");
     }
   }
 
   async function verifyCode(input: VerifyEmailInput) {
+    if (
+      pending ||
+      feedback.expired ||
+      !sessionId ||
+      (feedback.errorKey === "emailFlow.rateLimited" && feedback.remaining)
+    )
+      return;
     const parsed = verifyEmailSchema.safeParse({ ...input, sessionId });
-
     if (!parsed.success) {
-      const issue = parsed.error.issues[0];
-      const field = issue?.path[0] as keyof VerifyEmailInput | undefined;
-      if (field && issue) {
-        verifyForm.setError(field, { message: issue.message });
-      }
+      verifyForm.setError("code", { message: t("emailFlow.codeFormat") });
       return;
     }
-
+    feedback.clear();
     try {
-      await authService.verifyEmail(parsed.data);
+      await verify.mutateAsync(parsed.data);
       toast.success(t("verify.success"));
-      router.replace("/login");
+      router.replace(loginUrl);
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : t("verify.failed"));
+      feedback.fail(error, "otp");
     }
   }
 
   async function resendCode() {
-    if (!sessionId || isResending) return;
-
-    setIsResending(true);
+    if (!sessionId || pending || feedback.remaining || feedback.expired) return;
+    feedback.clear();
     try {
-      await authService.resendVerification({ sessionId });
+      await resend.mutateAsync({ sessionId });
+      feedback.cooldown();
+      verifyForm.reset({ code: "", sessionId });
       toast.success(t("verify.resendSuccess"));
     } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : t("verify.resendFailed"),
-      );
-    } finally {
-      setIsResending(false);
+      feedback.fail(error, "otp");
     }
   }
 
   return (
     <AuthShell description={t("verify.description")} title={t("verify.title")}>
-      {sessionId ? (
-        <form
-          className="space-y-4"
-          onSubmit={verifyForm.handleSubmit(verifyCode)}
-        >
-          <div className="rounded-md border border-slate-200 bg-white p-4 text-sm text-slate-600 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-300">
-            {t("verify.codeHint")}
-          </div>
-          <FormField
-            error={verifyForm.formState.errors.code?.message}
-            htmlFor="code"
-            label={t("fields.code")}
+      <div className="space-y-4">
+        <EmailAuthFeedback
+          errorKey={feedback.errorKey}
+          remaining={feedback.remaining}
+        />
+        {sessionId && !feedback.expired ? (
+          <form
+            className="space-y-4"
+            onSubmit={verifyForm.handleSubmit(verifyCode)}
           >
-            <div className="relative">
-              <ShieldCheck className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <p className="rounded-md border bg-muted p-4 text-sm text-muted-foreground">
+              {t("verify.codeHint")}
+            </p>
+            <FormField
+              error={verifyForm.formState.errors.code?.message}
+              htmlFor="code"
+              label={t("fields.code")}
+            >
               <Input
-                autoComplete="one-time-code"
-                className="pl-9 tracking-[0.3em]"
                 id="code"
+                autoComplete="one-time-code"
                 inputMode="numeric"
                 maxLength={6}
+                aria-invalid={Boolean(verifyForm.formState.errors.code)}
+                aria-describedby={
+                  verifyForm.formState.errors.code ? "code-error" : undefined
+                }
+                className="tracking-[0.3em]"
+                disabled={pending}
                 {...verifyForm.register("code")}
               />
-            </div>
-          </FormField>
-          <Button
-            className="w-full"
-            disabled={verifyForm.formState.isSubmitting}
-            type="submit"
+            </FormField>
+            <Button
+              className="w-full"
+              disabled={
+                pending ||
+                (feedback.errorKey === "emailFlow.rateLimited" &&
+                  feedback.remaining > 0)
+              }
+              type="submit"
+            >
+              {verify.isPending ? t("verify.submitting") : t("verify.submit")}
+            </Button>
+            <Button
+              className="w-full"
+              disabled={pending || feedback.remaining > 0}
+              onClick={() => void resendCode()}
+              type="button"
+              variant="outline"
+            >
+              {resend.isPending ? t("verify.resending") : t("verify.resend")}
+            </Button>
+          </form>
+        ) : (
+          <form
+            className="space-y-4"
+            onSubmit={requestForm.handleSubmit(requestCode)}
           >
-            <ShieldCheck className="h-4 w-4" />
-            {verifyForm.formState.isSubmitting
-              ? t("verify.submitting")
-              : t("verify.submit")}
-          </Button>
-          <Button
-            className="w-full"
-            disabled={isResending}
-            onClick={() => void resendCode()}
-            type="button"
-            variant="outline"
-          >
-            <RefreshCw className="h-4 w-4" />
-            {isResending ? t("verify.resending") : t("verify.resend")}
-          </Button>
-        </form>
-      ) : (
-        <form
-          className="space-y-4"
-          onSubmit={requestForm.handleSubmit(requestCode)}
-        >
-          <FormField
-            error={requestForm.formState.errors.email?.message}
-            htmlFor="email"
-            label={t("fields.email")}
-          >
-            <div className="relative">
-              <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <FormField
+              error={requestForm.formState.errors.email?.message}
+              htmlFor="email"
+              label={t("fields.email")}
+            >
               <Input
-                autoComplete="email"
-                className="pl-9"
                 id="email"
                 type="email"
+                autoComplete="email"
+                disabled={pending}
+                aria-invalid={Boolean(requestForm.formState.errors.email)}
+                aria-describedby={
+                  requestForm.formState.errors.email ? "email-error" : undefined
+                }
                 {...requestForm.register("email")}
               />
-            </div>
-          </FormField>
-          <Button
-            className="w-full"
-            disabled={requestForm.formState.isSubmitting}
-            type="submit"
-          >
-            <Mail className="h-4 w-4" />
-            {requestForm.formState.isSubmitting
-              ? t("verify.requesting")
-              : t("verify.request")}
-          </Button>
-        </form>
-      )}
-      <Button asChild className="mt-3 w-full" type="button" variant="ghost">
-        <Link href="/login">
-          <ArrowLeft className="h-4 w-4" />
-          {t("backToLogin")}
-        </Link>
-      </Button>
+            </FormField>
+            <Button
+              className="w-full"
+              disabled={pending || feedback.remaining > 0}
+              type="submit"
+            >
+              {request.isPending ? t("verify.requesting") : t("verify.request")}
+            </Button>
+          </form>
+        )}
+        <Button asChild className="w-full" variant="ghost">
+          <Link href={loginUrl}>{t("backToLogin")}</Link>
+        </Button>
+      </div>
     </AuthShell>
   );
 }

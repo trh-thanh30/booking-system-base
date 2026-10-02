@@ -154,11 +154,11 @@
       "sessionTitle": "Reset session",
       "submit": "Gửi mã đặt lại",
       "submitting": "Đang gửi mã",
-      "success": "Đã yêu cầu mã đặt lại",
+      "success": "Nếu tài khoản đủ điều kiện, mã đặt lại mật khẩu đã được gửi qua email.",
       "title": "Quên mật khẩu"
     },
     "reset": {
-      "description": "Nhập reset session, mã xác minh và mật khẩu mới.",
+      "description": "Nhập mã 6 chữ số được gửi qua email và mật khẩu mới.",
       "failed": "Không thể đặt lại mật khẩu",
       "submit": "Đặt lại mật khẩu",
       "submitting": "Đang đặt lại",
@@ -192,6 +192,19 @@
       "success": "Đã chấp nhận lời mời. Bạn có thể đăng nhập.",
       "title": "Chấp nhận lời mời",
       "unavailable": "Không khả dụng"
+    },
+    "emailFlow": {
+      "failed": "Không thể xử lý yêu cầu. Vui lòng thử lại.",
+      "networkError": "Không kết nối được máy chủ. Kiểm tra mạng và thử lại.",
+      "sessionExpired": "Phiên đã hết hạn hoặc không hợp lệ. Vui lòng yêu cầu mã mới.",
+      "invalidCode": "Mã không đúng hoặc đã hết hạn. Kiểm tra mã hoặc yêu cầu mã mới.",
+      "rateLimited": "Bạn đã gửi quá nhiều yêu cầu. Vui lòng chờ rồi thử lại.",
+      "retryIn": "Có thể gửi lại sau {seconds} giây.",
+      "requestNewCode": "Yêu cầu mã mới",
+      "invalidEmail": "Vui lòng nhập email hợp lệ.",
+      "codeFormat": "Mã xác minh phải gồm đúng 6 chữ số.",
+      "passwordLength": "Mật khẩu cần ít nhất 8 ký tự.",
+      "passwordMismatch": "Mật khẩu xác nhận phải trùng với mật khẩu mới."
     }
   },
   "Home": {

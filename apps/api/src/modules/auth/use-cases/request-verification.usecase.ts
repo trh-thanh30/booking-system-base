@@ -26,13 +26,24 @@ export class RequestVerificationUseCase implements BaseUseCase<
       'email_verification',
     );
 
-    // Keep the public response identical to prevent account enumeration.
-    if (!user || user.is_verified) {
-      return { sessionId };
-    }
-
     try {
-      await this.sendVerificationCode(email);
+      // The quota must not reveal whether an account exists or is already verified.
+      const { expiresAt, code } = await this.verificationService.generate({
+        namespace: 'email_verification',
+        subject: email,
+        ttlSec: 15 * 60,
+        length: 6,
+        maxAttempts: 5,
+        rateLimitMax: 6,
+        rateLimitWindowSec: 24 * 60 * 60,
+      });
+      if (user && !user.is_verified) {
+        await this.sendVerificationEmailUseCase.execute({
+          to: email,
+          code,
+          ttl: expiresAt - Date.now(),
+        });
+      }
       return { sessionId };
     } catch (error) {
       await this.verificationSessionService.deleteSession(
@@ -41,25 +52,5 @@ export class RequestVerificationUseCase implements BaseUseCase<
       );
       throw error;
     }
-  }
-
-  private async sendVerificationCode(email: string): Promise<void> {
-    const { expiresAt, code } = await this.verificationService.generate({
-      namespace: 'email_verification',
-      subject: email,
-      ttlSec: 15 * 60, // 15 minutes
-      length: 6,
-      maxAttempts: 5,
-      rateLimitMax: 6,
-      rateLimitWindowSec: 24 * 60 * 60, // 24 hours
-    });
-
-    const ttl = expiresAt - Date.now();
-
-    await this.sendVerificationEmailUseCase.execute({
-      to: email,
-      code,
-      ttl,
-    });
   }
 }

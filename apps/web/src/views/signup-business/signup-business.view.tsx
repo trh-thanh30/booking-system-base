@@ -1,39 +1,26 @@
 "use client";
 
 import { useMutation } from "@tanstack/react-query";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { ArrowLeft, Building2, CheckCircle2, ExternalLink } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useToast } from "@repo/hooks";
-import { registerOwnerSchema, type RegisterOwnerInput } from "@repo/shared";
-import { Button, Input, Label } from "@repo/ui";
+import { HttpClientError, type RegisterOwnerInput } from "@repo/shared";
+import { Button, Input } from "@repo/ui";
 import { Link } from "@/src/i18n/navigation";
 import { authService } from "@/src/services/auth.service";
-
-function Field({
-  error,
-  id,
-  label,
-  children,
-}: {
-  error?: string;
-  id: string;
-  label: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="space-y-2">
-      <Label htmlFor={id}>{label}</Label>
-      {children}
-      {error ? <p className="text-xs leading-5 text-red-600">{error}</p> : null}
-    </div>
-  );
-}
+import { RegistrationField as Field } from "./components/registration-field";
+import {
+  getAdminVerificationUrl,
+  parseOwnerRegistration,
+} from "./utils/registration.utils";
 
 export function SignupBusinessView() {
   const { toast } = useToast();
   const locale = useLocale();
+  const t = useTranslations("SignupBusiness");
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [verificationUrl, setVerificationUrl] = useState<string | null>(null);
   const {
     formState: { errors },
@@ -61,73 +48,83 @@ export function SignupBusinessView() {
     },
   });
   const signupMutation = useMutation({
-    mutationFn: authService.registerOwner,
-    onSuccess(result) {
-      const adminBaseUrl =
+    retry: false,
+    async mutationFn(input: RegisterOwnerInput) {
+      const baseUrl =
         process.env.NEXT_PUBLIC_ADMIN_URL ?? "http://localhost:3002";
-      setVerificationUrl(
-        `${adminBaseUrl}/${locale}/verify-email?sessionId=${encodeURIComponent(result.sessionId)}`,
-      );
-      toast.success(`${result.tenant.name} workspace created`);
+      // Validate configuration before creating an account to avoid a duplicate registration after a broken handoff.
+      getAdminVerificationUrl(baseUrl, locale, "");
+      const result = await authService.registerOwner(input);
+      return getAdminVerificationUrl(baseUrl, locale, result.sessionId);
+    },
+    onSuccess(url) {
+      setVerificationUrl(url);
+      toast.success(t("success"));
+      window.location.assign(url);
     },
     onError(error) {
-      toast.error(error instanceof Error ? error.message : "Signup failed");
+      setSubmitError(
+        t(
+          error instanceof HttpClientError && error.status === 429
+            ? "rateLimited"
+            : "failed",
+        ),
+      );
     },
   });
 
   return (
-    <main className="min-h-dvh bg-slate-50 text-slate-950">
+    <main className="min-h-dvh bg-background text-foreground">
       <div className="mx-auto flex min-h-dvh w-full max-w-6xl flex-col px-4 py-6 sm:px-6 lg:px-8">
         <div>
           <Button asChild variant="ghost">
             <Link href="/">
               <ArrowLeft className="h-4 w-4" />
-              Back
+              {t("back")}
             </Link>
           </Button>
         </div>
         <div className="grid flex-1 items-center gap-8 py-8 lg:grid-cols-[0.9fr_1.1fr]">
           <section className="space-y-6">
-            <div className="flex h-12 w-12 items-center justify-center rounded-md bg-slate-950 text-white">
+            <div className="flex h-12 w-12 items-center justify-center rounded-md bg-primary text-primary-foreground">
               <Building2 className="h-5 w-5" />
             </div>
             <div>
-              <p className="text-sm font-medium uppercase text-slate-500">
-                Business signup
+              <p className="text-sm font-medium uppercase text-muted-foreground">
+                {t("eyebrow")}
               </p>
               <h1 className="mt-3 max-w-xl text-4xl font-semibold tracking-normal sm:text-5xl">
-                Create a booking workspace for your business.
+                {t("title")}
               </h1>
-              <p className="mt-4 max-w-xl text-base leading-7 text-slate-600">
-                Register a tenant, create the owner account, then continue to
-                the business admin portal to configure services, staff and
-                booking rules.
+              <p className="mt-4 max-w-xl text-base leading-7 text-muted-foreground">
+                {t("description")}
               </p>
             </div>
-            <div className="grid gap-3 text-sm text-slate-600 sm:grid-cols-3">
-              <div className="rounded-md border border-slate-200 bg-white p-4">
-                Tenant isolated
+            <div className="grid gap-3 text-sm text-muted-foreground sm:grid-cols-3">
+              <div className="rounded-md border border-border bg-card p-4">
+                {t("tenantIsolated")}
               </div>
-              <div className="rounded-md border border-slate-200 bg-white p-4">
-                Owner role ready
+              <div className="rounded-md border border-border bg-card p-4">
+                {t("ownerReady")}
               </div>
-              <div className="rounded-md border border-slate-200 bg-white p-4">
-                Email verification
+              <div className="rounded-md border border-border bg-card p-4">
+                {t("verification")}
               </div>
             </div>
           </section>
-          <section className="rounded-md border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+          <section className="rounded-md border border-border bg-card p-5 shadow-sm sm:p-6">
             {verificationUrl ? (
               <div className="flex min-h-96 flex-col justify-center text-center">
-                <CheckCircle2 className="mx-auto h-10 w-10 text-emerald-600" />
-                <h2 className="mt-4 text-xl font-semibold">Check your email</h2>
-                <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-slate-600">
-                  Your workspace and default business are ready. Verify the
-                  owner email before signing in to the business admin portal.
+                <CheckCircle2 className="mx-auto h-10 w-10 text-success" />
+                <h2 className="mt-4 text-xl font-semibold">
+                  {t("checkEmail")}
+                </h2>
+                <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-muted-foreground">
+                  {t("successDescription")}
                 </p>
                 <Button asChild className="mx-auto mt-6">
                   <a href={verificationUrl}>
-                    Verify email
+                    {t("verifyEmail")}
                     <ExternalLink className="h-4 w-4" />
                   </a>
                 </Button>
@@ -136,19 +133,8 @@ export function SignupBusinessView() {
               <form
                 className="space-y-5"
                 onSubmit={handleSubmit((input) => {
-                  const parsed = registerOwnerSchema.safeParse({
-                    ...input,
-                    default_business_name:
-                      input.default_business_name?.trim() || undefined,
-                    default_business_slug:
-                      input.default_business_slug?.trim() || undefined,
-                    primary_domain: input.primary_domain?.trim() || undefined,
-                    owner: {
-                      ...input.owner,
-                      full_name: input.owner.full_name?.trim() || undefined,
-                      phone: input.owner.phone?.trim() || undefined,
-                    },
-                  });
+                  setSubmitError(null);
+                  const parsed = parseOwnerRegistration(input);
 
                   if (!parsed.success) {
                     const issue = parsed.error.issues[0];
@@ -158,11 +144,11 @@ export function SignupBusinessView() {
                     const [root, child] = issue?.path ?? [];
                     if (root === "owner" && child) {
                       setError(`owner.${String(child)}` as never, {
-                        message: issue.message,
+                        message: t("invalidField"),
                       });
                     } else if (root) {
                       setError(String(root) as keyof RegisterOwnerInput, {
-                        message: issue?.message,
+                        message: t("invalidField"),
                       });
                     }
                     return;
@@ -171,129 +157,140 @@ export function SignupBusinessView() {
                   signupMutation.mutate(parsed.data);
                 })}
               >
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <Field
-                    error={errors.name?.message}
-                    id="business-name"
-                    label="Business name"
+                {submitError ? (
+                  <p
+                    role="alert"
+                    className="rounded-md border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive"
                   >
-                    <Input id="business-name" {...register("name")} />
-                  </Field>
-                  <Field
-                    error={errors.slug?.message}
-                    id="business-slug"
-                    label="Business slug"
-                  >
-                    <Input id="business-slug" {...register("slug")} />
-                  </Field>
-                </div>
-                <Field
-                  error={errors.primary_domain?.message}
-                  id="business-domain"
-                  label="Booking domain"
-                >
-                  <Input
-                    id="business-domain"
-                    placeholder="demo.localhost"
-                    {...register("primary_domain")}
-                  />
-                </Field>
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <Field
-                    error={errors.default_business_name?.message}
-                    id="default-business-name"
-                    label="First business"
-                  >
-                    <Input
-                      id="default-business-name"
-                      placeholder="Same as account name"
-                      {...register("default_business_name")}
-                    />
-                  </Field>
-                  <Field
-                    error={errors.default_business_slug?.message}
-                    id="default-business-slug"
-                    label="Business slug"
-                  >
-                    <Input
-                      id="default-business-slug"
-                      placeholder="Same as account slug"
-                      {...register("default_business_slug")}
-                    />
-                  </Field>
-                </div>
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <Field
-                    error={errors.owner?.full_name?.message}
-                    id="owner-name"
-                    label="Owner name"
-                  >
-                    <Input id="owner-name" {...register("owner.full_name")} />
-                  </Field>
-                  <Field
-                    error={errors.owner?.username?.message}
-                    id="owner-username"
-                    label="Username"
-                  >
-                    <Input
-                      id="owner-username"
-                      {...register("owner.username")}
-                    />
-                  </Field>
-                </div>
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <Field
-                    error={errors.owner?.email?.message}
-                    id="owner-email"
-                    label="Email"
-                  >
-                    <Input
-                      id="owner-email"
-                      type="email"
-                      {...register("owner.email")}
-                    />
-                  </Field>
-                  <Field
-                    error={errors.owner?.phone?.message}
-                    id="owner-phone"
-                    label="Phone"
-                  >
-                    <Input id="owner-phone" {...register("owner.phone")} />
-                  </Field>
-                </div>
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <Field
-                    error={errors.owner?.password?.message}
-                    id="owner-password"
-                    label="Password"
-                  >
-                    <Input
-                      id="owner-password"
-                      type="password"
-                      {...register("owner.password")}
-                    />
-                  </Field>
-                  <Field
-                    error={errors.owner?.confirmPassword?.message}
-                    id="owner-confirm-password"
-                    label="Confirm password"
-                  >
-                    <Input
-                      id="owner-confirm-password"
-                      type="password"
-                      {...register("owner.confirmPassword")}
-                    />
-                  </Field>
-                </div>
-                <Button
-                  className="w-full"
+                    {submitError}
+                  </p>
+                ) : null}
+                <fieldset
+                  className="space-y-5"
                   disabled={signupMutation.isPending}
-                  type="submit"
                 >
-                  {signupMutation.isPending
-                    ? "Creating workspace"
-                    : "Create workspace"}
-                </Button>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <Field
+                      error={errors.name?.message}
+                      id="business-name"
+                      label={t("fields.name")}
+                    >
+                      <Input id="business-name" {...register("name")} />
+                    </Field>
+                    <Field
+                      error={errors.slug?.message}
+                      id="business-slug"
+                      label={t("fields.slug")}
+                    >
+                      <Input id="business-slug" {...register("slug")} />
+                    </Field>
+                  </div>
+                  <Field
+                    error={errors.primary_domain?.message}
+                    id="business-domain"
+                    label={t("fields.domain")}
+                  >
+                    <Input
+                      id="business-domain"
+                      placeholder="demo.localhost"
+                      {...register("primary_domain")}
+                    />
+                  </Field>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <Field
+                      error={errors.default_business_name?.message}
+                      id="default-business-name"
+                      label={t("fields.defaultBusiness")}
+                    >
+                      <Input
+                        id="default-business-name"
+                        placeholder={t("sameName")}
+                        {...register("default_business_name")}
+                      />
+                    </Field>
+                    <Field
+                      error={errors.default_business_slug?.message}
+                      id="default-business-slug"
+                      label={t("fields.slug")}
+                    >
+                      <Input
+                        id="default-business-slug"
+                        placeholder={t("sameSlug")}
+                        {...register("default_business_slug")}
+                      />
+                    </Field>
+                  </div>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <Field
+                      error={errors.owner?.full_name?.message}
+                      id="owner-name"
+                      label={t("fields.fullName")}
+                    >
+                      <Input id="owner-name" {...register("owner.full_name")} />
+                    </Field>
+                    <Field
+                      error={errors.owner?.username?.message}
+                      id="owner-username"
+                      label={t("fields.username")}
+                    >
+                      <Input
+                        id="owner-username"
+                        {...register("owner.username")}
+                      />
+                    </Field>
+                  </div>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <Field
+                      error={errors.owner?.email?.message}
+                      id="owner-email"
+                      label={t("fields.email")}
+                    >
+                      <Input
+                        id="owner-email"
+                        type="email"
+                        {...register("owner.email")}
+                      />
+                    </Field>
+                    <Field
+                      error={errors.owner?.phone?.message}
+                      id="owner-phone"
+                      label={t("fields.phone")}
+                    >
+                      <Input id="owner-phone" {...register("owner.phone")} />
+                    </Field>
+                  </div>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <Field
+                      error={errors.owner?.password?.message}
+                      id="owner-password"
+                      label={t("fields.password")}
+                    >
+                      <Input
+                        id="owner-password"
+                        type="password"
+                        {...register("owner.password")}
+                      />
+                    </Field>
+                    <Field
+                      error={errors.owner?.confirmPassword?.message}
+                      id="owner-confirm-password"
+                      label={t("fields.confirmPassword")}
+                    >
+                      <Input
+                        id="owner-confirm-password"
+                        type="password"
+                        {...register("owner.confirmPassword")}
+                      />
+                    </Field>
+                  </div>
+                  <Button
+                    className="w-full"
+                    disabled={signupMutation.isPending}
+                    type="submit"
+                  >
+                    {signupMutation.isPending ? t("submitting") : t("submit")}
+                  </Button>
+                </fieldset>
               </form>
             )}
           </section>

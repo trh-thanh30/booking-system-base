@@ -8,6 +8,7 @@
     "build": "next build --turbopack",
     "start": "node ../../scripts/next-port.mjs start WEB_PORT 3001",
     "lint": "eslint . --max-warnings 0",
+    "test": "node --import ./test/register.mjs ./test/run.mjs",
     "check-types": "next typegen && tsc --noEmit"
   },
   "dependencies": {
