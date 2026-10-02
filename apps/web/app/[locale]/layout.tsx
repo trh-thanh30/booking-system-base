@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
@@ -6,6 +5,7 @@ import { Plus_Jakarta_Sans } from "next/font/google";
 import { Toaster } from "@repo/ui/sonner";
 import { routing } from "@/src/i18n/routing";
 import { QueryProvider } from "@/src/app/providers/query-provider";
+import { createLandingMetadata } from "@/src/utils/metadata.utils";
 import "../globals.css";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
@@ -14,10 +14,14 @@ const plusJakartaSans = Plus_Jakarta_Sans({
   variable: "--font-plus-jakarta-sans",
 });
 
-export const metadata: Metadata = {
-  title: "Web App",
-  description: "Public app shell for the monorepo base",
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  return createLandingMetadata(locale);
+}
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));

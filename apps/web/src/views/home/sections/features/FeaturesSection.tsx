@@ -60,19 +60,19 @@ export function FeaturesSection() {
       initial={reveal.initial}
       animate={reveal.animate}
       transition={reveal.transition}
-      className="scroll-mt-20 md:scroll-mt-24 py-16 md:py-24 lg:py-28 bg-bg-secondary border-t border-border-light font-sans overflow-hidden"
+      className="scroll-mt-20 md:scroll-mt-24 py-16 md:py-24 lg:py-28 bg-background border-t border-border font-sans overflow-hidden"
       id="features"
     >
       <div className="mx-auto max-w-7xl px-5 sm:px-6">
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-8 space-y-3.5">
-          <span className="text-[12px] font-bold uppercase tracking-[0.08em] text-brand-blue">
+          <span className="text-[12px] font-bold uppercase tracking-[0.08em] text-primary">
             All-in-One Solution
           </span>
-          <h2 className="text-[28px] sm:text-[34px] lg:text-[40px] font-extrabold leading-[1.15] tracking-[-0.02em] text-text-primary">
+          <h2 className="text-[28px] sm:text-[34px] lg:text-[40px] font-extrabold leading-[1.15] tracking-[-0.02em] text-foreground">
             Run your entire booking operation from one place
           </h2>
-          <p className="text-[15.5px] leading-relaxed text-text-muted">
+          <p className="text-[15.5px] leading-relaxed text-muted-foreground">
             Create a branded booking page, manage availability, collect
             deposits, send reminders and track performance from one dashboard.
           </p>
@@ -80,7 +80,7 @@ export function FeaturesSection() {
 
         {/* Tour Control Bar */}
         <div className="flex justify-center items-center gap-4 mb-10 flex-wrap text-center select-none">
-          <span className="text-[12.5px] font-semibold text-text-muted">
+          <span className="text-[12.5px] font-semibold text-muted-foreground">
             Click any feature — the dashboard transforms to match
           </span>
           <button
@@ -88,20 +88,20 @@ export function FeaturesSection() {
             onClick={handleToggleTour}
             className={`group inline-flex items-center gap-2 px-4 py-1.5 rounded-full border text-[11.5px] font-bold transition duration-200 cursor-pointer shadow-sm ${
               isTourPlaying
-                ? "bg-brand-blue border-brand-blue text-white hover:bg-brand-blue/90"
-                : "bg-bg-primary border-border-light text-text-secondary hover:border-brand-blue hover:text-brand-blue"
+                ? "bg-primary border-primary text-primary-foreground hover:bg-primary/90"
+                : "bg-surface border-border text-foreground hover:border-primary hover:text-primary"
             }`}
           >
             {isTourPlaying ? (
               <>
-                <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping" />
+                <span className="w-1.5 h-1.5 rounded-full bg-surface animate-ping" />
                 <Square className="w-2.5 h-2.5 fill-white stroke-white" />
                 <span>Stop tour</span>
               </>
             ) : (
               <>
-                <span className="w-1.5 h-1.5 rounded-full bg-brand-blue animate-pulse" />
-                <Play className="w-2.5 h-2.5 fill-brand-blue stroke-brand-blue group-hover:fill-brand-blue group-hover:stroke-brand-blue" />
+                <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                <Play className="w-2.5 h-2.5 fill-primary stroke-primary group-hover:fill-primary group-hover:stroke-primary" />
                 <span>Start tour</span>
               </>
             )}
@@ -127,7 +127,7 @@ export function FeaturesSection() {
         <div className="mt-14 text-center">
           <a
             href="#deposits-reminders"
-            className="group inline-flex min-h-11 items-center justify-center rounded-full border border-border-light bg-bg-primary px-7 text-sm font-semibold text-text-secondary transition hover:bg-brand-blue hover:text-white hover:border-brand-blue active:scale-[0.98] shadow-sm gap-0 hover:gap-1.5 cursor-pointer duration-200"
+            className="group inline-flex min-h-11 items-center justify-center rounded-full border border-border bg-surface px-7 text-sm font-semibold text-foreground transition hover:bg-primary hover:text-primary-foreground hover:border-primary active:scale-[0.98] shadow-sm gap-0 hover:gap-1.5 cursor-pointer duration-200"
           >
             <span>See no-show protection</span>
             <span className="relative flex h-4 w-0 items-center justify-center overflow-hidden transition-all duration-300 group-hover:w-4">

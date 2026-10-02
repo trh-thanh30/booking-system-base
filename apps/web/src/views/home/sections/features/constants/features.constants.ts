@@ -120,9 +120,9 @@ export const AVAILABILITY_SLOTS = [
   "available",
 ];
 export const AVAILABILITY_LEGENDS = [
-  { label: "Available", color: "bg-emerald-500/20 border-emerald-500/35" },
-  { label: "Buffer", color: "bg-amber-500/10 border-amber-500/30" },
-  { label: "Blocked", color: "bg-rose-500/10 border-rose-500/20" },
+  { label: "Available", color: "bg-success-500/20 border-success-500/35" },
+  { label: "Buffer", color: "bg-warning-500/10 border-warning-500/30" },
+  { label: "Blocked", color: "bg-danger-500/10 border-danger-500/20" },
 ];
 export const AVAILABILITY_RULES = [
   { label: "Buffer time", val: "15 min" },

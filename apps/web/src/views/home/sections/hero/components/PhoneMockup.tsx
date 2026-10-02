@@ -22,21 +22,21 @@ export function PhoneMockup({
   return (
     <>
       {/* Speaker / Camera notches */}
-      <div className="w-12 h-3 bg-text-primary rounded-full mx-auto mb-2 flex items-center justify-center">
-        <div className="w-1 h-1 rounded-full bg-text-muted" />
+      <div className="w-12 h-3 bg-foreground rounded-full mx-auto mb-2 flex items-center justify-center">
+        <div className="w-1 h-1 rounded-full bg-muted-foreground" />
       </div>
 
       {/* Fake Shop Info */}
       <div className="text-center mb-3">
-        <div className="w-8 h-8 rounded-full bg-brand-blue text-white flex items-center justify-center mx-auto mb-1 text-xs font-bold shadow-sm">
+        <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center mx-auto mb-1 text-xs font-bold shadow-sm">
           L
         </div>
-        <h4 className="text-[10px] font-extrabold text-text-primary leading-tight">
+        <h4 className="text-[10px] font-extrabold text-foreground leading-tight">
           LUMIÈRE SPA & BEAUTY
         </h4>
         <div className="flex items-center justify-center gap-0.5 mt-0.5">
-          <Star className="w-2.5 h-2.5 fill-yellow-400 stroke-yellow-400" />
-          <span className="text-[8px] font-bold text-text-primary">
+          <Star className="w-2.5 h-2.5 fill-warning-400 stroke-warning-400" />
+          <span className="text-[8px] font-bold text-foreground">
             4.9 (186 reviews)
           </span>
         </div>
@@ -44,7 +44,7 @@ export function PhoneMockup({
 
       {/* Service Select */}
       <div className="space-y-1.5 mb-3">
-        <span className="text-[8px] font-extrabold text-text-muted block">
+        <span className="text-[8px] font-extrabold text-muted-foreground block">
           SELECT SERVICE
         </span>
 
@@ -52,40 +52,40 @@ export function PhoneMockup({
           onClick={() => handleSelectServiceManual("spa")}
           className={`p-1.5 border rounded-[4px] cursor-pointer flex items-center justify-between transition-colors ${
             selectedService === "spa"
-              ? "border-brand-blue bg-[#E5F0FF]/40"
-              : "border-border-light hover:border-text-secondary"
+              ? "border-primary bg-accent/40"
+              : "border-border hover:border-foreground"
           }`}
         >
           <div>
-            <span className="text-[9px] font-bold text-text-primary block leading-none">
+            <span className="text-[9px] font-bold text-foreground block leading-none">
               Hot Stone Massage
             </span>
-            <span className="text-[7px] text-text-muted">60 mins</span>
+            <span className="text-[7px] text-muted-foreground">60 mins</span>
           </div>
-          <span className="text-[9px] font-bold text-brand-blue">$65.00</span>
+          <span className="text-[9px] font-bold text-primary">$65.00</span>
         </div>
 
         <div
           onClick={() => handleSelectServiceManual("hair")}
           className={`p-1.5 border rounded-[4px] cursor-pointer flex items-center justify-between transition-colors ${
             selectedService === "hair"
-              ? "border-brand-blue bg-[#E5F0FF]/40"
-              : "border-border-light hover:border-text-secondary"
+              ? "border-primary bg-accent/40"
+              : "border-border hover:border-foreground"
           }`}
         >
           <div>
-            <span className="text-[9px] font-bold text-text-primary block leading-none">
+            <span className="text-[9px] font-bold text-foreground block leading-none">
               Deep Cleansing Facial
             </span>
-            <span className="text-[7px] text-text-muted">75 mins</span>
+            <span className="text-[7px] text-muted-foreground">75 mins</span>
           </div>
-          <span className="text-[9px] font-bold text-brand-blue">$85.00</span>
+          <span className="text-[9px] font-bold text-primary">$85.00</span>
         </div>
       </div>
 
       {/* Time Slots */}
       <div className="mb-3">
-        <span className="text-[8px] font-extrabold text-text-muted block mb-1">
+        <span className="text-[8px] font-extrabold text-muted-foreground block mb-1">
           SELECT TIME SLOT
         </span>
         <div className="grid grid-cols-3 gap-1">
@@ -101,10 +101,10 @@ export function PhoneMockup({
                   onClick={() => handleSelectSlotManual(slot)}
                   className={`text-[8px] py-1 border rounded-[2px] font-medium transition-all ${
                     isSlotDisabled
-                      ? "bg-bg-secondary text-text-muted border-border-light cursor-not-allowed line-through"
+                      ? "bg-background text-muted-foreground border-border cursor-not-allowed line-through"
                       : isSelected
-                        ? "bg-brand-blue text-white border-transparent font-bold"
-                        : "border-border-light hover:border-text-primary bg-bg-primary text-text-primary"
+                        ? "bg-primary text-primary-foreground border-transparent font-bold"
+                        : "border-border hover:border-foreground bg-surface text-foreground"
                   }`}
                 >
                   {slot}
@@ -120,17 +120,17 @@ export function PhoneMockup({
         type="button"
         disabled={isBooked || isBookingLoading}
         onClick={handleBookManual}
-        className={`w-full py-1.5 text-white text-[9px] font-bold rounded-full shadow-sm transition-all duration-300 flex items-center justify-center gap-1 cursor-pointer ${
+        className={`w-full py-1.5 text-primary-foreground text-[9px] font-bold rounded-full shadow-sm transition-all duration-300 flex items-center justify-center gap-1 cursor-pointer ${
           isBooked
-            ? "bg-emerald-500 hover:bg-emerald-600"
+            ? "bg-success-500 hover:bg-success-600"
             : isBookingLoading
-              ? "bg-brand-blue/80"
-              : "bg-brand-blue hover:bg-brand-blue-hover"
+              ? "bg-primary/80"
+              : "bg-primary hover:bg-primary-hover"
         }`}
       >
         {isBookingLoading ? (
           <>
-            <span className="w-2.5 h-2.5 border border-white/30 border-t-white rounded-full animate-spin" />
+            <span className="w-2.5 h-2.5 border border-surface/30 border-t-white rounded-full animate-spin" />
             <span>Booking...</span>
           </>
         ) : isBooked ? (

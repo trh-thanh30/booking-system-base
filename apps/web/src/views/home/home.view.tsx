@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { motion, useScroll, useSpring } from "framer-motion";
+import { useTranslations } from "next-intl";
 
 import {
   Header,
@@ -22,6 +23,7 @@ import {
 } from "./sections";
 
 export function HomeView() {
+  const t = useTranslations("Navigation");
   // Shared state passed to child sections
   const [activeTemplateIdx, setActiveTemplateIdx] = useState<number>(0);
   const [customColor, setCustomColor] = useState<string>("brand-blue");
@@ -43,59 +45,67 @@ export function HomeView() {
   });
 
   return (
-    <main className="min-h-screen bg-bg-secondary text-text-primary overflow-x-hidden font-sans relative">
+    <div className="landing min-h-dvh bg-background text-foreground overflow-x-clip font-sans relative">
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-md focus:bg-surface focus:p-3"
+      >
+        {t("skip")}
+      </a>
       <motion.div
-        className="fixed top-0 left-0 right-0 h-[3px] bg-brand-blue origin-[0%] z-[100]"
+        className="fixed top-0 left-0 right-0 h-[3px] bg-primary origin-[0%] z-[100]"
         style={{ scaleX }}
       />
 
       <Header />
-      <Hero />
-      <Problem />
-      <HowItWorks />
-      <Features />
-      <NoShowSection />
+      <main id="main-content" tabIndex={-1}>
+        <Hero />
+        <Problem />
+        <HowItWorks />
+        <Features />
+        <NoShowSection />
 
-      <Templates
-        activeTemplateIdx={activeTemplateIdx}
-        setActiveTemplateIdx={setActiveTemplateIdx}
-      />
+        <Templates
+          activeTemplateIdx={activeTemplateIdx}
+          setActiveTemplateIdx={setActiveTemplateIdx}
+        />
 
-      <Customization
-        customColor={customColor}
-        setCustomColor={setCustomColor}
-        customRequireDeposit={customRequireDeposit}
-        setCustomRequireDeposit={setCustomRequireDeposit}
-        customSMS={customSMS}
-        setCustomSMS={setCustomSMS}
-        customStaff={customStaff}
-        setCustomStaff={setCustomStaff}
-        customBusinessName={customBusinessName}
-        setCustomBusinessName={setCustomBusinessName}
-        customSelectedStaff={customSelectedStaff}
-        setCustomSelectedStaff={setCustomSelectedStaff}
-      />
+        <Customization
+          customColor={customColor}
+          setCustomColor={setCustomColor}
+          customRequireDeposit={customRequireDeposit}
+          setCustomRequireDeposit={setCustomRequireDeposit}
+          customSMS={customSMS}
+          setCustomSMS={setCustomSMS}
+          customStaff={customStaff}
+          setCustomStaff={setCustomStaff}
+          customBusinessName={customBusinessName}
+          setCustomBusinessName={setCustomBusinessName}
+          customSelectedStaff={customSelectedStaff}
+          setCustomSelectedStaff={setCustomSelectedStaff}
+        />
 
-      <Channels
-        customColor={customColor}
-        customBusinessName={customBusinessName}
-        setCustomBusinessName={setCustomBusinessName}
-      />
+        <Channels
+          customColor={customColor}
+          customBusinessName={customBusinessName}
+          setCustomBusinessName={setCustomBusinessName}
+        />
 
-      <Marketplace
-        activeTemplateIdx={activeTemplateIdx}
-        setActiveTemplateIdx={setActiveTemplateIdx}
-        customBusinessName={customBusinessName}
-      />
+        <Marketplace
+          activeTemplateIdx={activeTemplateIdx}
+          setActiveTemplateIdx={setActiveTemplateIdx}
+          customBusinessName={customBusinessName}
+        />
 
-      <Industries
-        activeTemplateIdx={activeTemplateIdx}
-        setActiveTemplateIdx={setActiveTemplateIdx}
-      />
-      <EarlyAccess />
-      <Pricing />
-      <FAQ />
-      <FinalCTA />
-    </main>
+        <Industries
+          activeTemplateIdx={activeTemplateIdx}
+          setActiveTemplateIdx={setActiveTemplateIdx}
+        />
+        <EarlyAccess />
+        <Pricing />
+        <FAQ />
+        <FinalCTA />
+      </main>
+    </div>
   );
 }

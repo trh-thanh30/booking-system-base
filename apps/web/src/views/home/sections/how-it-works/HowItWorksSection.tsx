@@ -51,19 +51,19 @@ export function HowItWorksSection() {
       initial={reveal.initial}
       animate={reveal.animate}
       transition={reveal.transition}
-      className="scroll-mt-20 md:scroll-mt-24 py-16 md:py-24 lg:py-28 bg-bg-primary border-t border-border-light font-sans overflow-hidden"
+      className="scroll-mt-20 md:scroll-mt-24 py-16 md:py-24 lg:py-28 bg-surface border-t border-border font-sans overflow-hidden"
       id="how-it-works"
     >
       <div className="mx-auto max-w-7xl px-5 sm:px-6">
         {/* Header */}
         <div className="mb-12 text-center max-w-3xl mx-auto space-y-3.5">
-          <div className="text-[12px] font-bold uppercase tracking-[0.08em] text-brand-blue">
+          <div className="text-[12px] font-bold uppercase tracking-[0.08em] text-primary">
             How it works
           </div>
-          <h2 className="text-[28px] sm:text-[34px] lg:text-[40px] font-extrabold leading-[1.15] tracking-[-0.02em] text-text-primary">
+          <h2 className="text-[28px] sm:text-[34px] lg:text-[40px] font-extrabold leading-[1.15] tracking-[-0.02em] text-foreground">
             Launch your booking flow in minutes
           </h2>
-          <p className="text-[15.5px] leading-relaxed text-text-muted">
+          <p className="text-[15.5px] leading-relaxed text-muted-foreground">
             Create services, set availability, share your booking page and let
             customers book online 24/7 — no code required.
           </p>
@@ -85,7 +85,7 @@ export function HowItWorksSection() {
         <div className="mt-12 text-center">
           <a
             href="#features"
-            className="group inline-flex min-h-11 items-center justify-center rounded-full border border-border-light bg-bg-primary px-7 text-sm font-semibold text-text-secondary transition hover:bg-brand-blue hover:text-white hover:border-brand-blue active:scale-[0.98] shadow-sm gap-0 hover:gap-1.5 cursor-pointer duration-200"
+            className="group inline-flex min-h-11 items-center justify-center rounded-full border border-border bg-surface px-7 text-sm font-semibold text-foreground transition hover:bg-primary hover:text-primary-foreground hover:border-primary active:scale-[0.98] shadow-sm gap-0 hover:gap-1.5 cursor-pointer duration-200"
           >
             <span>Explore all features</span>
             <span className="relative flex h-4 w-0 items-center justify-center overflow-hidden transition-all duration-300 group-hover:w-4">

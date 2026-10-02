@@ -113,19 +113,19 @@ export function ChallengesSection() {
       initial={reveal.initial}
       animate={reveal.animate}
       transition={reveal.transition}
-      className="scroll-mt-20 md:scroll-mt-24 py-16 md:py-24 lg:py-28 border-t border-border-light bg-bg-secondary font-sans overflow-hidden"
+      className="scroll-mt-20 md:scroll-mt-24 py-16 md:py-24 lg:py-28 border-t border-border bg-background font-sans overflow-hidden"
       id="problems"
     >
       <div className="mx-auto max-w-7xl px-5 sm:px-6">
         {/* Header */}
         <div className="mb-10 text-center max-w-3xl mx-auto space-y-3.5">
-          <span className="text-[12px] font-bold uppercase tracking-[0.08em] text-brand-blue">
+          <span className="text-[12px] font-bold uppercase tracking-[0.08em] text-primary">
             Merchant challenges
           </span>
-          <h2 className="text-[28px] sm:text-[34px] lg:text-[40px] font-extrabold leading-[1.15] tracking-[-0.02em] text-text-primary">
+          <h2 className="text-[28px] sm:text-[34px] lg:text-[40px] font-extrabold leading-[1.15] tracking-[-0.02em] text-foreground">
             Still managing bookings through chats, calls and paper notes?
           </h2>
-          <p className="text-[15.5px] leading-relaxed text-text-muted">
+          <p className="text-[15.5px] leading-relaxed text-muted-foreground">
             Manual scheduling creates double-booked slots, missed appointments
             and hours of back-and-forth messages before every booking is
             confirmed.
@@ -152,14 +152,14 @@ export function ChallengesSection() {
         </div>
 
         {/* Bottom CTA bar */}
-        <div className="mx-auto w-full md:w-fit max-w-full rounded-3xl border border-border-light bg-bg-primary px-6 py-5 text-center shadow-sm flex flex-col md:flex-row items-center justify-between gap-5">
-          <p className="text-[14px] font-semibold text-text-secondary leading-relaxed flex-1 text-left md:mr-8">
+        <div className="mx-auto w-full md:w-fit max-w-full rounded-3xl border border-border bg-surface px-6 py-5 text-center shadow-sm flex flex-col md:flex-row items-center justify-between gap-5">
+          <p className="text-[14px] font-semibold text-foreground leading-relaxed flex-1 text-left md:mr-8">
             A booking system turns scattered chats into one clear flow for
             services, staff, payments and reminders.
           </p>
           <a
             href="#how-it-works"
-            className="group inline-flex min-h-11 items-center justify-center rounded-full border border-border-light bg-bg-primary px-6 text-sm font-semibold text-text-secondary transition hover:bg-brand-blue hover:text-white hover:border-brand-blue active:scale-[0.98] shadow-sm gap-0 hover:gap-1.5 whitespace-nowrap cursor-pointer duration-200"
+            className="group inline-flex min-h-11 items-center justify-center rounded-full border border-border bg-surface px-6 text-sm font-semibold text-foreground transition hover:bg-primary hover:text-primary-foreground hover:border-primary active:scale-[0.98] shadow-sm gap-0 hover:gap-1.5 whitespace-nowrap cursor-pointer duration-200"
           >
             <span>See how it works</span>
             <span className="relative flex h-4 w-0 items-center justify-center overflow-hidden transition-all duration-300 group-hover:w-4">

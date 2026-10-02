@@ -656,11 +656,11 @@ export const MARKETPLACE_PROVIDERS = [
 ];
 
 export const COLOR_SWATCHES = [
-  { name: "brand-blue", class: "bg-brand-blue", label: "Blue" },
-  { name: "emerald", class: "bg-[#10b981]", label: "Emerald" },
-  { name: "violet", class: "bg-[#7c3aed]", label: "Violet" },
-  { name: "rose", class: "bg-[#ec4899]", label: "Pink" },
-  { name: "amber", class: "bg-[#f59e0b]", label: "Amber" },
+  { name: "brand-blue", class: "bg-primary", label: "Blue" },
+  { name: "emerald", class: "bg-success", label: "Emerald" },
+  { name: "violet", class: "bg-info", label: "Sky Blue" },
+  { name: "rose", class: "bg-danger", label: "Red" },
+  { name: "amber", class: "bg-warning", label: "Amber" },
 ];
 
 export const TYPOGRAPHY_PRESETS = [

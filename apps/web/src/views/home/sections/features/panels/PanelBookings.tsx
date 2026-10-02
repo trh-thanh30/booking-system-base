@@ -124,15 +124,15 @@ export function PanelBookings({ isActive }: { isActive: boolean }) {
         ].map((stat, idx) => (
           <div
             key={idx}
-            className="rounded-2xl bg-bg-secondary/40 p-3.5 border border-border-light/40"
+            className="rounded-2xl bg-background/40 p-3.5 border border-border/40"
           >
-            <p className="text-[9px] font-bold uppercase tracking-wider text-text-muted">
+            <p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">
               {stat.label}
             </p>
             <motion.p
               key={stat.key}
-              initial={{ scale: 1.1, color: "#3b82f6" }}
-              animate={{ scale: 1, color: "#111827" }}
+              initial={{ scale: 1.1, color: "var(--color-primary)" }}
+              animate={{ scale: 1, color: "var(--color-foreground)" }}
               transition={{ duration: 0.6 }}
               className="mt-1 text-sm font-extrabold leading-none"
             >
@@ -143,13 +143,13 @@ export function PanelBookings({ isActive }: { isActive: boolean }) {
       </div>
 
       {/* Calendar List with Locked Height to prevent layout shift */}
-      <div className="rounded-2xl bg-bg-secondary/40 p-4 border border-border-light/40">
+      <div className="rounded-2xl bg-background/40 p-4 border border-border/40">
         <div className="flex items-center justify-between">
-          <p className="text-[10px] font-extrabold uppercase tracking-wider text-text-muted">
+          <p className="text-[10px] font-extrabold uppercase tracking-wider text-muted-foreground">
             Today&apos;s calendar
           </p>
-          <span className="inline-flex items-center gap-1 text-[9px] font-bold text-brand-blue">
-            <span className="w-1.5 h-1.5 rounded-full bg-brand-blue animate-pulse" />
+          <span className="inline-flex items-center gap-1 text-[9px] font-bold text-primary">
+            <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
             <span>Live</span>
           </span>
         </div>
@@ -163,21 +163,21 @@ export function PanelBookings({ isActive }: { isActive: boolean }) {
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 12, scale: 0.98 }}
                 transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                className={`flex items-center justify-between bg-bg-primary px-3.5 py-2.5 rounded-xl border border-border-light/50 shadow-[0_1px_3px_rgba(0,0,0,0.01)] ${
+                className={`flex items-center justify-between bg-surface px-3.5 py-2.5 rounded-xl border border-border/50 shadow-md ${
                   item.isNew
-                    ? "border-l-3 border-l-emerald-500 bg-emerald-50/10"
+                    ? "border-l-3 border-l-emerald-500 bg-success-surface/10"
                     : ""
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <span className="text-[10px] font-extrabold text-brand-blue bg-[#E5F0FF] px-2 py-0.5 rounded">
+                  <span className="text-[10px] font-extrabold text-primary bg-accent px-2 py-0.5 rounded">
                     {item.time}
                   </span>
                   <div>
-                    <p className="font-bold text-text-primary text-xs leading-tight">
+                    <p className="font-bold text-foreground text-xs leading-tight">
                       {item.title} · {item.staff}
                     </p>
-                    <p className="text-[9px] text-text-muted mt-0.5">
+                    <p className="text-[9px] text-muted-foreground mt-0.5">
                       {item.meta}
                     </p>
                   </div>
@@ -186,13 +186,13 @@ export function PanelBookings({ isActive }: { isActive: boolean }) {
                   <span
                     className={`w-1.5 h-1.5 rounded-full ${
                       item.status === "green"
-                        ? "bg-emerald-500"
+                        ? "bg-success-500"
                         : item.status === "orange"
-                          ? "bg-amber-500"
-                          : "bg-zinc-400"
+                          ? "bg-warning-500"
+                          : "bg-neutral-400"
                     }`}
                   />
-                  <span className="text-[9.5px] font-bold text-text-muted">
+                  <span className="text-[9.5px] font-bold text-muted-foreground">
                     {item.statusText}
                   </span>
                 </div>
@@ -203,8 +203,8 @@ export function PanelBookings({ isActive }: { isActive: boolean }) {
       </div>
 
       {/* Staff Availability */}
-      <div className="rounded-2xl bg-bg-secondary/40 p-4 border border-border-light/40">
-        <p className="text-[10px] font-extrabold uppercase tracking-wider text-text-muted leading-none">
+      <div className="rounded-2xl bg-background/40 p-4 border border-border/40">
+        <p className="text-[10px] font-extrabold uppercase tracking-wider text-muted-foreground leading-none">
           Staff availability
         </p>
 
@@ -212,27 +212,25 @@ export function PanelBookings({ isActive }: { isActive: boolean }) {
           {staffSlots.map((item, idx) => (
             <div
               key={idx}
-              className="flex items-center justify-between text-xs py-1.5 px-1 border-b border-border-light/30 last:border-b-0"
+              className="flex items-center justify-between text-xs py-1.5 px-1 border-b border-border/30 last:border-b-0"
             >
               <div className="flex items-center gap-2">
-                <div className="flex h-5 w-5 items-center justify-center rounded-full bg-brand-blue text-white text-[9px] font-bold">
+                <div className="flex h-5 w-5 items-center justify-center rounded-full bg-primary text-primary-foreground text-[9px] font-bold">
                   {item.name[0]}
                 </div>
-                <span className="font-bold text-text-secondary">
-                  {item.name}
-                </span>
+                <span className="font-bold text-foreground">{item.name}</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <span
                   className={`w-1.5 h-1.5 rounded-full ${
                     item.status === "open"
-                      ? "bg-emerald-500"
+                      ? "bg-success-500"
                       : item.status === "few"
-                        ? "bg-amber-500"
-                        : "bg-rose-500"
+                        ? "bg-warning-500"
+                        : "bg-danger-500"
                   }`}
                 />
-                <span className="text-[10px] font-bold text-text-muted">
+                <span className="text-[10px] font-bold text-muted-foreground">
                   {item.status === "full"
                     ? "Fully booked"
                     : `${item.slots} slots open`}
