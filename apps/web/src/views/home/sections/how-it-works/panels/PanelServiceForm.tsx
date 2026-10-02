@@ -72,16 +72,16 @@ export function PanelServiceForm() {
             {staff.map((s) => (
               <span
                 key={s.id}
-                className="inline-flex items-center gap-1.5 rounded-full border border-border-light bg-bg-primary pl-2.5 pr-1 py-1 text-[12.5px] shadow-sm animate-chip-in"
+                className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface pl-2.5 pr-1 py-1 text-[12.5px] shadow-sm animate-chip-in"
               >
-                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-brand-blue text-[10px] font-bold text-white uppercase">
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground uppercase">
                   {s.name[0]}
                 </span>
-                <span className="font-medium text-text-primary">{s.name}</span>
+                <span className="font-medium text-foreground">{s.name}</span>
                 <button
                   type="button"
                   onClick={() => removeStaff(s.id)}
-                  className="text-text-muted hover:text-danger hover:bg-danger-bg p-0.5 rounded-full transition-colors cursor-pointer"
+                  className="text-muted-foreground hover:text-danger hover:bg-danger-bg p-0.5 rounded-full transition-colors cursor-pointer"
                 >
                   <X className="h-3.5 w-3.5" />
                 </button>
@@ -90,7 +90,7 @@ export function PanelServiceForm() {
             <button
               type="button"
               onClick={addStaff}
-              className="inline-flex items-center gap-1 rounded-full border border-dashed border-border-light bg-bg-primary px-3 py-1 text-[12.5px] text-text-muted hover:border-brand-blue hover:text-brand-blue cursor-pointer transition-colors"
+              className="inline-flex items-center gap-1 rounded-full border border-dashed border-border bg-surface px-3 py-1 text-[12.5px] text-muted-foreground hover:border-primary hover:text-primary cursor-pointer transition-colors"
             >
               <Plus className="h-3.5 w-3.5" />
               Add staff
@@ -100,28 +100,28 @@ export function PanelServiceForm() {
       </div>
 
       <div>
-        <div className="rounded-2xl border border-border-light bg-bg-secondary p-5 shadow-inner">
-          <div className="mb-2.5 text-[10.5px] font-bold uppercase tracking-[0.06em] text-text-muted">
+        <div className="rounded-2xl border border-border bg-background p-5 shadow-inner">
+          <div className="mb-2.5 text-[10.5px] font-bold uppercase tracking-[0.06em] text-muted-foreground">
             Live preview
           </div>
-          <div className="flex items-start justify-between gap-3 bg-bg-primary p-4 rounded-xl border border-border-light/60 shadow-sm transition-all duration-300">
+          <div className="flex items-start justify-between gap-3 bg-surface p-4 rounded-xl border border-border/60 shadow-sm transition-all duration-300">
             <div>
-              <div className="text-[17px] font-bold text-text-primary leading-tight">
+              <div className="text-[17px] font-bold text-foreground leading-tight">
                 {name || "Untitled Service"}
               </div>
-              <div className="mt-1 text-[12.5px] text-text-muted">
+              <div className="mt-1 text-[12.5px] text-muted-foreground">
                 {duration} min ·{" "}
                 {staff.length > 0
                   ? staff.map((s) => s.name).join(", ")
                   : "No staff assigned"}
               </div>
             </div>
-            <div className="rounded-lg bg-brand-blue/10 px-3 py-1 text-[13.5px] font-bold text-brand-blue whitespace-nowrap">
+            <div className="rounded-lg bg-primary/10 px-3 py-1 text-[13.5px] font-bold text-primary whitespace-nowrap">
               ${price}
             </div>
           </div>
         </div>
-        <p className="mt-3 text-[12px] text-text-muted leading-relaxed">
+        <p className="mt-3 text-[12px] text-muted-foreground leading-relaxed">
           💡 Add as many services as you need. Each gets its own customizable
           booking rules and landing page.
         </p>
@@ -131,7 +131,7 @@ export function PanelServiceForm() {
 }
 
 const inputCls =
-  "w-full rounded-lg border border-border-light bg-bg-primary px-3 py-2 text-[13.5px] text-text-primary transition focus:border-brand-blue focus:outline-none focus:ring-[3px] focus:ring-brand-blue/10";
+  "w-full rounded-lg border border-border bg-surface px-3 py-2 text-[13.5px] text-foreground transition focus:border-primary focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2 focus:ring-[3px] focus:ring-primary/10";
 
 function Field({
   label,
@@ -142,7 +142,7 @@ function Field({
 }) {
   return (
     <div className="flex flex-col">
-      <label className="mb-1.5 text-[12.5px] font-semibold text-text-muted">
+      <label className="mb-1.5 text-[12.5px] font-semibold text-muted-foreground">
         {label}
       </label>
       {children}

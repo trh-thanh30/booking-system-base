@@ -38,6 +38,8 @@ This repo uses a lightweight, repo-native agent workflow inspired by Matt Pocock
 - Keep `*.view.tsx` at the feature root; put supporting files in role folders even if there is only one file: `constants/*.constants.ts`, `types/*.types.ts`, `utils/*.utils.ts`, `columns/*.columns.tsx`, `data/*.data.ts`. Apply this to nested sections too. Keep components/hooks in their existing role folders and `index.ts` export-only.
 - Put API response types and reusable domain DTOs in `packages/shared/src/types`; use `src/views/<feature>/types/<feature>.types.ts` only for view/local UI state types.
 - Use `const { toast } = useToast()` from `@repo/hooks` in frontend components/hooks; do not import `toast` directly from `sonner` in Admin/Web.
+- Landing compositions live in `apps/web/src/components/common/landing-compositions.tsx`; compose shared `@repo/ui` primitives rather than copying them. Run Web/UI `validate:tokens` after styling changes.
+- Web locale selection supports only `vi`/`en`, derives its value from `useLocale`, and navigates through app-local `next-intl` helpers. Keep metadata localized and configure public origins in `src/config`, not individual components.
 - Keep `index.ts` files export-only and only in folders that actually re-export child modules. Do not create `index.ts` just to keep an empty folder.
 
 ## Backend Architecture

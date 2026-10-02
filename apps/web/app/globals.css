@@ -4,6 +4,37 @@
 
 @source "../../../packages/ui/src/**/*.{ts,tsx}";
 
+@layer base {
+  :where(a, button, input, textarea, select, summary):focus-visible {
+    outline: 2px solid var(--color-ring);
+    outline-offset: 3px;
+  }
+}
+
+@layer components {
+  .landing-nav-link {
+    @apply min-h-11 rounded-md px-3 py-3 text-label font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground;
+  }
+  .landing h1 {
+    @apply text-heading-1 font-extrabold tracking-tight sm:text-display;
+  }
+  .landing h2 {
+    @apply text-heading-2 font-bold tracking-tight sm:text-heading-1;
+  }
+  .landing h3 {
+    @apply text-heading-3 font-semibold;
+  }
+  .landing h4 {
+    @apply text-heading-4 font-semibold;
+  }
+  .landing h5 {
+    @apply text-heading-5 font-semibold;
+  }
+  .landing h6 {
+    @apply text-heading-6 font-semibold;
+  }
+}
+
 @theme {
   --animate-pulse-success: pulseSuccess 1s ease-out;
   --animate-pulse-danger: pulseDanger 1s ease-out;

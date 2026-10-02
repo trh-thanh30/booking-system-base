@@ -10,10 +10,10 @@ interface Props {
 }
 
 const BADGE_STYLES = {
-  success: "bg-success-bg text-emerald-700",
-  info: "bg-brand-blue/10 text-brand-blue",
-  warning: "bg-warning-bg text-amber-700",
-  danger: "bg-danger-bg text-red-700",
+  success: "bg-success-bg text-success-surface-foreground",
+  info: "bg-primary/10 text-primary",
+  warning: "bg-warning-bg text-warning-surface-foreground",
+  danger: "bg-danger-bg text-danger-surface-foreground",
 } as const;
 
 export function Timeline({ steps, activeStep, mode }: Props) {
@@ -29,13 +29,11 @@ export function Timeline({ steps, activeStep, mode }: Props) {
       ? "bg-success border-success animate-pulse-success"
       : "bg-danger border-danger animate-pulse-danger";
   const dotGlow =
-    mode === "with"
-      ? "shadow-[0_0_0_4px_var(--color-success-bg)]"
-      : "shadow-[0_0_0_4px_var(--color-danger-bg)]";
+    mode === "with" ? "ring-4 ring-success/20" : "ring-4 ring-danger/20";
 
   return (
     <div className="relative pl-7">
-      <div className="absolute left-[7px] top-3.5 bottom-3.5 w-0.5 bg-border-light" />
+      <div className="absolute left-[7px] top-3.5 bottom-3.5 w-0.5 bg-border" />
       <div
         className={`absolute left-[7px] top-3.5 w-0.5 ${progressColor} transition-all duration-[400ms] ease-out`}
         style={{
@@ -51,8 +49,8 @@ export function Timeline({ steps, activeStep, mode }: Props) {
             className={`relative py-3 transition-opacity duration-[400ms] ${isActive ? "opacity-100" : "opacity-35"}`}
           >
             <div
-              className={`absolute -left-7 top-[18px] h-4 w-4 rounded-full border-2 bg-bg-primary transition-all duration-300 ${
-                isActive ? `${dotActive} ${dotGlow}` : "border-border-gray"
+              className={`absolute -left-7 top-[18px] h-4 w-4 rounded-full border-2 bg-surface transition-all duration-300 ${
+                isActive ? `${dotActive} ${dotGlow}` : "border-input"
               }`}
             />
 
@@ -60,16 +58,16 @@ export function Timeline({ steps, activeStep, mode }: Props) {
               className={`rounded-xl border p-3 transition-all duration-300 ${
                 isActive
                   ? mode === "with"
-                    ? "bg-bg-primary border-success-border shadow-[0_2px_12px_rgba(16,185,129,0.08)]"
-                    : "bg-bg-primary border-danger-border shadow-[0_2px_12px_rgba(239,68,68,0.08)]"
-                  : "bg-bg-secondary border-border-light"
+                    ? "bg-surface border-success-border shadow-md"
+                    : "bg-surface border-danger-border shadow-md"
+                  : "bg-background border-border"
               }`}
             >
               <div className="mb-2 flex flex-wrap items-center gap-2">
-                <span className="text-[11.5px] font-bold text-text-muted tracking-[0.04em]">
+                <span className="text-[11.5px] font-bold text-muted-foreground tracking-[0.04em]">
                   {step.time}
                 </span>
-                <span className="text-[10.5px] font-bold uppercase tracking-[0.06em] text-text-muted">
+                <span className="text-[10.5px] font-bold uppercase tracking-[0.06em] text-muted-foreground">
                   {step.type}
                 </span>
                 <span
@@ -86,7 +84,7 @@ export function Timeline({ steps, activeStep, mode }: Props) {
               <div className="text-[14px] font-semibold leading-tight">
                 {step.title}
               </div>
-              <div className="mt-1 text-[12.5px] text-text-muted">
+              <div className="mt-1 text-[12.5px] text-muted-foreground">
                 {step.meta}
               </div>
             </div>

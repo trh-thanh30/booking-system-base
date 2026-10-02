@@ -64,14 +64,14 @@ export function CommandCenterDemo({ activeTab }: Props) {
   const isSuccessBadge = meta.syncStatus === "success";
 
   return (
-    <div className="rounded-[2.5rem] border border-border-light bg-bg-primary p-6 md:p-7.5 shadow-[0_20px_50px_rgba(229,240,255,0.7),0_1px_3px_rgba(0,0,0,0.05)] ring-1 ring-zinc-100/50 font-sans w-full h-auto lg:h-[560px] min-h-[480px] lg:min-h-[560px] flex flex-col justify-between relative overflow-hidden">
+    <div className="rounded-[2.5rem] border border-border bg-surface p-6 md:p-7.5 shadow-md ring-1 ring-neutral-100/50 font-sans w-full h-auto lg:h-[560px] min-h-[480px] lg:min-h-[560px] flex flex-col justify-between relative overflow-hidden">
       {/* Dashboard Top Header */}
-      <div className="flex items-start justify-between gap-4 border-b border-border-light/40 pb-4.5 shrink-0 select-none">
+      <div className="flex items-start justify-between gap-4 border-b border-border/40 pb-4.5 shrink-0 select-none">
         <div>
-          <p className="text-[10px] font-extrabold uppercase tracking-wider text-brand-blue leading-none">
+          <p className="text-[10px] font-extrabold uppercase tracking-wider text-primary leading-none">
             {meta.eyebrow}
           </p>
-          <h3 className="mt-2 text-base sm:text-lg font-extrabold tracking-tight text-text-primary leading-tight">
+          <h3 className="mt-2 text-base sm:text-lg font-extrabold tracking-tight text-foreground leading-tight">
             {meta.title}
           </h3>
         </div>
@@ -79,13 +79,13 @@ export function CommandCenterDemo({ activeTab }: Props) {
         <span
           className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[9px] font-bold border transition-colors duration-300 ${
             isSuccessBadge
-              ? "bg-emerald-50 border-emerald-200 text-emerald-700"
-              : "bg-blue-50 border-blue-200 text-blue-700"
+              ? "bg-success-surface border-success-border text-success-surface-foreground"
+              : "bg-accent border-primary-200 text-accent-foreground"
           }`}
         >
           <span
             className={`w-1.5 h-1.5 rounded-full animate-pulse ${
-              isSuccessBadge ? "bg-emerald-500" : "bg-blue-500"
+              isSuccessBadge ? "bg-success-500" : "bg-primary-500"
             }`}
           />
           <span>{meta.sync}</span>
@@ -117,9 +117,9 @@ export function CommandCenterDemo({ activeTab }: Props) {
       </div>
 
       {/* Dashboard Footer Banner */}
-      <div className="mt-6.5 -mx-6 md:-mx-7.5 -mb-6 md:-mb-7.5 rounded-b-[2.5rem] bg-[#E5F0FF]/30 py-3.5 px-6 md:px-7.5 border-t border-[#E5F0FF]/50 flex items-center justify-center gap-2 select-none shrink-0">
-        <span className="w-1.5 h-1.5 rounded-full bg-brand-blue" />
-        <p className="text-[10px] font-bold text-brand-blue leading-none">
+      <div className="mt-6.5 -mx-6 md:-mx-7.5 -mb-6 md:-mb-7.5 rounded-b-[2.5rem] bg-accent/30 py-3.5 px-6 md:px-7.5 border-t border-accent/50 flex items-center justify-center gap-2 select-none shrink-0">
+        <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+        <p className="text-[10px] font-bold text-primary leading-none">
           {activeTab === "bookings" &&
             "Auto-syncs as customers book, pay & reschedule"}
           {activeTab === "page" &&

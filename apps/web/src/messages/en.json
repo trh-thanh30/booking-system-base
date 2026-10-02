@@ -1,4 +1,13 @@
 {
+  "Navigation": {
+    "language": "Choose language",
+    "mainNavigation": "Main navigation",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "login": "Log in",
+    "trial": "Start free trial",
+    "skip": "Skip to main content"
+  },
   "App": {
     "title": "Web App",
     "description": "Public app shell for the monorepo base"

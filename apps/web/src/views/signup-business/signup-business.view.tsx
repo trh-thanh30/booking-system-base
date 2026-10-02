@@ -9,6 +9,7 @@ import { useToast } from "@repo/hooks";
 import { HttpClientError, type RegisterOwnerInput } from "@repo/shared";
 import { Button, Input } from "@repo/ui";
 import { Link } from "@/src/i18n/navigation";
+import { LandingContainer } from "@/src/components/common/landing-compositions";
 import { authService } from "@/src/services/auth.service";
 import { RegistrationField as Field } from "./components/registration-field";
 import {
@@ -75,7 +76,7 @@ export function SignupBusinessView() {
 
   return (
     <main className="min-h-dvh bg-background text-foreground">
-      <div className="mx-auto flex min-h-dvh w-full max-w-6xl flex-col px-4 py-6 sm:px-6 lg:px-8">
+      <LandingContainer className="flex min-h-dvh max-w-6xl flex-col py-6">
         <div>
           <Button asChild variant="ghost">
             <Link href="/">
@@ -295,7 +296,7 @@ export function SignupBusinessView() {
             )}
           </section>
         </div>
-      </div>
+      </LandingContainer>
     </main>
   );
 }

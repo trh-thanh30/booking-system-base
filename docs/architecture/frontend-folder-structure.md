@@ -233,7 +233,7 @@ Ví dụ:
 
 Rule:
 
-- Constant chỉ dùng trong một feature thì đặt trong `src/views/<feature>/<feature>.constants.ts`.
+- Constant chỉ dùng trong một feature thì đặt trong `src/views/<feature>/constants/<feature>.constants.ts`.
 - Constant dùng nhiều feature mới đưa lên `src/constants`.
 
 ### `src/hooks/`

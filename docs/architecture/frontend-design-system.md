@@ -97,6 +97,7 @@ Type utilities dùng chung:
 
 - `text-display`
 - `text-heading-1`, `text-heading-2`, `text-heading-3`
+- `text-heading-4`, `text-heading-5`, `text-heading-6`
 - `text-body`
 - `text-label`
 - `text-caption`
@@ -174,3 +175,77 @@ Chạy kiểm tra token của shared UI bằng:
 ```bash
 pnpm --filter @repo/ui validate:tokens
 ```
+
+## Landing Page — DS-002
+
+Web dùng Blue Brand Theme từ shared tokens; không định nghĩa lại palette trong
+`apps/web/app/globals.css`. Trang mặc định Light. Semantic stylesheet vẫn hỗ trợ
+`.dark` và được kiểm tra riêng; chưa thêm theme switch hoặc system-theme provider.
+
+Composition marketing nằm tại `apps/web/src/components/common/landing-compositions.tsx`:
+
+- `LandingContainer`: `max-w-landing` (80rem), mobile gutters 16px → 24px → 32px.
+- `LandingSection`: nhịp section 48px mobile / 80px desktop.
+- Breakpoint dùng Tailwind mobile-first chuẩn: sm 40rem, md 48rem, lg 64rem, xl 80rem, 2xl 96rem; không tạo breakpoint riêng theo từng section.
+- `SectionHeading`: eyebrow, h2 và mô tả theo shared typography; không chứa wording.
+- `MarketingButton`: compose shared Button, control tối thiểu 44px, variant primary/secondary/outline/ghost.
+- `FeatureCard`, `PricingCard`, `TestimonialCard`: compose shared Card; featured pricing dùng border/ring primary. Testimonial có figure/blockquote/figcaption; không thêm testimonial giả.
+- Motion utility shared: `duration-fast`, `duration-normal`, `duration-slow` (120/200/320ms); reduced motion override ở base stylesheet.
+
+```tsx
+<LandingSection id="features">
+  <LandingContainer>
+    <SectionHeading
+      title="Features"
+      description="Booking tools for your team"
+    />
+    <FeatureCard>...</FeatureCard>
+    <MarketingButton asChild>
+      <Link href="/signup-business">Start</Link>
+    </MarketingButton>
+  </LandingContainer>
+</LandingSection>
+```
+
+`MotionButton` tái sử dụng `buttonVariants`; `MotionCard` bọc FeatureCard. Animation
+hiện có được giữ lại, có reduced-motion fallback. Mockup dashboard/phone có thể
+dùng type size nhỏ để minh họa; chữ hướng dẫn, form và CTA thật không lấy size đó
+làm mặc định. Shared tokens là foundation, utility theo ngữ cảnh vẫn được phép.
+
+Header dùng shared DropdownMenu/Sheet cho keyboard navigation, Escape và focus
+management. Locale selector native dùng ở header/mobile/footer; chỉ Việt/Anh,
+lấy locale từ route và giữ path/query/hash qua `next-intl`. Chỉ navigation/form
+và metadata được localized trong DS-002; marketing copy tiếng Anh hiện có không
+được dịch lại trong task này.
+
+Modal feedback và bảng so sánh dùng shared Dialog cho focus trap/Escape, thay
+overlay tự dựng. `cn` của UI khai báo custom font-size groups để `text-label`,
+`text-body`, `text-heading-*` không bị hiểu nhầm là màu và xóa semantic text color.
+
+`/signup-business` tiếp tục dùng Input/Label/Button và RegistrationField; lỗi có
+label association, aria-invalid, aria-describedby và role alert. Không đổi Auth flow.
+
+Metadata có title/description/OG/Twitter/canonical/hreflang cho vi/en, signup
+noindex; public origin từ `NEXT_PUBLIC_WEB_URL`, Admin login từ `NEXT_PUBLIC_ADMIN_URL`.
+Chưa khai báo OG image/social handle khi chưa có asset/tài khoản chính thức.
+
+### Token guard và ngoại lệ
+
+```bash
+pnpm --filter @repo/web validate:tokens
+pnpm lint:web
+```
+
+Web lint chạy guard dùng chung với UI: kiểm tra source/app, màu HEX/RGB/HSL,
+palette Tailwind (gồm gradient stops) và tên token Landing cũ.
+Ngoại lệ duy nhất có whitelist hẹp: `COLOR_INPUT_DEFAULT = "#006aff"` trong
+`views/home/constants/color-input.constants.ts`, vì native input[type=color]
+cần literal hex. Đây là initial primary-600 cho demo chọn màu Business, không
+phải palette UI mới. Màu do người dùng nhập là dữ liệu tùy biến, không phải brand
+token hệ thống. Opacity của CSS variable/custom hex dùng `withColorAlpha`, không
+ghép suffix hex vào chuỗi `var(...)`. SVG download resolve token thành màu trước
+khi xuất vì file độc lập không có stylesheet ứng dụng.
+
+Kiểm tra contrast tự động hiện bao phủ cặp canvas, body/muted, primary và status
+surface ở Light/Dark; kiểm tra trình duyệt cần chạy thêm để xác nhận responsive,
+focus, menu và trạng thái interactive thực tế.

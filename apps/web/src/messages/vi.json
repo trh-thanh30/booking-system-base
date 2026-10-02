@@ -1,4 +1,13 @@
 {
+  "Navigation": {
+    "language": "Chọn ngôn ngữ",
+    "mainNavigation": "Điều hướng chính",
+    "openMenu": "Mở menu",
+    "closeMenu": "Đóng menu",
+    "login": "Đăng nhập",
+    "trial": "Dùng thử miễn phí",
+    "skip": "Đến nội dung chính"
+  },
   "App": {
     "title": "Web App",
     "description": "Ứng dụng public cho monorepo base"

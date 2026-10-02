@@ -38,18 +38,18 @@ export function DemoPanel({ activeStep }: Props) {
   const meta = STEP_META[activeStep];
 
   return (
-    <div className="rounded-3xl border border-border-light bg-bg-primary p-6 shadow-[0_4px_24px_rgba(0,0,0,0.03)] sm:p-7">
+    <div className="rounded-3xl border border-border bg-surface p-6 shadow-md sm:p-7">
       {/* key={activeStep} forces React to re-mount the component, which triggers CSS animations to re-run on transition */}
       <div key={activeStep} className="animate-panel-in">
         <div className="mb-2">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-brand-blue/10 px-2.5 py-1 text-[11px] font-bold text-brand-blue uppercase">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1 text-[11px] font-bold text-primary uppercase">
             {meta.badge}
           </span>
         </div>
-        <h3 className="mb-2 text-[20px] sm:text-[22px] font-bold text-text-primary tracking-[-0.01em]">
+        <h3 className="mb-2 text-[20px] sm:text-[22px] font-bold text-foreground tracking-[-0.01em]">
           {meta.title}
         </h3>
-        <p className="mb-5 text-[13px] sm:text-[13.5px] text-text-muted leading-relaxed">
+        <p className="mb-5 text-[13px] sm:text-[13.5px] text-muted-foreground leading-relaxed">
           {meta.sub}
         </p>
 

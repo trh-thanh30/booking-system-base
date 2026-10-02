@@ -1,10 +1,10 @@
 export const TEMPLATE_COLORS: Record<string, string> = {
-  beauty: "#a855f7", // purple
-  healthcare: "#0d9488", // teal
-  fitness: "#ef4444", // red
-  consulting: "#3b82f6", // blue
-  education: "#f59e0b", // amber
-  repair: "#f97316", // orange
+  beauty: "var(--color-primary)", // purple
+  healthcare: "var(--color-primary)", // teal
+  fitness: "var(--color-primary)", // red
+  consulting: "var(--color-primary)", // blue
+  education: "var(--color-warning)", // amber
+  repair: "var(--color-primary)", // orange
 };
 
 export const FILTERS = [
