@@ -26,6 +26,20 @@ apps/api/src/
 
 ## Vai Trò Folder Cấp API
 
+### Ranh giới production build
+
+- `tsconfig.build.json` dùng `rootDir: ./src` để giữ entrypoint API tại
+  `dist/main.js` và email worker tại `dist/workers/email/worker.main.js`.
+- Loại `src/test/**` và `**/*spec.ts` khỏi build. Helper/mock Jest không được
+  kéo source của workspace khác vào production compilation.
+- Đặt incremental cache tại `dist/tsconfig.build.tsbuildinfo` để Nest xóa cache
+  cùng output; không để cache bên ngoài `dist` khiến rebuild bỏ qua emit.
+- API sử dụng `@repo/shared` qua package đã build; import source trực tiếp chỉ
+  dành cho test khi cần và phải nằm ngoài production build.
+- Chạy `pnpm --filter @repo/api test:build-config` để kiểm tra ranh giới này.
+- API không có pipeline Tailwind hay giao diện frontend. Styling thuộc Web/UI;
+  email dùng template MJML/Handlebars, không phụ thuộc Tailwind.
+
 ### `common/`
 
 Chứa hạ tầng dùng chung trong API app:

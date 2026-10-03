@@ -48,7 +48,9 @@ jobs:
       - run: pnpm lint:api
       - run: pnpm typecheck:api
       - run: pnpm test:api
+      - run: pnpm --filter @repo/api test:build-config
       - run: pnpm build:api
+      - run: pnpm --filter @repo/api test:build-config --built
 
   web:
     name: Web + Business Admin
