@@ -8,9 +8,7 @@
   "files": [
     "dist",
     "prisma",
-    "prisma.config.ts",
-    "public",
-    "scripts"
+    "prisma.config.ts"
   ],
   "scripts": {
     "build": "nest build && tsc-alias -p tsconfig.json",
@@ -51,9 +49,6 @@
     "db:seed:dev": "dotenv -e ../../.env.development -- ts-node prisma/seed.ts",
     "db:seed:test": "dotenv -e ../../.env.test -- ts-node prisma/seed.ts",
     "db:seed:prod": "dotenv -e ../../.env.production -- ts-node prisma/seed.production.ts",
-    "test:users:dev": "cross-env NODE_ENV=development ts-node scripts/test_base_users_module.ts",
-    "test:users:test": "cross-env NODE_ENV=test ts-node scripts/test_base_users_module.ts",
-    "test:users:prod": "cross-env NODE_ENV=production ts-node scripts/test_base_users_module.ts",
     "postinstall": "prisma generate",
     "prepare": "husky"
   },

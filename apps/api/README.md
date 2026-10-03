@@ -143,19 +143,18 @@ The project follows a modular NestJS architecture:
 ```
 ├── [prisma/](prisma/README.md)           # Prisma schema and migrations
 │   ├── schema.prisma     # Database schema with User model
-├── [scripts/](scripts/README.md)         # Utility scripts for setup
 ├── src/
 │   ├── [common/](src/common/README.md)       # Shared utilities and decorators
 │   │   ├── decorators/   # Custom decorators (roles, public, API responses)
 │   │   ├── filters/      # Exception filters
-│   │   ├── helpers/      # Utility services (bcrypt, code generation)
+│   │   ├── helpers/      # Password hashing utilities
 │   │   ├── interceptors/ # HTTP interceptors (logging, response)
 │   │   ├── logger/       # Logging system
 │   │   ├── response/     # Response types and success/error classes
 │   │   └── types/        # TypeScript type definitions
 │   ├── [config/](src/config/README.md)       # Configuration modules (JWT, email, database)
-│   ├── [infra/](src/infra/README.md)         # Infrastructure (Prisma, Redis)
-│   ├── [module/](src/module/README.md)       # Feature modules
+│   ├── [database/](src/database/README.md)         # Infrastructure (Prisma, Redis)
+│   ├── [modules/](src/modules/README.md)       # Feature modules
 │   │   ├── auth/         # Authentication module
 │   │   ├── email/        # Email service with templates
 │   │   ├── health/       # Health check indicators
@@ -163,114 +162,38 @@ The project follows a modular NestJS architecture:
 │   │   └── user/         # User management module
 │   ├── app.module.ts     # Main application module
 │   └── main.ts           # Application entry point
-├── test/                 # E2E tests
-└── public/               # Static assets and email templates
+└── test/                 # Test configuration and build regression checks
 ```
 
 ## Quick Start
 
-### Using the Setup Script
-
-The easiest way to get started is using our setup script:
-
-```bash
-# Make the script executable
-chmod +x ./scripts/setup_dev_env.sh
-
-# Run the setup script
-./scripts/setup_dev_env.sh
-```
-
-This script will:
-
-1. Start the development database container
-2. Push the Prisma schema to the database
-3. Seed the database with sample data
-
-### Clearing Development Environment
-
-If you want to completely clean up your development environment, you can use the clear script:
+Run commands from the repository root. Copy the root `.env.example` to
+`.env.development` and configure local credentials before starting services.
 
 ```bash
-# Make the script executable
-chmod +x ./scripts/clear_dev_env.sh
-
-# Run the clear script
-./scripts/clear_dev_env.sh
-```
-
-Or using Make:
-
-```bash
-make clear-dev
-```
-
-This script will:
-
-1. **Remove** `.env.development` file
-2. **Stop and remove** the development database container with volumes
-3. **Clean** Prisma generated files
-4. **Clean** `dist` folder
-5. **Clean** `logs` folder
-
-**⚠️ WARNING:** This will permanently delete your development database data and configuration!
-
-### Using Make Commands
-
-If you have Make installed, you can use the following commands:
-
-```bash
-# Setup the entire development environment (database, schema, seed data)
-make setup-dev
-
-# Clear the entire development environment
-make clear-dev
-
-# Start only the development database
-make docker-dev-up
-
-# Push the schema to the database
-make db-push-dev
-
-# Reset and recreate database with fresh schema and seed data (no confirmation)
-make db-reset-dev
-
-# Reset database with user confirmation prompt
-make db-reset-force
-
-# Seed the database with sample data
-make db-seed-dev
-
-# Start the application in development mode
-make dev
-```
-
-### Manual Setup
-
-If you prefer to run commands manually:
-
-```bash
-# Start the development database
-docker-compose -f docker-compose.dev.yml --env-file .env.development up -d
+# Start development infrastructure without resetting data
+pnpm infra:dev:up
 
 # Generate Prisma client
-npm run prisma:generate
+pnpm prisma:generate
 
-# Push the schema to the database
-npm run db:push:dev
+# Apply development migrations (review generated SQL before committing)
+pnpm prisma:migrate:dev
 
-# Reset and recreate database with fresh schema and seed data (no confirmation)
-npm run prisma:migrate:reset:force
+# Optional: seed a local development database
+pnpm db:seed:dev
 
-# Reset database with user confirmation prompt
-npm run prisma:migrate:reset
-
-# Seed the database
-npm run db:seed:dev
-
-# Start the application
-npm run start:dev
+# Start the API
+pnpm dev:api
 ```
+
+Stop development infrastructure with `pnpm infra:dev:down`. This command does
+not remove named volumes. Database reset commands are destructive and should
+only be used deliberately against a disposable development database.
+
+Legacy setup/cleanup scripts and the Railway launcher have been retired.
+Supported API and email worker entrypoints are the Nest scripts in
+`package.json` and the compiled entrypoints used by Docker Compose.
 
 ## Database Management
 
@@ -787,38 +710,22 @@ npm run test:cov
 
 ### API Testing
 
-The project includes a script to test the Users API endpoints:
+User CRUD and authentication behavior are covered by module tests under
+`src/modules/*/tests`. The legacy HTTP Users scripts have been removed because
+their payloads, HTTP methods and authentication assumptions no longer match
+the API.
 
 ```bash
-# Test users module API in development environment
-make test-users-dev
-# or
-npm run test:users:dev
+# Run API unit/controller tests from the repository root
+pnpm test:api
 
-# Test users module API in test environment
-make test-users-test
-# or
-npm run test:users:test
-
-# Test users module API in production environment
-make test-users-prod
-# or
-npm run test:users:prod
+# Check production build output and incremental cache
+pnpm build:api
+pnpm --filter @repo/api test:build-config --built
 ```
 
-You can also use the shell script that handles starting the application if needed:
-
-```bash
-# Make the script executable
-chmod +x ./scripts/test_users_module.sh
-
-# Run the test (default: development environment)
-./scripts/test_users_module.sh
-
-# Run the test in a specific environment
-./scripts/test_users_module.sh test
-./scripts/test_users_module.sh production
-```
+The starter E2E files are retained pending a separate test migration; they are
+not a passing production E2E suite and are not part of the default API test run.
 
 ## Docker
 
