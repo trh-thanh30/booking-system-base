@@ -15,8 +15,7 @@ Frontend apps cũng có file mẫu riêng để copy khi cần override cục b�
 
 | File                               | Vai trò                                        |
 | :--------------------------------- | :--------------------------------------------- |
-| `apps/web/.env.example`            | Mẫu env riêng cho public storefront.           |
-| `apps/admin/.env.example`          | Mẫu env riêng cho Business Admin Portal.       |
+| `apps/web/.env.example`            | Mẫu env cho Landing + Business Admin.          |
 | `apps/platform-admin/.env.example` | Mẫu env riêng cho Platform/Super Admin Portal. |
 
 Với luồng dev thông thường, ưu tiên copy root `.env.example` thành `.env.development`. Chỉ tạo `apps/<app>/.env.local` khi app đó cần override riêng.
@@ -27,17 +26,16 @@ Với luồng dev thông thường, ưu tiên copy root `.env.example` thành `.
 
 - `API_PORT`
 - `WEB_PORT`
-- `ADMIN_PORT`
 - `PLATFORM_ADMIN_PORT`
 
 Giá trị local mặc định:
 
-| App/Service    | Biến                  | URL mặc định            |
-| :------------- | :-------------------- | :---------------------- |
-| API            | `API_PORT`            | `http://localhost:3000` |
-| Web            | `WEB_PORT`            | `http://localhost:3001` |
-| Business Admin | `ADMIN_PORT`          | `http://localhost:3002` |
-| Platform Admin | `PLATFORM_ADMIN_PORT` | `http://localhost:3003` |
+| App/Service    | Biến                  | URL mặc định                     |
+| :------------- | :-------------------- | :------------------------------- |
+| API            | `API_PORT`            | `http://localhost:3000`          |
+| Web            | `WEB_PORT`            | `http://localhost:3001`          |
+| Business Admin | `WEB_PORT`            | `http://localhost:3001/vi/admin` |
+| Platform Admin | `PLATFORM_ADMIN_PORT` | `http://localhost:3003`          |
 
 ### Database
 
@@ -76,11 +74,17 @@ Production compose dùng các biến image sau:
 
 - `API_IMAGE`
 - `WEB_IMAGE`
-- `ADMIN_IMAGE`
 - `PLATFORM_ADMIN_IMAGE`
 - `IMAGE_TAG`
 
 ## Frontend Env
+
+ARCH-001: `WEB_URL` / `NEXT_PUBLIC_WEB_URL` là origin chung của Landing + Admin,
+không chứa `/admin`. API Google redirects thêm `/{locale}/admin/*` trong code.
+`ADMIN_URL`, `NEXT_PUBLIC_ADMIN_URL`, `ADMIN_PORT`, `ADMIN_IMAGE` không còn được
+dùng cho Business Admin; có thể bỏ khỏi env deploy sau cutover. Không đổi Google
+API callback hay nới cookie Domain/SameSite. Docker/CI phải truyền public URLs
+ở build time. `*:admin` scripts là alias về Web, không tạo service riêng.
 
 Các app Next.js chỉ được expose biến ra browser nếu biến có prefix `NEXT_PUBLIC_`.
 
@@ -91,11 +95,11 @@ Biến FE dùng chung:
 
 Biến riêng theo app:
 
-| App                   | Biến public URL                  | Auth context |
-| :-------------------- | :------------------------------- | :----------- |
-| `apps/web`            | `NEXT_PUBLIC_WEB_URL`            | `client`     |
-| `apps/admin`          | `NEXT_PUBLIC_ADMIN_URL`          | `admin`      |
-| `apps/platform-admin` | `NEXT_PUBLIC_PLATFORM_ADMIN_URL` | `platform`   |
+| App                     | Biến public URL                  | Auth context |
+| :---------------------- | :------------------------------- | :----------- |
+| `apps/web`              | `NEXT_PUBLIC_WEB_URL`            | `client`     |
+| `apps/web` (`/admin/*`) | `NEXT_PUBLIC_WEB_URL`            | `admin`      |
+| `apps/platform-admin`   | `NEXT_PUBLIC_PLATFORM_ADMIN_URL` | `platform`   |
 
 `NEXT_PUBLIC_AUTH_CONTEXT` chỉ nên đặt trong app-local env file nếu cần debug/override. Trong code hiện tại auth context đang được set tường minh theo từng app để tránh trộn Business Admin với Platform Admin.
 

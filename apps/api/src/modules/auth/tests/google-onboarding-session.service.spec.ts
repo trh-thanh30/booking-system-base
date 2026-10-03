@@ -22,7 +22,7 @@ describe('GoogleOnboardingSessionService', () => {
       email: 'owner@example.com',
       locale: 'vi' as const,
       providerAccountId: 'google-subject',
-      returnTo: '/dashboard',
+      returnTo: '/admin/dashboard',
     };
 
     const created = await service.create(session);

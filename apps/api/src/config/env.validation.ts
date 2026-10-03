@@ -31,8 +31,8 @@ export const envSchema = z
       .min(300)
       .max(3600)
       .default(900),
-    ADMIN_URL: z.string().url().optional(),
-    NEXT_PUBLIC_ADMIN_URL: z.string().url().optional(),
+    WEB_URL: z.string().url().optional(),
+    NEXT_PUBLIC_WEB_URL: z.string().url().optional(),
 
     // Database
     DB_HOST: z.string().default('localhost'),

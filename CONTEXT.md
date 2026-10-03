@@ -7,7 +7,7 @@
 - **Core module**: generic module that can be reused across domains, such as auth, users, settings, files, email, notifications, and health.
 - **Domain module**: product-specific module, such as booking, ecommerce, CRM, inventory, or billing.
 - **Platform Admin Portal**: `apps/platform-admin`, the super-admin surface for managing the whole SaaS platform.
-- **Business Admin Portal**: `apps/admin`, the tenant workspace for a business owner and staff.
+- **Business Admin Portal**: `apps/web` under `/{locale}/admin/*`, the tenant workspace for a business owner and staff. Shares one frontend service with Landing, not its public API credentials/query cache.
 - **Tenant**: an organization/account boundary on the platform. It owns billing, users, domains, settings, and one or more businesses. Tenant-scoped APIs must not leak data across tenants.
 - **Business**: an operational booking unit inside a tenant, such as a branch, brand, location, or store. Business-scoped APIs use `x-business-id` and `@RequireBusiness()` so booking/service/staff data stays inside `tenant_id + business_id`.
 - **Super Admin**: global platform operator. Uses `SUPER_ADMIN`, does not require `tenant_id`, and authenticates with the `platform` context.

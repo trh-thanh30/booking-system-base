@@ -2,9 +2,9 @@
 
 `apps/platform-admin` is the super admin portal for platform-level operations.
 
-It is intentionally separate from `apps/admin`:
+It is intentionally separate from `apps/web`:
 
-- `apps/admin`: business/tenant admin portal for owners, managers, and staff.
+- `apps/web` under `/{locale}/admin/*`: business/tenant admin portal for owners, managers, and staff.
 - `apps/platform-admin`: platform portal for super admins and internal operators.
 
 Current scope:

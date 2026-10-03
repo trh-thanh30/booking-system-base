@@ -1,7 +1,7 @@
 "use client";
 
-import { Children, cloneElement, isValidElement, type ReactNode } from "react";
-import { Label, cn } from "@repo/ui";
+import type { ReactNode } from "react";
+import { FormField } from "@/src/components/common/form-field";
 
 export function RegistrationField({
   error,
@@ -15,31 +15,8 @@ export function RegistrationField({
   children: ReactNode;
 }) {
   return (
-    <div className="space-y-2">
-      <Label htmlFor={id}>{label}</Label>
-      {Children.map(children, (child) =>
-        isValidElement<Record<string, unknown>>(child)
-          ? cloneElement(child, {
-              className: cn(
-                "min-h-11 text-body",
-                typeof child.props.className === "string"
-                  ? child.props.className
-                  : undefined,
-              ),
-              "aria-invalid": Boolean(error),
-              "aria-describedby": error ? `${id}-error` : undefined,
-            })
-          : child,
-      )}
-      {error ? (
-        <p
-          id={`${id}-error`}
-          role="alert"
-          className="text-xs leading-5 text-destructive"
-        >
-          {error}
-        </p>
-      ) : null}
-    </div>
+    <FormField htmlFor={id} label={label} error={error}>
+      {children}
+    </FormField>
   );
 }

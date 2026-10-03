@@ -5,7 +5,7 @@ import { Plus_Jakarta_Sans } from "next/font/google";
 import { Toaster } from "@repo/ui/sonner";
 import { routing } from "@/src/i18n/routing";
 import { QueryProvider } from "@/src/app/providers/query-provider";
-import { createLandingMetadata } from "@/src/utils/metadata.utils";
+import { ThemeProvider } from "@/src/app/providers/theme-provider";
 import "../globals.css";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
@@ -13,15 +13,6 @@ const plusJakartaSans = Plus_Jakarta_Sans({
   weight: ["300", "400", "500", "600", "700", "800"],
   variable: "--font-plus-jakarta-sans",
 });
-
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}) {
-  const { locale } = await params;
-  return createLandingMetadata(locale);
-}
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
@@ -45,14 +36,17 @@ export default async function LocaleLayout({
   return (
     <html
       lang={locale}
+      suppressHydrationWarning
       className={`${plusJakartaSans.variable} scroll-smooth motion-reduce:scroll-auto`}
     >
       <body>
         <NextIntlClientProvider messages={messages}>
-          <QueryProvider>
-            {children}
-            <Toaster />
-          </QueryProvider>
+          <ThemeProvider>
+            <QueryProvider>
+              {children}
+              <Toaster />
+            </QueryProvider>
+          </ThemeProvider>
         </NextIntlClientProvider>
       </body>
     </html>

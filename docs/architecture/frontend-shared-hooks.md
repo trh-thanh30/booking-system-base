@@ -48,7 +48,7 @@ import { useAuth, usePermission } from "@repo/hooks/auth";
 
 ## Quy Ước Sử Dụng
 
-- Hook dùng lại giữa `apps/admin` và `apps/web` đặt trong `packages/hooks`.
+- Hook dùng lại giữa Web và Platform Admin đặt trong `packages/hooks`; hook chỉ dùng Landing/Admin của Web có thể ở app-level `src/hooks`.
 - Hook chỉ dùng riêng một app đặt trong `apps/<client>/src/hooks`.
 - Hook chỉ dùng riêng một view đặt trong `apps/<client>/src/views/<feature>`.
 - Không đặt React hook trong `packages/shared`.

@@ -2,8 +2,8 @@ import { registerAs } from '@nestjs/config';
 
 export default registerAs('googleOAuth', () => ({
   adminUrl:
-    process.env.ADMIN_URL ??
-    process.env.NEXT_PUBLIC_ADMIN_URL ??
+    process.env.WEB_URL ??
+    process.env.NEXT_PUBLIC_WEB_URL ??
     'http://localhost:3001',
   clientId: process.env.GOOGLE_CLIENT_ID ?? '',
   clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? '',

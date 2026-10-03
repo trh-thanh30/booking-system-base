@@ -27,7 +27,7 @@ describe('GoogleOAuthStateService', () => {
 
     const result = await subject.create({
       locale: 'en',
-      returnTo: '/businesses?tab=active',
+      returnTo: '/admin/businesses?tab=active',
     });
 
     expect(result.state).toMatch(/^[A-Za-z0-9_-]{43}$/);
@@ -45,15 +45,20 @@ describe('GoogleOAuthStateService', () => {
       codeVerifier: result.codeVerifier,
       locale: 'en',
       nonce: result.nonce,
-      returnTo: '/businesses?tab=active',
+      returnTo: '/admin/businesses?tab=active',
     });
   });
 
   it.each([
     'https://attacker.example/path',
     '//attacker.example/path',
+    '/vi',
+    '/admin/login',
+    '/en/admin/onboarding/business',
+    '/api/v1/auth/admin/google',
+    '/admin/%2f%2fattacker.example',
     '/\\attacker.example/path',
-    '/dashboard\r\nLocation:https://attacker.example',
+    '/admin/dashboard\r\nLocation:https://attacker.example',
   ])(
     'replaces an unsafe returnTo path with the dashboard',
     async (returnTo) => {
@@ -62,7 +67,7 @@ describe('GoogleOAuthStateService', () => {
       await subject.create({ returnTo });
 
       const stored = JSON.parse(redis.set.mock.calls[0]?.[1] as string);
-      expect(stored.returnTo).toBe('/dashboard');
+      expect(stored.returnTo).toBe('/admin/dashboard');
     },
   );
 
@@ -81,7 +86,7 @@ describe('GoogleOAuthStateService', () => {
       codeVerifier: 'code-verifier',
       locale: 'vi',
       nonce: 'nonce',
-      returnTo: '/dashboard',
+      returnTo: '/admin/dashboard',
     };
     redis.getdel
       .mockResolvedValueOnce(JSON.stringify(session))

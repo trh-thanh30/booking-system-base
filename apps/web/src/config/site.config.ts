@@ -15,8 +15,4 @@ export const siteConfig = {
     process.env.NEXT_PUBLIC_WEB_URL,
     "http://localhost:3001",
   ),
-  adminUrl: publicOrigin(
-    process.env.NEXT_PUBLIC_ADMIN_URL,
-    "http://localhost:3002",
-  ),
 } as const;

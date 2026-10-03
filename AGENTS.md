@@ -31,7 +31,8 @@ This repo uses a lightweight, repo-native agent workflow inspired by Matt Pocock
 
 ## Frontend Architecture
 
-- Read `docs/architecture/frontend-folder-structure.md` before changing `apps/admin` or `apps/web`.
+- Read `docs/architecture/frontend-folder-structure.md` before changing `apps/web` or `apps/platform-admin`.
+- Web hosts Landing and Business Admin at `/{locale}/admin/*`. Keep Admin AuthProvider/private query cache in the Admin layout only; marketing must not bootstrap Admin. Platform Admin remains a separate service.
 - Keep `app/**/page.tsx` as a thin server component that imports and renders a view from `src/views`.
 - Do not add `"use client"` to `page.tsx`; put client state, event handlers, charts, tables, and browser APIs inside view components or their child components.
 - Put app-level shared components in `src/components/common`, layout components in `src/components/layout`, and feature-specific components in `src/views/<feature>/components`.

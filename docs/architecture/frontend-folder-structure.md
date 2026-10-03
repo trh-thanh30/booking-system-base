@@ -2,8 +2,8 @@
 
 Tài liệu này mô tả đầy đủ vai trò, chức năng và rule sử dụng folder cho các client frontend trong monorepo, hiện áp dụng cho:
 
-- `apps/web`: app public/customer-facing.
-- `apps/admin`: app dashboard/quản trị nội bộ.
+- `apps/web`: Landing + Business Admin tại `/{locale}/admin/*`.
+- `apps/platform-admin`: Super Admin riêng.
 
 Mục tiêu là giữ cấu trúc đủ rõ để làm boilerplate cho nhiều dự án Next.js khác, đồng thời tránh việc code UI, API, type và helper bị trộn lẫn.
 
@@ -12,6 +12,19 @@ Quy ước màu sắc, typography, theme và shared UI primitives được đị
 token từ `@repo/ui/styles.css`, không duy trì brand palette riêng trong từng app.
 
 ## Cây Folder Chuẩn
+
+### Web sau ARCH-001
+
+- `app/[locale]/(marketing)`: Landing/signup, localized SEO metadata.
+- `app/[locale]/admin/(auth)`: public Owner auth/Google onboarding screens.
+- `app/[locale]/admin/(dashboard)`: protected dashboard shell/routes.
+- `app/[locale]/admin/layout.tsx`: một AuthProvider và private QueryClient dùng chung xuyên suốt Admin; marketing không bootstrap Admin.
+- `src/views/admin/<feature>`: các màn hình Admin, giữ role folders như rule dưới đây.
+- `src/lib/admin`, `src/services/admin`, `src/app/providers/admin`, `src/app/stores/admin`: session/context riêng, không trộn public client.
+- `src/components/layout/admin`: shell/navigation; common FormField và LanguageSwitcher tái sử dụng cho Landing/Admin.
+- Font, NextIntl provider, theme, CSS và Toaster chỉ mount một lần tại locale root. Private query cache của Admin độc lập với public cache.
+- `/admin` là segment URL thật, route groups chỉ phân layout. Platform Admin vẫn là service riêng.
+- URL FE sử dụng `/admin/*`; API vẫn `/auth/admin/*`, `/users`, `/businesses`, không tự thêm `/admin` vào API routes.
 
 ```txt
 apps/<client>/
@@ -34,7 +47,7 @@ apps/<client>/
 └── tsconfig.json
 ```
 
-`apps/<client>` có thể là `apps/web`, `apps/admin` hoặc client Next.js khác được thêm sau này.
+`apps/<client>` có thể là `apps/web`, `apps/platform-admin` hoặc client Next.js khác được thêm sau này.
 
 ## Vai Trò Cấp App Root
 
@@ -379,7 +392,7 @@ export type BookingSummary = {
 ```
 
 ```ts
-// apps/admin/src/views/bookings/types/bookings.types.ts
+// apps/web/src/views/admin/bookings/types/bookings.types.ts
 import type { BookingStatus } from "@repo/shared";
 
 export type BookingStatusFilter = "all" | BookingStatus;

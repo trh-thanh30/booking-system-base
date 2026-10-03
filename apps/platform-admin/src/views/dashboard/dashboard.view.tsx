@@ -67,7 +67,7 @@ export function DashboardView() {
           </CardDescription>
         </CardHeader>
         <CardContent className="text-sm leading-6 text-slate-500 dark:text-slate-400">
-          Tenant/business workflows stay in <code>apps/admin</code>. Global
+          Tenant/business workflows stay in <code>apps/web /admin</code>. Global
           tenant lifecycle, platform users, audits, billing oversight, and
           system health belong here.
         </CardContent>

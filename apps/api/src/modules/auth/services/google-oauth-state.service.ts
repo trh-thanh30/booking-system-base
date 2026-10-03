@@ -4,6 +4,7 @@ import { RedisService } from '@/database/redis/redis.service';
 import { Inject, Injectable } from '@nestjs/common';
 import type { ConfigType } from '@nestjs/config';
 import { createHash, randomBytes, timingSafeEqual } from 'node:crypto';
+import { getSafeAdminReturnTo } from '@repo/shared';
 
 export type GoogleOAuthSession = {
   codeVerifier: string;
@@ -35,7 +36,7 @@ export class GoogleOAuthStateService {
       codeVerifier,
       locale: input.locale ?? 'vi',
       nonce: this.randomValue(),
-      returnTo: this.normalizeReturnTo(input.returnTo),
+      returnTo: getSafeAdminReturnTo(input.returnTo),
     };
 
     await this.redisService.set(
@@ -108,28 +109,6 @@ export class GoogleOAuthStateService {
   private getKey(state: string): string {
     const digest = createHash('sha256').update(state).digest('hex');
     return `auth:oauth:google:state:${digest}`;
-  }
-
-  private normalizeReturnTo(value?: string): string {
-    if (
-      !value ||
-      !value.startsWith('/') ||
-      value.startsWith('//') ||
-      value.includes('\\') ||
-      /[\r\n]/.test(value)
-    ) {
-      return '/dashboard';
-    }
-
-    try {
-      const url = new URL(value, 'https://admin.internal');
-      if (url.origin !== 'https://admin.internal') {
-        return '/dashboard';
-      }
-      return `${url.pathname}${url.search}${url.hash}`;
-    } catch {
-      return '/dashboard';
-    }
   }
 
   private randomValue(): string {

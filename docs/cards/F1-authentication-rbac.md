@@ -65,10 +65,14 @@ Không thêm `sessions` table trong F1. Refresh/session state dùng `users.refre
 
 ## Auth Contexts
 
+ARCH-001: Business Admin nằm trong Web tại `/{locale}/admin/*`; giữ context
+`admin` và API `/auth/admin/*`. Public registration/recovery dùng client riêng,
+không kế thừa Admin token/headers. Platform Admin vẫn là app độc lập.
+
 | Context    | App                   | Roles hợp lệ     | Refresh cookies                             |
 | :--------- | :-------------------- | :--------------- | :------------------------------------------ |
 | `platform` | `apps/platform-admin` | `SUPER_ADMIN`    | `platform_refresh_token`, `platform_has_rt` |
-| `admin`    | `apps/admin`          | `OWNER`, `STAFF` | `admin_refresh_token`, `admin_has_rt`       |
+| `admin`    | `apps/web`            | `OWNER`, `STAFF` | `admin_refresh_token`, `admin_has_rt`       |
 | `client`   | `apps/web`            | `CUSTOMER`       | `client_refresh_token`, `client_has_rt`     |
 
 `SUPER_ADMIN` là global role, không cần `tenant_id`. `OWNER` và `STAFF` là tenant-scoped roles. Tenant là account/organization; business/branch/location nằm trong `Business`.
@@ -147,7 +151,7 @@ Không thêm `sessions` table trong F1. Refresh/session state dùng `users.refre
 - Owner được truy cập toàn bộ Business trong Tenant; Staff chỉ truy cập Business có membership cùng Tenant.
 - Google OAuth account mới chỉ nhận Redis onboarding session tại callback; Tenant/Business/Owner chỉ được tạo khi hoàn tất onboarding.
 - Google onboarding token chỉ nằm trong HttpOnly cookie, không truyền qua URL; email và Google subject luôn lấy từ verified provider profile.
-- Backend F1-007 cung cấp contract onboarding; UI `/{locale}/onboarding/business` được triển khai trong F1-011.
+- Backend F1-007 cung cấp contract onboarding; UI `/{locale}/admin/onboarding/business` được triển khai trong F1-011.
 
 ## Delivery Phases
 

@@ -6,7 +6,7 @@ const oauthSession = {
   codeVerifier: 'code-verifier',
   locale: 'vi',
   nonce: 'nonce',
-  returnTo: '/dashboard',
+  returnTo: '/admin/dashboard',
 };
 
 const googleProfile = {
@@ -127,7 +127,7 @@ describe('LoginWithGoogleUseCase', () => {
       access_token: 'access-token',
       refresh_token: 'refresh-token',
       locale: 'vi',
-      returnTo: '/dashboard',
+      returnTo: '/admin/dashboard',
       user: {
         id: 'owner-id',
         is_verified: true,
@@ -202,7 +202,7 @@ describe('LoginWithGoogleUseCase', () => {
       }),
     ).resolves.toMatchObject({
       locale: 'vi',
-      returnTo: '/dashboard',
+      returnTo: '/admin/dashboard',
       status: 'onboarding_required',
       onboardingToken: 'onboarding-token',
       onboardingTtlSeconds: 900,
@@ -213,7 +213,7 @@ describe('LoginWithGoogleUseCase', () => {
       fullName: 'Business Owner',
       locale: 'vi',
       providerAccountId: 'google-subject',
-      returnTo: '/dashboard',
+      returnTo: '/admin/dashboard',
     });
 
     expect(transaction.userIdentity.create).not.toHaveBeenCalled();

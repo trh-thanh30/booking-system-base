@@ -10,3 +10,4 @@ coverage
 storage
 prisma-data
 telegram-notification.preview.*
+.next-*/

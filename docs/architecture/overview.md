@@ -1,10 +1,10 @@
 # Architecture Overview
 
-This base uses a three-app Turborepo layout:
+The core runtime uses API, merged Web + Business Admin, and separate Platform Admin:
 
 - `apps/api` exposes the HTTP API and owns database access.
-- `apps/web` is the public web application.
-- `apps/admin` is the internal operations application.
+- `apps/web` hosts public Landing and Business Admin (`/{locale}/admin/*`).
+- `apps/platform-admin` hosts global Super Admin separately.
 - `packages/shared` owns cross-app contracts and small framework-neutral utilities.
 - `packages/hooks` owns reusable React hooks for frontend clients.
 - `packages/ui` owns reusable React UI primitives.
