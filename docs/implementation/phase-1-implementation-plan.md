@@ -29,15 +29,15 @@ Kế hoạch này không coi dự án bắt đầu từ số 0. Những thành p
 
 ## 3. Kiến trúc và ranh giới hệ thống hiện tại
 
-| Thành phần            | Vai trò Phase 1                                                                                         |
-| --------------------- | ------------------------------------------------------------------------------------------------------- |
-| `apps/api`            | NestJS API, Prisma/PostgreSQL, tenant/business isolation, Redis/BullMQ, email worker và Stripe webhook. |
-| `apps/web`            | Landing page, đăng ký doanh nghiệp và trang đặt lịch công khai theo tenant/subdomain.                   |
-| `apps/admin`          | Business Admin quản lý vận hành của một doanh nghiệp.                                                   |
-| `apps/platform-admin` | Platform Admin quản lý tenant, ngành nghề, template, subscription, chính sách và liên hệ.               |
-| `packages/shared`     | Contract, schema, type và constant dùng chung giữa API và các frontend.                                 |
-| `packages/ui`         | UI primitive dùng chung, không chứa nội dung nghiệp vụ.                                                 |
-| `packages/hooks`      | React hook tái sử dụng giữa các frontend.                                                               |
+| Thành phần                       | Vai trò Phase 1                                                                                         |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `apps/api`                       | NestJS API, Prisma/PostgreSQL, tenant/business isolation, Redis/BullMQ, email worker và Stripe webhook. |
+| `apps/web`                       | Landing page, đăng ký doanh nghiệp và trang đặt lịch công khai theo tenant/subdomain.                   |
+| `apps/web` (`/{locale}/admin/*`) | Business Admin quản lý vận hành, chung frontend service/image với Landing.                              |
+| `apps/platform-admin`            | Platform Admin quản lý tenant, ngành nghề, template, subscription, chính sách và liên hệ.               |
+| `packages/shared`                | Contract, schema, type và constant dùng chung giữa API và các frontend.                                 |
+| `packages/ui`                    | UI primitive dùng chung, không chứa nội dung nghiệp vụ.                                                 |
+| `packages/hooks`                 | React hook tái sử dụng giữa các frontend.                                                               |
 
 Các API nghiệp vụ phải giữ chuỗi phụ thuộc: `controller -> use case -> repository -> Prisma`. Business-scoped API phải nhận business context từ guard/decorator, không tin `tenant_id` hoặc `business_id` do client gửi tùy ý.
 

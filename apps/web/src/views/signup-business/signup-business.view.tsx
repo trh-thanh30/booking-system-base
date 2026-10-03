@@ -51,8 +51,7 @@ export function SignupBusinessView() {
   const signupMutation = useMutation({
     retry: false,
     async mutationFn(input: RegisterOwnerInput) {
-      const baseUrl =
-        process.env.NEXT_PUBLIC_ADMIN_URL ?? "http://localhost:3002";
+      const baseUrl = window.location.origin;
       // Validate configuration before creating an account to avoid a duplicate registration after a broken handoff.
       getAdminVerificationUrl(baseUrl, locale, "");
       const result = await authService.registerOwner(input);

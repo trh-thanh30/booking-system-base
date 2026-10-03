@@ -22,7 +22,6 @@ import {
   LandingContainer,
   MarketingButton,
 } from "@/src/components/common/landing-compositions";
-import { siteConfig } from "@/src/config/site.config";
 import { NAV_ITEMS } from "../constants/home.constants";
 
 export function Header() {
@@ -30,7 +29,7 @@ export function Header() {
   const locale = useLocale();
   const scrolled = useScrollHeader(12);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const loginUrl = `${siteConfig.adminUrl}/${locale === "en" ? "en" : "vi"}/login`;
+  const loginUrl = `/${locale === "en" ? "en" : "vi"}/admin/login`;
   return (
     <header
       className={`sticky top-0 z-50 w-full border-b transition-colors duration-normal ${scrolled ? "border-border bg-surface/95 shadow-sm backdrop-blur-md" : "border-transparent bg-surface"}`}

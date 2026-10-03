@@ -68,7 +68,6 @@ jobs:
           echo "source_sha=$source_sha" >> "$GITHUB_OUTPUT"
           echo "api_image=$image_prefix-api" >> "$GITHUB_OUTPUT"
           echo "web_image=$image_prefix-web" >> "$GITHUB_OUTPUT"
-          echo "admin_image=$image_prefix-admin" >> "$GITHUB_OUTPUT"
           echo "platform_admin_image=$image_prefix-platform-admin" >> "$GITHUB_OUTPUT"
 
       - name: Validate production configuration
@@ -114,7 +113,6 @@ jobs:
         env:
           API_IMAGE: ${{ steps.metadata.outputs.api_image }}
           WEB_IMAGE: ${{ steps.metadata.outputs.web_image }}
-          ADMIN_IMAGE: ${{ steps.metadata.outputs.admin_image }}
           PLATFORM_ADMIN_IMAGE: ${{ steps.metadata.outputs.platform_admin_image }}
           IMAGE_TAG: ${{ steps.metadata.outputs.image_tag }}
           GHCR_USERNAME: ${{ secrets.GHCR_USERNAME || github.repository_owner }}
@@ -124,7 +122,7 @@ jobs:
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
           port: ${{ secrets.DEPLOY_PORT || 22 }}
-          envs: API_IMAGE,WEB_IMAGE,ADMIN_IMAGE,PLATFORM_ADMIN_IMAGE,IMAGE_TAG,GHCR_USERNAME,GHCR_TOKEN
+          envs: API_IMAGE,WEB_IMAGE,PLATFORM_ADMIN_IMAGE,IMAGE_TAG,GHCR_USERNAME,GHCR_TOKEN
           script_stop: true
           script: |
             set -eu
@@ -156,9 +154,9 @@ jobs:
             rollback() {
               echo "Deployment failed; restoring the previous application images."
               cp .deploy/env-before-deploy .env.production
-              unset API_IMAGE WEB_IMAGE ADMIN_IMAGE PLATFORM_ADMIN_IMAGE IMAGE_TAG
-              compose pull api worker-email web admin platform-admin || true
-              compose up -d --remove-orphans api worker-email web admin platform-admin || true
+              unset API_IMAGE WEB_IMAGE PLATFORM_ADMIN_IMAGE IMAGE_TAG
+              compose pull api worker-email web platform-admin || true
+              compose up -d --remove-orphans api worker-email web platform-admin || true
               compose ps
             }
 
@@ -171,14 +169,14 @@ jobs:
 
             printf '%s' "$GHCR_TOKEN" | docker login ghcr.io --username "$GHCR_USERNAME" --password-stdin
 
-            export API_IMAGE WEB_IMAGE ADMIN_IMAGE PLATFORM_ADMIN_IMAGE IMAGE_TAG
+            export API_IMAGE WEB_IMAGE PLATFORM_ADMIN_IMAGE IMAGE_TAG
 
             if ! docker compose -f docker-compose.prod.yml --env-file .env.production --profile tools config --services | grep -qx migrate; then
               echo "Production Compose configuration does not define the migrate service."
               exit 1
             fi
 
-            if ! compose --profile tools pull migrate api worker-email web admin platform-admin; then
+            if ! compose --profile tools pull migrate api worker-email web platform-admin; then
               echo "Unable to pull the requested application images."
               exit 1
             fi
@@ -190,7 +188,6 @@ jobs:
 
             set_env_value API_IMAGE "$API_IMAGE"
             set_env_value WEB_IMAGE "$WEB_IMAGE"
-            set_env_value ADMIN_IMAGE "$ADMIN_IMAGE"
             set_env_value PLATFORM_ADMIN_IMAGE "$PLATFORM_ADMIN_IMAGE"
             set_env_value IMAGE_TAG "$IMAGE_TAG"
 
@@ -244,7 +241,6 @@ jobs:
         env:
           DEPLOY_API_HEALTH_URL: ${{ secrets.DEPLOY_API_HEALTH_URL }}
           DEPLOY_WEB_URL: ${{ secrets.DEPLOY_WEB_URL }}
-          DEPLOY_ADMIN_URL: ${{ secrets.DEPLOY_ADMIN_URL }}
           DEPLOY_PLATFORM_ADMIN_URL: ${{ secrets.DEPLOY_PLATFORM_ADMIN_URL }}
         run: bash scripts/check-deployment-endpoints.sh
 
@@ -275,6 +271,6 @@ jobs:
             fi
 
             cp .deploy/env-before-deploy .env.production
-            docker compose -f docker-compose.prod.yml --env-file .env.production pull api worker-email web admin platform-admin
+            docker compose -f docker-compose.prod.yml --env-file .env.production pull api worker-email web platform-admin
             docker compose -f docker-compose.prod.yml --env-file .env.production up -d --remove-orphans
             docker compose -f docker-compose.prod.yml --env-file .env.production ps

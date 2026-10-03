@@ -27,14 +27,13 @@ Sau đó kiểm tra các nhóm biến chính:
 
 - Database: `DATABASE_URL`, `DEV_DB_PORT`
 - Redis: `REDIS_URL`, `REDIS_DB_PORT`
-- App ports: `API_PORT`, `WEB_PORT`, `ADMIN_PORT`, `PLATFORM_ADMIN_PORT`
+- App ports: `API_PORT`, `WEB_PORT`, `PLATFORM_ADMIN_PORT`
 - Telegram CI: `CI_TELEGRAM_BOT_TOKEN`, `CI_TELEGRAM_CHAT_ID`
 
 Frontend apps có file mẫu riêng nếu cần override theo app:
 
 ```bash
 cp apps/web/.env.example apps/web/.env.local
-cp apps/admin/.env.example apps/admin/.env.local
 cp apps/platform-admin/.env.example apps/platform-admin/.env.local
 ```
 
@@ -56,7 +55,7 @@ URL mặc định:
 
 - API: `http://localhost:${API_PORT:-3000}`
 - Web: `http://localhost:${WEB_PORT:-3001}`
-- Business Admin: `http://localhost:${ADMIN_PORT:-3002}`
+- Business Admin: `http://localhost:${WEB_PORT:-3001}/vi/admin`
 - Platform Admin: `http://localhost:${PLATFORM_ADMIN_PORT:-3003}`
 
 ## Kiểm Tra Repo
@@ -73,8 +72,6 @@ Khi chỉ làm frontend:
 ```bash
 pnpm lint:web
 pnpm typecheck:web
-pnpm lint:admin
-pnpm typecheck:admin
 pnpm lint:platform-admin
 pnpm typecheck:platform-admin
 ```

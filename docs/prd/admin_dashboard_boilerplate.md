@@ -6,7 +6,7 @@ The Admin Dashboard layout, header, sidebar, search menu, and home view in the c
 
 ## Goals
 
-1. **Centralize UI Configuration**: Abstract all dashboard layouts, menus, paths, and brand elements into a single configuration file (`apps/admin/src/config/dashboard.config.ts`).
+1. **Centralize UI Configuration**: Abstract all dashboard layouts, menus, paths, and brand elements into a single configuration file (`apps/web/src/config/dashboard.config.ts`).
 2. **Decouple Layout Components**: Refactor `DashboardShell`, `AppSidebar`, `Header`, `CommandMenu`, and `UserMenu` to dynamically render their titles, logos, navigation groups, and links from the configuration.
 3. **Enhance UI/UX Aesthetics**: Refactor and polish the dashboard view and layout based on the `ui-ux-pro-max` guidelines (responsive grids, premium light/dark mode styling, smooth Framer Motion micro-animations, standard accessible SVG icons, and visible keyboard shortcuts).
 4. **Implement Global Search Interactions**: Fully wire up the keyboard shortcut listener (`Ctrl+K` / `Cmd+K`) to trigger the search command menu.

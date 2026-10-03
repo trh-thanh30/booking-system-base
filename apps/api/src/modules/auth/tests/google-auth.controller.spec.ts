@@ -82,7 +82,7 @@ describe('GoogleAuthController', () => {
     });
 
     await request(httpServer)
-      .get('/auth/admin/google?locale=en&returnTo=%2Fbusinesses')
+      .get('/auth/admin/google?locale=en&returnTo=%2Fadmin%2Fbusinesses')
       .expect(302)
       .expect(
         'location',
@@ -91,7 +91,7 @@ describe('GoogleAuthController', () => {
 
     expect(startGoogleLoginUseCase.execute).toHaveBeenCalledWith({
       locale: 'en',
-      returnTo: '/businesses',
+      returnTo: '/admin/businesses',
     });
     expect(authCookieService.setGoogleOAuthStateCookie).toHaveBeenCalledWith(
       expect.anything(),
@@ -105,13 +105,13 @@ describe('GoogleAuthController', () => {
     loginWithGoogleUseCase.execute.mockResolvedValue({
       locale: 'en',
       refresh_token: 'refresh-token',
-      returnTo: '/businesses',
+      returnTo: '/admin/businesses',
     });
 
     await request(httpServer)
       .get('/auth/admin/google/callback?code=code&state=oauth-state')
       .expect(302)
-      .expect('location', 'http://localhost:3001/en/businesses');
+      .expect('location', 'http://localhost:3001/en/admin/businesses');
 
     expect(loginWithGoogleUseCase.execute).toHaveBeenCalledWith({
       code: 'code',
@@ -132,14 +132,14 @@ describe('GoogleAuthController', () => {
       locale: 'en',
       onboardingToken: 'onboarding-token',
       onboardingTtlSeconds: 900,
-      returnTo: '/dashboard',
+      returnTo: '/admin/dashboard',
       status: 'onboarding_required',
     });
 
     await request(httpServer)
       .get('/auth/admin/google/callback?code=code&state=oauth-state')
       .expect(302)
-      .expect('location', 'http://localhost:3001/en/onboarding/business');
+      .expect('location', 'http://localhost:3001/en/admin/onboarding/business');
 
     expect(authCookieService.setGoogleOnboardingCookie).toHaveBeenCalledWith(
       expect.anything(),
@@ -159,7 +159,7 @@ describe('GoogleAuthController', () => {
       fullName: 'Business Owner',
       locale: 'vi',
       providerAccountId: 'google-subject',
-      returnTo: '/dashboard',
+      returnTo: '/admin/dashboard',
     });
 
     await request(httpServer)
@@ -183,7 +183,7 @@ describe('GoogleAuthController', () => {
     completeOnboardingUseCase.execute.mockResolvedValue({
       access_token: 'access-token',
       locale: 'vi',
-      returnTo: '/dashboard',
+      returnTo: '/admin/dashboard',
       refresh_token: 'refresh-token',
       owner: { id: 'owner-id' },
     });
@@ -201,7 +201,7 @@ describe('GoogleAuthController', () => {
       .expect({
         access_token: 'access-token',
         locale: 'vi',
-        return_to: '/dashboard',
+        return_to: '/admin/dashboard',
         user: { id: 'owner-id' },
       });
 
@@ -231,7 +231,7 @@ describe('GoogleAuthController', () => {
       .expect(302)
       .expect(
         'location',
-        'http://localhost:3001/vi/login?oauthError=GOOGLE_ACCOUNT_NOT_REGISTERED',
+        'http://localhost:3001/vi/admin/login?oauthError=GOOGLE_ACCOUNT_NOT_REGISTERED',
       );
 
     expect(authCookieService.clearGoogleOAuthStateCookie).toHaveBeenCalled();

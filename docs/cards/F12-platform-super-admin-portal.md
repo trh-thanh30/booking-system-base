@@ -73,7 +73,7 @@ Cổng quản trị nội bộ cho đội vận hành Booking System Base: quả
 
 ## Technical Notes
 
-- Có thể dùng `apps/admin` với route group riêng cho platform hoặc tách portal sau.
+- Platform portal dùng `apps/platform-admin` riêng; không gộp vào tenant `/admin` của Web.
 - Super Admin role không thuộc tenant thông thường.
 
 ## Dependencies

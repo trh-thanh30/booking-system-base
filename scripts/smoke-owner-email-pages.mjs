@@ -2,11 +2,8 @@ import { spawn } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import assert from "node:assert/strict";
 
-// Build Web/Admin first. Temporary servers are stopped even when an assertion fails.
-const servers = [
-  ["admin", 3102],
-  ["web", 3101],
-].map(([app, port]) => {
+// Build the merged Web first. Temporary servers are stopped even when an assertion fails.
+const servers = [["web", 3101]].map(([app, port]) => {
   const server = spawn(
     process.execPath,
     ["node_modules/next/dist/bin/next", "start", "-p", String(port)],
@@ -37,21 +34,21 @@ try {
   for (const [url, marker] of [
     ["http://localhost:3101/vi/signup-business", 'name="owner.email"'],
     [
-      "http://localhost:3102/en/verify-email?sessionId=smoke-session",
+      "http://localhost:3101/en/admin/verify-email?sessionId=smoke-session",
       'name="code"',
     ],
-    ["http://localhost:3102/vi/forgot-password", 'type="email"'],
+    ["http://localhost:3101/vi/admin/forgot-password", 'type="email"'],
     [
-      "http://localhost:3102/en/reset-password?sessionId=smoke-session",
+      "http://localhost:3101/en/admin/reset-password?sessionId=smoke-session",
       'name="confirmPassword"',
     ],
-    ["http://localhost:3102/en/reset-password", "invalid or expired"],
+    ["http://localhost:3101/en/admin/reset-password", "invalid or expired"],
     [
-      "http://localhost:3102/en/onboarding/business",
+      "http://localhost:3101/en/admin/onboarding/business",
       "Complete your business details",
     ],
     [
-      "http://localhost:3102/en/login?oauthError=GOOGLE_AUTH_CANCELLED",
+      "http://localhost:3101/en/admin/login?oauthError=GOOGLE_AUTH_CANCELLED",
       "Sign in",
     ],
   ]) {

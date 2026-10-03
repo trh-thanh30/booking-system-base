@@ -1,6 +1,6 @@
 # Frontend Route Template
 
-Template này dùng khi thêm route mới vào `apps/admin` hoặc `apps/web`.
+Template này dùng khi thêm route mới vào `apps/web` hoặc `apps/platform-admin`. Business Admin routes nằm dưới `app/[locale]/admin`, views tại `src/views/admin/<feature>`.
 
 ## Route Page
 

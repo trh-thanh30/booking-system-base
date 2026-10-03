@@ -25,6 +25,7 @@ import {
 } from '@nestjs/common';
 import type { ConfigType } from '@nestjs/config';
 import type { Request, Response } from 'express';
+import { getSafeAdminReturnTo } from '@repo/shared';
 
 @Public()
 @Controller('auth/admin/google')
@@ -88,7 +89,7 @@ export class GoogleAuthController {
     return {
       access_token: result.access_token,
       locale: result.locale,
-      return_to: result.returnTo,
+      return_to: getSafeAdminReturnTo(result.returnTo),
       user: await this.authProfileService.getByUserId(result.owner.id),
     };
   }
@@ -113,7 +114,7 @@ export class GoogleAuthController {
           result.onboardingTtlSeconds,
         );
         response.redirect(
-          this.createAdminUrl(result.locale, '/onboarding/business'),
+          this.createAdminUrl(result.locale, '/admin/onboarding/business'),
         );
         return;
       }
@@ -124,7 +125,12 @@ export class GoogleAuthController {
         'admin',
         result.refresh_token,
       );
-      response.redirect(this.createAdminUrl(result.locale, result.returnTo));
+      response.redirect(
+        this.createAdminUrl(
+          result.locale,
+          getSafeAdminReturnTo(result.returnTo),
+        ),
+      );
     } catch (error) {
       this.authCookieService.clearGoogleOAuthStateCookie(response);
       const errorCode =
@@ -133,7 +139,7 @@ export class GoogleAuthController {
           : 'GOOGLE_AUTH_UNAVAILABLE';
       this.logger.warn(`Google login failed with code ${errorCode}`);
       response.redirect(
-        this.createAdminUrl('vi', '/login', { oauthError: errorCode }),
+        this.createAdminUrl('vi', '/admin/login', { oauthError: errorCode }),
       );
     }
   }

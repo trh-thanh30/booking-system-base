@@ -1,7 +1,8 @@
 import { createApiClient } from "@repo/shared";
+import { apiConfig } from "@/src/config/api.config";
 
 export const apiClient = createApiClient({
-  baseURL: process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000/api/v1",
+  baseURL: apiConfig.baseUrl,
   headers: {
     "x-auth-context": "client",
   },

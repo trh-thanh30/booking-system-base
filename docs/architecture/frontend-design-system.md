@@ -1,7 +1,6 @@
 # Shared Frontend Design System
 
-Tài liệu này quy định nền tảng giao diện dùng chung cho `apps/web`,
-`apps/admin`, `apps/platform-admin` và các frontend được thêm sau này.
+Tài liệu này quy định nền tảng giao diện dùng chung cho `apps/web` (Landing + Business Admin), `apps/platform-admin` và các frontend được thêm sau này.
 
 Mục tiêu của DS-001 là tạo cùng một ngôn ngữ thiết kế, không dựng lại layout
 hoặc màn hình. Hướng hình ảnh là booking SaaS sáng, sạch, tin cậy; tham khảo
@@ -180,7 +179,7 @@ pnpm --filter @repo/ui validate:tokens
 
 Web dùng Blue Brand Theme từ shared tokens; không định nghĩa lại palette trong
 `apps/web/app/globals.css`. Trang mặc định Light. Semantic stylesheet vẫn hỗ trợ
-`.dark` và được kiểm tra riêng; chưa thêm theme switch hoặc system-theme provider.
+`.dark` và được kiểm tra riêng. ARCH-001 dùng một theme provider chung mặc định Light; Admin theme toggle áp dụng cùng theme cho Landing, không tự chọn system theme.
 
 Composition marketing nằm tại `apps/web/src/components/common/landing-compositions.tsx`:
 
@@ -226,7 +225,7 @@ overlay tự dựng. `cn` của UI khai báo custom font-size groups để `text
 label association, aria-invalid, aria-describedby và role alert. Không đổi Auth flow.
 
 Metadata có title/description/OG/Twitter/canonical/hreflang cho vi/en, signup
-noindex; public origin từ `NEXT_PUBLIC_WEB_URL`, Admin login từ `NEXT_PUBLIC_ADMIN_URL`.
+noindex; public origin từ `NEXT_PUBLIC_WEB_URL`, Admin login từ `NEXT_PUBLIC_WEB_URL`.
 Chưa khai báo OG image/social handle khi chưa có asset/tài khoản chính thức.
 
 ### Token guard và ngoại lệ

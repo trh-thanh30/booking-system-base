@@ -7,7 +7,7 @@ const onboardingSession = {
   fullName: 'Business Owner',
   locale: 'vi' as const,
   providerAccountId: 'google-subject',
-  returnTo: '/dashboard',
+  returnTo: '/admin/dashboard',
 };
 
 const input = {
@@ -32,7 +32,7 @@ describe('CompleteGoogleOwnerOnboardingUseCase', () => {
     ).resolves.toMatchObject({
       access_token: 'access-token',
       locale: 'vi',
-      returnTo: '/dashboard',
+      returnTo: '/admin/dashboard',
       refresh_token: 'refresh-token',
       owner: { id: 'owner-id', is_verified: true },
       tenant: { id: 'tenant-id' },

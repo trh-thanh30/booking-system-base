@@ -9,8 +9,9 @@ Mục tiêu của repo là cung cấp một nền tảng đủ chuẩn để clo
 ### Ứng Dụng
 
 - **API** (`apps/api`): NestJS, Prisma, PostgreSQL, Redis, BullMQ, kiểm tra sức khỏe hệ thống và cấu trúc module sẵn sàng mở rộng.
-- **Web** (`apps/web`): Next.js 16, React 19, TailwindCSS 4, dùng cho giao diện công khai hoặc phía khách hàng.
-- **Admin** (`apps/admin`): Next.js 16, React 19, TailwindCSS 4, dùng cho dashboard quản trị nội bộ.
+- **Web** (`apps/web`): Next.js 15.5, React 19, TailwindCSS 4, dùng cho giao diện công khai hoặc phía khách hàng.
+- **Business Admin**: nằm trong `apps/web`, route `/{locale}/admin/*`, chung image/service với Landing.
+- **Platform Admin** (`apps/platform-admin`): app riêng cho Super Admin, không gộp vào Web tenant flow.
 
 ### Package Dùng Chung
 
@@ -37,7 +38,7 @@ booking-system-base/
 ├── apps/
 │   ├── api/                 # @repo/api - Backend NestJS
 │   ├── web/                 # @repo/web - app Next.js công khai
-│   └── admin/               # @repo/admin - app Next.js quản trị
+│   └── platform-admin/      # @repo/platform-admin - app Super Admin riêng
 ├── packages/
 │   ├── shared/              # @repo/shared - giao kèo dữ liệu và utility dùng chung
 │   ├── hooks/               # @repo/hooks - React hooks dùng chung
@@ -56,7 +57,7 @@ booking-system-base/
 ├── .github/
 │   └── workflows/           # quy trình CI
 ├── docker-compose.dev.yml   # cụm dev: db, redis, api
-├── docker-compose.prod.yml  # cụm giống sản xuất: db, redis, api, worker-email, web, admin
+├── docker-compose.prod.yml  # cụm giống sản xuất: db, redis, api, worker-email, web (Landing + Business Admin), platform-admin
 ├── Makefile                 # shortcut lệnh
 ├── pnpm-workspace.yaml      # cấu hình pnpm workspace
 └── turbo.json               # cấu hình Turborepo
@@ -64,7 +65,7 @@ booking-system-base/
 
 ## Kiến Trúc Frontend
 
-Các app Next.js trong `apps/admin` và `apps/web` dùng chung rule folder để dễ tái sử dụng làm boilerplate.
+Web (Landing + Business Admin) và Platform Admin dùng chung rule folder để dễ tái sử dụng làm boilerplate.
 
 Nguyên tắc chính:
 
@@ -158,20 +159,19 @@ cp .env.example .env.development
 
 Các port mặc định trong `.env.example`:
 
-| Dịch vụ        | Biến môi trường       | Mặc định |
-| :------------- | :-------------------- | :------- |
-| API            | `API_PORT`            | `3000`   |
-| Web            | `WEB_PORT`            | `3001`   |
-| Business Admin | `ADMIN_PORT`          | `3002`   |
-| Platform Admin | `PLATFORM_ADMIN_PORT` | `3003`   |
-| PostgreSQL     | `DEV_DB_PORT`         | `15432`  |
-| Redis          | `REDIS_DB_PORT`       | `16379`  |
+| Dịch vụ        | Biến môi trường        | Mặc định        |
+| :------------- | :--------------------- | :-------------- |
+| API            | `API_PORT`             | `3000`          |
+| Web            | `WEB_PORT`             | `3001`          |
+| Business Admin | `WEB_PORT` (chung Web) | `3001/vi/admin` |
+| Platform Admin | `PLATFORM_ADMIN_PORT`  | `3003`          |
+| PostgreSQL     | `DEV_DB_PORT`          | `15432`         |
+| Redis          | `REDIS_DB_PORT`        | `16379`         |
 
 Nếu cần override riêng theo từng frontend app, có thể copy file mẫu app-local:
 
 ```bash
 cp apps/web/.env.example apps/web/.env.local
-cp apps/admin/.env.example apps/admin/.env.local
 cp apps/platform-admin/.env.example apps/platform-admin/.env.local
 ```
 
@@ -221,7 +221,7 @@ URL cục bộ mặc định:
 
 - API: `http://localhost:3000`
 - Web: `http://localhost:3001`
-- Admin: `http://localhost:3002`
+- Admin: `http://localhost:3001/vi/admin`
 
 ## Danh Sách Lệnh
 
@@ -248,13 +248,13 @@ URL cục bộ mặc định:
 | `pnpm dev:api`       | Chạy API NestJS ở chế độ watch      |
 | `pnpm dev:api:debug` | Chạy API ở chế độ debug watch       |
 | `pnpm dev:web`       | Chạy app Web                        |
-| `pnpm dev:admin`     | Chạy app Admin                      |
+| `pnpm dev:admin`     | Alias chạy Web + Business Admin     |
 | `pnpm build:api`     | Biên dịch riêng API                 |
 | `pnpm build:web`     | Biên dịch riêng Web                 |
-| `pnpm build:admin`   | Biên dịch riêng Admin               |
+| `pnpm build:admin`   | Alias build Web + Business Admin    |
 | `pnpm start:api`     | Chạy API đã build ở chế độ sản xuất |
 | `pnpm start:web`     | Chạy Web đã build                   |
-| `pnpm start:admin`   | Chạy Admin đã build                 |
+| `pnpm start:admin`   | Alias start Web + Business Admin    |
 
 ### Lệnh Test
 
@@ -300,16 +300,16 @@ URL cục bộ mặc định:
 
 ### Lệnh Docker
 
-| Lệnh                      | Mô tả                         |
-| :------------------------ | :---------------------------- |
-| `pnpm docker:build:api`   | Tạo Docker image cho API      |
-| `pnpm docker:build:web`   | Tạo Docker image cho Web      |
-| `pnpm docker:build:admin` | Tạo Docker image cho Admin    |
-| `pnpm docker:build:all`   | Tạo toàn bộ image app         |
-| `pnpm docker:check:api`   | Kiểm tra Dockerfile của API   |
-| `pnpm docker:check:web`   | Kiểm tra Dockerfile của Web   |
-| `pnpm docker:check:admin` | Kiểm tra Dockerfile của Admin |
-| `pnpm docker:check:all`   | Kiểm tra toàn bộ Dockerfile   |
+| Lệnh                      | Mô tả                       |
+| :------------------------ | :-------------------------- |
+| `pnpm docker:build:api`   | Tạo Docker image cho API    |
+| `pnpm docker:build:web`   | Tạo Docker image cho Web    |
+| `pnpm docker:build:admin` | Alias build image Web       |
+| `pnpm docker:build:all`   | Tạo toàn bộ image app       |
+| `pnpm docker:check:api`   | Kiểm tra Dockerfile của API |
+| `pnpm docker:check:web`   | Kiểm tra Dockerfile của Web |
+| `pnpm docker:check:admin` | Alias check Dockerfile Web  |
+| `pnpm docker:check:all`   | Kiểm tra toàn bộ Dockerfile |
 
 ### Shortcut Makefile
 
@@ -361,13 +361,12 @@ pnpm infra:dev:down
 - `api`
 - `worker-email`
 - `web`
-- `admin`
 - `platform-admin`
 
 Compose giống sản xuất dùng Docker image, không mount mã nguồn:
 
 ```bash
-API_IMAGE=booking-api WEB_IMAGE=booking-web ADMIN_IMAGE=booking-admin PLATFORM_ADMIN_IMAGE=booking-platform-admin IMAGE_TAG=latest \
+API_IMAGE=booking-api WEB_IMAGE=booking-web PLATFORM_ADMIN_IMAGE=booking-platform-admin IMAGE_TAG=latest \
 pnpm infra:prod:up
 ```
 
@@ -390,7 +389,7 @@ Các nhóm biến quan trọng:
 - **Database**: `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`, `DATABASE_URL`
 - **Redis**: `REDIS_HOST`, `REDIS_DEV_PORT`, `REDIS_PASSWORD`, `REDIS_URL`
 - **Storage**: `STORAGE_DRIVER`, `STORAGE_ROOT_DIR`, `ASSET_CDN_URL`
-- **Web/Admin/Platform Admin**: `WEB_PORT`, `ADMIN_PORT`, `PLATFORM_ADMIN_PORT`, `NEXT_PUBLIC_API_URL`
+- **Web/Admin/Platform Admin**: `WEB_PORT`, `PLATFORM_ADMIN_PORT`, `NEXT_PUBLIC_API_URL`
 - **Telegram CI/CD**: `CI_TELEGRAM_BOT_TOKEN`, `CI_TELEGRAM_CHAT_ID`
 
 Không commit `.env.development`, `.env.production` hoặc bất kỳ file nào chứa secret thật.
@@ -539,7 +538,7 @@ Danh sách kiểm tra khuyến nghị:
 1. Đổi metadata trong `package.json`.
 2. Cập nhật `APP_NAME`, port, tên database và giá trị secret mẫu trong `.env.example`.
 3. Cập nhật tên Docker image trong script và compose env.
-4. Thay UI mẫu trong `apps/web` và `apps/admin`.
+4. Thay UI Landing và Business Admin trong `apps/web`; Platform Admin ở app riêng.
 5. Thêm module nghiệp vụ dưới `apps/api/src/module`.
 6. Tạo hoặc cập nhật PRD trong `docs/prd`.
 7. Tạo ADR cho các quyết định kiến trúc quan trọng.

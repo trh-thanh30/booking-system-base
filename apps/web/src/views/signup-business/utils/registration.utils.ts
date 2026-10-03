@@ -30,7 +30,7 @@ export function getAdminVerificationUrl(
     url.password
   )
     throw new Error("Invalid Admin URL");
-  url.pathname = `/${locale === "en" ? "en" : "vi"}/verify-email`;
+  url.pathname = `/${locale === "en" ? "en" : "vi"}/admin/verify-email`;
   url.search = new URLSearchParams({ sessionId }).toString();
   url.hash = "";
   return url.toString();

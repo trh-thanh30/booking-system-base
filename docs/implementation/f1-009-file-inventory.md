@@ -137,3 +137,9 @@ Admin: 20 specs, lint, typecheck và production build đều pass sau khi chuy�
 Web: lint, typecheck và production build đều pass. `git diff --check` pass.
 
 Specs session/Axios dùng API mô phỏng; middleware specs dùng NextRequest thật. Không cần tài khoản hoặc database để chạy `pnpm test:admin`.
+
+# Historical inventory
+
+Paths below describe the original F1-009 delivery. ARCH-001 migrates Business
+Admin into `apps/web`; current layout and route mapping are documented in
+[ADR 0003](../adr/0003-merge-web-business-admin.md) and the frontend architecture.

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+export { getSafeAdminReturnTo } from '../../../../packages/shared/src/utils/admin-navigation';
 
 const DEFAULT_RESPONSE_VERSION = 'v1';
 

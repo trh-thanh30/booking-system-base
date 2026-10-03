@@ -42,7 +42,7 @@ test("registration normalizes optional business fields and validates the shared 
 test("Web hands off to localized Admin verification, not login, and encodes the opaque session", () => {
   assert.equal(
     getAdminVerificationUrl("https://admin.example.com/", "vi", "a+b"),
-    "https://admin.example.com/vi/verify-email?sessionId=a%2Bb",
+    "https://admin.example.com/vi/admin/verify-email?sessionId=a%2Bb",
   );
   assert.throws(() =>
     getAdminVerificationUrl("javascript:alert(1)", "vi", "s"),
