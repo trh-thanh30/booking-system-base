@@ -17,6 +17,12 @@ token từ `@repo/ui/styles.css`, không duy trì brand palette riêng trong t�
 
 - `app/[locale]/(marketing)`: Landing/signup, localized SEO metadata.
 - `app/[locale]/admin/(auth)`: public Owner auth/Google onboarding screens.
+- `AuthenticationLayout` trong `src/components/layout` dùng chung cho đăng ký và Auth.
+  Header dùng `src/components/layout/site-header.tsx`; Home chỉ compose navigation,
+  Auth dùng cùng header không navigation. Không tạo một logo/header riêng cho Auth.
+  `PasswordInput` ở `src/components/common`; Business wizard/map nằm ở
+  `src/views/admin/auth/components`. Google redirect hook dùng chung ở `src/hooks`;
+  marketing không import Admin AuthProvider hoặc private API client để khởi tạo OAuth.
 - `app/[locale]/admin/(dashboard)`: protected dashboard shell/routes.
 - `app/[locale]/admin/layout.tsx`: một AuthProvider và private QueryClient dùng chung xuyên suốt Admin; marketing không bootstrap Admin.
 - `src/views/admin/<feature>`: các màn hình Admin, giữ role folders như rule dưới đây.
@@ -266,6 +272,13 @@ Rule:
 - Hook chỉ dùng riêng một feature thì đặt trong `src/views/<feature>`.
 - Hook dùng API/server state nên gọi service/query function, không hardcode request ngay trong component UI.
 - Hook dùng chung giữa nhiều client nên đưa vào `packages/hooks`.
+- Consumer import trực tiếp hook từ nơi sở hữu implementation (`src/hooks` hoặc
+  public export của `@repo/hooks`). Không tạo file hook trong feature chỉ để
+  re-export hoặc gọi lại hook chung mà không bổ sung behavior.
+- Khi chuyển hook lên app/package, cập nhật toàn bộ consumer và xóa file ở vị trí
+  cũ; không giữ alias tương thích trong nội bộ repo. Chỉ tạo wrapper feature khi
+  có logic riêng thực sự (state, mapping, policy), đặt tên thể hiện vai trò đó.
+- Quy tắc barrel cho component không yêu cầu tạo bản re-export hook trong feature.
 
 ### `src/lib/`
 
@@ -399,6 +412,14 @@ export type BookingStatusFilter = "all" | BookingStatus;
 ```
 
 ## Barrel File Rule
+
+Component được dùng ngoài folder sở hữu phải được export qua `index.ts` của
+folder đó; consumer import từ folder, không import thẳng file component.
+Ví dụ: view lấy EmailInput từ `@/src/components/common`, AuthShell từ `./components`.
+Trong cùng folder, component dùng relative import trực tiếp tới sibling để tránh
+vòng lặp qua chính barrel của mình. Lazy/dynamic import có thể trỏ trực tiếp
+module cần tải để giữ ranh giới bundle. Không re-export Admin provider/private
+feature qua barrel của common/layout dùng bởi marketing.
 
 Chỉ tạo `index.ts` ở folder thật sự cần re-export module con.
 

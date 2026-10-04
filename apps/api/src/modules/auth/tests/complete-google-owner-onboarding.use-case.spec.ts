@@ -24,6 +24,51 @@ const input = {
 };
 
 describe('CompleteGoogleOwnerOnboardingUseCase', () => {
+  it('attaches a callback-persisted Google Owner instead of creating a second user', async () => {
+    const dependencies = makeDependencies();
+    dependencies.sessions.get.mockResolvedValue({
+      ...onboardingSession,
+      userId: 'owner-id',
+    });
+    dependencies.users.findById.mockResolvedValue({
+      id: 'owner-id',
+      email: onboardingSession.email,
+      role: 'OWNER',
+      status: 'ACTIVE',
+      tenant_id: null,
+      is_verified: true,
+    });
+    dependencies.users.findByEmail.mockResolvedValue({ id: 'owner-id' });
+    dependencies.prisma.userIdentity.findUnique.mockResolvedValue({
+      id: 'identity',
+      user_id: 'owner-id',
+    });
+    await createUseCase(dependencies).execute('ticket', {
+      ...input,
+      business_profile: {
+        address: {
+          country: 'Vietnam',
+          city: 'Hanoi',
+          street: '1 Example',
+          location: null,
+        },
+        opening_hours: Array.from({ length: 7 }, (_, day) => ({
+          day,
+          enabled: day === 1,
+          opens: '09:00',
+          closes: '18:00',
+        })),
+      },
+    });
+    expect(dependencies.workspace.execute).toHaveBeenCalledWith(
+      expect.objectContaining({
+        owner: expect.objectContaining({
+          existingUserId: 'owner-id',
+          password: null,
+        }),
+      }),
+    );
+  });
   it('provisions a verified Google Owner workspace and creates an admin session', async () => {
     const dependencies = makeDependencies();
 
@@ -124,6 +169,7 @@ function makeDependencies() {
       },
     },
     users: {
+      findById: jest.fn().mockResolvedValue(null),
       findByEmail: jest.fn().mockResolvedValue(null),
       findByPhone: jest.fn().mockResolvedValue(null),
       findByUsername: jest.fn().mockResolvedValue(null),

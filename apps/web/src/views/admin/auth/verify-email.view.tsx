@@ -11,25 +11,31 @@ import {
   type EmailRequestInput,
   type VerifyEmailInput,
 } from "@repo/shared";
-import { Button, Input } from "@repo/ui";
-import { FormField } from "@/src/components/common/form-field";
+import { Button } from "@repo/ui";
+import {
+  AuthInput as Input,
+  EmailInput,
+  FormField,
+} from "@/src/components/common";
 import { Link, useRouter } from "@/src/i18n/navigation";
 import { getLoginUrl } from "@/src/lib/admin/auth-routing";
 import { authService } from "@/src/services/admin/auth.service";
-import { AuthShell } from "./components/auth-shell";
-import { EmailAuthFeedback } from "./components/email-auth-feedback";
+import { AuthShell, EmailAuthFeedback } from "./components";
 import { useEmailAuthFeedback } from "./hooks/use-email-auth-feedback";
 import { getSessionUrl } from "./utils/email-auth.utils";
 
 export function VerifyEmailView({
   initialSessionId = "",
   returnTo,
+  ownerOnboarding = false,
 }: {
   initialSessionId?: string;
   returnTo?: string;
+  ownerOnboarding?: boolean;
 }) {
   const { toast } = useToast();
   const t = useTranslations("Auth");
+  const placeholders = useTranslations("AuthJourney.placeholders");
   const router = useRouter();
   const [sessionId, setSessionId] = useState(initialSessionId);
   const feedback = useEmailAuthFeedback();
@@ -38,7 +44,7 @@ export function VerifyEmailView({
     retry: false,
   });
   const verify = useMutation({
-    mutationFn: authService.verifyEmail,
+    mutationFn: authService.verifyOwnerAccount,
     retry: false,
   });
   const resend = useMutation({
@@ -68,7 +74,10 @@ export function VerifyEmailView({
       feedback.resetSession();
       feedback.cooldown();
       verifyForm.reset({ code: "", sessionId: result.sessionId });
-      router.replace(getSessionUrl("verify-email", result.sessionId, returnTo));
+      router.replace(
+        getSessionUrl("verify-email", result.sessionId, returnTo) +
+          (ownerOnboarding ? "&onboarding=1" : ""),
+      );
       toast.success(t("verify.requestSuccess"));
     } catch (error) {
       feedback.fail(error, "request");
@@ -90,9 +99,13 @@ export function VerifyEmailView({
     }
     feedback.clear();
     try {
-      await verify.mutateAsync(parsed.data);
+      const result = await verify.mutateAsync(parsed.data);
       toast.success(t("verify.success"));
-      router.replace(loginUrl);
+      router.replace(
+        result.onboarding_required
+          ? "/admin/onboarding/business?provider=email"
+          : loginUrl,
+      );
     } catch (error) {
       feedback.fail(error, "otp");
     }
@@ -133,6 +146,7 @@ export function VerifyEmailView({
             >
               <Input
                 id="code"
+                placeholder={placeholders("code")}
                 autoComplete="one-time-code"
                 inputMode="numeric"
                 maxLength={6}
@@ -176,8 +190,9 @@ export function VerifyEmailView({
               htmlFor="email"
               label={t("fields.email")}
             >
-              <Input
+              <EmailInput
                 id="email"
+                placeholder={placeholders("email")}
                 type="email"
                 autoComplete="email"
                 disabled={pending}

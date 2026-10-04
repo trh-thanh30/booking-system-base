@@ -3,8 +3,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { useToast } from "@repo/hooks";
-import { authService } from "@/src/services/admin/auth.service";
-import { createGoogleRedirect } from "../utils/google-auth.utils";
+import { apiConfig } from "@/src/config/api.config";
+import { buildGoogleLoginUrl } from "@/src/lib/admin/auth-routing";
+import { createGoogleRedirect } from "@/src/utils/google-redirect.utils";
 
 export function useGoogleLogin(returnTo?: string) {
   const locale = useLocale();
@@ -23,10 +24,11 @@ export function useGoogleLogin(returnTo?: string) {
     window.addEventListener("pageshow", reset);
     return () => window.removeEventListener("pageshow", reset);
   }, [redirect]);
-
   function startGoogleLogin() {
     try {
-      if (redirect.start(authService.getGoogleLoginUrl(locale, returnTo)))
+      if (
+        redirect.start(buildGoogleLoginUrl(apiConfig.baseUrl, locale, returnTo))
+      )
         setIsRedirecting(true);
     } catch {
       setIsRedirecting(false);

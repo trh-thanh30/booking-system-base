@@ -15,8 +15,10 @@ export interface CreateTenantWorkspaceInput {
     defaultBusinessName?: string;
     defaultBusinessSlug?: string;
     settings?: Record<string, unknown>;
+    defaultBusinessSettings?: Record<string, unknown>;
   };
   owner: {
+    existingUserId?: string;
     email: string;
     username: string;
     password: string | null;
@@ -42,15 +44,27 @@ export class CreateTenantWorkspaceUseCase {
       input.tenant.primaryDomain,
     );
 
-    const result = await this.tenantRepository.createTenantWithOwner({
-      tenant: {
-        ...input.tenant,
-        primaryDomain: input.tenant.primaryDomain
-          ? normalizeHost(input.tenant.primaryDomain)
-          : undefined,
-      },
-      owner: input.owner,
-    });
+    const result = await this.tenantRepository
+      .createTenantWithOwner({
+        tenant: {
+          ...input.tenant,
+          primaryDomain: input.tenant.primaryDomain
+            ? normalizeHost(input.tenant.primaryDomain)
+            : undefined,
+        },
+        owner: input.owner,
+      })
+      .catch((error: unknown) => {
+        if (
+          typeof error === 'object' &&
+          error !== null &&
+          'code' in error &&
+          error.code === 'P2002'
+        ) {
+          throw new ConflictError('Workspace details are already in use');
+        }
+        throw error;
+      });
 
     return {
       tenant: toTenantContext(result.tenant),

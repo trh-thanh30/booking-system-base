@@ -144,6 +144,21 @@ notification thống nhất và có thể thay provider tại shared package.
 
 ## Component Rules
 
+- Các input trong luồng Auth/onboarding dùng `AuthInput` compose shared `Input`
+  với nền `bg-card`, không lấy nền trang `bg-background` làm nền field.
+  Trường email dùng `EmailInput` chung với icon mail bên trái; login dùng cùng
+  component với `type="text"` để vẫn nhận username. Disabled state giữ nguyên.
+  Login có CTA đăng ký rõ ràng dẫn đến `/signup-business`, giữ locale hiện tại.
+- Input/textarea nhập văn bản, email, số và mật khẩu phải có placeholder mô tả
+  hoặc example value theo locale. Không dùng placeholder thay cho label; không
+  ghi example vào `defaultValue` như dữ liệu người dùng. Hidden/checkbox/radio,
+  native time/date/color không có placeholder hiển thị: dùng label và hint/example
+  thích hợp; readonly field hiển thị giá trị thật. Không dùng mật khẩu thật làm ví dụ.
+- `PasswordInput` dùng lock bên trái, eye toggle bên phải; eye không đổi nền/màu
+  khi hover nhưng vẫn giữ focus-visible, aria-label, disabled và vùng bấm 44px.
+- Nút Google dùng `GoogleIcon` chung với asset màu tại `public/icons/google.svg`.
+  Màu trong asset logo là ngoại lệ brand bên thứ ba, không phải token giao diện.
+
 - Shared primitive nằm ở `packages/ui` và dùng semantic token làm mặc định.
 - API public hiện tại của component phải được giữ ổn định khi chỉ đổi styling.
 - Mọi interactive component phải có `focus-visible` rõ ràng.
@@ -221,8 +236,18 @@ Modal feedback và bảng so sánh dùng shared Dialog cho focus trap/Escape, th
 overlay tự dựng. `cn` của UI khai báo custom font-size groups để `text-label`,
 `text-body`, `text-heading-*` không bị hiểu nhầm là màu và xóa semantic text color.
 
-`/signup-business` tiếp tục dùng Input/Label/Button và RegistrationField; lỗi có
-label association, aria-invalid, aria-describedby và role alert. Không đổi Auth flow.
+`/signup-business` và các màn Auth dùng `AuthenticationLayout` với header brand/vi-en,
+card hẹp căn giữa, nền semantic và Button/Input/FormField từ shared UI.
+Header được lấy từ `SiteHeader` dùng chung với Landing. Landing truyền navigation;
+Auth không truyền navigation nên chỉ hiện logo/ngôn ngữ, không nav/menu/CTA marketing.
+PasswordInput hỗ trợ hiện/ẩn mật khẩu bằng nút có aria-label. Không sao chép logo, trial claim,
+CAPTCHA hoặc nội dung điều khoản của website tham chiếu.
+
+Luồng account-first (ADR 0004): đăng ký email → xác minh → Business info → địa chỉ
+→ giờ hoạt động. `BusinessOnboardingForm` dùng chung cho email/Google; không tạo hai
+wizard. Bản đồ Leaflet chỉ tải ở client tại bước địa chỉ, có attribution OSM,
+click/drag pin và định vị theo thao tác người dùng. Địa chỉ/tọa độ nhập tay vẫn dùng
+được khi bản đồ hoặc quyền định vị lỗi. Không có Nominatim autocomplete.
 
 Metadata có title/description/OG/Twitter/canonical/hreflang cho vi/en, signup
 noindex; public origin từ `NEXT_PUBLIC_WEB_URL`, Admin login từ `NEXT_PUBLIC_WEB_URL`.

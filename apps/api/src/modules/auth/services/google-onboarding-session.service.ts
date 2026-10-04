@@ -6,6 +6,7 @@ import type { ConfigType } from '@nestjs/config';
 import { createHash, randomBytes } from 'node:crypto';
 
 export type GoogleOnboardingSession = {
+  userId?: string;
   avatarUrl?: string;
   email: string;
   fullName?: string;
@@ -67,6 +68,7 @@ export class GoogleOnboardingSessionService {
     if (!this.isRecord(value)) return false;
     return (
       typeof value.email === 'string' &&
+      (value.userId === undefined || typeof value.userId === 'string') &&
       typeof value.providerAccountId === 'string' &&
       (value.locale === 'vi' || value.locale === 'en') &&
       typeof value.returnTo === 'string' &&

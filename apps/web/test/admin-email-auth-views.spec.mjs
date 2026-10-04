@@ -40,8 +40,14 @@ test("verification handoff renders OTP without displaying or editing its session
 });
 
 test("verification without a session renders the public email request form", () => {
-  assert.match(render(VerifyEmailView), /type="email"/);
-  assert.match(render(ForgotPasswordView), /type="email"/);
+  for (const view of [VerifyEmailView, ForgotPasswordView]) {
+    const html = render(view);
+    assert.match(html, /type="email"/);
+    assert.match(html, /lucide-mail/);
+    const input = html.match(/<input[^>]*type="email"[^>]*>/)?.[0];
+    assert.match(input, /bg-card/);
+    assert.doesNotMatch(input, /bg-background/);
+  }
 });
 
 test("reset without a session has actionable expired state and no editable session field", () => {
@@ -59,5 +65,9 @@ test("valid reset session renders OTP and matching password fields without expos
   assert.match(html, /name="code"/);
   assert.match(html, /name="password"/);
   assert.match(html, /name="confirmPassword"/);
+  for (const input of html.matchAll(/<input[^>]*>/g)) {
+    assert.match(input[0], /bg-card/);
+    assert.doesNotMatch(input[0], /bg-background/);
+  }
   assert.doesNotMatch(html, /secret-session|name="sessionId"/);
 });

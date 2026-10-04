@@ -5,18 +5,18 @@ import { useMutation } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { useToast } from "@repo/hooks";
 import { emailRequestSchema, type EmailRequestInput } from "@repo/shared";
-import { Button, Input } from "@repo/ui";
-import { FormField } from "@/src/components/common/form-field";
+import { Button } from "@repo/ui";
+import { EmailInput, FormField } from "@/src/components/common";
 import { Link, useRouter } from "@/src/i18n/navigation";
 import { authService } from "@/src/services/admin/auth.service";
-import { AuthShell } from "./components/auth-shell";
-import { EmailAuthFeedback } from "./components/email-auth-feedback";
+import { AuthShell, EmailAuthFeedback } from "./components";
 import { useEmailAuthFeedback } from "./hooks/use-email-auth-feedback";
 import { getSessionUrl } from "./utils/email-auth.utils";
 
 export function ForgotPasswordView() {
   const { toast } = useToast();
   const t = useTranslations("Auth");
+  const placeholders = useTranslations("AuthJourney.placeholders");
   const router = useRouter();
   const feedback = useEmailAuthFeedback();
   const request = useMutation({
@@ -59,8 +59,9 @@ export function ForgotPasswordView() {
           htmlFor="email"
           label={t("fields.email")}
         >
-          <Input
+          <EmailInput
             id="email"
+            placeholder={placeholders("email")}
             type="email"
             autoComplete="email"
             disabled={request.isPending}

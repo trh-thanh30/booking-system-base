@@ -52,5 +52,11 @@ export function getUnverifiedEmailUrl(error: unknown, returnTo?: string) {
     typeof details.sessionId === "string"
       ? details.sessionId
       : "";
-  return getSessionUrl("verify-email", sessionId, returnTo);
+  const url = getSessionUrl("verify-email", sessionId, returnTo);
+  return typeof details === "object" &&
+    details !== null &&
+    "requiresOnboarding" in details &&
+    details.requiresOnboarding === true
+    ? `${url}&onboarding=1`
+    : url;
 }

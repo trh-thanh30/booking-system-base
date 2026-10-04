@@ -20,6 +20,23 @@ export class StartGoogleOAuthDto {
 }
 
 export class GoogleOAuthCallbackDto {
+  // Optional Google response metadata; identity is verified from the ID token.
+  @IsOptional()
+  @IsString()
+  iss?: string;
+
+  @IsOptional()
+  @IsString()
+  scope?: string;
+
+  @IsOptional()
+  @IsString()
+  authuser?: string;
+
+  @IsOptional()
+  @IsString()
+  prompt?: string;
+
   @IsOptional()
   @IsString()
   @IsNotEmpty()

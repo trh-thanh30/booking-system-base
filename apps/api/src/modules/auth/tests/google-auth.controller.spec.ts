@@ -7,7 +7,7 @@ import { GoogleOnboardingSessionService } from '@/modules/auth/services/google-o
 import { CompleteGoogleOwnerOnboardingUseCase } from '@/modules/auth/use-cases/complete-google-owner-onboarding.usecase';
 import { LoginWithGoogleUseCase } from '@/modules/auth/use-cases/login-with-google.usecase';
 import { StartGoogleLoginUseCase } from '@/modules/auth/use-cases/start-google-login.usecase';
-import { INestApplication } from '@nestjs/common';
+import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import cookieParser from 'cookie-parser';
 import request from 'supertest';
@@ -64,6 +64,14 @@ describe('GoogleAuthController', () => {
     }).compile();
 
     app = moduleRef.createNestApplication();
+    app.useGlobalPipes(
+      new ValidationPipe({
+        whitelist: true,
+        transform: true,
+        forbidNonWhitelisted: true,
+        transformOptions: { enableImplicitConversion: true },
+      }),
+    );
     app.use(cookieParser());
     app.useLogger(false);
     await app.init();
@@ -125,6 +133,50 @@ describe('GoogleAuthController', () => {
       'refresh-token',
     );
   });
+
+  it('accepts Google callback metadata with strict global validation', async () => {
+    authCookieService.getGoogleOAuthStateCookie.mockReturnValue('oauth-state');
+    loginWithGoogleUseCase.execute.mockResolvedValue({
+      locale: 'en',
+      refresh_token: 'refresh-token',
+      returnTo: '/admin/dashboard',
+    });
+    const query = {
+      code: 'test-code',
+      state: 'oauth-state',
+      iss: 'https://accounts.google.com',
+      scope: 'openid email profile',
+      authuser: '0',
+      prompt: 'consent',
+    };
+    await request(httpServer)
+      .get('/auth/admin/google/callback')
+      .query(query)
+      .expect(302)
+      .expect('location', 'http://localhost:3001/en/admin/dashboard');
+    expect(loginWithGoogleUseCase.execute).toHaveBeenCalledWith({
+      ...query,
+      stateCookie: 'oauth-state',
+    });
+  });
+
+  it.each([
+    { unexpected: 'value', state: 'oauth-state', code: 'test-code' },
+    { code: 'test-code' },
+    { state: 'oauth-state', iss: ['first', 'second'] },
+    { state: 'oauth-state', scope: ['first', 'second'] },
+    { state: 'oauth-state', authuser: ['0', '1'] },
+    { state: 'oauth-state', prompt: ['consent', 'none'] },
+  ])(
+    'rejects invalid callback input before calling OAuth: %j',
+    async (query) => {
+      await request(httpServer)
+        .get('/auth/admin/google/callback')
+        .query(query)
+        .expect(400);
+      expect(loginWithGoogleUseCase.execute).not.toHaveBeenCalled();
+    },
+  );
 
   it('redirects a first-time Google Owner to business onboarding', async () => {
     authCookieService.getGoogleOAuthStateCookie.mockReturnValue('oauth-state');

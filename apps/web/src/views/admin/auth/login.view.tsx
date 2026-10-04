@@ -1,22 +1,28 @@
 "use client";
 
-import { Lock, LogIn, Mail } from "lucide-react";
+import { LogIn } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { useEffect, useRef, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useToast } from "@repo/hooks";
-import { loginSchema, type LoginInput } from "@repo/shared";
-import { Button, Input } from "@repo/ui";
-import { FormField } from "@/src/components/common/form-field";
+import { HttpClientError, loginSchema, type LoginInput } from "@repo/shared";
+import {
+  PasswordInput,
+  GoogleIcon,
+  EmailInput,
+  FormField,
+} from "@/src/components/common";
+import { authService } from "@/src/services/admin/auth.service";
+import { Button } from "@repo/ui";
 import { useAuth } from "@/src/app/providers/admin";
 import { Link, useRouter } from "@/src/i18n/navigation";
-import { AuthShell } from "./components/auth-shell";
+import { AuthShell } from "./components";
 import { getSafeReturnTo } from "@/src/lib/admin/auth-routing";
 import { getLoginErrorKey } from "./utils/auth.utils";
 import { getUnverifiedEmailUrl } from "./utils/email-auth.utils";
 import { getOAuthErrorKey, stripOAuthError } from "./utils/google-auth.utils";
-import { useGoogleLogin } from "./hooks/use-google-login";
+import { useGoogleLogin } from "@/src/hooks/use-google-login";
 
 export function LoginView({
   returnTo,
@@ -26,6 +32,7 @@ export function LoginView({
   oauthError?: string;
 }) {
   const t = useTranslations("Auth");
+  const placeholders = useTranslations("AuthJourney.placeholders");
   const router = useRouter();
   const { login, isLoading, isAuthenticated } = useAuth();
   const { toast } = useToast();
@@ -82,6 +89,18 @@ export function LoginView({
       toast.success(t("login.success"));
       router.replace(destination);
     } catch (error) {
+      if (
+        error instanceof HttpClientError &&
+        error.code === "OWNER_ONBOARDING_REQUIRED"
+      ) {
+        try {
+          await authService.resumeOwnerOnboarding(parsed.data);
+          router.replace("/admin/onboarding/business?provider=email");
+        } catch (resumeError) {
+          setSubmitError(t(getLoginErrorKey(resumeError)));
+        }
+        return;
+      }
       const verificationUrl = getUnverifiedEmailUrl(error, destination);
       if (verificationUrl) {
         toast.info(t("login.verificationRequired"));
@@ -114,41 +133,34 @@ export function LoginView({
             htmlFor="usernameOrEmail"
             label={t("fields.usernameOrEmail")}
           >
-            <div className="relative">
-              <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                aria-invalid={Boolean(errors.usernameOrEmail)}
-                aria-describedby={
-                  errors.usernameOrEmail ? "usernameOrEmail-error" : undefined
-                }
-                disabled={isSubmitting || google.isRedirecting}
-                autoComplete="username"
-                className="pl-9"
-                id="usernameOrEmail"
-                {...register("usernameOrEmail")}
-              />
-            </div>
+            <EmailInput
+              type="text"
+              aria-invalid={Boolean(errors.usernameOrEmail)}
+              aria-describedby={
+                errors.usernameOrEmail ? "usernameOrEmail-error" : undefined
+              }
+              disabled={isSubmitting || google.isRedirecting}
+              autoComplete="username"
+              id="usernameOrEmail"
+              placeholder={placeholders("usernameOrEmail")}
+              {...register("usernameOrEmail")}
+            />
           </FormField>
           <FormField
             error={errors.password?.message}
             htmlFor="password"
             label={t("fields.password")}
           >
-            <div className="relative">
-              <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                aria-invalid={Boolean(errors.password)}
-                aria-describedby={
-                  errors.password ? "password-error" : undefined
-                }
-                disabled={isSubmitting || google.isRedirecting}
-                autoComplete="current-password"
-                className="pl-9"
-                id="password"
-                type="password"
-                {...register("password")}
-              />
-            </div>
+            <PasswordInput
+              aria-invalid={Boolean(errors.password)}
+              aria-describedby={errors.password ? "password-error" : undefined}
+              disabled={isSubmitting || google.isRedirecting}
+              autoComplete="current-password"
+              id="password"
+              placeholder={placeholders("password")}
+              type="password"
+              {...register("password")}
+            />
           </FormField>
           <div className="flex items-center justify-between">
             <Link
@@ -165,7 +177,7 @@ export function LoginView({
             </Link>
           </div>
           <Button
-            className="w-full"
+            className="min-h-11 w-full rounded-full"
             disabled={
               isSubmitting || loginMutation.isPending || google.isRedirecting
             }
@@ -180,7 +192,7 @@ export function LoginView({
             <span className="h-px flex-1 bg-border" />
           </div>
           <Button
-            className="w-full"
+            className="min-h-11 w-full rounded-full"
             variant="outline"
             type="button"
             disabled={
@@ -188,7 +200,18 @@ export function LoginView({
             }
             onClick={google.startGoogleLogin}
           >
+            <GoogleIcon />
             {google.isRedirecting ? t("google.redirecting") : t("google.login")}
+          </Button>
+          <p className="pt-4 text-center text-sm text-muted-foreground">
+            {t("login.noAccount")}
+          </p>
+          <Button
+            asChild
+            variant="outline"
+            className="min-h-11 w-full rounded-full"
+          >
+            <Link href="/signup-business">{t("login.createAccount")}</Link>
           </Button>
         </form>
       )}

@@ -44,6 +44,11 @@ Bảo vệ dữ liệu doanh nghiệp, cho phép mỗi nhóm người dùng ch�
 - `GET /auth/invitations/:token`
 - `POST /auth/invitations/accept`
 - `POST /auth/register`
+- `POST /auth/admin/onboarding/register`
+- `POST /auth/admin/onboarding/verify`
+- `POST /auth/admin/onboarding/login`
+- `GET /auth/admin/onboarding`
+- `POST /auth/admin/onboarding`
 - `GET /auth/admin/google`
 - `GET /auth/admin/google/callback`
 - `GET /auth/admin/google/onboarding`
@@ -52,6 +57,18 @@ Bảo vệ dữ liệu doanh nghiệp, cho phép mỗi nhóm người dùng ch�
 - `POST /platform/tenants`
 
 ## Database Changes
+
+### Account-first onboarding (2026-10-03)
+
+Luồng Web mới: đăng ký Owner → xác minh email → thông tin Business → địa chỉ/
+OpenStreetMap pin → giờ hoạt động → tạo Tenant/default Business/membership.
+Owner được lưu trước, tenant_id=null; không cấp Admin session khi chưa hoàn tất.
+Đăng nhập lại có thể tiếp tục onboarding bằng ticket HttpOnly 30 phút. Google
+Owner mới được lưu với password=null/is_verified=true trước Business setup.
+Manual completion quay về login; Google completion dùng Admin session hiện có.
+Business profile lưu tại Business.settings.onboarding, chưa thay thế rule availability.
+`POST /auth/register` là compatibility endpoint cũ, không dùng bởi signup Web mới.
+Xem [ADR 0004](../adr/0004-account-first-owner-onboarding.md).
 
 - `users`
 - `permissions`
@@ -149,7 +166,8 @@ không kế thừa Admin token/headers. Platform Admin vẫn là app độc lậ
 - Access/refresh JWT mang `tenant_id` và `auth_context`; refresh bị revoke nếu account đổi Tenant.
 - Route `()` chỉ nhận Admin context của `OWNER`/`STAFF` và bắt buộc Tenant header trùng JWT.
 - Owner được truy cập toàn bộ Business trong Tenant; Staff chỉ truy cập Business có membership cùng Tenant.
-- Google OAuth account mới chỉ nhận Redis onboarding session tại callback; Tenant/Business/Owner chỉ được tạo khi hoàn tất onboarding.
+- Google OAuth account mới được lưu là Owner đã xác minh tại callback, kèm Redis
+  onboarding ticket; Tenant/Business chỉ được tạo khi hoàn tất setup (ADR 0004).
 - Google onboarding token chỉ nằm trong HttpOnly cookie, không truyền qua URL; email và Google subject luôn lấy từ verified provider profile.
 - Backend F1-007 cung cấp contract onboarding; UI `/{locale}/admin/onboarding/business` được triển khai trong F1-011.
 

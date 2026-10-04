@@ -10,3 +10,4 @@ export * from "./service.types.ts";
 export * from "./system-health.types.ts";
 export * from "./tenant.types.ts";
 export * from "./user.types.ts";
+export * from "./owner-onboarding.ts";

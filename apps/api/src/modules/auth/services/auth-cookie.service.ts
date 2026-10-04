@@ -78,6 +78,38 @@ export class AuthCookieService {
     });
   }
 
+  getOwnerOnboardingCookie(req: CookieRequest): string {
+    return (
+      (req.cookies as Record<string, string> | undefined)
+        ?.admin_owner_onboarding ?? ''
+    );
+  }
+
+  setOwnerOnboardingCookie(
+    res: CookieResponse,
+    token: string,
+    ttlSeconds: number,
+  ): void {
+    res.cookie('admin_owner_onboarding', token, {
+      httpOnly: true,
+      secure: this.configCookie.secure,
+      sameSite: 'lax',
+      domain: this.configCookie.domain,
+      path: this.configCookie.refreshPaths.admin + '/onboarding',
+      maxAge: ttlSeconds * 1000,
+    });
+  }
+
+  clearOwnerOnboardingCookie(res: CookieResponse): void {
+    res.clearCookie('admin_owner_onboarding', {
+      httpOnly: true,
+      secure: this.configCookie.secure,
+      sameSite: 'lax',
+      domain: this.configCookie.domain,
+      path: this.configCookie.refreshPaths.admin + '/onboarding',
+    });
+  }
+
   getRefreshToken(req: CookieRequest, context: AuthContext) {
     const { refreshToken } = this.getRefreshCookieNames(context);
     return (

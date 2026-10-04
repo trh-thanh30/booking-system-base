@@ -18,6 +18,10 @@ import { apiClient, publicAuthClient } from "@/src/lib/admin/api-client";
 import { refreshAdminAccessToken } from "@/src/lib/admin/api-client";
 import { buildGoogleLoginUrl } from "@/src/lib/admin/auth-routing";
 import { apiConfig } from "@/src/config/api.config";
+import type {
+  CompleteOwnerBusinessInput,
+  OwnerOnboardingProfile,
+} from "@repo/shared";
 
 export type InvitationPreview = {
   id: string;
@@ -49,6 +53,27 @@ export type CreatedInvitation = {
 };
 
 export const authService = {
+  async verifyOwnerAccount(input: VerifyEmailInput) {
+    return unwrapApiData(
+      await publicAuthClient.post<{ onboarding_required: boolean }>(
+        "/auth/admin/onboarding/verify",
+        input,
+      ),
+    );
+  },
+  async resumeOwnerOnboarding(input: LoginInput) {
+    await publicAuthClient.post("/auth/admin/onboarding/login", input);
+  },
+  async getOwnerOnboardingProfile() {
+    return unwrapApiData(
+      await publicAuthClient.get<OwnerOnboardingProfile>(
+        "/auth/admin/onboarding",
+      ),
+    );
+  },
+  async completeOwnerOnboarding(input: CompleteOwnerBusinessInput) {
+    await publicAuthClient.post("/auth/admin/onboarding", input);
+  },
   getGoogleLoginUrl(locale: string, returnTo?: string) {
     return buildGoogleLoginUrl(apiConfig.baseUrl, locale, returnTo);
   },

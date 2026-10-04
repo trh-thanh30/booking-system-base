@@ -2,6 +2,76 @@ import { TenantRepository } from '@/modules/tenant/repository/tenant.repository'
 import { business_status, tenant_status, user_role } from '@prisma/client';
 
 describe('TenantRepository', () => {
+  it.each([1, 0])(
+    'conditionally attaches an existing Owner; count=%s guards replay',
+    async (count) => {
+      const tx = {
+        tenant: {
+          create: jest.fn().mockResolvedValue({
+            id: 'tenant',
+            businesses: [{ id: 'business', is_default: true }],
+          }),
+        },
+        user: {
+          updateMany: jest.fn().mockResolvedValue({ count }),
+          findUniqueOrThrow: jest
+            .fn()
+            .mockResolvedValue({ id: 'owner', tenant_id: 'tenant' }),
+          create: jest.fn(),
+        },
+        businessMembership: { create: jest.fn() },
+      };
+      const repository = new TenantRepository({
+        $transaction: (callback: (value: typeof tx) => Promise<unknown>) =>
+          callback(tx),
+      } as never);
+      const result = repository.createTenantWithOwner({
+        tenant: {
+          name: 'Demo',
+          slug: 'demo',
+          defaultBusinessSettings: { onboarding: { address: 'demo' } },
+        },
+        owner: {
+          existingUserId: 'owner',
+          email: 'owner@example.com',
+          username: 'owner',
+          password: 'hash',
+        },
+      });
+      if (count === 1)
+        await expect(result).resolves.toMatchObject({ owner: { id: 'owner' } });
+      else
+        await expect(result).rejects.toMatchObject({
+          code: 'OWNER_ONBOARDING_ALREADY_COMPLETED',
+        });
+      expect(tx.user.create).not.toHaveBeenCalled();
+      expect(tx.user.updateMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: {
+            id: 'owner',
+            tenant_id: null,
+            role: 'OWNER',
+            status: 'ACTIVE',
+            is_verified: true,
+          },
+        }),
+      );
+      if (count === 0)
+        expect(tx.businessMembership.create).not.toHaveBeenCalled();
+      expect(tx.tenant.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            settings: { create: { settings: {} } },
+            businesses: {
+              create: expect.objectContaining({
+                settings: { onboarding: { address: 'demo' } },
+              }),
+            },
+          }),
+        }),
+      );
+    },
+  );
   it('creates the unverified Owner, default Business and membership in one transaction', async () => {
     const business = {
       id: 'business-1',

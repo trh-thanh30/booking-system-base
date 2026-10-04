@@ -32,7 +32,7 @@ async function get(url) {
 
 try {
   for (const [url, marker] of [
-    ["http://localhost:3101/vi/signup-business", 'name="owner.email"'],
+    ["http://localhost:3101/vi/signup-business", 'name="email"'],
     [
       "http://localhost:3101/en/admin/verify-email?sessionId=smoke-session",
       'name="code"',
