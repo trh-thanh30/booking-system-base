@@ -50,4 +50,5 @@ test("Landing registration only collects account details before verification and
   }
   assert.match(html, /hover:bg-transparent/);
   assert.match(html, /src="\/icons\/google.svg"/);
+  assert.match(html, /data-nimg="1"/);
 });

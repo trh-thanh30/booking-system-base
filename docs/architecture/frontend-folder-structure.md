@@ -455,6 +455,23 @@ Không viết business logic, React component implementation, constant lớn ho�
 
 ## Import Rule
 
+- Ảnh do app Next.js render dùng `Image` từ `next/image`, có `alt` và
+  `width`/`height` hoặc `fill` kèm `sizes`. SVG local vẫn dùng Image; không bật
+  `dangerouslyAllowSVG` chỉ để hiển thị logo. Remote image phải cấu hình nguồn
+  cụ thể, không mở wildcard rộng.
+- Điều hướng route nội bộ dùng `Link` từ helper `src/i18n/navigation` của app
+  (wrapper Next Link) để giữ locale; không tự thêm locale lần nữa. Nếu không
+  cần locale thì dùng `next/link`. Không thay OAuth redirect đầy trang thành
+  client-side Link.
+- Native `<a>` chỉ dùng khi cần hành vi trình duyệt: skip-link/anchor trong
+  cùng trang, URL ngoài, `mailto:`, `tel:`, download hoặc redirect khác origin.
+  Giữ `rel` phù hợp khi dùng `target="_blank"`.
+- Native `<img>` chỉ được giữ khi thư viện/framework-neutral primitive quản lý
+  ảnh (ví dụ Avatar, Leaflet) hoặc có ngoại lệ được giải thích. Không tắt rule
+  `@next/next/no-img-element` trong app chỉ để tránh dùng Next Image.
+- Các view/page/component Landing hiện có được loại khỏi đợt migration này;
+  không mở rộng việc sửa marketing khi task chỉ yêu cầu Admin/Auth. Ngoại lệ
+  về phạm vi này không phải quy tắc cho phép code mới dùng native tag tùy ý.
 - Trong app dùng alias `@/src/...`.
 - Import primitive từ `@repo/ui`.
 - Import shared type/schema/helper từ `@repo/shared`.
@@ -463,6 +480,52 @@ Không viết business logic, React component implementation, constant lớn ho�
 - View có thể import `src/components/common`, `src/components/layout`, `src/hooks`, `src/services`, `src/utils`, `src/constants`.
 - `src/components/common` không import ngược vào `src/views`.
 - Feature này không import component private của feature khác.
+
+## Test Kiểm Soát Native HTML
+
+Mỗi frontend có native HTML spec riêng, quét `src` và `app` của chính app đó.
+Web chạy `apps/web/test/native-html-policy.spec.mjs`; Platform chạy
+`apps/platform-admin/test/policies/native-html-policy.spec.mjs`. Chỉ logic phân
+tích TypeScript AST được chia sẻ tại `scripts/testing/native-html-policy.mjs`.
+Không import spec của app khác. CI chạy từng bộ test độc lập; lỗi nêu rõ file,
+dòng và tag cần sửa, không bắt nhầm comment/string.
+
+- `<img>` và `<a>` điều hướng nội bộ bị chặn mặc định.
+- Anchor có href tĩnh cho fragment, HTTP(S), `mailto:`, `tel:` hoặc download được
+  phép. Href động/spread cần ngoại lệ vì AST không xác định được đích runtime.
+- Ngoại lệ gắn trực tiếp lên element bằng `data-native-reason` có lý do tĩnh,
+  cụ thể (ít nhất 12 ký tự). Không dùng lý do chung chung để né Image/Link.
+  Ví dụ: `<a href={oauthUrl} data-native-reason="Full-page redirect to external OAuth provider">Continue</a>`.
+  Ngoại lệ không áp dụng cho element bên cạnh hay toàn bộ file. Nếu native img
+  được ESLint cảnh báo, chỉ suppress đúng dòng với cùng lý do integration.
+- Danh sách Landing được loại trừ nằm trong `isLandingExempt` tại
+  `scripts/testing/native-html-policy.mjs`: Home, signup marketing, marketing
+  routes, SiteHeader và landing compositions. Không loại trừ toàn bộ common/layout
+  hay Admin. Không mở rộng danh sách này để bỏ qua lỗi từ feature mới.
+
+Chạy guard riêng: `node --test apps/web/test/native-html-policy.spec.mjs`.
+
+### Client Test Runners
+
+Web và Platform Admin có `test/register.mjs` và `test/run.mjs` riêng; script
+package là `node --import ./test/register.mjs ./test/run.mjs`. Runner dùng chung
+helper discovery, tự chạy tất cả `*.spec.mjs` trong `test/` và folder con theo thứ
+tự ổn định. Thêm spec không cần cập nhật package.json; helper/fixture không dùng
+hậu tố `.spec.mjs` nếu không muốn được chạy. Loader dùng chung hỗ trợ TypeScript,
+TSX và Next, nhưng alias `@/` luôn trỏ đúng app đang test.
+
+Root scripts:
+
+- `pnpm test:web`: toàn bộ Web/Business Admin tests.
+- `pnpm test:admin`: alias của `test:web`, không có app Admin riêng.
+- `pnpm test:platform-admin`: toàn bộ Platform Admin tests.
+- `pnpm test:clients`: build shared một lần, chạy cả hai frontend song song.
+- `pnpm test` / `pnpm test:all`: toàn bộ workspace qua Turbo.
+
+Platform có spec local trong `test/policies/`; không đăng ký hoặc import spec của
+Web và không quét source của Web. Runner/loader và hàm AST dùng chung chỉ là hạ
+tầng tại `scripts/testing/`, không chứa bộ test của app. Web và Platform có
+`test/register.mjs`, `test/run.mjs`, alias root và danh sách spec độc lập.
 
 ## Khi Nào Đưa Code Lên Tầng Cao Hơn?
 

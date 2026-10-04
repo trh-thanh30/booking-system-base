@@ -144,6 +144,12 @@ notification thống nhất và có thể thay provider tại shared package.
 
 ## Component Rules
 
+# <<<<<<< Updated upstream
+
+# <<<<<<< Updated upstream
+
+> > > > > > > Stashed changes
+
 - Các input trong luồng Auth/onboarding dùng `AuthInput` compose shared `Input`
   với nền `bg-card`, không lấy nền trang `bg-background` làm nền field.
   Trường email dùng `EmailInput` chung với icon mail bên trái; login dùng cùng
@@ -157,7 +163,16 @@ notification thống nhất và có thể thay provider tại shared package.
 - `PasswordInput` dùng lock bên trái, eye toggle bên phải; eye không đổi nền/màu
   khi hover nhưng vẫn giữ focus-visible, aria-label, disabled và vùng bấm 44px.
 - Nút Google dùng `GoogleIcon` chung với asset màu tại `public/icons/google.svg`.
+  <<<<<<< Updated upstream
   Màu trong asset logo là ngoại lệ brand bên thứ ba, không phải token giao diện.
+
+=======
+Component dùng `Image` từ `next/image`, kích thước 20×20 và `alt=""` vì tên
+hành động đã có trong button; không thay bằng native img để lách test runner.
+Màu trong asset logo là ngoại lệ brand bên thứ ba, không phải token giao diện.
+
+> > > > > > > Stashed changes
+> > > > > > > Stashed changes
 
 - Shared primitive nằm ở `packages/ui` và dùng semantic token làm mặc định.
 - API public hiện tại của component phải được giữ ổn định khi chỉ đổi styling.

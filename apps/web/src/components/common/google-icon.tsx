@@ -1,8 +1,8 @@
-/* eslint-disable @next/next/no-img-element -- Fixed-size local SVG logo needs no raster optimization. */
+import Image from "next/image";
 
 export function GoogleIcon() {
   return (
-    <img
+    <Image
       src="/icons/google.svg"
       alt=""
       aria-hidden="true"
