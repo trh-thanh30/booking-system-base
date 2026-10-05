@@ -4,6 +4,7 @@ import { readFileSync } from "node:fs";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { NextIntlClientProvider } from "next-intl";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { GoogleBusinessForm } from "../src/views/admin/auth/components/google-business-form.tsx";
 
 const messages = JSON.parse(
@@ -15,16 +16,23 @@ const profile = {
   avatar_url: null,
 };
 function render(isPending = false) {
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false } },
+  });
   return renderToStaticMarkup(
     createElement(
       NextIntlClientProvider,
       { locale: "en", messages, timeZone: "UTC" },
-      createElement(GoogleBusinessForm, {
-        profile,
-        locale: "en",
-        isPending,
-        onSubmit: async () => {},
-      }),
+      createElement(
+        QueryClientProvider,
+        { client: queryClient },
+        createElement(GoogleBusinessForm, {
+          profile,
+          locale: "en",
+          isPending,
+          onSubmit: async () => {},
+        }),
+      ),
     ),
   );
 }
@@ -36,16 +44,12 @@ test("Google onboarding displays verified identity, read-only email and workspac
     html,
     /id="google-email"[^>]*readOnly=""[^>]*value="verified@example.com"/i,
   );
-  for (const name of [
-    "owner.username",
-    "owner.phone",
-    "name",
-    "timezone",
-    "locale",
-  ]) {
+  for (const name of ["owner.username", "owner.phone", "name", "timezone"]) {
     assert.ok(html.includes(`name="${name}"`));
   }
   assert.ok(!html.includes('name="slug"'));
+  assert.ok(!html.includes('name="locale"'));
+  assert.match(html, /Business category/);
   assert.match(html, /your-business\.bookingbase\.com/);
   assert.doesNotMatch(
     html,

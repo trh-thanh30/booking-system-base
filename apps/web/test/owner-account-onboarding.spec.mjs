@@ -10,6 +10,7 @@ import {
 } from "../src/views/admin/auth/utils/business-onboarding.utils.ts";
 
 const input = {
+  business_category_id: "2518359c-6d0d-4ad8-a7ce-10f00eb36074",
   name: "Demo",
   slug: "demo",
   timezone: "Asia/Ho_Chi_Minh",

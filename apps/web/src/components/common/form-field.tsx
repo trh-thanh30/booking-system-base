@@ -1,11 +1,19 @@
 "use client";
 
-import { Children, cloneElement, isValidElement, type ReactNode } from "react";
+import {
+  Children,
+  cloneElement,
+  isValidElement,
+  type AriaRole,
+  type ReactNode,
+} from "react";
 import { Label, cn } from "@repo/ui";
 
 type FormFieldProps = {
   children: ReactNode;
-  description?: string;
+  description?: ReactNode;
+  descriptionClassName?: string;
+  descriptionRole?: AriaRole;
   error?: string;
   htmlFor: string;
   label: string;
@@ -15,11 +23,16 @@ type FormFieldProps = {
 export function FormField({
   children,
   description,
+  descriptionClassName,
+  descriptionRole,
   error,
   htmlFor,
   label,
   required = false,
 }: FormFieldProps) {
+  const childNodes = Children.toArray(children);
+  const controlIndex = childNodes.findIndex((child) => isValidElement(child));
+
   return (
     <div className="space-y-2">
       <Label htmlFor={htmlFor}>
@@ -30,8 +43,8 @@ export function FormField({
           </span>
         ) : null}
       </Label>
-      {Children.map(children, (child) =>
-        isValidElement<Record<string, unknown>>(child)
+      {childNodes.map((child, index) =>
+        index === controlIndex && isValidElement<Record<string, unknown>>(child)
           ? cloneElement(child, {
               className: cn(
                 "min-h-11 text-body",
@@ -55,7 +68,11 @@ export function FormField({
       {description ? (
         <p
           id={`${htmlFor}-description`}
-          className="text-xs leading-5 text-muted-foreground"
+          role={descriptionRole}
+          className={cn(
+            "text-xs leading-5 text-muted-foreground",
+            descriptionClassName,
+          )}
         >
           {description}
         </p>

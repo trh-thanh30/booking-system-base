@@ -1,26 +1,26 @@
 "use client";
 
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { useMutation } from "@tanstack/react-query";
-import { useTranslations } from "next-intl";
-import { useToast } from "@repo/hooks";
-import {
-  registerOwnerAccountSchema,
-  HttpClientError,
-  type RegisterOwnerAccountInput,
-} from "@repo/shared";
-import { Button } from "@repo/ui";
 import {
   EmailInput,
   FormField,
-  PasswordInput,
   GoogleIcon,
+  PasswordInput,
 } from "@/src/components/common";
 import { AuthenticationLayout } from "@/src/components/layout";
-import { Link, useRouter } from "@/src/i18n/navigation";
 import { useGoogleLogin } from "@/src/hooks/use-google-login";
+import { Link, useRouter } from "@/src/i18n/navigation";
 import { authService } from "@/src/services/auth.service";
+import { useToast } from "@repo/hooks";
+import {
+  HttpClientError,
+  registerOwnerAccountSchema,
+  type RegisterOwnerAccountInput,
+} from "@repo/shared";
+import { Button } from "@repo/ui";
+import { useMutation } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
 
 export function SignupBusinessView() {
   const t = useTranslations("AuthJourney");
@@ -123,6 +123,13 @@ export function SignupBusinessView() {
             htmlFor="owner-password"
             label={auth("fields.password")}
             error={form.formState.errors.password?.message}
+            description={t(
+              password.length >= 8 ? "passwordReady" : "passwordHint",
+            )}
+            descriptionClassName={
+              password.length >= 8 ? "text-success" : undefined
+            }
+            descriptionRole="status"
             required
           >
             <PasswordInput
@@ -132,16 +139,6 @@ export function SignupBusinessView() {
               {...form.register("password")}
             />
           </FormField>
-          <p
-            className={
-              password.length >= 8
-                ? "text-sm text-success"
-                : "text-sm text-muted-foreground"
-            }
-            role="status"
-          >
-            {t(password.length >= 8 ? "passwordReady" : "passwordHint")}
-          </p>
           <FormField
             htmlFor="owner-confirm-password"
             label={t("confirmPassword")}
