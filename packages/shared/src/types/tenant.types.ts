@@ -66,7 +66,13 @@ export type TenantListItem = TenantContext & {
   users_count: number;
 };
 
-export type TenantSignupResult = {
+export type GoogleOwnerOnboardingProfile = {
+  avatar_url: string | null;
+  email: string;
+  full_name: string | null;
+};
+
+export type RegisterOwnerResult = {
   tenant: TenantContext;
   business: BusinessContext;
   owner: {
@@ -79,4 +85,5 @@ export type TenantSignupResult = {
     status: "ACTIVE" | "INACTIVE";
     is_verified: boolean;
   };
+  sessionId: string;
 };

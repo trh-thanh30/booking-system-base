@@ -1,6 +1,5 @@
-import { NotFoundError } from '@/common/response/client-errors/not-found';
 import { ForgotPasswordDto } from '@/modules/auth/dto/forgot-password.dto';
-import { VerificationSessionService } from '@/modules/auth/service/verification-session.service';
+import { VerificationSessionService } from '@/modules/auth/services/verification-session.service';
 import { SendForgotPasswordEmailUseCase } from '@/modules/email/use-cases/send-forgot-password-email.usecase';
 import { UsersService } from '@/modules/user/user.service';
 import { VerificationService } from '@/modules/verification/verification.service';
@@ -20,20 +19,15 @@ export class ForgotPasswordUseCase implements BaseUseCase<
   ) {}
 
   async execute(dto: ForgotPasswordDto): Promise<string> {
-    const { email } = dto;
-
-    // Find user by email
+    const email = dto.email.trim().toLowerCase();
     const user = await this.usersService.findByEmail(email);
-    if (!user) {
-      throw new NotFoundError('User with this email not found');
-    }
-
-    // Create verification session (random ID, not email-based)
-    const sessionId =
-      await this.verificationSessionService.createSession(email);
+    const sessionId = await this.verificationSessionService.createSession(
+      email,
+      'password_reset',
+    );
 
     try {
-      // Generate a reset code and its expiration time
+      // Apply the same quota and response for every email, including missing accounts.
       const { expiresAt, code } = await this.verificationService.generate({
         namespace: 'password_reset',
         subject: email,
@@ -43,6 +37,7 @@ export class ForgotPasswordUseCase implements BaseUseCase<
         rateLimitMax: 3,
         rateLimitWindowSec: 60 * 15, // 15 minutes
       });
+      if (!user) return sessionId;
       const ttl = new Date(expiresAt);
 
       // Send forgot password email asynchronously
@@ -54,7 +49,10 @@ export class ForgotPasswordUseCase implements BaseUseCase<
 
       return sessionId;
     } catch (error) {
-      console.error('Failed to generate or send password reset code:', error);
+      await this.verificationSessionService.deleteSession(
+        sessionId,
+        'password_reset',
+      );
       throw error;
     }
   }

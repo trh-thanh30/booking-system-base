@@ -17,7 +17,7 @@ help:
 		'Common:' \
 		'  make install              Install dependencies' \
 		'  make dev                  Run all dev tasks through Turborepo' \
-		'  make dev-full             Run api, web, and admin dev tasks' \
+		'  make dev-full             Run api, web (with Business Admin), and platform-admin dev tasks' \
 		'  make build                Build the full monorepo' \
 		'  make build-packages       Build shared packages only' \
 		'  make lint                 Lint the full monorepo' \
@@ -33,7 +33,7 @@ help:
 		'  make infra-prod-down      Stop production compose stack' \
 		'' \
 		'Docker images:' \
-		'  make docker-build-all     Build api, web, and admin images' \
+		'  make docker-build-all     Build api, web (with Business Admin), and platform-admin images' \
 		'  make docker-check-all     Run Dockerfile build checks' \
 		'' \
 		'Database:' \

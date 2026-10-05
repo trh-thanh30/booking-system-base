@@ -1,8 +1,7 @@
 import { BadRequestError } from '@/common/response/client-errors/bad-request';
-import { NotFoundError } from '@/common/response/client-errors/not-found';
 import { UnauthorizedError } from '@/common/response/client-errors/unauthorized';
 import { PrismaService } from '@/database/prisma/prisma.service';
-import { VerificationSessionService } from '@/modules/auth/service/verification-session.service';
+import { VerificationSessionService } from '@/modules/auth/services/verification-session.service';
 import { VerificationService } from '@/modules/verification/verification.service';
 import { BaseUseCase } from '@/shared/interfaces/base-usecase.interface';
 import { Injectable } from '@nestjs/common';
@@ -27,29 +26,15 @@ export class VerifyAccountUseCase implements BaseUseCase<
     const { sessionId, code } = params;
 
     // Get email from session (sessionId is random, not email-based)
-    const email = await this.verificationSessionService.getEmail(sessionId);
+    const email = await this.verificationSessionService.getEmail(
+      sessionId,
+      'email_verification',
+    );
     if (!email) {
       throw new UnauthorizedError('Invalid or expired verification session');
     }
 
-    // Check if user exists
-    const user = await this.prismaService.user.findUnique({
-      where: { email },
-    });
-
-    if (!user) {
-      throw new NotFoundError('User not found');
-    }
-
-    // Check if already verified
-    if (user.is_verified) {
-      // Clean up session
-      await this.verificationSessionService.deleteSession(sessionId);
-      throw new BadRequestError('Account is already verified');
-    }
-
-    // Verify and consume the code using verification service
-    const isValid = await this.verificationService.verifyAndConsume({
+    const isValid = await this.verificationService.verify({
       namespace: 'email_verification',
       subject: email,
       code,
@@ -59,13 +44,41 @@ export class VerifyAccountUseCase implements BaseUseCase<
       throw new BadRequestError('Invalid or expired verification code');
     }
 
+    const user = await this.prismaService.user.findUnique({
+      where: { email },
+    });
+
+    if (!user) {
+      throw new BadRequestError('Invalid or expired verification code');
+    }
+
+    if (user.is_verified) {
+      await this.verificationService.consume({
+        namespace: 'email_verification',
+        subject: email,
+      });
+      await this.verificationSessionService.deleteSession(
+        sessionId,
+        'email_verification',
+      );
+      return;
+    }
+
     // Update user status to verified
     await this.prismaService.user.update({
       where: { email },
       data: { is_verified: true },
     });
 
+    await this.verificationService.consume({
+      namespace: 'email_verification',
+      subject: email,
+    });
+
     // Delete verification session after successful verification
-    await this.verificationSessionService.deleteSession(sessionId);
+    await this.verificationSessionService.deleteSession(
+      sessionId,
+      'email_verification',
+    );
   }
 }

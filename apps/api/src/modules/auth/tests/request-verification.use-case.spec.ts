@@ -1,30 +1,49 @@
 import { RequestVerificationUseCase } from '@/modules/auth/use-cases/request-verification.usecase';
 
 describe('RequestVerificationUseCase', () => {
-  it('rejects missing or already verified users', async () => {
-    const verification = { generate: jest.fn() };
-    const sessions = { createSession: jest.fn() };
+  it('does not disclose missing or already verified accounts', async () => {
+    const verification = {
+      generate: jest
+        .fn()
+        .mockResolvedValue({ code: '123456', expiresAt: Date.now() + 1000 }),
+    };
     const emailUseCase = { execute: jest.fn() };
 
-    await expect(
-      new RequestVerificationUseCase(
-        { findByEmail: jest.fn().mockResolvedValue(null) } as any,
-        verification as any,
-        sessions as any,
-        emailUseCase as any,
-      ).execute({ email: 'user@example.com' }),
-    ).rejects.toThrow('User not found');
+    for (const user of [null, { is_verified: true }]) {
+      await expect(
+        new RequestVerificationUseCase(
+          { findByEmail: jest.fn().mockResolvedValue(user) } as any,
+          verification as any,
+          {
+            createSession: jest.fn().mockResolvedValue('opaque-session'),
+          } as any,
+          emailUseCase as any,
+        ).execute({ email: 'user.com' }),
+      ).resolves.toEqual({ sessionId: 'opaque-session' });
+    }
 
-    await expect(
-      new RequestVerificationUseCase(
-        {
-          findByEmail: jest.fn().mockResolvedValue({ is_verified: true }),
-        } as any,
-        verification as any,
-        sessions as any,
-        emailUseCase as any,
-      ).execute({ email: 'user@example.com' }),
-    ).rejects.toThrow('Account is already verified');
+    expect(verification.generate).toHaveBeenCalledTimes(2);
+    expect(emailUseCase.execute).not.toHaveBeenCalled();
+  });
+
+  it('applies the same verification quota to missing and existing accounts', async () => {
+    for (const user of [null, { is_verified: false }, { is_verified: true }]) {
+      const email = { execute: jest.fn() };
+      await expect(
+        new RequestVerificationUseCase(
+          { findByEmail: jest.fn().mockResolvedValue(user) } as any,
+          {
+            generate: jest.fn().mockRejectedValue(new Error('quota exceeded')),
+          } as any,
+          {
+            createSession: jest.fn().mockResolvedValue('s'),
+            deleteSession: jest.fn(),
+          } as any,
+          email as any,
+        ).execute({ email: 'owner@example.com' }),
+      ).rejects.toThrow('quota exceeded');
+      expect(email.execute).not.toHaveBeenCalled();
+    }
   });
 
   it('creates a session and sends a verification code', async () => {

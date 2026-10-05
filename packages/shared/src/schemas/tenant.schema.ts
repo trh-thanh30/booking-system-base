@@ -31,13 +31,13 @@ export const createTenantSchema = z.object({
 
 export type CreateTenantInput = z.input<typeof createTenantSchema>;
 
-export const signupTenantSchema = createTenantSchema
+export const registerOwnerSchema = createTenantSchema
   .omit({ status: true })
   .extend({
     owner: z.object({
       username: z.string().min(1).max(80),
       email: z.string().email().max(160),
-      password: z.string().min(6),
+      password: z.string().min(8),
       confirmPassword: z.string().min(1),
       full_name: z.string().max(120).optional(),
       phone: z.string().max(40).optional(),
@@ -48,7 +48,20 @@ export const signupTenantSchema = createTenantSchema
     message: "Confirm password does not match",
   });
 
-export type SignupTenantInput = z.input<typeof signupTenantSchema>;
+export type RegisterOwnerInput = z.input<typeof registerOwnerSchema>;
+
+export const completeGoogleOwnerOnboardingSchema = createTenantSchema
+  .omit({ status: true })
+  .extend({
+    owner: z.object({
+      username: z.string().min(1).max(80),
+      phone: z.string().max(40).optional(),
+    }),
+  });
+
+export type CompleteGoogleOwnerOnboardingInput = z.input<
+  typeof completeGoogleOwnerOnboardingSchema
+>;
 
 export const createBusinessSchema = z.object({
   slug: z.string().min(2).max(80),

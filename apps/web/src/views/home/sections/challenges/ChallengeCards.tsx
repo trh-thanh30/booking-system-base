@@ -1,7 +1,7 @@
 "use client";
 
 import { Calendar, CreditCard, MessageSquare, Users } from "lucide-react";
-import type { ChallengeMeta, ChallengeId } from "./Challenges.types";
+import type { ChallengeMeta, ChallengeId } from "./types/Challenges.types";
 
 const ICON_MAP = {
   calendar: Calendar,
@@ -40,15 +40,15 @@ export function ChallengeCards({ challenges, activeId, onSelect }: Props) {
             key={item.id}
             type="button"
             onClick={() => onSelect(item.id)}
-            className={`group relative grid grid-cols-[auto_1fr_auto] items-center gap-4.5 overflow-hidden rounded-2xl border bg-bg-primary p-4.5 text-left transition-all duration-300 cursor-pointer shadow-sm hover:shadow ${
+            className={`group relative grid grid-cols-[auto_1fr_auto] items-center gap-4.5 overflow-hidden rounded-2xl border bg-surface p-4.5 text-left transition-all duration-300 cursor-pointer shadow-sm hover:shadow ${
               isActive
-                ? "border-brand-blue ring-[3.5px] ring-brand-blue/8 shadow-md"
-                : "border-border-light hover:border-border-gray/50 hover:translate-x-0.5"
+                ? "border-primary ring-[3.5px] ring-primary/8 shadow-md"
+                : "border-border hover:border-input/50 hover:translate-x-0.5"
             }`}
           >
             {/* Active left bar */}
             <span
-              className={`absolute left-0 top-0 bottom-0 w-[3px] bg-brand-blue transition-transform duration-300 ${
+              className={`absolute left-0 top-0 bottom-0 w-[3px] bg-primary transition-transform duration-300 ${
                 isActive ? "scale-y-100" : "scale-y-0"
               }`}
             />
@@ -56,28 +56,28 @@ export function ChallengeCards({ challenges, activeId, onSelect }: Props) {
             <div
               className={`flex h-10 w-10 items-center justify-center rounded-xl ring-1 transition-transform duration-300 ${activeAnim} ${
                 item.tone === "red"
-                  ? "bg-red-50 text-red-600 ring-red-100/60"
+                  ? "bg-danger-surface text-danger-surface-foreground ring-danger-100/60"
                   : item.tone === "yellow"
-                    ? "bg-amber-50 text-amber-600 ring-amber-100/60"
+                    ? "bg-warning-surface text-warning-surface-foreground ring-warning-100/60"
                     : item.tone === "blue"
-                      ? "bg-blue-50 text-blue-600 ring-blue-100/60"
-                      : "bg-violet-50 text-violet-600 ring-violet-100/60"
+                      ? "bg-accent text-accent-foreground ring-primary-100/60"
+                      : "bg-info-surface text-info-surface-foreground ring-info-100/60"
               }`}
             >
               <Icon className="h-4.5 w-4.5 stroke-[1.8]" />
             </div>
 
             <div className="min-w-0 flex-1">
-              <h3 className="text-[14.5px] font-extrabold text-text-primary tracking-tight">
+              <h3 className="text-[14.5px] font-extrabold text-foreground tracking-tight">
                 {item.title}
               </h3>
-              <p className="text-[12px] leading-relaxed text-text-muted mt-0.5">
+              <p className="text-[12px] leading-relaxed text-muted-foreground mt-0.5">
                 {item.desc}
               </p>
             </div>
 
             <span
-              className={`text-[13px] font-bold text-brand-blue transition-all duration-300 ${
+              className={`text-[13px] font-bold text-primary transition-all duration-300 ${
                 isActive
                   ? "translate-x-0 opacity-100"
                   : "-translate-x-1.5 opacity-0"

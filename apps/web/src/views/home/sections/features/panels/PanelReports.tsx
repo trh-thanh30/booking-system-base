@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { REPORT_KPIS, REPORT_SERVICES } from "../features.constants";
+import { REPORT_KPIS, REPORT_SERVICES } from "../constants/features.constants";
 
 export function PanelReports() {
   return (
@@ -11,18 +11,20 @@ export function PanelReports() {
         {REPORT_KPIS.map((kpi, idx) => (
           <div
             key={idx}
-            className="rounded-xl border border-border-light/40 bg-bg-secondary/40 p-3 hover:border-brand-blue/20 hover:-translate-y-0.5 transition duration-200"
+            className="rounded-xl border border-border/40 bg-background/40 p-3 hover:border-primary/20 hover:-translate-y-0.5 transition duration-200"
           >
-            <span className="block text-[8.5px] font-bold uppercase tracking-wider text-text-muted leading-none">
+            <span className="block text-[8.5px] font-bold uppercase tracking-wider text-muted-foreground leading-none">
               {kpi.label}
             </span>
             <div className="flex items-baseline justify-between mt-2.5">
-              <span className="text-base sm:text-lg font-extrabold text-text-primary tracking-tight leading-none font-mono">
+              <span className="text-base sm:text-lg font-extrabold text-foreground tracking-tight leading-none font-mono">
                 {kpi.val}
               </span>
               <span
                 className={`text-[9.5px] font-bold leading-none ${
-                  kpi.trendType === "up" ? "text-emerald-600" : "text-rose-500"
+                  kpi.trendType === "up"
+                    ? "text-success-surface-foreground"
+                    : "text-danger-500"
                 }`}
               >
                 {kpi.trend}
@@ -33,8 +35,8 @@ export function PanelReports() {
       </div>
 
       {/* Top Services */}
-      <div className="rounded-2xl bg-bg-secondary/40 p-4 border border-border-light/40 flex-1 flex flex-col min-h-0">
-        <p className="text-[10px] font-extrabold uppercase tracking-wider text-text-muted mb-3.5 leading-none shrink-0">
+      <div className="rounded-2xl bg-background/40 p-4 border border-border/40 flex-1 flex flex-col min-h-0">
+        <p className="text-[10px] font-extrabold uppercase tracking-wider text-muted-foreground mb-3.5 leading-none shrink-0">
           Top Services This Week
         </p>
 
@@ -42,14 +44,14 @@ export function PanelReports() {
           {REPORT_SERVICES.map((svc, idx) => (
             <div
               key={idx}
-              className="flex items-center justify-between gap-4 bg-bg-primary px-3.5 py-2.5 rounded-xl border border-border-light/30 shadow-[0_1px_2px_rgba(0,0,0,0.01)]"
+              className="flex items-center justify-between gap-4 bg-surface px-3.5 py-2.5 rounded-xl border border-border/30 shadow-md"
             >
               <div className="flex-1 min-w-0">
-                <span className="font-extrabold text-text-primary text-[11.5px] leading-tight block">
+                <span className="font-extrabold text-foreground text-[11.5px] leading-tight block">
                   {svc.name}
                 </span>
                 {/* Horizontal Progress Bar */}
-                <div className="h-1 w-full bg-[#E5F0FF]/40 rounded-full mt-2 overflow-hidden">
+                <div className="h-1 w-full bg-accent/40 rounded-full mt-2 overflow-hidden">
                   <motion.div
                     initial={{ width: 0 }}
                     animate={{ width: `${svc.percent}%` }}
@@ -58,15 +60,15 @@ export function PanelReports() {
                       delay: idx * 0.1,
                       ease: "easeOut",
                     }}
-                    className="h-full bg-brand-blue rounded-full"
+                    className="h-full bg-primary rounded-full"
                   />
                 </div>
               </div>
               <div className="text-right shrink-0">
-                <span className="text-xs font-extrabold text-text-primary font-mono block">
+                <span className="text-xs font-extrabold text-foreground font-mono block">
                   {svc.count}
                 </span>
-                <span className="text-[8px] font-bold text-text-muted mt-0.5 block leading-none">
+                <span className="text-[8px] font-bold text-muted-foreground mt-0.5 block leading-none">
                   bookings
                 </span>
               </div>

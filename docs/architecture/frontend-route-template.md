@@ -1,6 +1,6 @@
 # Frontend Route Template
 
-Template này dùng khi thêm route mới vào `apps/admin` hoặc `apps/web`.
+Template này dùng khi thêm route mới vào `apps/web` hoặc `apps/platform-admin`. Business Admin routes nằm dưới `app/[locale]/admin`, views tại `src/views/admin/<feature>`.
 
 ## Route Page
 
@@ -25,16 +25,23 @@ Rule:
 ```txt
 src/views/example/
 ├── example.view.tsx
-├── example.constants.ts
-├── example.types.ts
-├── example.utils.ts
-├── example.columns.tsx
+├── constants/
+│   └── example.constants.ts
+├── types/
+│   └── example.types.ts
+├── utils/
+│   └── example.utils.ts
+├── columns/
+│   └── example.columns.tsx
 ├── components/
 │   └── example-table.tsx
 └── index.ts
 ```
 
 Không phải feature nào cũng cần đủ mọi file. Tạo file khi feature thật sự cần.
+File hỗ trợ luôn nằm trong folder theo hậu tố chức năng, kể cả chỉ có một file.
+`*.view.tsx` và `index.ts` export-only ở cấp feature; mock data, hooks và schemas
+lần lượt đặt trong `data/`, `hooks/` và `schemas/` khi cần.
 
 ## View
 
@@ -58,7 +65,7 @@ export function ExampleView() {
 
 ## Constants
 
-`src/views/example/example.constants.ts`
+`src/views/example/constants/example.constants.ts`
 
 ```ts
 export const exampleTabs = [
@@ -75,7 +82,7 @@ export const exampleTabs = [
 
 ## Types
 
-`src/views/example/example.types.ts`
+`src/views/example/types/example.types.ts`
 
 ```ts
 export type ExampleViewMode = "table" | "cards";
@@ -86,10 +93,10 @@ Rule: file này chỉ chứa type phục vụ view/local UI state. Type dữ li�
 
 ## Utils
 
-`src/views/example/example.utils.ts`
+`src/views/example/utils/example.utils.ts`
 
 ```ts
-import type { ExampleItem } from "@/src/views/example/example.types";
+import type { ExampleItem } from "@/src/views/example/types/example.types";
 
 export function isExampleActive(item: ExampleItem) {
   return item.status === "active";
@@ -98,7 +105,7 @@ export function isExampleActive(item: ExampleItem) {
 
 ## Columns
 
-`src/views/example/example.columns.tsx`
+`src/views/example/columns/example.columns.tsx`
 
 ```tsx
 import type { ColumnDef } from "@tanstack/react-table";
@@ -122,9 +129,9 @@ export const exampleColumns: ColumnDef<ExampleItemSummary>[] = [
 
 ```ts
 export * from "./example.view";
-export * from "./example.constants";
-export * from "./example.types";
-export * from "./example.utils";
+export * from "./constants/example.constants";
+export * from "./types/example.types";
+export * from "./utils/example.utils";
 ```
 
 Không viết implementation trong `index.ts`.

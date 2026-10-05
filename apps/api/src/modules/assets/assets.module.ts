@@ -6,7 +6,7 @@ import { FileValidatorService } from '@/modules/assets/services/file-validator.s
 import { LocalStorageService } from '@/modules/assets/services/local-storage.service';
 import { MinioStorageService } from '@/modules/assets/services/minio-storage.service';
 import { UploadAssetService } from '@/modules/assets/services/upload-asset.service';
-import { AuthTokenService } from '@/modules/auth/service/auth-token.service';
+import { AuthTokenService } from '@/modules/auth/services/auth-token.service';
 import { Module } from '@nestjs/common';
 import type { ConfigType } from '@nestjs/config';
 import { MulterModule } from '@nestjs/platform-express';

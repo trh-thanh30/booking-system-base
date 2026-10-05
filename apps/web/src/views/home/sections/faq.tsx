@@ -4,7 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 import { Reveal } from "@/src/components/motion/Reveal";
-import { FAQ_GROUPS } from "../home.constants";
+import { FAQ_GROUPS } from "../constants/home.constants";
 
 export function FAQ() {
   const [openFaqKey, setOpenFaqKey] = useState<string | null>("coding-skills");
@@ -21,18 +21,18 @@ export function FAQ() {
     <Reveal
       as="section"
       id="faq"
-      className="scroll-mt-20 md:scroll-mt-24 py-10 md:py-12 lg:py-14 bg-bg-primary border-t border-border-light"
+      className="scroll-mt-20 md:scroll-mt-24 py-10 md:py-12 lg:py-14 bg-surface border-t border-border"
     >
-      <div className="mx-auto max-w-7xl px-6">
+      <div className="mx-auto w-full max-w-landing px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-8 space-y-2">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-blue-100 bg-blue-50/50 px-3.5 py-0.5 text-[10px] font-bold text-brand-blue uppercase tracking-wider select-none">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-primary-100 bg-accent/50 px-3.5 py-0.5 text-[10px] font-bold text-primary uppercase tracking-wider select-none">
             Frequently Asked Questions
           </span>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-text-primary tracking-tight">
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-foreground tracking-tight">
             Questions before you start?
           </h2>
-          <p className="text-text-muted text-xs leading-relaxed max-w-lg mx-auto">
+          <p className="text-muted-foreground text-xs leading-relaxed max-w-lg mx-auto">
             Find quick answers about templates, booking pages, payments, trials
             and Early Access.
           </p>
@@ -43,14 +43,14 @@ export function FAQ() {
           <button
             type="button"
             onClick={() => handleScrollToGroup("faq-product")}
-            className="px-4 py-1.5 rounded-full border border-border-light bg-white text-xs font-bold text-text-muted hover:bg-blue-50/50 hover:text-brand-blue hover:border-brand-blue/30 shadow-sm transition-all duration-200 cursor-pointer active:scale-[0.98]"
+            className="px-4 py-1.5 rounded-full border border-border bg-surface text-xs font-bold text-muted-foreground hover:bg-accent/50 hover:text-primary hover:border-primary/30 shadow-sm transition-all duration-200 cursor-pointer active:scale-[0.98]"
           >
             Jump to Product & Booking ↓
           </button>
           <button
             type="button"
             onClick={() => handleScrollToGroup("faq-trial")}
-            className="px-4 py-1.5 rounded-full border border-border-light bg-white text-xs font-bold text-text-muted hover:bg-blue-50/50 hover:text-brand-blue hover:border-brand-blue/30 shadow-sm transition-all duration-200 cursor-pointer active:scale-[0.98]"
+            className="px-4 py-1.5 rounded-full border border-border bg-surface text-xs font-bold text-muted-foreground hover:bg-accent/50 hover:text-primary hover:border-primary/30 shadow-sm transition-all duration-200 cursor-pointer active:scale-[0.98]"
           >
             Jump to Trial & Early Access ↓
           </button>
@@ -64,7 +64,7 @@ export function FAQ() {
               id={gidx === 0 ? "faq-product" : "faq-trial"}
               className="space-y-4 scroll-mt-28"
             >
-              <h3 className="text-sm sm:text-base font-extrabold text-text-primary border-b border-border-light pb-2 select-none">
+              <h3 className="text-sm sm:text-base font-extrabold text-foreground border-b border-border pb-2 select-none">
                 {group.title}
               </h3>
               <div className="space-y-2.5">
@@ -76,20 +76,20 @@ export function FAQ() {
                       key={faq.id}
                       className={`rounded-xl border p-4 transition-all duration-300 ${
                         isOpen
-                          ? "border-brand-blue bg-blue-50/15 shadow-sm"
-                          : "border-border-light bg-bg-primary hover:border-border-gray"
+                          ? "border-primary bg-accent/15 shadow-sm"
+                          : "border-border bg-surface hover:border-input"
                       }`}
                     >
                       <button
                         type="button"
                         onClick={() => setOpenFaqKey(isOpen ? null : faq.id)}
-                        className="flex w-full items-center justify-between gap-4 text-left focus:outline-none cursor-pointer rounded-lg select-none"
+                        className="flex w-full items-center justify-between gap-4 text-left focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2 cursor-pointer rounded-lg select-none"
                         aria-expanded={isOpen}
                         aria-controls={panelId}
                       >
                         <span
                           className={`text-sm sm:text-[15px] font-semibold transition-colors duration-200 ${
-                            isOpen ? "text-brand-blue" : "text-text-primary"
+                            isOpen ? "text-primary" : "text-foreground"
                           }`}
                         >
                           {faq.question}
@@ -105,7 +105,7 @@ export function FAQ() {
                             ease: "easeOut",
                           }}
                           className={`shrink-0 transition-colors duration-200 ${
-                            isOpen ? "text-brand-blue" : "text-text-muted"
+                            isOpen ? "text-primary" : "text-muted-foreground"
                           }`}
                         >
                           <ChevronDown className="h-4 w-4" />
@@ -132,7 +132,7 @@ export function FAQ() {
                             }}
                             className="overflow-hidden"
                           >
-                            <p className="pt-3 text-xs sm:text-[14px] text-text-muted leading-relaxed">
+                            <p className="pt-3 text-xs sm:text-[14px] text-muted-foreground leading-relaxed">
                               {faq.answer}
                             </p>
                           </motion.div>
@@ -147,11 +147,11 @@ export function FAQ() {
         </div>
 
         {/* FAQ CTA Card */}
-        <div className="text-center border border-border-light bg-white p-7 rounded-xl shadow-sm space-y-4 max-w-6xl mx-auto mt-10">
-          <h3 className="text-lg font-bold text-text-primary">
+        <div className="text-center border border-border bg-surface p-7 rounded-xl shadow-sm space-y-4 max-w-6xl mx-auto mt-10">
+          <h3 className="text-lg font-bold text-foreground">
             Still have questions?
           </h3>
-          <p className="text-sm text-text-muted max-w-[480px] mx-auto leading-relaxed">
+          <p className="text-sm text-muted-foreground max-w-[480px] mx-auto leading-relaxed">
             Reach our support team, or book a 15-minute walkthrough with a
             product specialist.
           </p>
@@ -163,7 +163,7 @@ export function FAQ() {
                 (window.location.href =
                   "mailto:support@bookingbase.com?subject=BookingBase%20Support%20Inquiry")
               }
-              className="w-full sm:w-auto inline-flex h-10 items-center justify-center rounded-full bg-brand-blue hover:bg-brand-blue-hover text-white shadow-sm hover:shadow px-6 text-sm font-semibold transition-all duration-200 cursor-pointer select-none"
+              className="w-full sm:w-auto inline-flex h-10 items-center justify-center rounded-full bg-primary hover:bg-primary-hover text-primary-foreground shadow-sm hover:shadow px-6 text-sm font-semibold transition-all duration-200 cursor-pointer select-none"
             >
               Contact support
             </motion.button>
@@ -171,7 +171,7 @@ export function FAQ() {
               whileHover={shouldReduceMotion ? undefined : { scale: 1.02 }}
               whileTap={shouldReduceMotion ? undefined : { scale: 0.98 }}
               href="mailto:demo@bookingbase.com?subject=BookingBase%20Demo%20Request"
-              className="w-full sm:w-auto inline-flex h-10 items-center justify-center rounded-full border border-border-light bg-white hover:bg-bg-secondary hover:border-border-gray px-6 text-sm font-semibold transition-all duration-200 cursor-pointer select-none"
+              className="w-full sm:w-auto inline-flex h-10 items-center justify-center rounded-full border border-border bg-surface hover:bg-background hover:border-input px-6 text-sm font-semibold transition-all duration-200 cursor-pointer select-none"
             >
               Book a demo
             </motion.a>

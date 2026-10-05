@@ -9,3 +9,4 @@ export * from "./use-pagination";
 export * from "./use-permission";
 export * from "./use-query-params";
 export * from "./use-table";
+export * from "./use-toast";

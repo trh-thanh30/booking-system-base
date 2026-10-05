@@ -17,10 +17,14 @@ import {
   Copy,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { toast } from "sonner";
+import { useToast } from "@repo/hooks";
 import QRCode from "qrcode";
 import { RepeatReveal } from "@/src/components/motion/RepeatReveal";
-import { formatSlug, getHexColorValue } from "../home.utils";
+import {
+  formatSlug,
+  getHexColorValue,
+  withColorAlpha,
+} from "../utils/home.utils";
 
 interface ChannelsProps {
   customColor: string;
@@ -76,6 +80,7 @@ export function Channels({
   customBusinessName,
   setCustomBusinessName,
 }: ChannelsProps) {
+  const { toast } = useToast();
   const hexColor = getHexColorValue(customColor);
   const slug = formatSlug(customBusinessName) || "lumiere";
 
@@ -127,8 +132,8 @@ export function Channels({
             width: 160,
             margin: 1,
             color: {
-              dark: "#0b0b14",
-              light: "#ffffff",
+              dark: "var(--color-primary)",
+              light: "var(--color-surface)",
             },
             errorCorrectionLevel: "M",
           },
@@ -145,8 +150,8 @@ export function Channels({
             width: 120,
             margin: 1,
             color: {
-              dark: "#0b0b14",
-              light: "#ffffff",
+              dark: "var(--color-primary)",
+              light: "var(--color-surface)",
             },
             errorCorrectionLevel: "M",
           },
@@ -197,9 +202,9 @@ export function Channels({
   return (
     <RepeatReveal
       id="channels"
-      className="scroll-mt-20 md:scroll-mt-24 py-16 md:py-24 lg:py-28 bg-bg-secondary border-t border-border-light"
+      className="scroll-mt-20 md:scroll-mt-24 py-16 md:py-24 lg:py-28 bg-background border-t border-border"
     >
-      <div className="mx-auto max-w-7xl px-6">
+      <div className="mx-auto w-full max-w-landing px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
           <span
@@ -208,10 +213,10 @@ export function Channels({
           >
             Booking Channels
           </span>
-          <h2 className="text-3xl sm:text-4xl md:text-[38px] font-extrabold tracking-tight text-text-primary leading-tight">
+          <h2 className="text-3xl sm:text-4xl md:text-[38px] font-extrabold tracking-tight text-foreground leading-tight">
             Publish once. Take bookings from every channel.
           </h2>
-          <p className="text-text-muted text-base max-w-2xl mx-auto leading-relaxed">
+          <p className="text-muted-foreground text-base max-w-2xl mx-auto leading-relaxed">
             Share one branded booking link across your website, social bios, QR
             codes and direct messages so customers can book wherever they find
             you.
@@ -223,8 +228,8 @@ export function Channels({
           {/* LEFT COLUMN: Controls, Selector Track, Active Config Card, Analytics */}
           <div className="lg:col-span-7 flex flex-col space-y-5 w-full">
             {/* 1. Topbar: Business Name Input */}
-            <div className="flex items-center gap-3 p-3 bg-white border border-border-light rounded-xl shadow-sm">
-              <span className="text-[10px] font-extrabold text-text-muted uppercase tracking-wider shrink-0 select-none">
+            <div className="flex items-center gap-3 p-3 bg-surface border border-border rounded-xl shadow-sm">
+              <span className="text-[10px] font-extrabold text-muted-foreground uppercase tracking-wider shrink-0 select-none">
                 Business
               </span>
               <input
@@ -232,28 +237,28 @@ export function Channels({
                 value={customBusinessName}
                 onChange={(e) => setCustomBusinessName?.(e.target.value)}
                 maxLength={24}
-                className="flex-1 px-3 py-1.5 border border-border-light rounded-lg text-xs font-medium focus:outline-none bg-[#fdfdfd]"
+                className="flex-1 px-3 py-1.5 border border-border rounded-lg text-xs font-medium focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2 bg-primary"
                 style={
                   {
-                    "--tw-ring-color": hexColor + "1f",
-                    borderColor: hexColor + "30",
+                    "--tw-ring-color": withColorAlpha(hexColor, "1f"),
+                    borderColor: withColorAlpha(hexColor, "30"),
                   } as React.CSSProperties
                 }
                 placeholder="Business name"
               />
-              <div className="hidden sm:block text-[11px] font-mono text-text-muted px-3 py-1.5 bg-bg-primary border border-border-light rounded-lg max-w-[280px] truncate select-none">
+              <div className="hidden sm:block text-[11px] font-mono text-muted-foreground px-3 py-1.5 bg-surface border border-border rounded-lg max-w-[280px] truncate select-none">
                 bookingbase.com/
                 <strong style={{ color: hexColor }}>{slug}</strong>
               </div>
             </div>
 
             {/* 2. Channels Carousel / Slider Track */}
-            <div className="relative bg-white border border-border-light rounded-xl p-3 shadow-sm select-none">
+            <div className="relative bg-surface border border-border rounded-xl p-3 shadow-sm select-none">
               {/* Scroll buttons */}
               <button
                 type="button"
                 onClick={() => scrollSlider("left")}
-                className="absolute left-2.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full border border-border-light bg-white hover:bg-bg-secondary hover:text-text-primary text-text-muted flex items-center justify-center cursor-pointer transition z-10 shadow-sm"
+                className="absolute left-2.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full border border-border bg-surface hover:bg-background hover:text-foreground text-muted-foreground flex items-center justify-center cursor-pointer transition z-10 shadow-sm"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
@@ -303,8 +308,8 @@ export function Channels({
                       onClick={() => setActiveCard(item.id)}
                       className={`flex-shrink-0 w-[140px] rounded-lg border p-3 flex flex-col justify-between h-[105px] transition-all cursor-pointer relative ${
                         isSelected
-                          ? "bg-white shadow-[0_4px_12px_rgba(0,0,0,0.05)]"
-                          : "border-border-light hover:border-text-secondary bg-[#fdfdfd]"
+                          ? "bg-surface shadow-md"
+                          : "border-border hover:border-foreground bg-primary"
                       } ${!isEnabled ? "opacity-50" : ""}`}
                       style={{
                         borderColor: isSelected ? hexColor : undefined,
@@ -317,9 +322,11 @@ export function Channels({
                           className="w-7 h-7 rounded-lg flex items-center justify-center"
                           style={{
                             backgroundColor: isSelected
-                              ? hexColor + "14"
-                              : "rgba(107, 114, 128, 0.08)",
-                            color: isSelected ? hexColor : "#6b7280",
+                              ? withColorAlpha(hexColor, "14")
+                              : "color-mix(in srgb, var(--color-muted-foreground) 8%, transparent)",
+                            color: isSelected
+                              ? hexColor
+                              : "var(--color-primary)",
                           }}
                         >
                           <Icon className="w-3.5 h-3.5" />
@@ -345,23 +352,23 @@ export function Channels({
                           }}
                           className={`text-[8.5px] font-bold px-2 py-0.5 rounded-full border cursor-pointer select-none transition ${
                             isEnabled
-                              ? "bg-emerald-50 text-emerald-700 border-emerald-200"
-                              : "bg-gray-100 text-gray-500 border-gray-200"
+                              ? "bg-success-surface text-success-surface-foreground border-success-border"
+                              : "bg-neutral-100 text-neutral-500 border-neutral-200"
                           }`}
                         >
                           <span
                             className={`inline-block w-1 h-1 rounded-full mr-1 ${
-                              isEnabled ? "bg-emerald-500" : "bg-gray-400"
+                              isEnabled ? "bg-success-500" : "bg-neutral-400"
                             }`}
                           />
                           {isEnabled ? item.status : "Off"}
                         </button>
                       </div>
                       <div className="text-left mt-2">
-                        <span className="text-[12px] font-bold text-text-primary block leading-tight">
+                        <span className="text-[12px] font-bold text-foreground block leading-tight">
                           {item.label}
                         </span>
-                        <span className="text-[8.5px] text-text-muted font-bold block uppercase tracking-wide mt-0.5">
+                        <span className="text-[8.5px] text-muted-foreground font-bold block uppercase tracking-wide mt-0.5">
                           {item.sub}
                         </span>
                       </div>
@@ -373,14 +380,14 @@ export function Channels({
               <button
                 type="button"
                 onClick={() => scrollSlider("right")}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full border border-border-light bg-white hover:bg-bg-secondary hover:text-text-primary text-text-muted flex items-center justify-center cursor-pointer transition z-10 shadow-sm"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full border border-border bg-surface hover:bg-background hover:text-foreground text-muted-foreground flex items-center justify-center cursor-pointer transition z-10 shadow-sm"
               >
                 <ChevronRight className="w-4 h-4" />
               </button>
             </div>
 
             {/* 3. Active Configuration Card (with Framer Motion swap animation) */}
-            <div className="bg-white border border-border-light rounded-xl p-5 shadow-sm text-left relative min-h-[290px] flex flex-col justify-between">
+            <div className="bg-surface border border-border rounded-xl p-5 shadow-sm text-left relative min-h-[290px] flex flex-col justify-between">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={activeCard}
@@ -392,12 +399,12 @@ export function Channels({
                 >
                   {/* Active Card Header */}
                   <div className="w-full">
-                    <div className="flex items-center justify-between border-b border-border-light/60 pb-3 mb-3">
+                    <div className="flex items-center justify-between border-b border-border/60 pb-3 mb-3">
                       <div className="flex items-center gap-2">
                         <div
                           className="w-8 h-8 rounded-lg flex items-center justify-center"
                           style={{
-                            backgroundColor: hexColor + "14",
+                            backgroundColor: withColorAlpha(hexColor, "14"),
                             color: hexColor,
                           }}
                         >
@@ -414,7 +421,7 @@ export function Channels({
                             <Share2 className="w-4 h-4" />
                           )}
                         </div>
-                        <h3 className="text-sm font-bold text-text-primary leading-tight">
+                        <h3 className="text-sm font-bold text-foreground leading-tight">
                           {activeCard === "url" && "Direct booking link"}
                           {activeCard === "qr" && "Instant QR code"}
                           {activeCard === "embed" && "Website embed widget"}
@@ -431,15 +438,15 @@ export function Channels({
                         }}
                         className={`text-[9.5px] font-extrabold px-3 py-1 rounded-full border cursor-pointer select-none transition ${
                           channelsStatus[activeCard]
-                            ? "bg-emerald-50 text-emerald-700 border-emerald-200"
-                            : "bg-gray-100 text-gray-500 border-gray-200"
+                            ? "bg-success-surface text-success-surface-foreground border-success-border"
+                            : "bg-neutral-100 text-neutral-500 border-neutral-200"
                         }`}
                       >
                         <span
                           className={`inline-block w-1.5 h-1.5 rounded-full mr-1.5 ${
                             channelsStatus[activeCard]
-                              ? "bg-emerald-500 animate-pulse"
-                              : "bg-gray-400"
+                              ? "bg-success-500 animate-pulse"
+                              : "bg-neutral-400"
                           }`}
                         />
                         {channelsStatus[activeCard]
@@ -450,7 +457,7 @@ export function Channels({
                       </button>
                     </div>
 
-                    <p className="text-xs text-text-muted leading-relaxed">
+                    <p className="text-xs text-muted-foreground leading-relaxed">
                       {activeCard === "url" &&
                         "Share a branded booking URL in messages, emails, ads or customer follow-ups."}
                       {activeCard === "qr" &&
@@ -467,8 +474,8 @@ export function Channels({
                     {/* DIRECT LINK CONFIG */}
                     {activeCard === "url" && (
                       <div className="space-y-3.5">
-                        <div className="flex items-center gap-2.5 bg-bg-secondary border border-border-light rounded-lg p-2.5 text-xs font-mono text-text-secondary select-none">
-                          <Lock className="w-3.5 h-3.5 text-text-muted shrink-0" />
+                        <div className="flex items-center gap-2.5 bg-background border border-border rounded-lg p-2.5 text-xs font-mono text-foreground select-none">
+                          <Lock className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
                           <span className="truncate flex-grow">
                             bookingbase.com/
                             <strong style={{ color: hexColor }}>{slug}</strong>
@@ -478,7 +485,7 @@ export function Channels({
                           </span>
                         </div>
                         <div className="space-y-1">
-                          <label className="text-[9px] font-extrabold text-text-muted uppercase tracking-wider block">
+                          <label className="text-[9px] font-extrabold text-muted-foreground uppercase tracking-wider block">
                             Track source (UTM source tag)
                           </label>
                           <select
@@ -492,7 +499,7 @@ export function Channels({
                                 );
                               }
                             }}
-                            className="w-full px-3 py-2 border border-border-light rounded-lg text-xs bg-white text-text-primary focus:outline-none focus:border-brand-blue"
+                            className="w-full px-3 py-2 border border-border rounded-lg text-xs bg-surface text-foreground focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2 focus:border-primary"
                           >
                             <option value="">
                               — No UTM tag (direct link) —
@@ -523,12 +530,12 @@ export function Channels({
                           : "hidden"
                       }
                     >
-                      <div className="p-3.5 border border-border-light rounded-xl bg-white shadow-sm flex flex-col items-center">
+                      <div className="p-3.5 border border-border rounded-xl bg-surface shadow-sm flex flex-col items-center">
                         <canvas
                           ref={canvasRef}
                           className="w-[160px] h-[160px]"
                         />
-                        <span className="text-[9px] font-extrabold text-text-muted uppercase tracking-wider mt-2.5">
+                        <span className="text-[9px] font-extrabold text-muted-foreground uppercase tracking-wider mt-2.5">
                           Scan to book
                         </span>
                       </div>
@@ -538,7 +545,7 @@ export function Channels({
                     {activeCard === "embed" && (
                       <div className="space-y-4">
                         {/* Tabs */}
-                        <div className="flex gap-1.5 p-1 bg-bg-secondary border border-border-light/60 rounded-xl">
+                        <div className="flex gap-1.5 p-1 bg-background border border-border/60 rounded-xl">
                           {(
                             [
                               "calendar",
@@ -552,8 +559,8 @@ export function Channels({
                               onClick={() => setEmbedVariant(v)}
                               className={`flex-1 py-2 text-[11px] font-bold rounded-lg transition-all cursor-pointer ${
                                 embedVariant === v
-                                  ? "bg-white text-text-primary shadow-sm"
-                                  : "text-text-muted hover:text-text-primary bg-transparent"
+                                  ? "bg-surface text-foreground shadow-sm"
+                                  : "text-muted-foreground hover:text-foreground bg-transparent"
                               }`}
                             >
                               {v === "calendar" && "📅 Calendar"}
@@ -564,17 +571,17 @@ export function Channels({
                         </div>
 
                         {/* Interactive Widget Stage */}
-                        <div className="border border-border-light rounded-xl p-4 bg-bg-secondary/40 min-h-[160px] flex flex-col justify-center items-center select-none overflow-hidden relative">
+                        <div className="border border-border rounded-xl p-4 bg-background/40 min-h-[160px] flex flex-col justify-center items-center select-none overflow-hidden relative">
                           {/* Calendar Variant Stage */}
                           {embedVariant === "calendar" && (
-                            <div className="w-full max-w-[280px] bg-white border border-border-light rounded-lg p-3 shadow-sm space-y-3">
+                            <div className="w-full max-w-[280px] bg-surface border border-border rounded-lg p-3 shadow-sm space-y-3">
                               {/* Browser Bar */}
-                              <div className="flex gap-1 border-b border-border-light/50 pb-1.5">
-                                <span className="w-1.5 h-1.5 rounded-full bg-[#ff5f57]" />
-                                <span className="w-1.5 h-1.5 rounded-full bg-[#febc2e]" />
-                                <span className="w-1.5 h-1.5 rounded-full bg-[#28c840]" />
+                              <div className="flex gap-1 border-b border-border/50 pb-1.5">
+                                <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+                                <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+                                <span className="w-1.5 h-1.5 rounded-full bg-primary" />
                               </div>
-                              <span className="text-[9px] font-extrabold text-text-muted uppercase tracking-wider block">
+                              <span className="text-[9px] font-extrabold text-muted-foreground uppercase tracking-wider block">
                                 Pick a time
                               </span>
                               <div className="grid grid-cols-5 gap-1.5">
@@ -594,8 +601,8 @@ export function Channels({
                                         }}
                                         className={`py-2 px-1 text-center rounded border text-[9.5px] font-bold cursor-pointer transition ${
                                           isHot
-                                            ? "text-white hover:opacity-90"
-                                            : "border-border-light text-text-muted bg-[#fafafa]"
+                                            ? "text-primary-foreground hover:opacity-90"
+                                            : "border-border text-muted-foreground bg-primary"
                                         }`}
                                         style={{
                                           backgroundColor: isHot
@@ -612,7 +619,7 @@ export function Channels({
                                   },
                                 )}
                               </div>
-                              <div className="text-[9.5px] text-text-secondary">
+                              <div className="text-[9.5px] text-foreground">
                                 Available slot: <strong>9:00 AM</strong>
                               </div>
                               <button
@@ -623,7 +630,7 @@ export function Channels({
                                     { icon: "🎉" },
                                   )
                                 }
-                                className="w-full py-2 text-white text-[10.5px] font-bold rounded-md hover:translate-y-[-1px] transition shadow-sm cursor-pointer"
+                                className="w-full py-2 text-primary-foreground text-[10.5px] font-bold rounded-md hover:translate-y-[-1px] transition shadow-sm cursor-pointer"
                                 style={{ backgroundColor: hexColor }}
                               >
                                 Book slot →
@@ -633,9 +640,9 @@ export function Channels({
 
                           {/* Button Variant Stage */}
                           {embedVariant === "button" && (
-                            <div className="flex flex-col items-center justify-center space-y-3 w-full py-4 bg-white border border-border-light rounded-lg max-w-[280px] p-4 shadow-sm text-center">
-                              <div className="h-2 w-2/3 bg-border-light rounded" />
-                              <div className="h-1.5 w-4/5 bg-border-light/60 rounded" />
+                            <div className="flex flex-col items-center justify-center space-y-3 w-full py-4 bg-surface border border-border rounded-lg max-w-[280px] p-4 shadow-sm text-center">
+                              <div className="h-2 w-2/3 bg-border rounded" />
+                              <div className="h-1.5 w-4/5 bg-border/60 rounded" />
                               <button
                                 type="button"
                                 onClick={() =>
@@ -644,12 +651,12 @@ export function Channels({
                                     { icon: "💻" },
                                   )
                                 }
-                                className="px-5 py-2 text-white text-xs font-bold rounded-full cursor-pointer hover:scale-105 active:scale-95 transition-all shadow"
+                                className="px-5 py-2 text-primary-foreground text-xs font-bold rounded-full cursor-pointer hover:scale-105 active:scale-95 transition-all shadow"
                                 style={{ backgroundColor: hexColor }}
                               >
                                 📅 Book now
                               </button>
-                              <span className="text-[9px] text-text-muted font-medium">
+                              <span className="text-[9px] text-muted-foreground font-medium">
                                 Pop-up booking widget triggers on click
                               </span>
                             </div>
@@ -657,11 +664,11 @@ export function Channels({
 
                           {/* Overlay Variant Stage */}
                           {embedVariant === "overlay" && (
-                            <div className="w-full max-w-[280px] bg-white border border-border-light rounded-lg p-3.5 shadow-sm min-h-[120px] flex flex-col justify-between relative">
+                            <div className="w-full max-w-[280px] bg-surface border border-border rounded-lg p-3.5 shadow-sm min-h-[120px] flex flex-col justify-between relative">
                               <div className="space-y-1.5">
-                                <div className="h-2 w-1/3 bg-border-light rounded" />
-                                <div className="h-1.5 w-full bg-border-light/50 rounded" />
-                                <div className="h-1.5 w-5/6 bg-border-light/50 rounded" />
+                                <div className="h-2 w-1/3 bg-border rounded" />
+                                <div className="h-1.5 w-full bg-border/50 rounded" />
+                                <div className="h-1.5 w-5/6 bg-border/50 rounded" />
                               </div>
 
                               {/* Pulsing Floating Overlay Badge */}
@@ -672,7 +679,7 @@ export function Channels({
                                     { icon: "📈" },
                                   )
                                 }
-                                className="absolute bottom-2.5 right-2.5 px-3 py-1.5 text-white text-[9.5px] font-extrabold rounded-lg shadow-md cursor-pointer animate-pulse hover:scale-105 transition-transform flex items-center gap-1"
+                                className="absolute bottom-2.5 right-2.5 px-3 py-1.5 text-primary-foreground text-[9.5px] font-extrabold rounded-lg shadow-md cursor-pointer animate-pulse hover:scale-105 transition-transform flex items-center gap-1"
                                 style={{ backgroundColor: hexColor }}
                               >
                                 <CalendarIcon className="w-3 h-3" />
@@ -688,31 +695,31 @@ export function Channels({
                     {activeCard === "social" && (
                       <div className="space-y-4">
                         {/* Bio Simulated Card */}
-                        <div className="bg-white border border-border-light rounded-xl p-4 shadow-sm space-y-3.5">
+                        <div className="bg-surface border border-border rounded-xl p-4 shadow-sm space-y-3.5">
                           <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-full shrink-0 bg-gradient-to-tr from-amber-500 via-rose-500 to-violet-500 p-0.5">
-                              <div className="w-full h-full rounded-full bg-white flex items-center justify-center text-xs font-extrabold uppercase text-gray-700 select-none">
+                            <div className="w-10 h-10 rounded-full shrink-0 bg-gradient-to-tr from-warning-500 via-danger-500 to-info-500 p-0.5">
+                              <div className="w-full h-full rounded-full bg-surface flex items-center justify-center text-xs font-extrabold uppercase text-neutral-700 select-none">
                                 {slug.slice(0, 2)}
                               </div>
                             </div>
                             <div>
-                              <strong className="text-xs text-text-primary block">
+                              <strong className="text-xs text-foreground block">
                                 @{slug}.wellness
                               </strong>
-                              <span className="text-[10px] text-text-muted leading-none">
+                              <span className="text-[10px] text-muted-foreground leading-none">
                                 Massage & Wellness Studio • Brooklyn
                               </span>
                             </div>
                           </div>
-                          <p className="text-[11px] text-text-secondary leading-relaxed">
+                          <p className="text-[11px] text-foreground leading-relaxed">
                             💆 Hot stone • Deep tissue • Reiki <br />
                             📍 247 Bedford Ave, Brooklyn <br />
                             <span
                               className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-bold font-mono tracking-tight mt-1 select-none border"
                               style={{
                                 color: hexColor,
-                                backgroundColor: hexColor + "08",
-                                borderColor: hexColor + "15",
+                                backgroundColor: withColorAlpha(hexColor, "08"),
+                                borderColor: withColorAlpha(hexColor, "15"),
                               }}
                             >
                               🔗 bookingbase.com/{slug}
@@ -730,7 +737,7 @@ export function Channels({
                                 { icon: "📸" },
                               )
                             }
-                            className="flex-1 py-2 px-3 border border-border-light hover:border-text-secondary text-text-secondary hover:text-text-primary text-[10.5px] font-bold rounded-full bg-white cursor-pointer active:scale-95 transition"
+                            className="flex-1 py-2 px-3 border border-border hover:border-foreground text-foreground hover:text-foreground text-[10.5px] font-bold rounded-full bg-surface cursor-pointer active:scale-95 transition"
                           >
                             📷 Instagram
                           </button>
@@ -742,7 +749,7 @@ export function Channels({
                               )}`;
                               window.open(waUrl, "_blank");
                             }}
-                            className="flex-1 py-2 px-3 border border-border-light hover:border-text-secondary text-text-secondary hover:text-text-primary text-[10.5px] font-bold rounded-full bg-white cursor-pointer active:scale-95 transition"
+                            className="flex-1 py-2 px-3 border border-border hover:border-foreground text-foreground hover:text-foreground text-[10.5px] font-bold rounded-full bg-surface cursor-pointer active:scale-95 transition"
                           >
                             💬 WhatsApp
                           </button>
@@ -752,7 +759,7 @@ export function Channels({
                   </div>
 
                   {/* Config Bottom Action Button */}
-                  <div className="pt-4 border-t border-border-light/60 w-full">
+                  <div className="pt-4 border-t border-border/60 w-full">
                     {activeCard === "url" && (
                       <button
                         type="button"
@@ -769,7 +776,7 @@ export function Channels({
                               : "Direct booking link",
                           );
                         }}
-                        className="w-full py-3 text-white text-xs font-bold rounded-full shadow-sm cursor-pointer active:scale-[0.98] hover:translate-y-[-1px] transition duration-150 flex items-center justify-center gap-1.5"
+                        className="w-full py-3 text-primary-foreground text-xs font-bold rounded-full shadow-sm cursor-pointer active:scale-[0.98] hover:translate-y-[-1px] transition duration-150 flex items-center justify-center gap-1.5"
                         style={{ backgroundColor: hexColor }}
                       >
                         <Copy className="w-3.5 h-3.5" />
@@ -782,7 +789,7 @@ export function Channels({
                         <button
                           type="button"
                           onClick={downloadQRCodePng}
-                          className="py-2.5 px-3 border border-border-light hover:border-text-secondary text-text-secondary hover:text-text-primary text-[11px] font-bold rounded-full bg-white cursor-pointer active:scale-[0.98] transition flex items-center justify-center gap-1.5"
+                          className="py-2.5 px-3 border border-border hover:border-foreground text-foreground hover:text-foreground text-[11px] font-bold rounded-full bg-surface cursor-pointer active:scale-[0.98] transition flex items-center justify-center gap-1.5"
                         >
                           <Download className="w-3.5 h-3.5" />
                           Download PNG
@@ -795,7 +802,7 @@ export function Channels({
                               { icon: "🖨️" },
                             )
                           }
-                          className="py-2.5 px-3 border border-border-light hover:border-text-secondary text-text-secondary hover:text-text-primary text-[11px] font-bold rounded-full bg-white cursor-pointer active:scale-[0.98] transition flex items-center justify-center gap-1.5"
+                          className="py-2.5 px-3 border border-border hover:border-foreground text-foreground hover:text-foreground text-[11px] font-bold rounded-full bg-surface cursor-pointer active:scale-[0.98] transition flex items-center justify-center gap-1.5"
                         >
                           <Printer className="w-3.5 h-3.5" />
                           Print PDF
@@ -812,7 +819,7 @@ export function Channels({
                             `${embedVariant} embed code`,
                           )
                         }
-                        className="w-full py-3 text-white text-xs font-bold rounded-full shadow-sm cursor-pointer active:scale-[0.98] hover:translate-y-[-1px] transition duration-150 flex items-center justify-center gap-1.5"
+                        className="w-full py-3 text-primary-foreground text-xs font-bold rounded-full shadow-sm cursor-pointer active:scale-[0.98] hover:translate-y-[-1px] transition duration-150 flex items-center justify-center gap-1.5"
                         style={{ backgroundColor: hexColor }}
                       >
                         <Code2 className="w-3.5 h-3.5" />
@@ -826,7 +833,7 @@ export function Channels({
                         onClick={() =>
                           copyToClipboard(`bookingbase.com/${slug}`, "Bio link")
                         }
-                        className="w-full py-3 text-white text-xs font-bold rounded-full shadow-sm cursor-pointer active:scale-[0.98] hover:translate-y-[-1px] transition duration-150 flex items-center justify-center gap-1.5"
+                        className="w-full py-3 text-primary-foreground text-xs font-bold rounded-full shadow-sm cursor-pointer active:scale-[0.98] hover:translate-y-[-1px] transition duration-150 flex items-center justify-center gap-1.5"
                         style={{ backgroundColor: hexColor }}
                       >
                         <Copy className="w-3.5 h-3.5" />
@@ -839,36 +846,36 @@ export function Channels({
             </div>
 
             {/* 4. Analytics Block (Counter animation) */}
-            <div className="bg-white border border-border-light rounded-xl p-4 md:p-5 shadow-sm grid grid-cols-3 gap-4 items-center select-none">
-              <div className="text-left border-r border-border-light/80 pr-4">
-                <div className="text-xl md:text-2xl font-black text-text-primary flex items-baseline tracking-tight">
+            <div className="bg-surface border border-border rounded-xl p-4 md:p-5 shadow-sm grid grid-cols-3 gap-4 items-center select-none">
+              <div className="text-left border-r border-border/80 pr-4">
+                <div className="text-xl md:text-2xl font-black text-foreground flex items-baseline tracking-tight">
                   <span>{animatedClicks}</span>
-                  <span className="text-[10px] font-extrabold text-[#15803D] bg-[#E6F9ED] border border-[#BBF7D0] px-1.5 py-0.5 rounded ml-1.5">
+                  <span className="text-[10px] font-extrabold text-primary bg-primary border border-success-border px-1.5 py-0.5 rounded ml-1.5">
                     +18%
                   </span>
                 </div>
-                <div className="text-[9px] text-text-muted font-extrabold uppercase tracking-wider mt-1 leading-none">
+                <div className="text-[9px] text-muted-foreground font-extrabold uppercase tracking-wider mt-1 leading-none">
                   Link clicks
                 </div>
               </div>
 
-              <div className="text-left border-r border-border-light/80 pr-4">
-                <div className="text-xl md:text-2xl font-black text-text-primary flex items-baseline tracking-tight">
+              <div className="text-left border-r border-border/80 pr-4">
+                <div className="text-xl md:text-2xl font-black text-foreground flex items-baseline tracking-tight">
                   <span>{animatedBookings}</span>
-                  <span className="text-[10px] font-extrabold text-[#15803D] bg-[#E6F9ED] border border-[#BBF7D0] px-1.5 py-0.5 rounded ml-1.5">
+                  <span className="text-[10px] font-extrabold text-primary bg-primary border border-success-border px-1.5 py-0.5 rounded ml-1.5">
                     +9%
                   </span>
                 </div>
-                <div className="text-[9px] text-text-muted font-extrabold uppercase tracking-wider mt-1 leading-none">
+                <div className="text-[9px] text-muted-foreground font-extrabold uppercase tracking-wider mt-1 leading-none">
                   Bookings
                 </div>
               </div>
 
               <div className="text-left pl-1">
-                <div className="text-[9px] text-text-muted font-extrabold uppercase tracking-wider leading-none mb-1.5">
+                <div className="text-[9px] text-muted-foreground font-extrabold uppercase tracking-wider leading-none mb-1.5">
                   Stats Range
                 </div>
-                <div className="flex gap-1 p-0.5 bg-bg-secondary border border-border-light/60 rounded-lg">
+                <div className="flex gap-1 p-0.5 bg-background border border-border/60 rounded-lg">
                   {([7, 30, 90] as const).map((range) => (
                     <button
                       key={range}
@@ -876,8 +883,8 @@ export function Channels({
                       onClick={() => setSelectedRange(range)}
                       className={`flex-1 py-1 text-[9.5px] font-extrabold rounded transition-all cursor-pointer ${
                         selectedRange === range
-                          ? "bg-white text-text-primary shadow-sm"
-                          : "text-text-muted hover:text-text-primary"
+                          ? "bg-surface text-foreground shadow-sm"
+                          : "text-muted-foreground hover:text-foreground"
                       }`}
                     >
                       {range}d
@@ -890,36 +897,36 @@ export function Channels({
 
           {/* RIGHT COLUMN: Browser mockup live preview of what customers see */}
           <div className="lg:col-span-5 order-1 lg:order-2 flex flex-col space-y-4 w-full relative">
-            <span className="text-[10px] font-extrabold text-text-muted uppercase tracking-wider flex items-center gap-1.5 select-none">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_0_2px_rgba(34,197,94,0.3)] animate-ping" />
+            <span className="text-[10px] font-extrabold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5 select-none">
+              <span className="w-1.5 h-1.5 rounded-full bg-success-500 shadow-md animate-ping" />
               LIVE PREVIEW • WHAT CUSTOMERS SEE
             </span>
 
             {/* Simulated Desktop Browser Frame */}
-            <div className="w-full bg-white border border-border-light rounded-xl shadow-2xl overflow-hidden select-none flex flex-col h-[520px]">
+            <div className="w-full bg-surface border border-border rounded-xl shadow-2xl overflow-hidden select-none flex flex-col h-[520px]">
               {/* Browser Header Bar */}
-              <div className="flex items-center justify-between p-3 border-b border-border-light/60 bg-bg-secondary shrink-0">
+              <div className="flex items-center justify-between p-3 border-b border-border/60 bg-background shrink-0">
                 <div className="flex items-center gap-1.5 w-16">
-                  <div className="w-3 h-3 rounded-full bg-red-400 border border-black/10" />
-                  <div className="w-3 h-3 rounded-full bg-yellow-400 border border-black/10" />
-                  <div className="w-3 h-3 rounded-full bg-green-400 border border-black/10" />
+                  <div className="w-3 h-3 rounded-full bg-danger-400 border border-neutral-950/10" />
+                  <div className="w-3 h-3 rounded-full bg-warning-400 border border-neutral-950/10" />
+                  <div className="w-3 h-3 rounded-full bg-success-400 border border-neutral-950/10" />
                 </div>
-                <div className="bg-white text-[9px] font-mono text-text-muted px-4 py-1.5 rounded-md border border-border-light w-full max-w-xs truncate text-center shadow-sm">
+                <div className="bg-surface text-[9px] font-mono text-muted-foreground px-4 py-1.5 rounded-md border border-border w-full max-w-xs truncate text-center shadow-sm">
                   {activeCard === "social" ? (
                     <>
                       instagram.com/
-                      <strong className="text-text-primary font-bold">
+                      <strong className="text-foreground font-bold">
                         {slug}.wellness
                       </strong>
                     </>
                   ) : activeCard === "embed" ? (
-                    <strong className="text-text-primary font-bold">
+                    <strong className="text-foreground font-bold">
                       {slug}wellness.com
                     </strong>
                   ) : (
                     <>
                       bookingbase.com/
-                      <strong className="text-text-primary font-bold">
+                      <strong className="text-foreground font-bold">
                         {slug}
                       </strong>
                       {activeCard === "url" &&
@@ -932,39 +939,39 @@ export function Channels({
               </div>
 
               {/* Mock Web Content */}
-              <div className="flex-grow overflow-y-auto [&::-webkit-scrollbar]:hidden bg-[#fcfcfd] p-4 relative flex flex-col">
+              <div className="flex-grow overflow-y-auto [&::-webkit-scrollbar]:hidden bg-primary p-4 relative flex flex-col">
                 {/* 1. DIRECT LINK PREVIEW (Standard Customer Booking Page) */}
                 {activeCard === "url" && (
                   <div className="space-y-4 flex flex-col justify-between flex-grow">
                     <div className="space-y-4">
                       {/* Mock Branding Header inside Mockup */}
-                      <div className="flex justify-between items-center pb-3 border-b border-border-light/40">
+                      <div className="flex justify-between items-center pb-3 border-b border-border/40">
                         <div className="flex items-center gap-2">
                           <div
-                            className="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-black shadow-sm shrink-0"
+                            className="w-7 h-7 rounded-full flex items-center justify-center text-primary-foreground text-xs font-black shadow-sm shrink-0"
                             style={{ backgroundColor: hexColor }}
                           >
                             {customBusinessName && customBusinessName[0]
                               ? customBusinessName[0].toUpperCase()
                               : "B"}
                           </div>
-                          <h4 className="text-[11px] font-extrabold text-text-primary truncate max-w-[120px]">
+                          <h4 className="text-[11px] font-extrabold text-foreground truncate max-w-[120px]">
                             {customBusinessName || "Lumière"}
                           </h4>
                         </div>
-                        <div className="flex gap-2.5 text-[8.5px] font-bold text-text-muted">
+                        <div className="flex gap-2.5 text-[8.5px] font-bold text-muted-foreground">
                           <span>Services</span>
                           <span>Reviews</span>
                         </div>
                       </div>
 
                       {/* Trust Badges in Mockup */}
-                      <div className="flex items-center justify-center gap-3 text-[8.5px] font-extrabold text-emerald-600 bg-emerald-50/50 border border-emerald-200/50 py-1.5 px-3 rounded-full max-w-[260px] mx-auto">
+                      <div className="flex items-center justify-center gap-3 text-[8.5px] font-extrabold text-success-surface-foreground bg-success-surface/50 border border-success-border/50 py-1.5 px-3 rounded-full max-w-[260px] mx-auto">
                         <span className="flex items-center gap-0.5">
                           <Check className="w-2.5 h-2.5 shrink-0" />
                           Instant Confirmation
                         </span>
-                        <span className="w-1 h-1 rounded-full bg-emerald-400" />
+                        <span className="w-1 h-1 rounded-full bg-success-400" />
                         <span className="flex items-center gap-0.5">
                           <Check className="w-2.5 h-2.5 shrink-0" />
                           Secure Deposit
@@ -972,19 +979,19 @@ export function Channels({
                       </div>
 
                       {/* Simulated Booking Form Card */}
-                      <div className="bg-white border border-border-light rounded-xl p-3.5 shadow-sm space-y-3.5">
+                      <div className="bg-surface border border-border rounded-xl p-3.5 shadow-sm space-y-3.5">
                         {/* Step 1: Service */}
                         <div className="text-left">
-                          <span className="text-[8px] font-extrabold text-text-muted uppercase tracking-wider block mb-1.5">
+                          <span className="text-[8px] font-extrabold text-muted-foreground uppercase tracking-wider block mb-1.5">
                             1. Select service
                           </span>
-                          <div className="border border-border-light rounded-lg p-2.5 bg-white">
+                          <div className="border border-border rounded-lg p-2.5 bg-surface">
                             <div className="flex justify-between items-center">
                               <div>
-                                <strong className="text-[10px] text-text-primary block font-bold">
+                                <strong className="text-[10px] text-foreground block font-bold">
                                   Signature Hot Stone Session
                                 </strong>
-                                <span className="text-[8.5px] text-text-muted mt-0.5 block leading-none">
+                                <span className="text-[8.5px] text-muted-foreground mt-0.5 block leading-none">
                                   65 mins • Personal Care
                                 </span>
                               </div>
@@ -1000,16 +1007,20 @@ export function Channels({
 
                         {/* Step 2: Specialists selectors */}
                         <div className="text-left">
-                          <span className="text-[8px] font-extrabold text-text-muted uppercase tracking-wider block mb-1.5">
+                          <span className="text-[8px] font-extrabold text-muted-foreground uppercase tracking-wider block mb-1.5">
                             2. Choose specialist
                           </span>
                           <div className="grid grid-cols-2 gap-2">
                             {[
-                              { id: "EC", name: "Emily Cooper", bg: "#2563eb" },
+                              {
+                                id: "EC",
+                                name: "Emily Cooper",
+                                bg: "var(--color-primary)",
+                              },
                               {
                                 id: "SJ",
                                 name: "Sarah Jennings",
-                                bg: "#a855f7",
+                                bg: "var(--color-primary)",
                               },
                             ].map((sp) => {
                               const isSel = selectedSpecialist === sp.id;
@@ -1021,8 +1032,8 @@ export function Channels({
                                   }
                                   className={`p-2 rounded-lg border text-left flex items-center justify-between cursor-pointer transition ${
                                     isSel
-                                      ? "bg-bg-secondary"
-                                      : "hover:border-text-muted bg-white border-border-light"
+                                      ? "bg-background"
+                                      : "hover:border-muted-foreground bg-surface border-border"
                                   }`}
                                   style={{
                                     borderColor: isSel ? hexColor : undefined,
@@ -1030,7 +1041,7 @@ export function Channels({
                                 >
                                   <div className="flex items-center gap-1.5 min-w-0">
                                     <div
-                                      className="w-5 h-5 rounded-full flex items-center justify-center text-[8px] font-bold text-white shrink-0"
+                                      className="w-5 h-5 rounded-full flex items-center justify-center text-[8px] font-bold text-primary-foreground shrink-0"
                                       style={{
                                         backgroundColor: isSel
                                           ? hexColor
@@ -1039,7 +1050,7 @@ export function Channels({
                                     >
                                       {sp.id}
                                     </div>
-                                    <span className="text-[9.5px] font-bold text-text-primary truncate">
+                                    <span className="text-[9.5px] font-bold text-foreground truncate">
                                       {sp.name}
                                     </span>
                                   </div>
@@ -1066,13 +1077,13 @@ export function Channels({
                             setShowSMS(false);
                             setTimeout(() => setShowSMS(true), 250);
                           }}
-                          className="w-full py-2.5 text-white text-[10px] font-bold rounded-full shadow hover:opacity-95 transition cursor-pointer"
+                          className="w-full py-2.5 text-primary-foreground text-[10px] font-bold rounded-full shadow hover:opacity-95 transition cursor-pointer"
                           style={{ backgroundColor: hexColor }}
                         >
                           Book & Pay Deposit ($15.00)
                         </button>
 
-                        <span className="text-[8.5px] font-extrabold text-emerald-600 block text-center leading-none">
+                        <span className="text-[8.5px] font-extrabold text-success-surface-foreground block text-center leading-none">
                           ✓ Secure online deposit
                         </span>
                       </div>
@@ -1085,12 +1096,12 @@ export function Channels({
                           initial={{ opacity: 0, height: 0, y: 10 }}
                           animate={{ opacity: 1, height: "auto", y: 0 }}
                           exit={{ opacity: 0, height: 0, y: 10 }}
-                          className="border border-border-light rounded-xl p-3.5 bg-white shadow-sm flex gap-2.5 items-start overflow-hidden text-left"
+                          className="border border-border rounded-xl p-3.5 bg-surface shadow-sm flex gap-2.5 items-start overflow-hidden text-left"
                         >
                           <div
                             className="w-7 h-7 rounded-full flex items-center justify-center shrink-0"
                             style={{
-                              backgroundColor: hexColor + "14",
+                              backgroundColor: withColorAlpha(hexColor, "14"),
                               color: hexColor,
                             }}
                           >
@@ -1098,16 +1109,16 @@ export function Channels({
                           </div>
                           <div className="flex-1 space-y-1">
                             <div className="flex justify-between items-center leading-none">
-                              <span className="text-[8.5px] font-extrabold text-text-primary uppercase tracking-wider">
+                              <span className="text-[8.5px] font-extrabold text-foreground uppercase tracking-wider">
                                 SMS reminder preview
                               </span>
-                              <span className="text-[8px] text-text-muted">
+                              <span className="text-[8px] text-muted-foreground">
                                 Just now
                               </span>
                             </div>
-                            <p className="text-[10px] text-text-secondary leading-snug">
+                            <p className="text-[10px] text-foreground leading-snug">
                               Hi Alex, your appointment at{" "}
-                              <strong className="text-text-primary font-bold">
+                              <strong className="text-foreground font-bold">
                                 {customBusinessName || "Lumière"}
                               </strong>{" "}
                               is confirmed. We&apos;ll text you 24h before.
@@ -1122,30 +1133,30 @@ export function Channels({
                 {/* 2. QR CODE PREVIEW (Storefront Acrylic Table Stand) */}
                 {activeCard === "qr" && (
                   <div className="flex-1 flex flex-col items-center justify-center p-6 text-center select-none">
-                    <div className="bg-white border-[6px] border-gray-900 rounded-xl p-6 shadow-2xl max-w-[200px] w-full flex flex-col items-center space-y-4 relative">
-                      <div className="w-3 h-3 rounded-full bg-gray-900 absolute -top-1.5 shadow" />
+                    <div className="bg-surface border-[6px] border-neutral-900 rounded-xl p-6 shadow-2xl max-w-[200px] w-full flex flex-col items-center space-y-4 relative">
+                      <div className="w-3 h-3 rounded-full bg-neutral-900 absolute -top-1.5 shadow" />
                       <span
                         className="text-[10px] font-black uppercase tracking-wider block"
                         style={{ color: hexColor }}
                       >
                         {customBusinessName || "Lumière"}
                       </span>
-                      <div className="p-1.5 border border-border-light rounded bg-[#fcfcfd]">
+                      <div className="p-1.5 border border-border rounded bg-primary">
                         <canvas
                           ref={previewCanvasRef}
                           className="w-[120px] h-[120px]"
                         />
                       </div>
                       <div className="space-y-1">
-                        <span className="text-[9px] font-extrabold text-text-primary uppercase tracking-wide block">
+                        <span className="text-[9px] font-extrabold text-foreground uppercase tracking-wide block">
                           Scan to Book
                         </span>
-                        <span className="text-[8px] font-medium text-text-muted block leading-none">
+                        <span className="text-[8px] font-medium text-muted-foreground block leading-none">
                           Storefront Stand Mockup
                         </span>
                       </div>
                     </div>
-                    <span className="text-[9.5px] font-bold text-text-muted mt-5 block">
+                    <span className="text-[9.5px] font-bold text-muted-foreground mt-5 block">
                       Customers scan the code at your shop to book instantly.
                     </span>
                   </div>
@@ -1153,13 +1164,13 @@ export function Channels({
 
                 {/* 3. EMBED WIDGET PREVIEW (Custom Website Integration) */}
                 {activeCard === "embed" && (
-                  <div className="flex-grow flex flex-col bg-white rounded-xl border border-border-light shadow-sm text-left overflow-hidden relative">
+                  <div className="flex-grow flex flex-col bg-surface rounded-xl border border-border shadow-sm text-left overflow-hidden relative">
                     {/* Mock Website Nav */}
-                    <div className="flex justify-between items-center px-3 py-2 border-b border-border-light bg-[#f9fafb] shrink-0">
-                      <span className="text-[9px] font-black text-text-primary uppercase tracking-tight">
+                    <div className="flex justify-between items-center px-3 py-2 border-b border-border bg-primary shrink-0">
+                      <span className="text-[9px] font-black text-foreground uppercase tracking-tight">
                         {customBusinessName || "Lumière"} Wellness
                       </span>
-                      <div className="flex gap-2.5 text-[8px] font-bold text-text-muted">
+                      <div className="flex gap-2.5 text-[8px] font-bold text-muted-foreground">
                         <span>Services</span>
                         <span>About</span>
                         <span>Contact</span>
@@ -1169,13 +1180,13 @@ export function Channels({
                     {/* Mock Website Body */}
                     <div className="p-4 flex-grow relative space-y-4">
                       <div className="space-y-1.5">
-                        <div className="inline-block px-2 py-0.5 text-[8.5px] font-extrabold rounded-full bg-blue-50 text-blue-700 border border-blue-200">
+                        <div className="inline-block px-2 py-0.5 text-[8.5px] font-extrabold rounded-full bg-accent text-accent-foreground border border-primary-200">
                           {embedVariant.toUpperCase()} WIDGET EMBEDDED
                         </div>
-                        <h5 className="text-xs font-black text-text-primary leading-tight">
+                        <h5 className="text-xs font-black text-foreground leading-tight">
                           Holistic Wellness & Bodywork
                         </h5>
-                        <p className="text-[9.5px] text-text-muted leading-relaxed">
+                        <p className="text-[9.5px] text-muted-foreground leading-relaxed">
                           We provide premium, customizable clinical massage and
                           skincare solutions. Adjusting schedules to fit yours.
                         </p>
@@ -1183,8 +1194,8 @@ export function Channels({
 
                       {/* Dynamic Widget Embed Demonstration */}
                       {embedVariant === "calendar" && (
-                        <div className="border border-border-light rounded-lg p-3 bg-[#fafafa] shadow-inner space-y-2.5 max-w-[250px]">
-                          <span className="text-[8.5px] font-extrabold text-text-muted uppercase tracking-wider block">
+                        <div className="border border-border rounded-lg p-3 bg-primary shadow-inner space-y-2.5 max-w-[250px]">
+                          <span className="text-[8.5px] font-extrabold text-muted-foreground uppercase tracking-wider block">
                             Direct Scheduler Widget
                           </span>
                           <div className="grid grid-cols-5 gap-1.5 text-center">
@@ -1193,8 +1204,8 @@ export function Channels({
                                 key={i}
                                 className={`py-1 text-[8.5px] font-bold rounded ${
                                   i === 1 || i === 4
-                                    ? "text-white"
-                                    : "bg-white text-text-muted border border-border-light/80"
+                                    ? "text-primary-foreground"
+                                    : "bg-surface text-muted-foreground border border-border/80"
                                 }`}
                                 style={{
                                   backgroundColor:
@@ -1207,7 +1218,7 @@ export function Channels({
                           </div>
                           <button
                             type="button"
-                            className="w-full py-1.5 text-white text-[9.5px] font-bold rounded shadow-sm"
+                            className="w-full py-1.5 text-primary-foreground text-[9.5px] font-bold rounded shadow-sm"
                             style={{ backgroundColor: hexColor }}
                           >
                             📅 Book a slot
@@ -1219,7 +1230,7 @@ export function Channels({
                         <div className="py-2">
                           <button
                             type="button"
-                            className="px-4.5 py-2 text-white text-[10px] font-bold rounded-full shadow hover:scale-105 active:scale-95 transition flex items-center gap-1.5"
+                            className="px-4.5 py-2 text-primary-foreground text-[10px] font-bold rounded-full shadow hover:scale-105 active:scale-95 transition flex items-center gap-1.5"
                             style={{ backgroundColor: hexColor }}
                           >
                             <CalendarIcon className="w-3.5 h-3.5" />
@@ -1231,7 +1242,7 @@ export function Channels({
                       {embedVariant === "overlay" && (
                         <div className="absolute bottom-3 right-3">
                           <div
-                            className="w-9 h-9 rounded-full shadow-lg flex items-center justify-center text-white cursor-pointer animate-bounce"
+                            className="w-9 h-9 rounded-full shadow-lg flex items-center justify-center text-primary-foreground cursor-pointer animate-bounce"
                             style={{ backgroundColor: hexColor }}
                           >
                             <CalendarIcon className="w-4 h-4" />
@@ -1244,13 +1255,13 @@ export function Channels({
 
                 {/* 4. SOCIAL BIOS PREVIEW (Instagram Mobile Profile Screen Mockup) */}
                 {activeCard === "social" && (
-                  <div className="flex-grow bg-white rounded-xl border border-border-light shadow-sm text-left overflow-hidden flex flex-col">
+                  <div className="flex-grow bg-surface rounded-xl border border-border shadow-sm text-left overflow-hidden flex flex-col">
                     {/* Instagram Mobile Top */}
-                    <div className="flex justify-between items-center px-3.5 py-2.5 border-b border-border-light bg-[#f9fafb] shrink-0 select-none">
-                      <span className="text-[9.5px] font-extrabold text-text-primary">
+                    <div className="flex justify-between items-center px-3.5 py-2.5 border-b border-border bg-primary shrink-0 select-none">
+                      <span className="text-[9.5px] font-extrabold text-foreground">
                         @{slug}.wellness
                       </span>
-                      <span className="text-[10px] text-text-muted font-bold font-mono">
+                      <span className="text-[10px] text-muted-foreground font-bold font-mono">
                         •••
                       </span>
                     </div>
@@ -1260,34 +1271,34 @@ export function Channels({
                       <div className="space-y-3.5">
                         <div className="flex items-center justify-between">
                           {/* Profile Avatar */}
-                          <div className="w-12 h-12 rounded-full shrink-0 bg-gradient-to-tr from-amber-500 via-rose-500 to-violet-500 p-0.5 shadow-sm">
-                            <div className="w-full h-full rounded-full bg-white flex items-center justify-center text-xs font-black uppercase text-gray-700">
+                          <div className="w-12 h-12 rounded-full shrink-0 bg-gradient-to-tr from-warning-500 via-danger-500 to-info-500 p-0.5 shadow-sm">
+                            <div className="w-full h-full rounded-full bg-surface flex items-center justify-center text-xs font-black uppercase text-neutral-700">
                               {slug.slice(0, 2)}
                             </div>
                           </div>
                           {/* Stats */}
                           <div className="flex gap-4 text-center">
                             <div>
-                              <strong className="text-[10px] text-text-primary block font-bold">
+                              <strong className="text-[10px] text-foreground block font-bold">
                                 42
                               </strong>
-                              <span className="text-[8px] text-text-muted block uppercase tracking-wide">
+                              <span className="text-[8px] text-muted-foreground block uppercase tracking-wide">
                                 posts
                               </span>
                             </div>
                             <div>
-                              <strong className="text-[10px] text-text-primary block font-bold">
+                              <strong className="text-[10px] text-foreground block font-bold">
                                 1.8K
                               </strong>
-                              <span className="text-[8px] text-text-muted block uppercase tracking-wide">
+                              <span className="text-[8px] text-muted-foreground block uppercase tracking-wide">
                                 followers
                               </span>
                             </div>
                             <div>
-                              <strong className="text-[10px] text-text-primary block font-bold">
+                              <strong className="text-[10px] text-foreground block font-bold">
                                 324
                               </strong>
-                              <span className="text-[8px] text-text-muted block uppercase tracking-wide">
+                              <span className="text-[8px] text-muted-foreground block uppercase tracking-wide">
                                 following
                               </span>
                             </div>
@@ -1296,10 +1307,10 @@ export function Channels({
 
                         {/* Bio Text */}
                         <div className="space-y-0.5 text-left text-[9.5px] leading-snug">
-                          <strong className="text-text-primary font-bold block">
+                          <strong className="text-foreground font-bold block">
                             {customBusinessName || "Lumière"} Wellness Studio
                           </strong>
-                          <p className="text-text-secondary">
+                          <p className="text-foreground">
                             💆 Hot stone • Deep tissue • Reiki <br />
                             📍 247 Bedford Ave, Brooklyn <br />
                             <a
@@ -1310,7 +1321,7 @@ export function Channels({
                                   icon: "🔗",
                                 });
                               }}
-                              className="text-sky-600 font-extrabold hover:underline block mt-1"
+                              className="text-info-surface-foreground font-extrabold hover:underline block mt-1"
                             >
                               bookingbase.com/{slug}
                             </a>
@@ -1323,9 +1334,9 @@ export function Channels({
                         {[...Array(3)].map((_, i) => (
                           <div
                             key={i}
-                            className="aspect-square bg-gradient-to-br from-bg-secondary to-bg-primary rounded-lg border border-border-light flex items-center justify-center"
+                            className="aspect-square bg-gradient-to-br from-background to-surface rounded-lg border border-border flex items-center justify-center"
                           >
-                            <span className="text-[8px] text-text-muted font-bold">
+                            <span className="text-[8px] text-muted-foreground font-bold">
                               Post {i + 1}
                             </span>
                           </div>
@@ -1338,8 +1349,8 @@ export function Channels({
             </div>
 
             {/* Bottom ready indicator */}
-            <div className="p-3 border border-emerald-200 bg-emerald-50/50 rounded-xl text-emerald-700 text-xs font-bold text-center flex items-center justify-center gap-2 select-none">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping shrink-0" />
+            <div className="p-3 border border-success-border bg-success-surface/50 rounded-xl text-success-surface-foreground text-xs font-bold text-center flex items-center justify-center gap-2 select-none">
+              <span className="w-2 h-2 rounded-full bg-success-500 animate-ping shrink-0" />
               <span>✓ BOOKING SITE IS LIVE AND READY TO SHARE</span>
             </div>
           </div>

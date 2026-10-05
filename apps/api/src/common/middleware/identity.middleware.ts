@@ -1,5 +1,5 @@
 import { cookieConfig } from '@/config';
-import { AuthTokenService } from '@/modules/auth/service/auth-token.service';
+import { AuthTokenService } from '@/modules/auth/services/auth-token.service';
 import { Inject, Injectable, NestMiddleware } from '@nestjs/common';
 import { type ConfigType } from '@nestjs/config';
 import { User } from '@prisma/client';

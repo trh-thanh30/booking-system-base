@@ -30,3 +30,8 @@ Each Next.js app owns its own messages and i18n config, while shared packages
 remain locale-agnostic unless they later own translatable copy. Backend i18n is
 deferred until API validation messages, emails, notifications, or persisted
 content need locale-specific behavior.
+
+# Superseded app boundary
+
+ARCH-001 merges Business Admin into Web while retaining the locale contract.
+See [ADR 0003](0003-merge-web-business-admin.md) for the current app/route boundary.

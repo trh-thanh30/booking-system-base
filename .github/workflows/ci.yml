@@ -48,10 +48,12 @@ jobs:
       - run: pnpm lint:api
       - run: pnpm typecheck:api
       - run: pnpm test:api
+      - run: pnpm --filter @repo/api test:build-config
       - run: pnpm build:api
+      - run: pnpm --filter @repo/api test:build-config --built
 
   web:
-    name: Web
+    name: Web + Business Admin
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -65,24 +67,9 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm lint:web
       - run: pnpm typecheck:web
+      - run: pnpm test:web
       - run: pnpm build:web
-
-  admin:
-    name: Admin
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 9.0.0
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm lint:admin
-      - run: pnpm typecheck:admin
-      - run: pnpm build:admin
+      - run: pnpm test:auth:smoke
 
   platform-admin:
     name: Platform Admin
@@ -172,7 +159,6 @@ jobs:
       - packages
       - api
       - web
-      - admin
       - platform-admin
       - dependency-security
     if: always()
@@ -225,7 +211,7 @@ jobs:
             --message "$CI_COMMIT_MESSAGE" \
             --author "${{ github.actor }}" \
             --workflow "${{ github.workflow }}" \
-            --job "Packages, API, Web, Admin, Platform Admin, Dependency Security" \
+            --job "Packages, API, Web + Business Admin, Platform Admin, Dependency Security" \
             --jobs-json "$JOBS_JSON" \
             --passed "$PASSED" \
             --failed "$FAILED" \

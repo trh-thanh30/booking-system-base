@@ -4,8 +4,8 @@ import { useState, useMemo, useEffect } from "react";
 import { Search, ChevronDown, Map, List, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { RepeatReveal } from "@/src/components/motion/RepeatReveal";
-import { WEBSITE_TEMPLATES } from "../home.constants";
-import { toast } from "sonner";
+import { WEBSITE_TEMPLATES } from "../constants/home.constants";
+import { useToast } from "@repo/hooks";
 
 interface MarketplaceProps {
   activeTemplateIdx: number;
@@ -313,20 +313,20 @@ const MARKETPLACE_LISTINGS = [
 const getCategoryAvatarStyles = (category: string) => {
   switch (category) {
     case "Beauty":
-      return "bg-[#FDF2F8] text-[#DB2777]"; // pink
+      return "bg-primary text-primary"; // pink
     case "Healthcare":
-      return "bg-[#ECFDF5] text-[#059669]"; // emerald
+      return "bg-primary text-primary"; // emerald
     case "Fitness":
-      return "bg-[#F5F3FF] text-[#7C3AED]"; // purple
+      return "bg-primary text-info"; // purple
     case "Consulting":
-      return "bg-[#EFF6FF] text-[#2563EB]"; // blue
+      return "bg-primary text-primary"; // blue
     case "Education":
-      return "bg-[#FFFBEB] text-[#D97706]"; // amber
+      return "bg-primary text-primary"; // amber
     case "Repair":
     case "Home Services":
-      return "bg-[#F0FDFA] text-[#0D9488]"; // teal
+      return "bg-primary text-primary"; // teal
     default:
-      return "bg-bg-secondary text-text-muted";
+      return "bg-background text-muted-foreground";
   }
 };
 
@@ -354,6 +354,7 @@ export function Marketplace({
   setActiveTemplateIdx,
   customBusinessName,
 }: MarketplaceProps) {
+  const { toast } = useToast();
   // State
   const [marketplaceSearchQuery, setMarketplaceSearchQuery] = useState("");
   const [marketplaceSelectedCategory, setMarketplaceSelectedCategory] =
@@ -385,7 +386,7 @@ export function Marketplace({
         icon: marketplaceVisibility ? "✨" : "🔒",
       },
     );
-  }, [marketplaceVisibility]);
+  }, [marketplaceVisibility, toast]);
 
   const handleSeeWorkflow = (categoryName: string) => {
     const templateIndices: Record<string, number> = {
@@ -571,20 +572,20 @@ export function Marketplace({
     <RepeatReveal
       as="section"
       id="marketplace"
-      className="scroll-mt-20 md:scroll-mt-24 py-16 md:py-24 lg:py-28 bg-bg-primary border-t border-border-light"
+      className="scroll-mt-20 md:scroll-mt-24 py-16 md:py-24 lg:py-28 bg-surface border-t border-border"
     >
-      <div className="mx-auto max-w-7xl px-6">
+      <div className="mx-auto w-full max-w-landing px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">
           {/* Left Column: Config simulator & filters */}
           <div className="lg:col-span-5 space-y-8 lg:sticky lg:top-28 lg:self-start">
             <div className="space-y-4 text-left">
-              <span className="text-xs font-bold text-brand-blue uppercase tracking-wider block">
+              <span className="text-xs font-bold text-primary uppercase tracking-wider block">
                 Service Discovery
               </span>
-              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-text-primary">
+              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground">
                 Get discovered by customers searching for services
               </h2>
-              <p className="text-text-muted text-base leading-relaxed">
+              <p className="text-muted-foreground text-base leading-relaxed">
                 List your booking site in a public marketplace so customers can
                 find your services by category, location or service — then book
                 directly from your page.
@@ -592,27 +593,27 @@ export function Marketplace({
             </div>
 
             {/* Marketplace Visibility Settings Simulator */}
-            <div className="bg-white border border-border-light rounded-2xl p-5 shadow-sm space-y-4">
-              <div className="flex items-center justify-between border-b border-border-light/60 pb-3">
+            <div className="bg-surface border border-border rounded-2xl p-5 shadow-sm space-y-4">
+              <div className="flex items-center justify-between border-b border-border/60 pb-3">
                 <div className="flex items-center gap-2">
-                  <div className="w-5 h-5 rounded bg-[#E6F9ED] text-[#15803D] flex items-center justify-center text-[10px] font-bold">
+                  <div className="w-5 h-5 rounded bg-primary text-primary flex items-center justify-center text-[10px] font-bold">
                     ✓
                   </div>
-                  <span className="text-[10px] font-extrabold text-text-primary uppercase tracking-wider">
+                  <span className="text-[10px] font-extrabold text-foreground uppercase tracking-wider">
                     MARKETPLACE VISIBILITY
                   </span>
                 </div>
-                <span className="text-[9px] bg-bg-secondary text-text-muted px-2 py-0.5 rounded font-bold border border-border-light">
+                <span className="text-[9px] bg-background text-muted-foreground px-2 py-0.5 rounded font-bold border border-border">
                   Optional listing
                 </span>
               </div>
 
               <div className="flex items-center justify-between py-1 text-left">
                 <div className="space-y-0.5 pr-4">
-                  <span className="text-xs font-bold text-text-primary block">
+                  <span className="text-xs font-bold text-foreground block">
                     List your booking site publicly
                   </span>
-                  <span className="text-[10px] text-text-muted">
+                  <span className="text-[10px] text-muted-foreground">
                     Allow customers to search and find you publicly
                   </span>
                 </div>
@@ -623,12 +624,12 @@ export function Marketplace({
                   onClick={() =>
                     setMarketplaceVisibility(!marketplaceVisibility)
                   }
-                  className={`w-9 h-5 rounded-full p-0.5 transition-colors focus:outline-none cursor-pointer shrink-0 relative ${
-                    marketplaceVisibility ? "bg-brand-blue" : "bg-border-light"
+                  className={`w-9 h-5 rounded-full p-0.5 transition-colors focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2 cursor-pointer shrink-0 relative ${
+                    marketplaceVisibility ? "bg-primary" : "bg-border"
                   }`}
                 >
                   <span
-                    className={`w-4 h-4 rounded-full bg-white shadow-sm transition-transform block transform ${
+                    className={`w-4 h-4 rounded-full bg-surface shadow-sm transition-transform block transform ${
                       marketplaceVisibility ? "translate-x-4" : "translate-x-0"
                     }`}
                   />
@@ -642,42 +643,40 @@ export function Marketplace({
                     : "opacity-40 pointer-events-none"
                 }`}
               >
-                <div className="bg-bg-secondary/60 border border-border-light/80 rounded-lg p-2.5 space-y-1">
-                  <span className="text-[8px] font-extrabold text-text-muted uppercase block">
+                <div className="bg-background/60 border border-border/80 rounded-lg p-2.5 space-y-1">
+                  <span className="text-[8px] font-extrabold text-muted-foreground uppercase block">
                     Directory category
                   </span>
-                  <span className="font-bold text-text-secondary">
+                  <span className="font-bold text-foreground">
                     {getMarketplaceCategory(
                       WEBSITE_TEMPLATES[activeTemplateIdx]?.id || "beauty",
                     )}
                   </span>
                 </div>
-                <div className="bg-bg-secondary/60 border border-border-light/80 rounded-lg p-2.5 space-y-1">
-                  <span className="text-[8px] font-extrabold text-text-muted uppercase block">
+                <div className="bg-background/60 border border-border/80 rounded-lg p-2.5 space-y-1">
+                  <span className="text-[8px] font-extrabold text-muted-foreground uppercase block">
                     Target location
                   </span>
-                  <span className="font-bold text-text-secondary">
-                    London, UK
-                  </span>
+                  <span className="font-bold text-foreground">London, UK</span>
                 </div>
               </div>
             </div>
 
             {/* Interactive Search & Discovery Demo */}
-            <div className="p-5 bg-bg-secondary/50 border border-border-light rounded-2xl space-y-5 text-left">
+            <div className="p-5 bg-background/50 border border-border rounded-2xl space-y-5 text-left">
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-extrabold text-text-muted uppercase tracking-wider block">
+                <span className="text-[10px] font-extrabold text-muted-foreground uppercase tracking-wider block">
                   Live Directory Search
                 </span>
-                <span className="inline-flex items-center gap-1 text-[8px] font-extrabold text-[#22C55E] uppercase bg-[#E6F9ED] px-1.5 py-0.5 rounded border border-[#BBF7D0]">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#22C55E] animate-pulse" />
+                <span className="inline-flex items-center gap-1 text-[8px] font-extrabold text-primary uppercase bg-primary px-1.5 py-0.5 rounded border border-success-border">
+                  <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
                   Customer Demo
                 </span>
               </div>
 
               {/* Search Bar Input */}
               <div className="relative">
-                <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-text-muted">
+                <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted-foreground">
                   <Search className="w-3.5 h-3.5" />
                 </span>
                 <input
@@ -687,7 +686,7 @@ export function Marketplace({
                     setMarketplaceSearchQuery(e.target.value);
                     setPageSize(6);
                   }}
-                  className="w-full pl-8.5 pr-4 py-2.5 border border-border-light rounded-lg text-xs focus:outline-none focus:border-brand-blue bg-white transition-all shadow-sm focus:shadow"
+                  className="w-full pl-8.5 pr-4 py-2.5 border border-border rounded-lg text-xs focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2 focus:border-primary bg-surface transition-all shadow-sm focus:shadow"
                   placeholder="Search category, location, business name..."
                 />
               </div>
@@ -696,7 +695,7 @@ export function Marketplace({
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 relative z-30">
                 {/* Category Dropdown */}
                 <div className="relative">
-                  <span className="text-[9px] font-bold text-text-muted uppercase block mb-1">
+                  <span className="text-[9px] font-bold text-muted-foreground uppercase block mb-1">
                     Category
                   </span>
                   <button
@@ -707,14 +706,14 @@ export function Marketplace({
                         prev === "category" ? null : "category",
                       );
                     }}
-                    className="w-full flex items-center justify-between px-3 py-2 border border-border-light rounded-lg text-xs font-semibold bg-white text-text-secondary hover:border-brand-blue/40 transition shadow-sm cursor-pointer select-none"
+                    className="w-full flex items-center justify-between px-3 py-2 border border-border rounded-lg text-xs font-semibold bg-surface text-foreground hover:border-primary/40 transition shadow-sm cursor-pointer select-none"
                   >
                     <span className="truncate">
                       {marketplaceSelectedCategory} (
                       {categoryCounts[marketplaceSelectedCategory] ?? 0})
                     </span>
                     <ChevronDown
-                      className={`w-3.5 h-3.5 ml-1 shrink-0 text-text-muted transition-transform duration-200 ${openDropdown === "category" ? "rotate-180" : ""}`}
+                      className={`w-3.5 h-3.5 ml-1 shrink-0 text-muted-foreground transition-transform duration-200 ${openDropdown === "category" ? "rotate-180" : ""}`}
                     />
                   </button>
                   <AnimatePresence>
@@ -724,7 +723,7 @@ export function Marketplace({
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -4 }}
                         transition={{ duration: 0.12 }}
-                        className="absolute left-0 right-0 mt-1 bg-white border border-border-light rounded-xl shadow-lg py-1 z-50 max-h-48 overflow-y-auto scrollbar-thin"
+                        className="absolute left-0 right-0 mt-1 bg-surface border border-border rounded-xl shadow-lg py-1 z-50 max-h-48 overflow-y-auto scrollbar-thin"
                       >
                         {[
                           "All",
@@ -749,16 +748,16 @@ export function Marketplace({
                               }}
                               className={`w-full flex items-center justify-between px-3 py-2 text-left text-xs font-medium transition-colors cursor-pointer ${
                                 isSelected
-                                  ? "bg-brand-blue text-white"
-                                  : "text-text-secondary hover:bg-bg-secondary"
+                                  ? "bg-primary text-primary-foreground"
+                                  : "text-foreground hover:bg-background"
                               }`}
                             >
                               <span>{cat}</span>
                               <span
                                 className={`text-[10px] px-1.5 py-0.5 rounded-full ${
                                   isSelected
-                                    ? "bg-white/20 text-white"
-                                    : "bg-bg-secondary text-text-muted font-bold"
+                                    ? "bg-surface/20 text-primary-foreground"
+                                    : "bg-background text-muted-foreground font-bold"
                                 }`}
                               >
                                 {count}
@@ -773,7 +772,7 @@ export function Marketplace({
 
                 {/* Distance Dropdown */}
                 <div className="relative">
-                  <span className="text-[9px] font-bold text-text-muted uppercase block mb-1">
+                  <span className="text-[9px] font-bold text-muted-foreground uppercase block mb-1">
                     Distance
                   </span>
                   <button
@@ -784,7 +783,7 @@ export function Marketplace({
                         prev === "distance" ? null : "distance",
                       );
                     }}
-                    className="w-full flex items-center justify-between px-3 py-2 border border-border-light rounded-lg text-xs font-semibold bg-white text-text-secondary hover:border-brand-blue/40 transition shadow-sm cursor-pointer select-none"
+                    className="w-full flex items-center justify-between px-3 py-2 border border-border rounded-lg text-xs font-semibold bg-surface text-foreground hover:border-primary/40 transition shadow-sm cursor-pointer select-none"
                   >
                     <span className="truncate">
                       {radiusKm === Infinity
@@ -792,7 +791,7 @@ export function Marketplace({
                         : `≤ ${radiusKm} km`}
                     </span>
                     <ChevronDown
-                      className={`w-3.5 h-3.5 ml-1 shrink-0 text-text-muted transition-transform duration-200 ${openDropdown === "distance" ? "rotate-180" : ""}`}
+                      className={`w-3.5 h-3.5 ml-1 shrink-0 text-muted-foreground transition-transform duration-200 ${openDropdown === "distance" ? "rotate-180" : ""}`}
                     />
                   </button>
                   <AnimatePresence>
@@ -802,7 +801,7 @@ export function Marketplace({
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -4 }}
                         transition={{ duration: 0.12 }}
-                        className="absolute left-0 right-0 mt-1 bg-white border border-border-light rounded-xl shadow-lg py-1 z-50"
+                        className="absolute left-0 right-0 mt-1 bg-surface border border-border rounded-xl shadow-lg py-1 z-50"
                       >
                         {[
                           { label: "Near (≤ 25km)", km: 25 },
@@ -822,8 +821,8 @@ export function Marketplace({
                               }}
                               className={`w-full text-left px-3 py-2 text-xs font-medium transition-colors cursor-pointer ${
                                 isSelected
-                                  ? "bg-brand-blue text-white"
-                                  : "text-text-secondary hover:bg-bg-secondary"
+                                  ? "bg-primary text-primary-foreground"
+                                  : "text-foreground hover:bg-background"
                               }`}
                             >
                               {rad.label}
@@ -837,7 +836,7 @@ export function Marketplace({
 
                 {/* Sort By Dropdown */}
                 <div className="relative">
-                  <span className="text-[9px] font-bold text-text-muted uppercase block mb-1">
+                  <span className="text-[9px] font-bold text-muted-foreground uppercase block mb-1">
                     Sort by
                   </span>
                   <button
@@ -848,7 +847,7 @@ export function Marketplace({
                         prev === "sort" ? null : "sort",
                       );
                     }}
-                    className="w-full flex items-center justify-between px-3 py-2 border border-border-light rounded-lg text-xs font-semibold bg-white text-text-secondary hover:border-brand-blue/40 transition shadow-sm cursor-pointer select-none"
+                    className="w-full flex items-center justify-between px-3 py-2 border border-border rounded-lg text-xs font-semibold bg-surface text-foreground hover:border-primary/40 transition shadow-sm cursor-pointer select-none"
                   >
                     <span className="truncate">
                       {sortMode === "recommended"
@@ -858,7 +857,7 @@ export function Marketplace({
                           : "Price ↓"}
                     </span>
                     <ChevronDown
-                      className={`w-3.5 h-3.5 ml-1 shrink-0 text-text-muted transition-transform duration-200 ${openDropdown === "sort" ? "rotate-180" : ""}`}
+                      className={`w-3.5 h-3.5 ml-1 shrink-0 text-muted-foreground transition-transform duration-200 ${openDropdown === "sort" ? "rotate-180" : ""}`}
                     />
                   </button>
                   <AnimatePresence>
@@ -868,7 +867,7 @@ export function Marketplace({
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -4 }}
                         transition={{ duration: 0.12 }}
-                        className="absolute left-0 right-0 mt-1 bg-white border border-border-light rounded-xl shadow-lg py-1 z-50"
+                        className="absolute left-0 right-0 mt-1 bg-surface border border-border rounded-xl shadow-lg py-1 z-50"
                       >
                         {[
                           { id: "recommended", label: "Recommended" },
@@ -887,8 +886,8 @@ export function Marketplace({
                               }}
                               className={`w-full text-left px-3 py-2 text-xs font-medium transition-colors cursor-pointer ${
                                 isSelected
-                                  ? "bg-brand-blue text-white"
-                                  : "text-text-secondary hover:bg-bg-secondary"
+                                  ? "bg-primary text-primary-foreground"
+                                  : "text-foreground hover:bg-background"
                               }`}
                             >
                               {s.label}
@@ -907,7 +906,7 @@ export function Marketplace({
                   <button
                     type="button"
                     onClick={clearAllFilters}
-                    className="inline-flex items-center gap-1 text-[10px] text-red-500 hover:text-red-600 font-bold cursor-pointer transition select-none"
+                    className="inline-flex items-center gap-1 text-[10px] text-danger-500 hover:text-danger-surface-foreground font-bold cursor-pointer transition select-none"
                   >
                     <X className="w-3.5 h-3.5" />
                     Reset Filters
@@ -923,7 +922,7 @@ export function Marketplace({
                   const el = document.getElementById("early-access");
                   if (el) el.scrollIntoView({ behavior: "smooth" });
                 }}
-                className="inline-flex min-h-11 items-center justify-center rounded-full bg-brand-blue hover:bg-brand-blue-hover px-6 text-sm font-bold text-white transition-all duration-200 cursor-pointer shadow-sm hover:shadow"
+                className="inline-flex min-h-11 items-center justify-center rounded-full bg-primary hover:bg-primary-hover px-6 text-sm font-bold text-primary-foreground transition-all duration-200 cursor-pointer shadow-sm hover:shadow"
               >
                 List your booking site
               </button>
@@ -933,13 +932,13 @@ export function Marketplace({
           {/* Right Column: Dynamic Listings stack & Interactive SVG Map */}
           <div className="lg:col-span-7 space-y-4 min-h-[560px] lg:min-h-[820px]">
             {/* Header with list/map tabs */}
-            <div className="flex items-center justify-between pb-2.5 border-b border-border-light/60">
-              <span className="text-xs font-bold text-text-muted uppercase">
+            <div className="flex items-center justify-between pb-2.5 border-b border-border/60">
+              <span className="text-xs font-bold text-muted-foreground uppercase">
                 Live Marketplace Directory
               </span>
               <div className="flex items-center gap-3">
                 {/* View Mode Toggle */}
-                <div className="flex gap-0.5 p-0.5 bg-bg-secondary rounded-lg border border-border-light">
+                <div className="flex gap-0.5 p-0.5 bg-background rounded-lg border border-border">
                   <button
                     type="button"
                     onClick={() => {
@@ -948,8 +947,8 @@ export function Marketplace({
                     }}
                     className={`p-1 rounded cursor-pointer transition ${
                       viewMode === "list"
-                        ? "bg-white text-brand-blue shadow-sm"
-                        : "text-text-muted hover:text-text-primary"
+                        ? "bg-surface text-primary shadow-sm"
+                        : "text-muted-foreground hover:text-foreground"
                     }`}
                   >
                     <List className="w-3.5 h-3.5" />
@@ -962,15 +961,15 @@ export function Marketplace({
                     }}
                     className={`p-1 rounded cursor-pointer transition ${
                       viewMode === "map"
-                        ? "bg-white text-brand-blue shadow-sm"
-                        : "text-text-muted hover:text-text-primary"
+                        ? "bg-surface text-primary shadow-sm"
+                        : "text-muted-foreground hover:text-foreground"
                     }`}
                   >
                     <Map className="w-3.5 h-3.5" />
                   </button>
                 </div>
 
-                <span className="text-[10px] bg-emerald-50 text-emerald-700 font-bold px-2.5 py-0.5 rounded border border-emerald-100">
+                <span className="text-[10px] bg-success-surface text-success-surface-foreground font-bold px-2.5 py-0.5 rounded border border-success-border">
                   {sortedProviders.length} matching{" "}
                   {sortedProviders.length === 1 ? "listing" : "listings"}
                 </span>
@@ -979,7 +978,7 @@ export function Marketplace({
 
             {/* Warning banner when site visibility is off */}
             {!marketplaceVisibility && (
-              <div className="bg-amber-50 text-[#92400E] border border-amber-200/50 px-4 py-2.5 rounded-xl text-[10px] font-extrabold text-center select-none">
+              <div className="bg-warning-surface text-primary border border-warning-border/50 px-4 py-2.5 rounded-xl text-[10px] font-extrabold text-center select-none">
                 🔒 Listing is private — toggle visibility ON in the left panel
                 to appear in the directory.
               </div>
@@ -987,13 +986,13 @@ export function Marketplace({
 
             {/* 1. MAP VIEW CONTAINER */}
             {viewMode === "map" && sortedProviders.length > 0 && (
-              <div className="w-full h-[450px] lg:h-[750px] bg-sky-50 rounded-2xl relative overflow-hidden border border-border-light shadow-inner flex flex-col justify-between select-none">
+              <div className="w-full h-[450px] lg:h-[750px] bg-info-surface rounded-2xl relative overflow-hidden border border-border shadow-inner flex flex-col justify-between select-none">
                 {/* Grid pattern overlay */}
                 <div className="absolute inset-0 bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none" />
 
                 {/* SVG Continents Map */}
                 <svg
-                  className="absolute inset-0 w-full h-full text-slate-200/60"
+                  className="absolute inset-0 w-full h-full text-neutral-200/60"
                   viewBox="0 0 100 100"
                   preserveAspectRatio="none"
                 >
@@ -1001,83 +1000,83 @@ export function Marketplace({
                   <path
                     d="M5,18 Q12,8 25,12 Q33,18 30,30 Q22,38 12,36 Q4,30 5,18 Z"
                     fill="currentColor"
-                    stroke="rgba(148,163,184,0.3)"
+                    stroke="var(--color-border)"
                     strokeWidth="0.3"
                   />
                   {/* Central America */}
                   <path
                     d="M22,38 Q26,42 25,46 Q22,46 21,42 Z"
                     fill="currentColor"
-                    stroke="rgba(148,163,184,0.3)"
+                    stroke="var(--color-border)"
                     strokeWidth="0.3"
                   />
                   {/* South America */}
                   <path
                     d="M27,46 Q33,48 33,58 Q31,72 26,75 Q20,72 21,60 Q22,50 27,46 Z"
                     fill="currentColor"
-                    stroke="rgba(148,163,184,0.3)"
+                    stroke="var(--color-border)"
                     strokeWidth="0.3"
                   />
                   {/* Europe */}
                   <path
                     d="M44,18 Q50,15 56,18 Q57,24 52,27 Q46,28 44,24 Z"
                     fill="currentColor"
-                    stroke="rgba(148,163,184,0.3)"
+                    stroke="var(--color-border)"
                     strokeWidth="0.3"
                   />
                   {/* Africa */}
                   <path
                     d="M46,30 Q55,30 56,42 Q55,55 50,58 Q44,55 44,42 Z"
                     fill="currentColor"
-                    stroke="rgba(148,163,184,0.3)"
+                    stroke="var(--color-border)"
                     strokeWidth="0.3"
                   />
                   {/* Asia */}
                   <path
                     d="M56,16 Q75,12 86,20 Q88,28 80,32 Q72,30 64,26 Q57,22 56,16 Z"
                     fill="currentColor"
-                    stroke="rgba(148,163,184,0.3)"
+                    stroke="var(--color-border)"
                     strokeWidth="0.3"
                   />
                   {/* India */}
                   <path
                     d="M65,28 Q70,30 68,38 Q64,40 63,35 Z"
                     fill="currentColor"
-                    stroke="rgba(148,163,184,0.3)"
+                    stroke="var(--color-border)"
                     strokeWidth="0.3"
                   />
                   {/* SE Asia */}
                   <path
                     d="M75,38 Q80,38 80,44 Q76,46 74,42 Z"
                     fill="currentColor"
-                    stroke="rgba(148,163,184,0.3)"
+                    stroke="var(--color-border)"
                     strokeWidth="0.3"
                   />
                   {/* Australia */}
                   <path
                     d="M80,62 Q90,60 90,70 Q86,74 80,70 Z"
                     fill="currentColor"
-                    stroke="rgba(148,163,184,0.3)"
+                    stroke="var(--color-border)"
                     strokeWidth="0.3"
                   />
                   {/* UK */}
                   <path
                     d="M45.5,22 L46.5,21 L47,23 L46,24 Z"
                     fill="currentColor"
-                    stroke="rgba(148,163,184,0.3)"
+                    stroke="var(--color-border)"
                     strokeWidth="0.3"
                   />
                 </svg>
 
                 {/* London Home Center Marker (You) */}
                 <div
-                  className="absolute w-5 h-5 rounded-full bg-brand-blue/20 border-2 border-brand-blue flex items-center justify-center -translate-x-1/2 -translate-y-1/2"
+                  className="absolute w-5 h-5 rounded-full bg-primary/20 border-2 border-primary flex items-center justify-center -translate-x-1/2 -translate-y-1/2"
                   style={{ left: "47.5%", top: "28%" }}
                 >
-                  <div className="w-2 h-2 rounded-full bg-brand-blue animate-pulse" />
+                  <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
                 </div>
                 <div
-                  className="absolute bg-brand-blue text-white px-2 py-0.5 rounded text-[8px] font-extrabold -translate-x-1/2 mt-3.5 whitespace-nowrap shadow-sm"
+                  className="absolute bg-primary text-primary-foreground px-2 py-0.5 rounded text-[8px] font-extrabold -translate-x-1/2 mt-3.5 whitespace-nowrap shadow-sm"
                   style={{ left: "47.5%", top: "28%" }}
                 >
                   London · You
@@ -1106,38 +1105,38 @@ export function Marketplace({
                       }}
                     >
                       <div
-                        className={`w-7 h-7 rounded-full border-2 border-white flex items-center justify-center text-[9px] font-black text-white shadow-md relative ${
+                        className={`w-7 h-7 rounded-full border-2 border-surface flex items-center justify-center text-[9px] font-black text-primary-foreground shadow-md relative ${
                           l.isCustom
-                            ? "bg-brand-blue"
+                            ? "bg-primary"
                             : l.category === "Beauty"
-                              ? "bg-pink-500"
+                              ? "bg-danger-500"
                               : l.category === "Healthcare"
-                                ? "bg-emerald-500"
+                                ? "bg-success-500"
                                 : l.category === "Fitness"
-                                  ? "bg-violet-500"
+                                  ? "bg-info-500"
                                   : l.category === "Consulting"
-                                    ? "bg-blue-600"
+                                    ? "bg-primary-600"
                                     : l.category === "Education"
-                                      ? "bg-amber-500"
-                                      : "bg-teal-500"
+                                      ? "bg-warning-500"
+                                      : "bg-success-500"
                         }`}
                       >
                         {l.initials}
                         {l.isCustom && (
-                          <div className="absolute -top-1.5 -right-1.5 bg-yellow-400 border border-white text-gray-900 rounded-full w-3.5 h-3.5 flex items-center justify-center text-[7px] font-bold">
+                          <div className="absolute -top-1.5 -right-1.5 bg-warning-400 border border-surface text-neutral-900 rounded-full w-3.5 h-3.5 flex items-center justify-center text-[7px] font-bold">
                             ★
                           </div>
                         )}
                       </div>
                       {/* Pin pointer pin-tip */}
-                      <div className="w-1.5 h-1.5 bg-white border-r border-b border-gray-200/80 rotate-45 -mt-1 shadow-sm" />
+                      <div className="w-1.5 h-1.5 bg-surface border-r border-b border-neutral-200/80 rotate-45 -mt-1 shadow-sm" />
                     </button>
                   );
                 })}
 
                 {/* Active Pin Details Drawer Popup */}
                 {activeListing && (
-                  <div className="absolute top-3 left-3 w-64 bg-white/95 backdrop-blur border border-border-light rounded-xl p-3.5 shadow-xl space-y-2.5 z-40 text-left">
+                  <div className="absolute top-3 left-3 w-64 bg-surface/95 backdrop-blur border border-border rounded-xl p-3.5 shadow-xl space-y-2.5 z-40 text-left">
                     <div className="flex justify-between items-start">
                       <div className="flex items-center gap-2">
                         <div
@@ -1148,10 +1147,10 @@ export function Marketplace({
                           {activeListing.initials}
                         </div>
                         <div>
-                          <h6 className="text-[11px] font-black text-text-primary leading-tight">
+                          <h6 className="text-[11px] font-black text-foreground leading-tight">
                             {activeListing.name}
                           </h6>
-                          <span className="text-[8px] bg-bg-secondary text-text-muted px-1.5 py-0.5 rounded font-bold">
+                          <span className="text-[8px] bg-background text-muted-foreground px-1.5 py-0.5 rounded font-bold">
                             {activeListing.category}
                           </span>
                         </div>
@@ -1159,19 +1158,19 @@ export function Marketplace({
                       <button
                         type="button"
                         onClick={() => setActivePinId(null)}
-                        className="text-text-muted hover:text-text-primary cursor-pointer"
+                        className="text-muted-foreground hover:text-foreground cursor-pointer"
                       >
                         <X className="w-3.5 h-3.5" />
                       </button>
                     </div>
-                    <p className="text-[9.5px] text-text-muted leading-relaxed">
+                    <p className="text-[9.5px] text-muted-foreground leading-relaxed">
                       {activeListing.desc}
                     </p>
-                    <div className="text-[9px] text-text-secondary space-y-0.5 font-semibold">
+                    <div className="text-[9px] text-foreground space-y-0.5 font-semibold">
                       <div className="flex items-center gap-1">
                         <span>📍 {activeListing.location}</span>
                         {activeListing.location !== "Online / Remote" && (
-                          <span className="text-text-muted">
+                          <span className="text-muted-foreground">
                             (
                             {
                               CITY_COORDS[activeListing.location]
@@ -1182,8 +1181,8 @@ export function Marketplace({
                         )}
                       </div>
                       <div>💼 Services from ${activeListing.price}</div>
-                      <div className="text-emerald-600 font-extrabold flex items-center gap-1">
-                        <span className="w-1 h-1 rounded-full bg-emerald-500" />
+                      <div className="text-success-surface-foreground font-extrabold flex items-center gap-1">
+                        <span className="w-1 h-1 rounded-full bg-success-500" />
                         {activeListing.availability}
                       </div>
                     </div>
@@ -1192,7 +1191,7 @@ export function Marketplace({
                       onClick={() =>
                         handleSeeWorkflow(activeListing.category.toLowerCase())
                       }
-                      className="w-full py-2 bg-brand-blue hover:bg-brand-blue-hover text-white text-[9.5px] font-bold rounded-full shadow-sm transition cursor-pointer active:scale-[0.98]"
+                      className="w-full py-2 bg-primary hover:bg-primary-hover text-primary-foreground text-[9.5px] font-bold rounded-full shadow-sm transition cursor-pointer active:scale-[0.98]"
                     >
                       View booking page
                     </button>
@@ -1200,19 +1199,19 @@ export function Marketplace({
                 )}
 
                 {/* Map Legend */}
-                <div className="absolute bottom-3 right-3 bg-white/90 backdrop-blur px-2.5 py-1.5 border border-border-light rounded-lg text-[8px] font-bold text-text-secondary flex gap-3 shadow-md z-20">
+                <div className="absolute bottom-3 right-3 bg-surface/90 backdrop-blur px-2.5 py-1.5 border border-border rounded-lg text-[8px] font-bold text-foreground flex gap-3 shadow-md z-20">
                   <div className="flex items-center gap-1">
-                    <div className="w-1.5 h-1.5 rounded-full bg-brand-blue" />
+                    <div className="w-1.5 h-1.5 rounded-full bg-primary" />
                     <span>Your Location</span>
                   </div>
                   <div className="flex items-center gap-1">
-                    <div className="w-2.5 h-2.5 bg-brand-blue rounded-full border border-white flex items-center justify-center text-[5px] font-bold text-white relative">
+                    <div className="w-2.5 h-2.5 bg-primary rounded-full border border-surface flex items-center justify-center text-[5px] font-bold text-primary-foreground relative">
                       ★
                     </div>
                     <span>Your Listing</span>
                   </div>
                   <div className="flex items-center gap-1">
-                    <div className="w-1.5 h-1.5 rounded-full bg-pink-500" />
+                    <div className="w-1.5 h-1.5 rounded-full bg-danger-500" />
                     <span>Others</span>
                   </div>
                 </div>
@@ -1231,10 +1230,10 @@ export function Marketplace({
                       exit={{ opacity: 0, scale: 0.95 }}
                       transition={{ duration: 0.2 }}
                       key={provider.name}
-                      className={`p-5 bg-white border rounded-xl hover:border-brand-blue/40 shadow-sm hover:shadow transition-all duration-300 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 ${
+                      className={`p-5 bg-surface border rounded-xl hover:border-primary/40 shadow-sm hover:shadow transition-all duration-300 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 ${
                         provider.isCustom
-                          ? "border-brand-blue/30 bg-[#F8FAFC]/50"
-                          : "border-border-light"
+                          ? "border-primary/30 bg-primary/50"
+                          : "border-border"
                       }`}
                     >
                       <div className="flex items-start gap-4 text-left">
@@ -1247,39 +1246,39 @@ export function Marketplace({
                         </div>
                         <div>
                           <div className="flex items-center gap-2 flex-wrap">
-                            <h3 className="text-sm font-bold text-text-primary flex items-center gap-1.5">
+                            <h3 className="text-sm font-bold text-foreground flex items-center gap-1.5">
                               {provider.name}
                               {provider.isCustom && (
-                                <span className="text-[8px] bg-brand-blue/15 text-brand-blue font-bold px-1.5 py-0.5 rounded-full">
+                                <span className="text-[8px] bg-primary/15 text-primary font-bold px-1.5 py-0.5 rounded-full">
                                   Your site
                                 </span>
                               )}
                             </h3>
-                            <span className="text-[9px] bg-bg-secondary text-text-muted px-2 py-0.5 rounded-[4px] font-bold">
+                            <span className="text-[9px] bg-background text-muted-foreground px-2 py-0.5 rounded-[4px] font-bold">
                               {provider.category}
                             </span>
                             {provider.tagLabel && (
                               <span
                                 className={`text-[8px] font-extrabold px-1.5 py-0.5 rounded border ${
                                   provider.tag === "verified"
-                                    ? "bg-emerald-50 text-emerald-700 border-emerald-100"
+                                    ? "bg-success-surface text-success-surface-foreground border-success-border"
                                     : provider.tag === "new"
-                                      ? "bg-blue-50 text-blue-700 border-blue-100"
-                                      : "bg-amber-50 text-amber-700 border-amber-100"
+                                      ? "bg-accent text-accent-foreground border-primary-100"
+                                      : "bg-warning-surface text-warning-surface-foreground border-warning-border"
                                 }`}
                               >
                                 {provider.tagLabel}
                               </span>
                             )}
                           </div>
-                          <p className="text-xs text-text-muted mt-1 leading-relaxed max-w-md">
+                          <p className="text-xs text-muted-foreground mt-1 leading-relaxed max-w-md">
                             {provider.desc}
                           </p>
-                          <div className="flex items-center gap-4 mt-2 text-[10px] text-text-muted font-semibold flex-wrap">
+                          <div className="flex items-center gap-4 mt-2 text-[10px] text-muted-foreground font-semibold flex-wrap">
                             <span>📍 {provider.location}</span>
                             <span>💵 Services from ${provider.price}</span>
-                            <span className="inline-flex items-center gap-1 text-[#15803D] bg-[#E6F9ED] px-1.5 py-0.5 rounded text-[9px] font-bold border border-[#BBF7D0]">
-                              <span className="w-1.5 h-1.5 rounded-full bg-[#22C55E]" />
+                            <span className="inline-flex items-center gap-1 text-primary bg-primary px-1.5 py-0.5 rounded text-[9px] font-bold border border-success-border">
+                              <span className="w-1.5 h-1.5 rounded-full bg-primary" />
                               {provider.availability}
                             </span>
                           </div>
@@ -1291,7 +1290,7 @@ export function Marketplace({
                         onClick={() =>
                           handleSeeWorkflow(provider.category.toLowerCase())
                         }
-                        className="w-full sm:w-auto px-4 py-2 border border-border-light hover:border-brand-blue hover:text-brand-blue text-xs font-bold rounded-full transition-colors cursor-pointer text-center bg-bg-primary active:scale-[0.98]"
+                        className="w-full sm:w-auto px-4 py-2 border border-border hover:border-primary hover:text-primary text-xs font-bold rounded-full transition-colors cursor-pointer text-center bg-surface active:scale-[0.98]"
                       >
                         View booking page
                       </button>
@@ -1304,12 +1303,12 @@ export function Marketplace({
                       <button
                         type="button"
                         onClick={() => setPageSize((prev) => prev + 6)}
-                        className="flex items-center gap-1.5 px-5 py-2.5 border border-border-light rounded-full text-xs font-extrabold text-brand-blue bg-white hover:bg-[#F8FAFC] transition-colors cursor-pointer shadow-sm"
+                        className="flex items-center gap-1.5 px-5 py-2.5 border border-border rounded-full text-xs font-extrabold text-primary bg-surface hover:bg-primary transition-colors cursor-pointer shadow-sm"
                       >
                         Load more listings
                         <ChevronDown className="w-3.5 h-3.5" />
                       </button>
-                      <span className="text-[10px] text-text-muted mt-2 font-medium">
+                      <span className="text-[10px] text-muted-foreground mt-2 font-medium">
                         {remainingCount} more listings to show
                       </span>
                     </div>
@@ -1322,18 +1321,18 @@ export function Marketplace({
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="p-12 text-center border border-dashed border-border-light rounded-xl space-y-4 bg-bg-secondary/40 select-none"
+                    className="p-12 text-center border border-dashed border-border rounded-xl space-y-4 bg-background/40 select-none"
                   >
-                    <div className="w-12 h-12 mx-auto bg-white rounded-full flex items-center justify-center text-lg text-text-muted shadow-sm border border-border-light">
+                    <div className="w-12 h-12 mx-auto bg-surface rounded-full flex items-center justify-center text-lg text-muted-foreground shadow-sm border border-border">
                       🔍
                     </div>
                     <div className="space-y-1">
-                      <h3 className="text-sm font-bold text-text-primary">
+                      <h3 className="text-sm font-bold text-foreground">
                         {!marketplaceVisibility
                           ? "Listing is private"
                           : "No matching listings"}
                       </h3>
-                      <p className="text-xs text-text-muted max-w-sm mx-auto leading-relaxed">
+                      <p className="text-xs text-muted-foreground max-w-sm mx-auto leading-relaxed">
                         {!marketplaceVisibility
                           ? "Your booking site will not appear to customers until you make it public."
                           : "Try widening your distance radius, selecting another category, or clearing filters."}
@@ -1343,7 +1342,7 @@ export function Marketplace({
                       <button
                         type="button"
                         onClick={clearAllFilters}
-                        className="px-4 py-2 border border-border-light hover:border-brand-blue hover:text-brand-blue bg-white text-xs font-bold rounded-full transition-colors cursor-pointer"
+                        className="px-4 py-2 border border-border hover:border-primary hover:text-primary bg-surface text-xs font-bold rounded-full transition-colors cursor-pointer"
                       >
                         Clear filters
                       </button>

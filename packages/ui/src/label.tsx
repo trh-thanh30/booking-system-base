@@ -11,7 +11,7 @@ export function Label({
   return (
     <LabelPrimitive.Root
       className={cn(
-        "text-sm font-medium leading-none text-slate-900 dark:text-slate-100",
+        "text-sm font-medium leading-none text-foreground",
         className,
       )}
       {...props}

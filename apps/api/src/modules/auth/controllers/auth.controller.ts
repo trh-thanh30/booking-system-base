@@ -1,0 +1,376 @@
+import {
+  ApiSuccess,
+  Permissions,
+  RequireTenant,
+  Tenant,
+} from '@/common/decorators';
+import { Public } from '@/common/decorators/public.decorator';
+import { User } from '@/common/decorators/user.decorator';
+import type { TenantContext } from '@/common/types/tenant-context.types';
+import {
+  BadRequestError,
+  ConflictError,
+  NotFoundError,
+  UnauthorizedError,
+} from '@/common/response';
+import { AssetsService } from '@/modules/assets/assets.service';
+import { AssetAccessTypeDto } from '@/modules/assets/dto/upload-asset.dto';
+import { AcceptInvitationDto } from '@/modules/auth/dto/accept-invitation.dto';
+import { ChangePasswordDto } from '@/modules/auth/dto/change-password.dto';
+import { CreateInvitationDto } from '@/modules/auth/dto/create-invitation.dto';
+import { ForgotPasswordDto } from '@/modules/auth/dto/forgot-password.dto';
+import { LoginDto } from '@/modules/auth/dto/login.dto';
+import { RegisterOwnerDto } from '@/modules/auth/dto/register-owner.dto';
+import { RequestVerificationDto } from '@/modules/auth/dto/request-verification.dto';
+import { ResetPasswordDto } from '@/modules/auth/dto/reset-password.dto';
+import { ResendVerificationDto } from '@/modules/auth/dto/resend-verification.dto';
+import { UpdateProfileDto } from '@/modules/auth/dto/update-profile.dto';
+import { VerifyEmailDto } from '@/modules/auth/dto/verify-email.dto';
+import type { AuthContext } from '@/modules/auth/auth.types';
+import { AuthCookieService } from '@/modules/auth/services/auth-cookie.service';
+import { AuthProfileService } from '@/modules/auth/services/auth-profile.service';
+import { AcceptInvitationUseCase } from '@/modules/auth/use-cases/accept-invitation.usecase';
+import { ChangePasswordUseCase } from '@/modules/auth/use-cases/change-password.usecase';
+import { CreateInvitationUseCase } from '@/modules/auth/use-cases/create-invitation.usecase';
+import { ForgotPasswordUseCase } from '@/modules/auth/use-cases/forgot-password.usecase';
+import { GetInvitationUseCase } from '@/modules/auth/use-cases/get-invitation.usecase';
+import { LoginUserUseCase } from '@/modules/auth/use-cases/login-user.usecase';
+import { RefreshTokenUseCase } from '@/modules/auth/use-cases/refresh-token.usecase';
+import { RegisterOwnerUseCase } from '@/modules/auth/use-cases/register-owner.usecase';
+import { RequestVerificationUseCase } from '@/modules/auth/use-cases/request-verification.usecase';
+import { ResendVerificationUseCase } from '@/modules/auth/use-cases/resend-verification.usecase';
+import { ResetPasswordUseCase } from '@/modules/auth/use-cases/reset-password.usecase';
+import { VerifyAccountUseCase } from '@/modules/auth/use-cases/verify-account.usecase';
+import { PERMISSIONS } from '@/modules/permission/constants/permission.constants';
+import { UsersService } from '@/modules/user/user.service';
+import {
+  Body,
+  Controller,
+  Get,
+  Headers,
+  Param,
+  Patch,
+  Post,
+  Req,
+  Res,
+  UploadedFile,
+  UseInterceptors,
+} from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { user_role, type User as CurrentUser } from '@prisma/client';
+import express from 'express';
+
+type AuthRequestUser = CurrentUser;
+@Controller('auth')
+export class AuthController {
+  constructor(
+    private readonly registerOwnerUseCase: RegisterOwnerUseCase,
+    private readonly loginUserUseCase: LoginUserUseCase,
+    private readonly verifyAccountUseCase: VerifyAccountUseCase,
+    private readonly forgotPasswordUseCase: ForgotPasswordUseCase,
+    private readonly resetPasswordUseCase: ResetPasswordUseCase,
+    private readonly refreshTokenUseCase: RefreshTokenUseCase,
+    private readonly resendVerificationUseCase: ResendVerificationUseCase,
+    private readonly requestVerificationUseCase: RequestVerificationUseCase,
+    private readonly changePasswordUseCase: ChangePasswordUseCase,
+    private readonly createInvitationUseCase: CreateInvitationUseCase,
+    private readonly getInvitationUseCase: GetInvitationUseCase,
+    private readonly acceptInvitationUseCase: AcceptInvitationUseCase,
+    private readonly usersService: UsersService,
+    private readonly assetsService: AssetsService,
+    private readonly authCookieService: AuthCookieService,
+    private readonly authProfileService: AuthProfileService,
+  ) {}
+
+  @Public()
+  @Post('register')
+  @ApiSuccess(
+    'Account registered successfully. Please check your email for verification.',
+  )
+  async register(@Body() dto: RegisterOwnerDto) {
+    const result = await this.registerOwnerUseCase.execute(dto);
+    return result;
+  }
+
+  @Public()
+  @Post('login')
+  @ApiSuccess('Login successful')
+  async login(
+    @Body() dto: LoginDto,
+    @Res({ passthrough: true }) res: express.Response,
+  ) {
+    const result = await this.loginUserUseCase.execute(
+      dto,
+      this.getRequiredRoles('client'),
+      'client',
+    );
+    this.authCookieService.setRefreshCookies(
+      res,
+      'client',
+      result.refresh_token,
+    );
+
+    return {
+      access_token: result.access_token,
+      user: await this.authProfileService.getByUserId(result.user.id),
+    };
+  }
+
+  @Public()
+  @Post('refresh')
+  @ApiSuccess('Token refreshed successfully')
+  async refresh(
+    @Headers('x-auth-context') authContext: string | undefined,
+    @Req() req: express.Request,
+    @Res({ passthrough: true }) res: express.Response,
+  ): Promise<{ access_token: string }> {
+    const context = this.resolveLegacySessionContext(authContext);
+    const refreshToken = this.authCookieService.getRefreshToken(req, context);
+
+    try {
+      const result = await this.refreshTokenUseCase.execute(
+        refreshToken,
+        this.getRequiredRoles(context),
+        context,
+      );
+
+      return {
+        access_token: result.access_token,
+      };
+    } catch (error) {
+      this.authCookieService.clearRefreshCookies(res, context);
+      throw error;
+    }
+  }
+
+  @Get('me')
+  @ApiSuccess('User profile retrieved successfully')
+  async me(
+    @User() user: AuthRequestUser,
+    @Headers('x-auth-context') authContext: string | undefined,
+  ) {
+    this.assertUserMatchesAuthContext(
+      user,
+      this.resolveAuthContext(authContext),
+    );
+
+    const profile = await this.usersService.findAuthProfileById(user.id);
+    if (!profile) {
+      throw new NotFoundError('User not found');
+    }
+
+    return this.authProfileService.getByUserId(profile.id);
+  }
+
+  @Patch('me')
+  @ApiSuccess('User profile updated successfully')
+  async updateProfile(
+    @User() user: AuthRequestUser,
+    @Headers('x-auth-context') authContext: string | undefined,
+    @Body() dto: UpdateProfileDto,
+  ) {
+    this.assertUserMatchesAuthContext(
+      user,
+      this.resolveAuthContext(authContext),
+    );
+    await this.assertProfileIsUnique(user.id, dto);
+
+    await this.usersService.update(user.id, dto);
+    return this.authProfileService.getByUserId(user.id);
+  }
+
+  @Patch('me/avatar')
+  @UseInterceptors(FileInterceptor('file'))
+  @ApiSuccess('User avatar updated successfully')
+  async updateAvatar(
+    @User() user: AuthRequestUser,
+    @Headers('x-auth-context') authContext: string | undefined,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    this.assertUserMatchesAuthContext(
+      user,
+      this.resolveAuthContext(authContext),
+    );
+
+    if (!file) {
+      throw new BadRequestError('Avatar file is required');
+    }
+
+    const asset = await this.assetsService.uploadFile(user, file, {
+      folder: 'avatars',
+      type: 'IMAGE',
+      accessType: AssetAccessTypeDto.PUBLIC,
+      entityId: user.id,
+      entityType: 'user',
+    });
+    await this.usersService.update(user.id, {
+      avatar_url: asset.url,
+    });
+
+    return this.authProfileService.getByUserId(user.id);
+  }
+
+  @Patch('change-password')
+  @ApiSuccess('Password changed successfully')
+  async changePassword(
+    @User() user: AuthRequestUser,
+    @Body() dto: ChangePasswordDto,
+    @Headers('x-auth-context') authContext: string | undefined,
+    @Res({ passthrough: true }) res: express.Response,
+  ) {
+    const context = this.resolveAuthContext(authContext);
+    this.assertUserMatchesAuthContext(user, context);
+
+    const { success } = await this.changePasswordUseCase.execute(user.id, dto);
+    if (success) {
+      this.authCookieService.clearRefreshCookies(res, context);
+    }
+  }
+
+  @Public()
+  @Post('logout')
+  @ApiSuccess('Logged out successfully')
+  async logout(
+    @Headers('x-auth-context') authContext: string | undefined,
+    @Req() req: express.Request,
+    @Res({ passthrough: true }) res: express.Response,
+  ) {
+    const context = this.resolveLegacySessionContext(authContext);
+    const refreshToken = this.authCookieService.getRefreshToken(req, context);
+
+    await this.refreshTokenUseCase.revoke(
+      refreshToken,
+      this.getRequiredRoles(context),
+      context,
+    );
+    this.authCookieService.clearRefreshCookies(res, context);
+  }
+
+  @Public()
+  @Post('verify')
+  @ApiSuccess('Account verified successfully')
+  async verify(@Body() body: VerifyEmailDto) {
+    await this.verifyAccountUseCase.execute(body);
+  }
+
+  @Public()
+  @Post('forgot-password')
+  @ApiSuccess('If your email is in our system, you will receive a reset code.')
+  async forgotPassword(@Body() dto: ForgotPasswordDto) {
+    const sessionId = await this.forgotPasswordUseCase.execute(dto);
+    return { sessionId };
+  }
+
+  @Public()
+  @Post('reset-password')
+  @ApiSuccess('Your password has been reset successfully.')
+  async resetPassword(@Body() dto: ResetPasswordDto) {
+    await this.resetPasswordUseCase.execute(dto);
+  }
+
+  @Public()
+  @Post('resend-verification')
+  @ApiSuccess('Verification code resent successfully.')
+  async resendVerification(@Body() dto: ResendVerificationDto) {
+    await this.resendVerificationUseCase.execute(dto);
+  }
+
+  @Public()
+  @Post('request-verification')
+  @ApiSuccess(
+    'If your account exists and is unverified, you will receive a verification code.',
+  )
+  async requestVerification(@Body() dto: RequestVerificationDto) {
+    return await this.requestVerificationUseCase.execute(dto);
+  }
+
+  @Post('invitations')
+  @RequireTenant()
+  @Permissions([PERMISSIONS.STAFF.INVITE])
+  @ApiSuccess('Invitation created successfully')
+  async createInvitation(
+    @Tenant() tenant: TenantContext,
+    @User() user: AuthRequestUser,
+    @Body() dto: CreateInvitationDto,
+  ) {
+    return this.createInvitationUseCase.execute(tenant.id, user.id, dto);
+  }
+
+  @Public()
+  @Get('invitations/:token')
+  @ApiSuccess('Invitation retrieved successfully')
+  async getInvitation(@Param('token') token: string) {
+    return this.getInvitationUseCase.execute(token);
+  }
+
+  @Public()
+  @Post('invitations/accept')
+  @ApiSuccess('Invitation accepted successfully')
+  async acceptInvitation(@Body() dto: AcceptInvitationDto) {
+    return this.acceptInvitationUseCase.execute(dto);
+  }
+
+  private async assertProfileIsUnique(
+    userId: string,
+    dto: UpdateProfileDto,
+  ): Promise<void> {
+    if (dto.email) {
+      const existingEmail = await this.usersService.findByEmail(dto.email);
+      if (existingEmail && existingEmail.id !== userId) {
+        throw new ConflictError('An account with this email already exists');
+      }
+    }
+
+    if (dto.username) {
+      const existingUsername = await this.usersService.findByUsername(
+        dto.username,
+      );
+      if (existingUsername && existingUsername.id !== userId) {
+        throw new ConflictError('Username is already taken');
+      }
+    }
+
+    if (dto.phone) {
+      const existingPhone = await this.usersService.findByPhone(dto.phone);
+      if (existingPhone && existingPhone.id !== userId) {
+        throw new ConflictError('Phone number is already taken');
+      }
+    }
+  }
+
+  private resolveAuthContext(authContext?: string): AuthContext {
+    if (authContext === 'platform') {
+      return 'platform';
+    }
+
+    return authContext === 'admin' ? 'admin' : 'client';
+  }
+
+  private resolveLegacySessionContext(authContext?: string): AuthContext {
+    const context = this.resolveAuthContext(authContext);
+    if (context !== 'client') {
+      throw new UnauthorizedError('Invalid session for this app');
+    }
+
+    return context;
+  }
+
+  private getRequiredRoles(context: AuthContext): user_role[] {
+    if (context === 'platform') {
+      return [user_role.SUPER_ADMIN];
+    }
+
+    return context === 'admin'
+      ? [user_role.OWNER, user_role.STAFF]
+      : [user_role.CUSTOMER];
+  }
+
+  private assertUserMatchesAuthContext(
+    user: AuthRequestUser,
+    context: AuthContext,
+  ): void {
+    if (!this.getRequiredRoles(context).includes(user.role)) {
+      throw new UnauthorizedError('Invalid session for this app');
+    }
+  }
+}

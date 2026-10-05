@@ -1,9 +1,12 @@
 {
   "$schema": "https://turborepo.com/schema.json",
   "ui": "tui",
+  "globalPassThroughEnv": ["CHROME_PATH", "FRONTEND_SMOKE_URL"],
   "globalEnv": [
     "NODE_ENV",
     "NEXT_PUBLIC_API_URL",
+    "NEXT_PUBLIC_WEB_URL",
+    "NEXT_DIST_DIR",
     "CI_TELEGRAM_BOT_TOKEN",
     "CI_TELEGRAM_CHAT_ID"
   ],

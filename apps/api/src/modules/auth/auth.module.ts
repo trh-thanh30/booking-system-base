@@ -1,23 +1,35 @@
 import { BcryptService } from '@/common/helpers/bcrypt.util';
-import { CodeService } from '@/common/helpers/code.util';
-import { cookieConfig } from '@/config';
+import { cookieConfig, googleOAuthConfig } from '@/config';
 import { PrismaService } from '@/database/prisma/prisma.service';
 import { RedisModule } from '@/database/redis/redis.module';
 import { AssetsModule } from '@/modules/assets/assets.module';
-import { AuthController } from '@/modules/auth/auth.controller';
-import { AuthTokenService } from '@/modules/auth/service/auth-token.service';
-import { VerificationSessionService } from '@/modules/auth/service/verification-session.service';
+import { AdminAuthController } from '@/modules/auth/controllers/admin-auth.controller';
+import { AuthController } from '@/modules/auth/controllers/auth.controller';
+import { GoogleAuthController } from '@/modules/auth/controllers/google-auth.controller';
+import { PlatformAuthController } from '@/modules/auth/controllers/platform-auth.controller';
+import { GoogleOAuthProvider } from '@/modules/auth/providers/google-oauth.provider';
+import { AuthCookieService } from '@/modules/auth/services/auth-cookie.service';
+import { AuthProfileService } from '@/modules/auth/services/auth-profile.service';
+import { AuthTokenService } from '@/modules/auth/services/auth-token.service';
+import { GoogleOnboardingSessionService } from '@/modules/auth/services/google-onboarding-session.service';
+import { GoogleOAuthStateService } from '@/modules/auth/services/google-oauth-state.service';
+import { VerificationSessionService } from '@/modules/auth/services/verification-session.service';
 import { AcceptInvitationUseCase } from '@/modules/auth/use-cases/accept-invitation.usecase';
 import { ChangePasswordUseCase } from '@/modules/auth/use-cases/change-password.usecase';
+import { CompleteGoogleOwnerOnboardingUseCase } from '@/modules/auth/use-cases/complete-google-owner-onboarding.usecase';
 import { CreateInvitationUseCase } from '@/modules/auth/use-cases/create-invitation.usecase';
 import { ForgotPasswordUseCase } from '@/modules/auth/use-cases/forgot-password.usecase';
 import { GetInvitationUseCase } from '@/modules/auth/use-cases/get-invitation.usecase';
 import { LoginUserUseCase } from '@/modules/auth/use-cases/login-user.usecase';
+import { LoginWithGoogleUseCase } from '@/modules/auth/use-cases/login-with-google.usecase';
+import { RefreshTokenSessionService } from '@/modules/auth/services/refresh-token-session.service';
 import { RefreshTokenUseCase } from '@/modules/auth/use-cases/refresh-token.usecase';
-import { RegisterUserUseCase } from '@/modules/auth/use-cases/register-user.usecase';
+import { RegisterOwnerUseCase } from '@/modules/auth/use-cases/register-owner.usecase';
+import { TenantModule } from '@/modules/tenant/tenant.module';
 import { RequestVerificationUseCase } from '@/modules/auth/use-cases/request-verification.usecase';
 import { ResendVerificationUseCase } from '@/modules/auth/use-cases/resend-verification.usecase';
 import { ResetPasswordUseCase } from '@/modules/auth/use-cases/reset-password.usecase';
+import { StartGoogleLoginUseCase } from '@/modules/auth/use-cases/start-google-login.usecase';
 import { VerifyAccountUseCase } from '@/modules/auth/use-cases/verify-account.usecase';
 import { EmailModule } from '@/modules/email/email.module';
 import { PermissionModule } from '@/modules/permission/permission.module';
@@ -27,25 +39,38 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  controllers: [AuthController],
+  controllers: [
+    AuthController,
+    AdminAuthController,
+    PlatformAuthController,
+    GoogleAuthController,
+  ],
   providers: [
-    RegisterUserUseCase,
+    RegisterOwnerUseCase,
     LoginUserUseCase,
+    StartGoogleLoginUseCase,
+    LoginWithGoogleUseCase,
     VerifyAccountUseCase,
     ResendVerificationUseCase,
     ForgotPasswordUseCase,
     ResetPasswordUseCase,
     RefreshTokenUseCase,
+    RefreshTokenSessionService,
     RequestVerificationUseCase,
     CreateInvitationUseCase,
     GetInvitationUseCase,
     AcceptInvitationUseCase,
     PrismaService,
-    CodeService,
     AuthTokenService,
     VerificationSessionService,
     BcryptService,
     ChangePasswordUseCase,
+    CompleteGoogleOwnerOnboardingUseCase,
+    AuthCookieService,
+    AuthProfileService,
+    GoogleOnboardingSessionService,
+    GoogleOAuthStateService,
+    GoogleOAuthProvider,
   ],
   imports: [
     AssetsModule,
@@ -53,11 +78,13 @@ import { ConfigModule } from '@nestjs/config';
     PermissionModule,
     EmailModule,
     VerificationModule,
+    TenantModule,
     RedisModule,
     ConfigModule.forFeature(cookieConfig),
+    ConfigModule.forFeature(googleOAuthConfig),
   ],
   exports: [
-    RegisterUserUseCase,
+    RegisterOwnerUseCase,
     LoginUserUseCase,
     VerifyAccountUseCase,
     ResendVerificationUseCase,

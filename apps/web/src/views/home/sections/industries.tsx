@@ -7,7 +7,7 @@ import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { RepeatReveal } from "@/src/components/motion/RepeatReveal";
 import { MotionCard } from "@/src/components/motion/MotionCard";
-import { INDUSTRIES } from "../home.constants";
+import { INDUSTRIES } from "../constants/home.constants";
 
 interface IndustriesProps {
   activeTemplateIdx: number;
@@ -140,18 +140,18 @@ export function Industries({
     <RepeatReveal
       as="section"
       id="industries"
-      className="scroll-mt-20 md:scroll-mt-24 py-16 md:py-24 lg:py-28 bg-bg-primary border-t border-border-light overflow-hidden"
+      className="scroll-mt-20 md:scroll-mt-24 py-16 md:py-24 lg:py-28 bg-surface border-t border-border overflow-hidden"
     >
-      <div className="mx-auto max-w-7xl px-6">
+      <div className="mx-auto w-full max-w-landing px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
           <div className="space-y-3 max-w-3xl">
-            <span className="text-xs font-bold tracking-wider text-brand-blue uppercase">
+            <span className="text-xs font-bold tracking-wider text-primary uppercase">
               Supported Industries
             </span>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-text-primary tracking-tight">
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-foreground tracking-tight">
               Designed for any service-based business
             </h2>
-            <p className="text-text-muted text-base">
+            <p className="text-muted-foreground text-base">
               From solo providers to growing service teams, BookingBase adapts
               to your services, staff, schedules and booking rules.
             </p>
@@ -172,8 +172,8 @@ export function Industries({
                   }}
                   className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
                     selectedIndex === index
-                      ? "bg-brand-blue w-4"
-                      : "bg-border-light hover:bg-text-muted/30 w-1.5"
+                      ? "bg-primary w-4"
+                      : "bg-border hover:bg-muted-foreground/30 w-1.5"
                   }`}
                   aria-label={`Go to slide page ${index + 1}`}
                 />
@@ -187,7 +187,7 @@ export function Industries({
                 disabled={prevBtnDisabled}
                 onClick={scrollPrev}
                 aria-label="Previous page"
-                className="w-9 h-9 rounded-lg border border-border-light flex items-center justify-center transition-all bg-white text-text-secondary hover:text-brand-blue cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed shadow-sm active:scale-[0.98]"
+                className="w-9 h-9 rounded-lg border border-border flex items-center justify-center transition-all bg-surface text-foreground hover:text-primary cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed shadow-sm active:scale-[0.98]"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
@@ -196,7 +196,7 @@ export function Industries({
                 disabled={nextBtnDisabled}
                 onClick={scrollNext}
                 aria-label="Next page"
-                className="w-9 h-9 rounded-lg border border-border-light flex items-center justify-center transition-all bg-white text-text-secondary hover:text-brand-blue cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed shadow-sm active:scale-[0.98]"
+                className="w-9 h-9 rounded-lg border border-border flex items-center justify-center transition-all bg-surface text-foreground hover:text-primary cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed shadow-sm active:scale-[0.98]"
               >
                 <ChevronRight className="w-4 h-4" />
               </button>
@@ -230,12 +230,16 @@ export function Industries({
                         autoplay.current.reset();
                       }
                     }}
-                    className={`h-full !p-0 overflow-hidden transition-all duration-300 bg-white group flex flex-col min-h-[420px] cursor-pointer border relative select-none ${
-                      isActive ? "shadow-md" : "hover:border-brand-blue/30"
+                    className={`h-full !p-0 overflow-hidden transition-all duration-300 bg-surface group flex flex-col min-h-[420px] cursor-pointer border relative select-none ${
+                      isActive ? "shadow-md" : "hover:border-primary/30"
                     }`}
                     style={{
-                      borderColor: isActive ? "#2563eb" : undefined,
-                      boxShadow: isActive ? "0 0 0 1px #2563eb" : undefined,
+                      borderColor: isActive
+                        ? "var(--color-primary)"
+                        : undefined,
+                      boxShadow: isActive
+                        ? "0 0 0 1px var(--color-primary)"
+                        : undefined,
                     }}
                   >
                     {/* Autoplay progress bar running along active industry card */}
@@ -249,11 +253,11 @@ export function Industries({
                             : "running",
                           transformOrigin: "left",
                         }}
-                        className="absolute top-0 left-0 right-0 h-1 bg-brand-blue animate-progress-bar z-10"
+                        className="absolute top-0 left-0 right-0 h-1 bg-primary animate-progress-bar z-10"
                       />
                     )}
 
-                    <div className="relative h-44 sm:h-48 overflow-hidden bg-bg-secondary w-full">
+                    <div className="relative h-44 sm:h-48 overflow-hidden bg-background w-full">
                       <Image
                         src={ind.image}
                         alt={ind.name}
@@ -262,7 +266,7 @@ export function Industries({
                         className="object-cover group-hover:scale-102 transition-transform duration-500"
                         priority={idx < 3}
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/50 via-neutral-950/10 to-transparent" />
                     </div>
 
                     <div className="p-6 flex-grow flex flex-col justify-between">
@@ -270,20 +274,20 @@ export function Industries({
                         <h3
                           className={`text-base font-bold transition-colors ${
                             isActive
-                              ? "text-brand-blue"
-                              : "text-text-primary group-hover:text-brand-blue"
+                              ? "text-primary"
+                              : "text-foreground group-hover:text-primary"
                           }`}
                         >
                           {ind.name}
                         </h3>
-                        <p className="text-xs text-text-muted leading-relaxed min-h-[54px]">
+                        <p className="text-xs text-muted-foreground leading-relaxed min-h-[54px]">
                           {ind.desc}
                         </p>
                         <div className="flex flex-wrap gap-1.5 pt-1 min-h-[26px]">
                           {ind.chips?.map((chip) => (
                             <span
                               key={chip}
-                              className="text-[9px] px-2.5 py-0.5 rounded-full bg-[#F8FAFC] border border-border-light text-text-secondary font-medium"
+                              className="text-[9px] px-2.5 py-0.5 rounded-full bg-primary border border-border text-foreground font-medium"
                             >
                               {chip}
                             </span>
@@ -298,7 +302,7 @@ export function Industries({
                             e.stopPropagation();
                             handleSeeWorkflow(ind.id || "");
                           }}
-                          className="inline-flex items-center text-[11px] text-brand-blue font-bold gap-1 group-hover:underline cursor-pointer bg-transparent border-none p-0 focus:outline-none"
+                          className="inline-flex items-center text-[11px] text-primary font-bold gap-1 group-hover:underline cursor-pointer bg-transparent border-none p-0 focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2"
                         >
                           See workflow &rarr;
                         </button>
@@ -311,8 +315,8 @@ export function Industries({
           </div>
         </div>
 
-        <div className="text-center mt-12 border-t border-border-light/50 pt-8">
-          <p className="text-xs text-text-muted max-w-md mx-auto leading-relaxed">
+        <div className="text-center mt-12 border-t border-border/50 pt-8">
+          <p className="text-xs text-muted-foreground max-w-md mx-auto leading-relaxed">
             Every industry template can be customized with your services, brand
             colors, staff and booking rules.
           </p>

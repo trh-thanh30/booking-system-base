@@ -15,6 +15,25 @@ export const envSchema = z
     PUPPETEER_EXECUTABLE_PATH: z.string().optional(),
     SENTRY_DSN: z.string().optional(),
 
+    // Google OAuth
+    GOOGLE_CLIENT_ID: z.string().optional(),
+    GOOGLE_CLIENT_SECRET: z.string().optional(),
+    GOOGLE_REDIRECT_URI: z.string().url().optional(),
+    GOOGLE_OAUTH_STATE_TTL_SECONDS: z.coerce
+      .number()
+      .int()
+      .min(60)
+      .max(1800)
+      .default(600),
+    GOOGLE_ONBOARDING_TTL_SECONDS: z.coerce
+      .number()
+      .int()
+      .min(300)
+      .max(3600)
+      .default(900),
+    WEB_URL: z.string().url().optional(),
+    NEXT_PUBLIC_WEB_URL: z.string().url().optional(),
+
     // Database
     DB_HOST: z.string().default('localhost'),
     DB_PORT: z.coerce.number().int().min(1).max(65535).default(5432),
@@ -59,7 +78,7 @@ export const envSchema = z
     SMTP_USER: z.string(),
     SMTP_PASS: z.string(),
     EMAIL_FROM: z.string(),
-    EMAIL_TEMPLATES_PATH: z.string().default('src/module/email/templates'),
+    EMAIL_TEMPLATES_PATH: z.string().default('src/modules/email/templates'),
 
     // Redis Configuration
     REDIS_URL: z.string(),
@@ -124,9 +143,9 @@ export const envSchema = z
     // Cookie Configuration
     COOKIE_DOMAIN: z.string().default('localhost'),
     COOKIE_SECURE: z.coerce.boolean().default(false),
-    COOKIE_HTTP_ONLY: z.coerce.boolean().default(true),
     COOKIE_MAX_AGE: z.coerce.number().int().positive().default(604800000),
     COOKIE_PATH: z.string().default('/'),
+    COOKIE_AUTH_PATH_PREFIX: z.string().default('/api/v1/auth'),
 
     // Client Configuration
     POSTCODES_API: z.string().default('https://api.postcodes.io'),

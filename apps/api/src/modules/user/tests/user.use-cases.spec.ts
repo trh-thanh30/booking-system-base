@@ -122,7 +122,26 @@ describe('user use cases', () => {
 
     expect(repository.update).toHaveBeenCalledWith(userId, {
       password: 'hashed-new-password',
-      refresh_token: null,
+      refresh_token_hash: null,
+    });
+  });
+
+  it('revokes the session when an account becomes inactive', async () => {
+    const repository = {
+      findByIdInTenant: jest.fn().mockResolvedValue(user()),
+      update: jest
+        .fn()
+        .mockResolvedValue(user({ status: user_status.INACTIVE })),
+    };
+
+    await new UpdateUserUseCase(
+      repository as any,
+      { hashPassword: jest.fn() } as any,
+    ).execute(tenantId, userId, { status: user_status.INACTIVE });
+
+    expect(repository.update).toHaveBeenCalledWith(userId, {
+      status: user_status.INACTIVE,
+      refresh_token_hash: null,
     });
   });
 

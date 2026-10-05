@@ -1,6 +1,6 @@
 import { CreateBusinessUseCase } from '@/modules/business/use-cases/create-business.use-case';
 import { ListBusinessesUseCase } from '@/modules/business/use-cases/list-businesses.use-case';
-import { business_status } from '@prisma/client';
+import { business_status, user_role } from '@prisma/client';
 
 function makeBusiness(overrides: Record<string, unknown> = {}) {
   return {
@@ -22,11 +22,15 @@ function makeBusiness(overrides: Record<string, unknown> = {}) {
 describe('Business use cases', () => {
   it('lists businesses in a tenant', async () => {
     const repository = {
-      listByTenant: jest.fn().mockResolvedValue([makeBusiness()]),
+      listForUser: jest.fn().mockResolvedValue([makeBusiness()]),
     };
 
     await expect(
-      new ListBusinessesUseCase(repository as any).execute('tenant-1'),
+      new ListBusinessesUseCase(repository as any).execute(
+        'tenant-1',
+        'owner-1',
+        user_role.OWNER,
+      ),
     ).resolves.toEqual([
       expect.objectContaining({
         id: 'business-1',
@@ -35,7 +39,33 @@ describe('Business use cases', () => {
       }),
     ]);
 
-    expect(repository.listByTenant).toHaveBeenCalledWith('tenant-1');
+    expect(repository.listForUser).toHaveBeenCalledWith(
+      'owner-1',
+      'tenant-1',
+      true,
+    );
+  });
+
+  it('lists only businesses accessible through Staff memberships', async () => {
+    const repository = {
+      listForUser: jest.fn().mockResolvedValue([makeBusiness()]),
+    };
+
+    await expect(
+      new ListBusinessesUseCase(repository as any).execute(
+        'tenant-1',
+        'staff-1',
+        user_role.STAFF,
+      ),
+    ).resolves.toEqual([
+      expect.objectContaining({ id: 'business-1', tenant_id: 'tenant-1' }),
+    ]);
+
+    expect(repository.listForUser).toHaveBeenCalledWith(
+      'staff-1',
+      'tenant-1',
+      false,
+    );
   });
 
   it('creates a business when slug is unique in the tenant', async () => {

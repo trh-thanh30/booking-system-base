@@ -22,12 +22,15 @@
     "./table": "./src/table.tsx",
     "./tabs": "./src/tabs.tsx",
     "./textarea": "./src/textarea.tsx",
-    "./tooltip": "./src/tooltip.tsx"
+    "./tooltip": "./src/tooltip.tsx",
+    "./sonner": "./src/toaster.tsx",
+    "./styles.css": "./src/styles/index.css"
   },
   "scripts": {
     "build": "tsc --noEmit && node -e \"fs.mkdirSync('dist', { recursive: true }); fs.writeFileSync('dist/.build', '')\"",
     "check-types": "tsc --noEmit",
-    "lint": "eslint . --max-warnings 0"
+    "lint": "eslint . --max-warnings 0 && pnpm validate:tokens",
+    "validate:tokens": "node scripts/validate-design-tokens.mjs"
   },
   "dependencies": {
     "@radix-ui/react-alert-dialog": "^1.1.15",
@@ -51,6 +54,7 @@
     "date-fns": "^4.4.0",
     "lucide-react": "^0.575.0",
     "react-day-picker": "^10.0.1",
+    "sonner": "^2.0.7",
     "tailwind-merge": "^3.5.0"
   },
   "devDependencies": {

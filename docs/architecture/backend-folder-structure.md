@@ -26,6 +26,20 @@ apps/api/src/
 
 ## Vai Trò Folder Cấp API
 
+### Ranh giới production build
+
+- `tsconfig.build.json` dùng `rootDir: ./src` để giữ entrypoint API tại
+  `dist/main.js` và email worker tại `dist/workers/email/worker.main.js`.
+- Loại `src/test/**` và `**/*spec.ts` khỏi build. Helper/mock Jest không được
+  kéo source của workspace khác vào production compilation.
+- Đặt incremental cache tại `dist/tsconfig.build.tsbuildinfo` để Nest xóa cache
+  cùng output; không để cache bên ngoài `dist` khiến rebuild bỏ qua emit.
+- API sử dụng `@repo/shared` qua package đã build; import source trực tiếp chỉ
+  dành cho test khi cần và phải nằm ngoài production build.
+- Chạy `pnpm --filter @repo/api test:build-config` để kiểm tra ranh giới này.
+- API không có pipeline Tailwind hay giao diện frontend. Styling thuộc Web/UI;
+  email dùng template MJML/Handlebars, không phụ thuộc Tailwind.
+
 ### `common/`
 
 Chứa hạ tầng dùng chung trong API app:
@@ -102,7 +116,9 @@ Module mới nên đi theo cấu trúc sau:
 ```txt
 src/modules/<module>/
 ├── <module>.module.ts
-├── <module>.controller.ts
+├── controllers/
+│   ├── <module>.controller.ts
+│   └── <context>-<module>.controller.ts
 ├── dto/
 │   ├── create-<entity>.dto.ts
 │   └── update-<entity>.dto.ts
@@ -114,13 +130,30 @@ src/modules/<module>/
 │   ├── update-<entity>.use-case.ts
 │   ├── get-<entity>.use-case.ts
 │   └── list-<entity>.use-case.ts
-├── service/
-│   └── <module>-domain.service.ts
+├── services/
+│   ├── <module>-domain.service.ts
+│   └── <module>-policy.service.ts
 ├── tests/
 │   ├── create-<entity>.use-case.spec.ts
 │   └── update-<entity>.use-case.spec.ts
-└── <module>.types.ts
+└── types/
+    ├── <module>.types.ts
+    └── <context>.types.ts
 ```
+
+### Quy Tắc Gom File Theo Trách Nhiệm
+
+- Một file duy nhất của một loại có thể đặt tại root của feature, ví dụ
+  `<module>.controller.ts` hoặc `<module>.types.ts`.
+- Khi có từ hai file cùng hậu tố/trách nhiệm trở lên, phải tạo folder tương ứng
+  và chuyển toàn bộ file cùng loại vào đó. Ví dụ: `controllers/`, `services/`,
+  `types/`, `guards/`, `strategies/`, `factories/`, `mappers/`.
+- `<module>.module.ts` chính luôn đặt tại root. Nếu feature có từ hai Nest module
+  phụ trở lên, đặt các module phụ trong `modules/`; không chuyển module chính.
+- `dto/`, `repository/`, `use-cases/` và `tests/` là các folder kiến trúc, tạo
+  ngay khi layer đó xuất hiện, không cần chờ có hai file.
+- Dùng tên folder số nhiều cho các nhóm file mới. Module cũ được chuẩn hóa dần
+  khi có task chạm tới module đó; không refactor toàn repository chỉ để đổi tên.
 
 Không phải module nào cũng cần đủ mọi folder ngay từ đầu. Nhưng với module nghiệp vụ có write/read data, tối thiểu nên có:
 
@@ -138,7 +171,8 @@ Không phải module nào cũng cần đủ mọi folder ngay từ đầu. Nhưn
 File:
 
 ```txt
-<module>.controller.ts
+<module>.controller.ts           # khi chỉ có một controller
+controllers/<name>.controller.ts # khi có từ hai controller
 ```
 
 Vai trò:
@@ -269,7 +303,8 @@ export interface BookingRepository {
 Folder tùy module:
 
 ```txt
-service/
+<module>-domain.service.ts # khi chỉ có một service
+services/                  # khi có từ hai service
 ```
 
 Vai trò:
@@ -384,7 +419,7 @@ Checklist:
 
 1. Tạo folder `src/modules/<module>`.
 2. Tạo `<module>.module.ts`.
-3. Tạo `<module>.controller.ts`.
+3. Tạo `<module>.controller.ts`; khi có controller thứ hai, chuyển toàn bộ vào `controllers/`.
 4. Tạo `dto/`.
 5. Tạo `repository/`.
 6. Tạo `use-cases/`.
@@ -414,15 +449,18 @@ Checklist:
 ```txt
 src/modules/bookings/
 ├── bookings.module.ts
-├── bookings.controller.ts
+├── controllers/
+│   ├── bookings.controller.ts
+│   └── public-bookings.controller.ts
 ├── dto/
 │   ├── create-booking.dto.ts
 │   └── reschedule-booking.dto.ts
 ├── repository/
 │   ├── bookings.repository.ts
 │   └── bookings.repository.interface.ts
-├── service/
-│   └── booking-availability.service.ts
+├── services/
+│   ├── booking-availability.service.ts
+│   └── booking-policy.service.ts
 ├── use-cases/
 │   ├── create-booking.use-case.ts
 │   ├── cancel-booking.use-case.ts

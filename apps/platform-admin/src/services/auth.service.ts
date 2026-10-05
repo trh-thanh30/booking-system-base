@@ -5,7 +5,7 @@ import { apiClient } from "@/src/lib/api-client";
 export const authService = {
   async loginPlatform(input: LoginInput) {
     return unwrapApiData(
-      await apiClient.post<AuthSession>("/auth/login-platform", input),
+      await apiClient.post<AuthSession>("/auth/platform/login", input),
     );
   },
 
@@ -15,11 +15,11 @@ export const authService = {
 
   async refresh() {
     return unwrapApiData(
-      await apiClient.post<{ access_token: string }>("/auth/refresh"),
+      await apiClient.post<{ access_token: string }>("/auth/platform/refresh"),
     );
   },
 
   async logout() {
-    await apiClient.post<void>("/auth/logout");
+    await apiClient.post<void>("/auth/platform/logout");
   },
 };

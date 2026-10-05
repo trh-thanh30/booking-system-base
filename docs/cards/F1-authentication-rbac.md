@@ -24,22 +24,30 @@ Bảo vệ dữ liệu doanh nghiệp, cho phép mỗi nhóm người dùng ch�
 - Guard theo permission cho từng API/action.
 - Đổi mật khẩu, quên mật khẩu qua email.
 - Invite user nội bộ cho doanh nghiệp.
-- Logout và revoke refresh token hiện tại trên `User.refresh_token`.
+- Logout và revoke refresh token hiện tại trên `User.refresh_token_hash`.
 
 ## API Endpoints
 
 - `POST /auth/login`
-- `POST /auth/login-admin`
-- `POST /auth/login-platform`
-- `POST /auth/refresh`
-- `POST /auth/logout`
+- `POST /auth/admin/login`
+- `POST /auth/platform/login`
+- `POST /auth/platform/refresh`
+- `POST /auth/platform/logout`
+- `POST /auth/admin/refresh`
+- `POST /auth/admin/logout`
+- `POST /auth/refresh` (Client)
+- `POST /auth/logout` (Client)
 - `POST /auth/forgot-password`
 - `POST /auth/reset-password`
 - `GET /auth/me`
 - `POST /auth/invitations`
 - `GET /auth/invitations/:token`
 - `POST /auth/invitations/accept`
-- `POST /tenants/signup`
+- `POST /auth/register`
+- `GET /auth/admin/google`
+- `GET /auth/admin/google/callback`
+- `GET /auth/admin/google/onboarding`
+- `POST /auth/admin/google/onboarding`
 - `GET /platform/tenants`
 - `POST /platform/tenants`
 
@@ -49,24 +57,58 @@ Bảo vệ dữ liệu doanh nghiệp, cho phép mỗi nhóm người dùng ch�
 - `permissions`
 - `user_permission`
 - `user_invitations`
+- `user_identity`
 
-Không thêm `sessions` table trong F1. Refresh/session state dùng `users.refresh_token`.
+`User.password` nullable để hỗ trợ tài khoản OAuth-only; đăng nhập thủ công phải từ chối tài khoản chưa có password.
+
+Không thêm `sessions` table trong F1. Refresh/session state dùng `users.refresh_token_hash`.
 
 ## Auth Contexts
+
+ARCH-001: Business Admin nằm trong Web tại `/{locale}/admin/*`; giữ context
+`admin` và API `/auth/admin/*`. Public registration/recovery dùng client riêng,
+không kế thừa Admin token/headers. Platform Admin vẫn là app độc lập.
 
 | Context    | App                   | Roles hợp lệ     | Refresh cookies                             |
 | :--------- | :-------------------- | :--------------- | :------------------------------------------ |
 | `platform` | `apps/platform-admin` | `SUPER_ADMIN`    | `platform_refresh_token`, `platform_has_rt` |
-| `admin`    | `apps/admin`          | `OWNER`, `STAFF` | `admin_refresh_token`, `admin_has_rt`       |
+| `admin`    | `apps/web`            | `OWNER`, `STAFF` | `admin_refresh_token`, `admin_has_rt`       |
 | `client`   | `apps/web`            | `CUSTOMER`       | `client_refresh_token`, `client_has_rt`     |
 
 `SUPER_ADMIN` là global role, không cần `tenant_id`. `OWNER` và `STAFF` là tenant-scoped roles. Tenant là account/organization; business/branch/location nằm trong `Business`.
+
+## Session Hardening
+
+- Database chỉ lưu SHA-256 hash của refresh token trong `User.refresh_token_hash`; raw token chỉ tồn tại trong HttpOnly cookie.
+- Mỗi user có một active refresh session. Login mới thay hash hiện tại và revoke session cũ.
+- Refresh token không rotate trong F1; refresh chỉ cấp access token mới.
+- JWT dùng audience theo context: `platform`, `admin` hoặc `client`.
+- Refresh luôn đọc lại user để kiểm tra status, verification, role, tenant và token hash.
+- Logout, đổi/reset mật khẩu và chuyển account sang `INACTIVE` đều revoke session.
+- Refresh cookie dùng path riêng theo context; marker cookie không chứa token.
+- `SameSite=None` bị chặn cho đến khi có CSRF protection.
+- Migration sang `refresh_token_hash` đặt các giá trị raw cũ về `NULL`, vì vậy tất cả session cũ phải đăng nhập lại.
+
+## Email Verification & Password Recovery
+
+- Public Business signup tạo Owner chưa xác thực, default Business và membership trong một transaction.
+- Signup trả `sessionId` và chuyển Owner sang Business Admin verify-email trước khi cho phép đăng nhập.
+
+- Public request endpoints trả phản hồi đồng nhất để không tiết lộ email có tồn tại hoặc đã xác thực.
+- Verification session có TTL 15 phút và được cô lập theo purpose: `email_verification` hoặc `password_reset`.
+- OTP gồm đúng 6 chữ số; rate-limit trả lỗi HTTP 429 có type rõ ràng.
+- OTP chỉ bị consume và session chỉ bị xóa sau khi database update thành công.
+- Reset password xóa `refresh_token_hash`, buộc user đăng nhập lại bằng mật khẩu mới.
+- Password tối thiểu 8 ký tự được áp dụng thống nhất ở shared schema và API DTO.
+- Admin giữ domain error `EMAIL_NOT_VERIFIED` cùng `sessionId` để chuyển sang màn hình verify email.
+- Forgot password tự chuyển `sessionId` sang reset password; không yêu cầu user sao chép thủ công.
 
 ## Frontend Screens
 
 - Login.
 - Forgot password.
 - Reset password.
+- Verify email và resend OTP.
 - Accept invitation.
 
 ## Admin Screens
@@ -103,20 +145,46 @@ Không thêm `sessions` table trong F1. Refresh/session state dùng `users.refre
 - `resource:manage` cover các action cùng resource.
 - Không hardcode quyền trong UI; API vẫn là nguồn kiểm soát cuối.
 - F1 triển khai permission engine dùng chung; các feature sau chỉ khai báo permission cụ thể theo module.
+- Public Owner registration thuộc Auth; Auth gọi Tenant provisioning qua interface hẹp. Tenant không phụ thuộc ngược vào Auth, Verification hoặc Email.
+- Access/refresh JWT mang `tenant_id` và `auth_context`; refresh bị revoke nếu account đổi Tenant.
+- Route `()` chỉ nhận Admin context của `OWNER`/`STAFF` và bắt buộc Tenant header trùng JWT.
+- Owner được truy cập toàn bộ Business trong Tenant; Staff chỉ truy cập Business có membership cùng Tenant.
+- Google OAuth account mới chỉ nhận Redis onboarding session tại callback; Tenant/Business/Owner chỉ được tạo khi hoàn tất onboarding.
+- Google onboarding token chỉ nằm trong HttpOnly cookie, không truyền qua URL; email và Google subject luôn lấy từ verified provider profile.
+- Backend F1-007 cung cấp contract onboarding; UI `/{locale}/admin/onboarding/business` được triển khai trong F1-011.
 
 ## Delivery Phases
 
 ### Phase 1 - API
 
 - Cập nhật `/auth/me` trả user, tenant và permissions.
-- Thêm `POST /auth/login-platform` cho `SUPER_ADMIN`.
-- Chuẩn hóa login/refresh/logout dựa trên `User.refresh_token`.
-- Clear refresh token khi logout, đổi mật khẩu hoặc reset mật khẩu.
+- Tách `PlatformAuthController` với login/refresh/logout riêng cho
+  `SUPER_ADMIN`.
+- Tách `AdminAuthController` với login/refresh/logout riêng cho `OWNER` và
+  `STAFF`; không phụ thuộc `x-auth-context` trong session flow.
+- Chuẩn hóa login/refresh/logout dựa trên hash trong `User.refresh_token_hash`.
+- Revoke session khi logout, đổi/reset mật khẩu hoặc account bị inactive.
+- Cô lập refresh token bằng JWT audience và cookie path theo auth context.
+- Chống refresh loop/storm bằng marker cookie và một shared refresh promise trên frontend.
 - Gắn permission guard vào API quản trị.
 - Thêm backend invitation flow.
 - Bổ sung unit tests cho auth, permission và invitation use cases.
 
 ### Phase 2 - Business Admin FE
+
+- F1-009: Owner password login/session đã nối với `/auth/me`; token chỉ giữ trong memory.
+- Bootstrap/interceptor dùng chung refresh promise; session hết hạn xóa cache và Business context.
+- Dashboard đợi xác thực, safe `returnTo`, permission navigation và Business selection hợp lệ.
+- Specs Admin được chạy trong từng task qua `pnpm test:admin` và CI.
+- F1-010: Web đăng ký Owner chuyển sang Admin verification, không tự login;
+  OTP/request/resend và forgot/reset có pending, lỗi inline, rate-limit và expired-session states.
+- Session ID chỉ truyền nội bộ qua URL/API, không có ô nhập hoặc nội dung yêu cầu sao chép.
+- Public request/resend responses và quota không phân biệt email tồn tại/đã verified;
+  Axios public auth client không refresh token khi OTP session hết hạn.
+- Web registration specs chạy qua `pnpm test:web` và CI.
+- F1-011: Admin Google Login và public Business onboarding đã nối OAuth backend;
+  email Google read-only, không password giả, session/context dùng chung F1-009.
+- OAuth/onboarding specs nằm trong task; Google Account thật cần hoàn tất HITL.
 
 - Login, forgot password, reset password và accept invitation screens.
 - Current user state đọc từ `/auth/me`.
@@ -125,7 +193,8 @@ Không thêm `sessions` table trong F1. Refresh/session state dùng `users.refre
 
 ### Phase 3 - Platform Admin FE
 
-- Platform Admin dùng `/auth/login-platform` và `x-auth-context: platform`.
+- Platform Admin dùng `/auth/platform/login`, `/auth/platform/refresh` và
+  `/auth/platform/logout` mà không phụ thuộc `x-auth-context` cho session flow.
 - Tenant registry đọc `GET /platform/tenants`.
 - Super Admin tạo tenant thủ công bằng `POST /platform/tenants`.
 - Dashboard platform hiển thị tenant/user totals từ tenant registry API.
@@ -133,8 +202,8 @@ Không thêm `sessions` table trong F1. Refresh/session state dùng `users.refre
 ### Phase 4 - Public Business Signup
 
 - Web route `/{locale}/signup-business`.
-- Tạo tenant + owner account bằng `POST /tenants/signup`.
-- Sau signup, owner đi tới Business Admin login.
+- Tạo tenant + owner account bằng `POST /auth/register`.
+- Sau signup, owner đi tới Business Admin verify-email bằng `sessionId`; chỉ đăng nhập sau khi xác thực thành công.
 
 ### Phase 5 - Migration & Docs
 

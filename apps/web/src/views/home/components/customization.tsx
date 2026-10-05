@@ -11,9 +11,18 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { RepeatReveal } from "@/src/components/motion/RepeatReveal";
-import { formatSlug, getHexColorValue, isHexColor } from "../home.utils";
-import { CustomizationProps, ToastMsg } from "../home.types";
-import { COLOR_SWATCHES, TYPOGRAPHY_PRESETS } from "../home.constants";
+import {
+  formatSlug,
+  getHexColorValue,
+  isHexColor,
+  withColorAlpha,
+} from "../utils/home.utils";
+import { COLOR_INPUT_DEFAULT } from "../constants/color-input.constants";
+import { CustomizationProps, ToastMsg } from "../types/home.types";
+import {
+  COLOR_SWATCHES,
+  TYPOGRAPHY_PRESETS,
+} from "../constants/home.constants";
 
 export function Customization({
   customColor,
@@ -169,21 +178,21 @@ export function Customization({
   return (
     <RepeatReveal
       id="customization"
-      className="scroll-mt-20 md:scroll-mt-24 py-16 md:py-24 lg:py-28 bg-bg-primary border-t border-border-light"
+      className="scroll-mt-20 md:scroll-mt-24 py-16 md:py-24 lg:py-28 bg-surface border-t border-border"
     >
       {/* Inject custom pulse keyframes dynamically depending on current brand color */}
       <style
         dangerouslySetInnerHTML={{
           __html: `
         @keyframes customPulse {
-          0% { box-shadow: 0 0 0 0 ${hexColor}80; }
+          0% { box-shadow: 0 0 0 0 ${withColorAlpha(hexColor, "80")}; }
           100% { box-shadow: 0 0 0 14px transparent; }
         }
       `,
         }}
       />
 
-      <div className="mx-auto max-w-7xl px-6">
+      <div className="mx-auto w-full max-w-landing px-4 sm:px-6 lg:px-8">
         {/* Centered Section Header above the panels */}
         <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
           <span
@@ -192,10 +201,10 @@ export function Customization({
           >
             Live Customization
           </span>
-          <h2 className="text-3xl sm:text-4xl md:text-[38px] font-extrabold tracking-tight text-text-primary leading-tight">
+          <h2 className="text-3xl sm:text-4xl md:text-[38px] font-extrabold tracking-tight text-foreground leading-tight">
             Customize every template to match your brand
           </h2>
-          <p className="text-text-muted text-base max-w-2xl mx-auto leading-relaxed">
+          <p className="text-muted-foreground text-base max-w-2xl mx-auto leading-relaxed">
             Change your logo, brand color, and typography — your booking page
             updates instantly.
           </p>
@@ -205,27 +214,27 @@ export function Customization({
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
           {/* Left Column: Interactive Customization Panel */}
           <div className="flex flex-col space-y-4 w-full">
-            <span className="text-[10px] font-extrabold text-text-muted uppercase tracking-wider flex items-center gap-1.5">
+            <span className="text-[10px] font-extrabold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
               <Settings className="w-3.5 h-3.5" />
               BRAND & BOOKING SETTINGS
             </span>
             {/* Control Panel Card */}
-            <div className="p-6 bg-bg-secondary border border-border-light rounded-2xl space-y-6">
+            <div className="p-6 bg-background border border-border rounded-2xl space-y-6">
               <div className="flex items-center gap-2 mb-2">
                 <div
-                  className="w-6 h-6 rounded-lg flex items-center justify-center text-white"
+                  className="w-6 h-6 rounded-lg flex items-center justify-center text-primary-foreground"
                   style={{ backgroundColor: hexColor }}
                 >
                   <LayoutDashboard className="w-3.5 h-3.5" />
                 </div>
-                <h3 className="text-sm font-bold text-text-primary">
+                <h3 className="text-sm font-bold text-foreground">
                   Brand & booking settings
                 </h3>
               </div>
 
               {/* 1. Business Name Field */}
               <div className="space-y-1.5">
-                <label className="text-[10px] font-extrabold text-text-muted uppercase tracking-wider block">
+                <label className="text-[10px] font-extrabold text-muted-foreground uppercase tracking-wider block">
                   Business name
                 </label>
                 <input
@@ -233,11 +242,11 @@ export function Customization({
                   maxLength={32}
                   value={customBusinessName}
                   onChange={(e) => setCustomBusinessName(e.target.value)}
-                  className="w-full px-3 py-2 border border-border-light rounded-lg text-xs focus:outline-none focus:border-brand-blue bg-white"
+                  className="w-full px-3 py-2 border border-border rounded-lg text-xs focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2 focus:border-primary bg-surface"
                   placeholder="e.g. Lumière"
                   style={
                     {
-                      "--tw-ring-color": hexColor + "1f",
+                      "--tw-ring-color": withColorAlpha(hexColor, "1f"),
                     } as React.CSSProperties
                   }
                 />
@@ -245,16 +254,16 @@ export function Customization({
 
               {/* 2. Logo Upload Field */}
               <div className="space-y-1.5">
-                <label className="text-[10px] font-extrabold text-text-muted uppercase tracking-wider block">
+                <label className="text-[10px] font-extrabold text-muted-foreground uppercase tracking-wider block">
                   Logo
                 </label>
                 <div className="flex items-center gap-3">
                   <div
-                    className="w-11 h-11 rounded-lg border border-border-light flex items-center justify-center shrink-0 overflow-hidden font-bold select-none"
+                    className="w-11 h-11 rounded-lg border border-border flex items-center justify-center shrink-0 overflow-hidden font-bold select-none"
                     style={{
                       backgroundColor: logoDataUrl
                         ? "transparent"
-                        : hexColor + "14",
+                        : withColorAlpha(hexColor, "14"),
                       color: hexColor,
                     }}
                   >
@@ -274,7 +283,7 @@ export function Customization({
                   <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
-                    className="flex-grow py-2 px-4 border border-dashed border-border-light hover:border-text-primary hover:text-text-primary rounded-full text-xs font-semibold text-text-muted transition cursor-pointer text-center bg-white"
+                    className="flex-grow py-2 px-4 border border-dashed border-border hover:border-foreground hover:text-foreground rounded-full text-xs font-semibold text-muted-foreground transition cursor-pointer text-center bg-surface"
                   >
                     Upload PNG / SVG
                   </button>
@@ -282,7 +291,7 @@ export function Customization({
                     <button
                       type="button"
                       onClick={() => setLogoDataUrl(null)}
-                      className="text-rose-500 hover:text-rose-600 text-xs font-bold px-2 py-1 transition cursor-pointer"
+                      className="text-danger-500 hover:text-danger-surface-foreground text-xs font-bold px-2 py-1 transition cursor-pointer"
                     >
                       Remove
                     </button>
@@ -299,7 +308,7 @@ export function Customization({
 
               {/* 3. Color Swatches */}
               <div className="space-y-1.5">
-                <label className="text-[10px] font-extrabold text-text-muted uppercase tracking-wider block">
+                <label className="text-[10px] font-extrabold text-muted-foreground uppercase tracking-wider block">
                   Brand color
                 </label>
                 <div className="flex flex-wrap gap-3 items-center">
@@ -312,10 +321,10 @@ export function Customization({
                         onClick={() => setCustomColor(col.name)}
                         className={`w-7 h-7 rounded-full ${
                           col.class
-                        } relative transition transform active:scale-95 focus:outline-none hover:scale-[1.08] cursor-pointer ${
+                        } relative transition transform active:scale-95 focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2 hover:scale-[1.08] cursor-pointer ${
                           isSelected
-                            ? "ring-[1.5px] ring-text-primary ring-offset-4"
-                            : "border border-black/5"
+                            ? "ring-[1.5px] ring-foreground ring-offset-4"
+                            : "border border-neutral-950/5"
                         }`}
                         aria-label={`Select color ${col.label}`}
                         aria-pressed={isSelected}
@@ -327,20 +336,20 @@ export function Customization({
                     <button
                       type="button"
                       onClick={() => colorInputRef.current?.click()}
-                      className={`h-7 px-3 rounded-full border text-[11px] font-bold flex items-center gap-1.5 transition active:scale-95 hover:bg-bg-secondary cursor-pointer ${
+                      className={`h-7 px-3 rounded-full border text-[11px] font-bold flex items-center gap-1.5 transition active:scale-95 hover:bg-background cursor-pointer ${
                         isHexColor(customColor)
-                          ? "border-text-primary bg-bg-secondary text-text-primary"
-                          : "border-border-light bg-white text-text-muted"
+                          ? "border-foreground bg-background text-foreground"
+                          : "border-border bg-surface text-muted-foreground"
                       }`}
                       aria-label="Custom color picker"
                       aria-pressed={isHexColor(customColor)}
                     >
                       <span
-                        className="w-3.5 h-3.5 rounded-full border border-black/10 shrink-0"
+                        className="w-3.5 h-3.5 rounded-full border border-neutral-950/10 shrink-0"
                         style={{
                           background: isHexColor(customColor)
                             ? customColor
-                            : "linear-gradient(135deg, #ec4899 0%, #3b82f6 50%, #10b981 100%)",
+                            : "linear-gradient(135deg, var(--color-danger) 0%, var(--color-primary) 50%, var(--color-success) 100%)",
                         }}
                       />
                       <span>Custom</span>
@@ -348,7 +357,11 @@ export function Customization({
                     <input
                       ref={colorInputRef}
                       type="color"
-                      value={isHexColor(customColor) ? customColor : "#111827"}
+                      value={
+                        isHexColor(customColor)
+                          ? customColor
+                          : COLOR_INPUT_DEFAULT
+                      }
                       onChange={(e) => setCustomColor(e.target.value)}
                       className="absolute opacity-0 pointer-events-none w-0 h-0"
                     />
@@ -358,7 +371,7 @@ export function Customization({
 
               {/* 4. Typography Presets */}
               <div className="space-y-1.5">
-                <label className="text-[10px] font-extrabold text-text-muted uppercase tracking-wider block">
+                <label className="text-[10px] font-extrabold text-muted-foreground uppercase tracking-wider block">
                   Typography
                 </label>
                 <div className="grid grid-cols-3 gap-2">
@@ -371,15 +384,15 @@ export function Customization({
                         onClick={() => setFontFamily(font.value)}
                         className={`py-2 px-2.5 rounded-lg border text-left flex flex-col justify-between h-[52px] transition active:scale-95 cursor-pointer ${
                           isSelected
-                            ? "border-text-primary bg-bg-secondary text-text-primary shadow-sm"
-                            : "border-border-light bg-white text-text-secondary hover:border-text-muted"
+                            ? "border-foreground bg-background text-foreground shadow-sm"
+                            : "border-border bg-surface text-foreground hover:border-muted-foreground"
                         }`}
                         style={{ fontFamily: font.value }}
                       >
                         <span className="text-xs font-bold leading-none">
                           Aa
                         </span>
-                        <span className="text-[9px] font-bold text-text-muted block tracking-tight truncate leading-none uppercase">
+                        <span className="text-[9px] font-bold text-muted-foreground block tracking-tight truncate leading-none uppercase">
                           {font.name}
                         </span>
                       </button>
@@ -389,8 +402,8 @@ export function Customization({
               </div>
 
               {/* 5. Booking Rules Checkboxes */}
-              <div className="space-y-3 pt-4 border-t border-border-light">
-                <label className="text-[10px] font-extrabold text-text-muted uppercase tracking-wider block mb-1">
+              <div className="space-y-3 pt-4 border-t border-border">
+                <label className="text-[10px] font-extrabold text-muted-foreground uppercase tracking-wider block mb-1">
                   Booking rules
                 </label>
                 <div className="space-y-3">
@@ -433,8 +446,8 @@ export function Customization({
                       <div
                         className={`w-[18px] h-[18px] rounded-[5px] border flex items-center justify-center shrink-0 transition duration-150 mt-0.5 ${
                           rule.checked
-                            ? "border-transparent text-white"
-                            : "border-border-light bg-white group-hover:border-text-muted"
+                            ? "border-transparent text-primary-foreground"
+                            : "border-border bg-surface group-hover:border-muted-foreground"
                         }`}
                         style={{
                           backgroundColor: rule.checked ? hexColor : undefined,
@@ -442,14 +455,14 @@ export function Customization({
                         }}
                       >
                         {rule.checked && (
-                          <span className="w-1.5 h-2.5 border-r-2 border-b-2 border-white transform rotate-45 -translate-y-[1px]" />
+                          <span className="w-1.5 h-2.5 border-r-2 border-b-2 border-surface transform rotate-45 -translate-y-[1px]" />
                         )}
                       </div>
                       <div className="flex flex-col">
-                        <span className="text-xs font-semibold text-text-primary group-hover:text-brand-blue transition-colors">
+                        <span className="text-xs font-semibold text-foreground group-hover:text-primary transition-colors">
                           {rule.label}
                         </span>
-                        <span className="text-[10px] text-text-muted mt-0.5">
+                        <span className="text-[10px] text-muted-foreground mt-0.5">
                           {rule.sub}
                         </span>
                       </div>
@@ -459,11 +472,11 @@ export function Customization({
               </div>
 
               {/* 6. Reset button */}
-              <div className="pt-4 border-t border-border-light">
+              <div className="pt-4 border-t border-border">
                 <button
                   type="button"
                   onClick={handleReset}
-                  className="flex items-center gap-1.5 px-3 py-1.5 border border-border-light hover:border-text-primary hover:text-text-primary text-[10.5px] font-bold text-text-muted rounded-full transition cursor-pointer bg-white"
+                  className="flex items-center gap-1.5 px-3 py-1.5 border border-border hover:border-foreground hover:text-foreground text-[10.5px] font-bold text-muted-foreground rounded-full transition cursor-pointer bg-surface"
                 >
                   <RotateCcw className="w-3 h-3" />
                   Reset to defaults
@@ -474,7 +487,7 @@ export function Customization({
 
           {/* Right Column: Live Customized Booking Page Mockup */}
           <div className="flex flex-col space-y-4 w-full relative">
-            <span className="text-[10px] font-extrabold text-text-muted uppercase tracking-wider flex items-center gap-1.5">
+            <span className="text-[10px] font-extrabold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
               <Smartphone className="w-3.5 h-3.5" />
               LIVE CUSTOMIZED PREVIEW
             </span>
@@ -487,23 +500,23 @@ export function Customization({
                     initial={{ opacity: 0, scale: 0.9, y: -5 }}
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.9, y: -5 }}
-                    className="absolute top-[56px] right-4 bg-gray-900/90 text-white text-[9.5px] font-bold py-1 px-2.5 rounded-full flex items-center gap-1.5 shadow-sm z-50 border border-white/5"
+                    className="absolute top-[56px] right-4 bg-neutral-900/90 text-primary-foreground text-[9.5px] font-bold py-1 px-2.5 rounded-full flex items-center gap-1.5 shadow-sm z-50 border border-surface/5"
                   >
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-success-500 animate-pulse" />
                     <span>Updating...</span>
                   </motion.div>
                 )}
               </AnimatePresence>
 
-              <div className="w-full bg-white border border-border-light rounded-xl shadow-2xl overflow-hidden select-none flex flex-col h-[620px]">
+              <div className="w-full bg-surface border border-border rounded-xl shadow-2xl overflow-hidden select-none flex flex-col h-[620px]">
                 {/* Browser bar top */}
-                <div className="flex items-center justify-between p-3 border-b border-border-light/60 bg-bg-secondary shrink-0">
+                <div className="flex items-center justify-between p-3 border-b border-border/60 bg-background shrink-0">
                   <div className="flex items-center gap-1.5 w-16">
-                    <div className="w-3 h-3 rounded-full bg-red-400 border border-black/10" />
-                    <div className="w-3 h-3 rounded-full bg-yellow-400 border border-black/10" />
-                    <div className="w-3 h-3 rounded-full bg-green-400 border border-black/10" />
+                    <div className="w-3 h-3 rounded-full bg-danger-400 border border-neutral-950/10" />
+                    <div className="w-3 h-3 rounded-full bg-warning-400 border border-neutral-950/10" />
+                    <div className="w-3 h-3 rounded-full bg-success-400 border border-neutral-950/10" />
                   </div>
-                  <div className="bg-white text-[9px] font-medium text-text-muted px-4 py-1.5 rounded-md border border-border-light w-full max-w-xs truncate text-center shadow-sm">
+                  <div className="bg-surface text-[9px] font-medium text-muted-foreground px-4 py-1.5 rounded-md border border-border w-full max-w-xs truncate text-center shadow-sm">
                     bookingbase.com/
                     {formatSlug(customBusinessName) || "your-brand"}
                   </div>
@@ -511,12 +524,12 @@ export function Customization({
                 </div>
 
                 {/* Mockup Content */}
-                <div className="flex-grow overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bg-bg-primary p-5 pb-16 relative">
+                <div className="flex-grow overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bg-surface p-5 pb-16 relative">
                   {/* Website Header */}
                   <div className="flex items-center justify-between mb-5">
                     <div className="flex items-center gap-2">
                       <div
-                        className="w-8 h-8 rounded-full flex items-center justify-center text-white font-extrabold text-xs shadow-sm overflow-hidden shrink-0"
+                        className="w-8 h-8 rounded-full flex items-center justify-center text-primary-foreground font-extrabold text-xs shadow-sm overflow-hidden shrink-0"
                         style={{
                           backgroundColor: logoDataUrl
                             ? "transparent"
@@ -534,11 +547,11 @@ export function Customization({
                           (customBusinessName && customBusinessName[0]) || "B"
                         )}
                       </div>
-                      <h3 className="text-xs font-bold text-text-primary">
+                      <h3 className="text-xs font-bold text-foreground">
                         {customBusinessName || "Your Service Brand"}
                       </h3>
                     </div>
-                    <div className="flex items-center gap-3 text-[9px] font-bold text-text-muted">
+                    <div className="flex items-center gap-3 text-[9px] font-bold text-muted-foreground">
                       <span>Services</span>
                       <span>Team</span>
                       <span>Reviews</span>
@@ -547,7 +560,7 @@ export function Customization({
 
                   {/* Booking Card */}
                   <div
-                    className="max-w-sm mx-auto bg-white border border-border-light rounded-xl p-4 shadow-sm space-y-4 relative transition-[font-family] duration-300"
+                    className="max-w-sm mx-auto bg-surface border border-border rounded-xl p-4 shadow-sm space-y-4 relative transition-[font-family] duration-300"
                     style={{ fontFamily }}
                   >
                     {/* Trust Badges inside Booking Card */}
@@ -570,13 +583,13 @@ export function Customization({
                               : { height: 0, opacity: 0, margin: 0 }
                           }
                           transition={{ duration: 0.3 }}
-                          className="flex items-center justify-center gap-3 text-[8.5px] font-bold text-[#16a34a] bg-[#f0fdf4] border border-[#bbf7d0] py-1.5 px-3 rounded-full max-w-[280px] mx-auto select-none overflow-hidden"
+                          className="flex items-center justify-center gap-3 text-[8.5px] font-bold text-success bg-success-surface border border-success-border py-1.5 px-3 rounded-full max-w-[280px] mx-auto select-none overflow-hidden"
                         >
                           <span className="flex items-center gap-1">
                             <Check className="w-2.5 h-2.5 shrink-0" />
                             Instant Confirmation
                           </span>
-                          <span className="w-1 h-1 rounded-full bg-emerald-500/40" />
+                          <span className="w-1 h-1 rounded-full bg-success-500/40" />
                           <span className="flex items-center gap-1">
                             <Check className="w-2.5 h-2.5 shrink-0" />
                             Secure Deposit
@@ -587,16 +600,16 @@ export function Customization({
 
                     {/* Step 1: Services */}
                     <div>
-                      <span className="text-[9px] font-extrabold text-text-muted block uppercase tracking-wider mb-2">
+                      <span className="text-[9px] font-extrabold text-muted-foreground block uppercase tracking-wider mb-2">
                         1. Select service
                       </span>
-                      <div className="border border-border-light rounded-lg p-3 cursor-pointer hover:border-text-secondary transition-colors">
+                      <div className="border border-border rounded-lg p-3 cursor-pointer hover:border-foreground transition-colors">
                         <div className="flex justify-between items-start">
                           <div>
-                            <span className="text-[11px] font-bold text-text-primary block">
+                            <span className="text-[11px] font-bold text-foreground block">
                               Signature Hot Stone Session
                             </span>
-                            <span className="text-[9px] text-text-muted mt-1 block">
+                            <span className="text-[9px] text-muted-foreground mt-1 block">
                               65 mins • Personal Care
                             </span>
                           </div>
@@ -632,7 +645,7 @@ export function Customization({
                           transition={{ duration: 0.25, ease: "easeInOut" }}
                         >
                           <div className="pt-2">
-                            <span className="text-[9px] font-extrabold text-text-muted block uppercase tracking-wider mb-2">
+                            <span className="text-[9px] font-extrabold text-muted-foreground block uppercase tracking-wider mb-2">
                               2. Choose specialist
                             </span>
                             <div className="grid grid-cols-2 gap-2">
@@ -661,21 +674,21 @@ export function Customization({
                                     }
                                     className={`p-2 rounded-lg border text-left flex items-center gap-2 transition active:scale-95 cursor-pointer ${
                                       isSelected
-                                        ? "border-text-primary bg-bg-secondary"
-                                        : "border-border-light hover:border-text-muted"
+                                        ? "border-foreground bg-background"
+                                        : "border-border hover:border-muted-foreground"
                                     }`}
                                   >
                                     <div
-                                      className="w-6 h-6 rounded-full flex items-center justify-center text-[9px] font-bold text-white shrink-0"
+                                      className="w-6 h-6 rounded-full flex items-center justify-center text-[9px] font-bold text-primary-foreground shrink-0"
                                       style={{ backgroundColor: hexColor }}
                                     >
                                       {staff.initials}
                                     </div>
                                     <div className="truncate">
-                                      <span className="text-[10px] font-bold text-text-primary block leading-tight">
+                                      <span className="text-[10px] font-bold text-foreground block leading-tight">
                                         {staff.name}
                                       </span>
-                                      <span className="text-[8px] text-text-muted block leading-none mt-0.5">
+                                      <span className="text-[8px] text-muted-foreground block leading-none mt-0.5">
                                         {staff.role}
                                       </span>
                                     </div>
@@ -690,7 +703,7 @@ export function Customization({
 
                     {/* Step 3: Date & Time Selector */}
                     <div>
-                      <span className="text-[9px] font-extrabold text-text-muted block uppercase tracking-wider mb-2">
+                      <span className="text-[9px] font-extrabold text-muted-foreground block uppercase tracking-wider mb-2">
                         3. Pick date & time
                       </span>
                       <div className="grid grid-cols-4 gap-1.5 text-center">
@@ -702,8 +715,8 @@ export function Customization({
                                 key={time}
                                 className={`py-1.5 px-1 rounded-md text-[9.5px] font-bold border transition ${
                                   isSelected
-                                    ? "text-white"
-                                    : "border-border-light text-text-secondary hover:border-text-muted"
+                                    ? "text-primary-foreground"
+                                    : "border-border text-foreground hover:border-muted-foreground"
                                 }`}
                                 style={{
                                   backgroundColor: isSelected
@@ -727,7 +740,7 @@ export function Customization({
                       <button
                         type="button"
                         onClick={handleBookClick}
-                        className="w-full py-3 text-white text-[11px] font-bold rounded-full shadow-sm cursor-pointer transition-transform duration-200 active:scale-[0.98] hover:translate-y-[-1px]"
+                        className="w-full py-3 text-primary-foreground text-[11px] font-bold rounded-full shadow-sm cursor-pointer transition-transform duration-200 active:scale-[0.98] hover:translate-y-[-1px]"
                         style={{
                           backgroundColor: hexColor,
                           animation: pulseCta
@@ -744,7 +757,7 @@ export function Customization({
                           className="w-3 h-3"
                           style={{ color: hexColor }}
                         />
-                        <p className="text-[9px] text-text-muted text-center font-medium">
+                        <p className="text-[9px] text-muted-foreground text-center font-medium">
                           {customRequireDeposit
                             ? "Secure online deposit"
                             : "Standard booking"}
@@ -784,27 +797,27 @@ export function Customization({
                               }
                         }
                         transition={{ duration: 0.3, ease: "easeOut" }}
-                        className="max-w-sm mx-auto bg-white border border-border-light rounded-xl shadow-sm p-4 select-none overflow-hidden"
+                        className="max-w-sm mx-auto bg-surface border border-border rounded-xl shadow-sm p-4 select-none overflow-hidden"
                       >
                         <div className="flex items-start gap-2.5">
                           <div
-                            className="w-6 h-6 rounded-full flex items-center justify-center text-white shrink-0"
+                            className="w-6 h-6 rounded-full flex items-center justify-center text-primary-foreground shrink-0"
                             style={{ backgroundColor: hexColor }}
                           >
-                            <Mail className="w-3.5 h-3.5 text-white" />
+                            <Mail className="w-3.5 h-3.5 text-primary-foreground" />
                           </div>
                           <div className="flex-grow">
                             <div className="flex items-center justify-between mb-0.5">
-                              <span className="text-[9px] font-extrabold text-text-primary uppercase tracking-wider">
+                              <span className="text-[9px] font-extrabold text-foreground uppercase tracking-wider">
                                 SMS reminder preview
                               </span>
-                              <span className="text-[8px] text-text-muted">
+                              <span className="text-[8px] text-muted-foreground">
                                 Just now
                               </span>
                             </div>
-                            <p className="text-[10px] text-text-secondary leading-snug text-left">
+                            <p className="text-[10px] text-foreground leading-snug text-left">
                               Hi Alex, your appointment at{" "}
-                              <strong className="text-text-primary font-bold">
+                              <strong className="text-foreground font-bold">
                                 {customBusinessName || "your business"}
                               </strong>{" "}
                               is confirmed. We&apos;ll text you a reminder 24h
@@ -871,7 +884,7 @@ function Toast({
     <div
       role="status"
       aria-live="polite"
-      className={`pointer-events-auto bg-white text-text-primary p-4 rounded-xl border border-border-light shadow-[0_10px_30px_rgba(0,0,0,0.08)] w-[340px] flex gap-3 transition-transform duration-400 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+      className={`pointer-events-auto bg-surface text-foreground p-4 rounded-xl border border-border shadow-md w-[340px] flex gap-3 transition-transform duration-400 ease-[cubic-bezier(0.16,1,0.3,1)] ${
         show ? "transform translate-x-0" : "transform translate-x-[120%]"
       }`}
       style={{ fontFamily }}
@@ -879,23 +892,23 @@ function Toast({
       <div
         className="w-9 h-9 rounded-full flex items-center justify-center shrink-0"
         style={{
-          backgroundColor: colorHex + "12",
+          backgroundColor: withColorAlpha(colorHex, "12"),
         }}
       >
         <Mail className="w-4 h-4" style={{ color: colorHex }} />
       </div>
       <div className="space-y-1 text-left">
-        <span className="text-[10px] font-extrabold text-text-muted uppercase tracking-wider block">
+        <span className="text-[10px] font-extrabold text-muted-foreground uppercase tracking-wider block">
           BOOKING SMS · SENT
         </span>
-        <p className="text-[11px] text-text-secondary leading-snug">
+        <p className="text-[11px] text-foreground leading-snug">
           Hi Alex, your appointment at{" "}
-          <strong className="text-text-primary font-bold">
+          <strong className="text-foreground font-bold">
             {msg.businessName}
           </strong>{" "}
           is confirmed for{" "}
-          <span className="text-text-primary font-bold">{msg.timeStr}</span>{" "}
-          with Emily Cooper. We&apos;ll text you a reminder 24h before.
+          <span className="text-foreground font-bold">{msg.timeStr}</span> with
+          Emily Cooper. We&apos;ll text you a reminder 24h before.
         </p>
       </div>
     </div>

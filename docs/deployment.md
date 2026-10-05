@@ -8,7 +8,6 @@ Tài liệu này mô tả hướng build và deploy cho repo base. Repo không h
 pnpm build:packages
 pnpm build:api
 pnpm build:web
-pnpm build:admin
 pnpm build:platform-admin
 ```
 
@@ -25,7 +24,6 @@ Build image:
 ```bash
 pnpm docker:build:api
 pnpm docker:build:web
-pnpm docker:build:admin
 pnpm docker:build:platform-admin
 pnpm docker:build:all
 ```
@@ -59,7 +57,6 @@ Production compose dùng image qua biến:
 
 - `API_IMAGE`
 - `WEB_IMAGE`
-- `ADMIN_IMAGE`
 - `PLATFORM_ADMIN_IMAGE`
 - `IMAGE_TAG`
 
@@ -81,10 +78,23 @@ pnpm prisma:migrate:prod
 
 ## CI/CD
 
+ARCH-001 hợp nhất Landing và Business Admin vào image `web`. Production build
+cần GitHub repository variables `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_WEB_URL`;
+Docker build args nhúng các biến này vào browser bundle. Thay env ở lúc start
+container không thay public URL đã build. Local Docker default dùng localhost.
+API dùng `WEB_URL` (origin, không `/admin`) cho OAuth redirect; Google authorized
+callback vẫn là URL API. Public health check kiểm tra Landing và
+`${DEPLOY_WEB_URL}/vi/admin/login` trên cùng service.
+
+Trước cutover từ release có Admin riêng, làm theo
+[ADR 0003](adr/0003-merge-web-business-admin.md): kiểm tra ingress/cookie/CORS,
+Google thật và giữ Compose + env + images cũ. Automatic image rollback không đủ
+để phục hồi service Admin đã loại khỏi Compose ở lần cutover đầu tiên.
+
 GitHub Actions chạy theo pipeline:
 
 1. `CI`: lint, typecheck, test, build và Trivy dependency scan.
-2. `Build, Scan, and Push Images`: build bốn application image, báo cáo
+2. `Build, Scan, and Push Images`: build ba application image, báo cáo
    vulnerability HIGH/CRITICAL, chặn CRITICAL và push image đã qua gate lên
    GHCR.
 3. `Deploy Production`: chạy Prisma migration, cập nhật Docker Compose qua
@@ -105,7 +115,7 @@ Tạo environment tên `production` và cấu hình các secrets:
 - `DEPLOY_PORT`: SSH port, không bắt buộc, mặc định `22`.
 - `DEPLOY_API_HEALTH_URL`: API liveness URL công khai, ví dụ
   `https://api.example.com/health/live`.
-- `DEPLOY_WEB_URL`, `DEPLOY_ADMIN_URL`, `DEPLOY_PLATFORM_ADMIN_URL`: endpoint
+- `DEPLOY_WEB_URL`, `DEPLOY_PLATFORM_ADMIN_URL`: endpoint
   frontend để kiểm tra sau deploy, không bắt buộc.
 - `GHCR_USERNAME`: tài khoản đọc private GHCR package, không bắt buộc nếu
   `github.repository_owner` có thể dùng được.

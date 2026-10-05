@@ -53,5 +53,7 @@ check_endpoint() {
 
 check_endpoint DEPLOY_API_HEALTH_URL "${DEPLOY_API_HEALTH_URL:-}" true
 check_endpoint DEPLOY_WEB_URL "${DEPLOY_WEB_URL:-}" false
-check_endpoint DEPLOY_ADMIN_URL "${DEPLOY_ADMIN_URL:-}" false
+if [[ -n "${DEPLOY_WEB_URL:-}" ]]; then
+  check_endpoint BUSINESS_ADMIN_URL "${DEPLOY_WEB_URL%/}/vi/admin/login" false
+fi
 check_endpoint DEPLOY_PLATFORM_ADMIN_URL "${DEPLOY_PLATFORM_ADMIN_URL:-}" false

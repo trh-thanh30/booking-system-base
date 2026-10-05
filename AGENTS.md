@@ -31,12 +31,16 @@ This repo uses a lightweight, repo-native agent workflow inspired by Matt Pocock
 
 ## Frontend Architecture
 
-- Read `docs/architecture/frontend-folder-structure.md` before changing `apps/admin` or `apps/web`.
+- Read `docs/architecture/frontend-folder-structure.md` before changing `apps/web` or `apps/platform-admin`.
+- Web hosts Landing and Business Admin at `/{locale}/admin/*`. Keep Admin AuthProvider/private query cache in the Admin layout only; marketing must not bootstrap Admin. Platform Admin remains a separate service.
 - Keep `app/**/page.tsx` as a thin server component that imports and renders a view from `src/views`.
 - Do not add `"use client"` to `page.tsx`; put client state, event handlers, charts, tables, and browser APIs inside view components or their child components.
 - Put app-level shared components in `src/components/common`, layout components in `src/components/layout`, and feature-specific components in `src/views/<feature>/components`.
-- Use `*.constants.ts`, `*.types.ts`, `*.utils.ts`, and `*.columns.tsx` inside feature folders instead of placing config, mock data, helper logic, or table definitions directly in views.
-- Put API response types and reusable domain DTOs in `packages/shared/src/types`; use `src/views/<feature>/<feature>.types.ts` only for view/local UI state types.
+- Keep `*.view.tsx` at the feature root; put supporting files in role folders even if there is only one file: `constants/*.constants.ts`, `types/*.types.ts`, `utils/*.utils.ts`, `columns/*.columns.tsx`, `data/*.data.ts`. Apply this to nested sections too. Keep components/hooks in their existing role folders and `index.ts` export-only.
+- Put API response types and reusable domain DTOs in `packages/shared/src/types`; use `src/views/<feature>/types/<feature>.types.ts` only for view/local UI state types.
+- Use `const { toast } = useToast()` from `@repo/hooks` in frontend components/hooks; do not import `toast` directly from `sonner` in Admin/Web.
+- Landing compositions live in `apps/web/src/components/common/landing-compositions.tsx`; compose shared `@repo/ui` primitives rather than copying them. Run Web/UI `validate:tokens` after styling changes.
+- Web locale selection supports only `vi`/`en`, derives its value from `useLocale`, and navigates through app-local `next-intl` helpers. Keep metadata localized and configure public origins in `src/config`, not individual components.
 - Keep `index.ts` files export-only and only in folders that actually re-export child modules. Do not create `index.ts` just to keep an empty folder.
 
 ## Backend Architecture

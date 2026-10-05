@@ -23,7 +23,7 @@ export class AcceptInvitationDto implements AcceptInvitationInput {
   full_name?: string;
 
   @IsNotEmpty()
-  @MinLength(6)
+  @MinLength(8)
   password: string;
 
   @IsNotEmpty()

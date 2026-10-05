@@ -2,9 +2,9 @@
 
 `apps/platform-admin` is the super admin portal for platform-level operations.
 
-It is intentionally separate from `apps/admin`:
+It is intentionally separate from `apps/web`:
 
-- `apps/admin`: business/tenant admin portal for owners, managers, and staff.
+- `apps/web` under `/{locale}/admin/*`: business/tenant admin portal for owners, managers, and staff.
 - `apps/platform-admin`: platform portal for super admins and internal operators.
 
 Current scope:
@@ -18,7 +18,9 @@ Current scope:
 Backend dependency:
 
 - `x-auth-context: platform`
-- `POST /auth/login-platform`
+- `POST /auth/platform/login`
+- `POST /auth/platform/refresh`
+- `POST /auth/platform/logout`
 - platform refresh/logout cookies: `platform_refresh_token`, `platform_has_rt`
 - a dedicated super admin role, recommended as `SUPER_ADMIN`
 

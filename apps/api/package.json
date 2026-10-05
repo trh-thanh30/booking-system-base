@@ -8,9 +8,7 @@
   "files": [
     "dist",
     "prisma",
-    "prisma.config.ts",
-    "public",
-    "scripts"
+    "prisma.config.ts"
   ],
   "scripts": {
     "build": "nest build && tsc-alias -p tsconfig.json",
@@ -30,6 +28,7 @@
     "lint:strict": "eslint \"{src,apps,libs,test}/**/*.ts\" --max-warnings 0",
     "check-types": "pnpm --filter @repo/shared run build && tsc --noEmit",
     "test": "pnpm --filter @repo/shared run build && cross-env NODE_ENV=test jest",
+    "test:build-config": "node test/build-config.test.cjs",
     "test:dev": "pnpm --filter @repo/shared run build && dotenv -e ../../.env.development -- cross-env NODE_ENV=development jest",
     "test:prod": "pnpm --filter @repo/shared run build && dotenv -e ../../.env.production -- cross-env NODE_ENV=production jest",
     "test:watch": "pnpm --filter @repo/shared run build && cross-env NODE_ENV=test jest --watch",
@@ -50,17 +49,6 @@
     "db:seed:dev": "dotenv -e ../../.env.development -- ts-node prisma/seed.ts",
     "db:seed:test": "dotenv -e ../../.env.test -- ts-node prisma/seed.ts",
     "db:seed:prod": "dotenv -e ../../.env.production -- ts-node prisma/seed.production.ts",
-    "test:users:dev": "cross-env NODE_ENV=development ts-node scripts/test_base_users_module.ts",
-    "test:users:test": "cross-env NODE_ENV=test ts-node scripts/test_base_users_module.ts",
-    "test:users:prod": "cross-env NODE_ENV=production ts-node scripts/test_base_users_module.ts",
-    "tw:dev": "tailwindcss -i ./src/styles/tailwind.css -o ./public/css/tailwind.css --watch --verbose",
-    "tw:build": "tailwindcss -i ./src/styles/tailwind.css -o ./public/css/tailwind.css --minify",
-    "tw:build:dev": "tailwindcss -i ./src/styles/tailwind.css -o ./public/css/tailwind.css",
-    "tw:clean": "rm -f ./public/css/tailwind.css",
-    "tw:purge": "tailwindcss -i ./src/styles/tailwind.css -o ./public/css/tailwind.css --content 'src/**/*.{ts,js,html,hbs}' 'src/docs/templates/**/*.{hbs,ts}' --purge",
-    "dev:full": "concurrently \"npm run start:dev\" \"npm run tw:dev\"",
-    "build:full": "npm run tw:build && npm run build",
-    "build:full:dev": "npm run tw:build:dev && npm run build",
     "postinstall": "prisma generate",
     "prepare": "husky"
   },
@@ -85,7 +73,6 @@
     "@prisma/config": "^7.4.1",
     "@repo/shared": "workspace:*",
     "@sentry/nestjs": "^10.52.0",
-    "@tailwindcss/cli": "^4.1.13",
     "argon2": "^0.44.0",
     "axios": "^1.11.0",
     "bcryptjs": "^3.0.2",
@@ -122,7 +109,6 @@
     "rxjs": "^7.8.1",
     "signale": "^1.4.0",
     "stripe": "^20.4.1",
-    "tailwindcss": "^4.1.13",
     "unified": "^11.0.5",
     "uuid": "^13.0.0",
     "winston": "^3.17.0",
@@ -148,7 +134,6 @@
     "@types/stripe": "^8.0.417",
     "@types/supertest": "^6.0.2",
     "@types/uuid": "^11.0.0",
-    "concurrently": "^9.2.1",
     "cross-env": "^10.0.0",
     "dotenv-cli": "^10.0.0",
     "eslint": "^9.18.0",
@@ -177,7 +162,16 @@
     "rootDir": "src",
     "testRegex": ".*\\.spec\\.ts$",
     "transform": {
-      "^.+\\.(t|j)s$": "ts-jest"
+      "^.+\\.(t|j)s$": [
+        "ts-jest",
+        {
+          "tsconfig": {
+            "module": "CommonJS",
+            "moduleResolution": "node",
+            "resolvePackageJsonExports": false
+          }
+        }
+      ]
     },
     "collectCoverageFrom": [
       "**/*.(t|j)s"

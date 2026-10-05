@@ -6,6 +6,7 @@ import {
   tenant_status,
   user_role,
   user_status,
+  identity_provider,
   type Prisma,
 } from '@prisma/client';
 
@@ -43,20 +44,6 @@ export class TenantRepository {
     return this.prisma.tenant.findUnique({
       where: { slug },
       select: { id: true },
-    });
-  }
-
-  findUserIdentity(email: string, username: string, phone?: string | null) {
-    return this.prisma.user.findFirst({
-      where: {
-        OR: [{ email }, { username }, ...(phone ? [{ phone }] : [])],
-      },
-      select: {
-        id: true,
-        email: true,
-        username: true,
-        phone: true,
-      },
     });
   }
 
@@ -104,9 +91,16 @@ export class TenantRepository {
     owner: {
       email: string;
       username: string;
-      password: string;
+      password: string | null;
       full_name?: string;
       phone?: string;
+      avatar_url?: string;
+      isVerified?: boolean;
+      identity?: {
+        provider: identity_provider;
+        providerAccountId: string;
+        providerEmail: string;
+      };
     };
   }) {
     return this.prisma.$transaction(async (tx) => {
@@ -150,6 +144,14 @@ export class TenantRepository {
         },
       });
 
+      const defaultBusiness = tenant.businesses.find(
+        (business) => business.is_default,
+      );
+
+      if (!defaultBusiness) {
+        throw new Error('Default business was not created');
+      }
+
       const owner = await tx.user.create({
         data: {
           tenant_id: tenant.id,
@@ -158,25 +160,29 @@ export class TenantRepository {
           password: input.owner.password,
           full_name: input.owner.full_name,
           phone: input.owner.phone,
+          avatar_url: input.owner.avatar_url,
           role: user_role.OWNER,
           status: user_status.ACTIVE,
-          is_verified: true,
+          is_verified: input.owner.isVerified ?? false,
+          identities: input.owner.identity
+            ? {
+                create: {
+                  provider: input.owner.identity.provider,
+                  provider_account_id: input.owner.identity.providerAccountId,
+                  provider_email: input.owner.identity.providerEmail,
+                },
+              }
+            : undefined,
         },
       });
 
-      const defaultBusiness = tenant.businesses.find(
-        (business) => business.is_default,
-      );
-
-      if (defaultBusiness) {
-        await tx.businessMembership.create({
-          data: {
-            tenant_id: tenant.id,
-            business_id: defaultBusiness.id,
-            user_id: owner.id,
-          },
-        });
-      }
+      await tx.businessMembership.create({
+        data: {
+          tenant_id: tenant.id,
+          business_id: defaultBusiness.id,
+          user_id: owner.id,
+        },
+      });
 
       return { tenant, business: defaultBusiness, owner };
     });

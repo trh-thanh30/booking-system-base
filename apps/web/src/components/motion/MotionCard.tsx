@@ -1,6 +1,9 @@
 "use client";
 
 import { motion, useReducedMotion, HTMLMotionProps } from "framer-motion";
+import { FeatureCard } from "@/src/components/common/landing-compositions";
+
+const AnimatedFeatureCard = motion.create(FeatureCard);
 
 type MotionCardProps = HTMLMotionProps<"div">;
 
@@ -12,18 +15,17 @@ export function MotionCard({
   const shouldReduceMotion = useReducedMotion();
 
   return (
-    <motion.div
+    <AnimatedFeatureCard
       whileHover={shouldReduceMotion ? undefined : { y: -4 }}
       transition={{ duration: 0.2, ease: "easeOut" }}
       className={`
-        rounded-[4px] border border-border-light bg-bg-primary p-6 shadow-sm
-        transition-all duration-300 ease-out
-        hover:border-border-gray hover:shadow-md
+        transition-shadow duration-normal ease-standard
+        hover:border-input hover:shadow-md
         ${className}
       `}
       {...props}
     >
       {children}
-    </motion.div>
+    </AnimatedFeatureCard>
   );
 }

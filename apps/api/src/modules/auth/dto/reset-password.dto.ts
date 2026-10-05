@@ -1,5 +1,5 @@
 import { Match } from '@/common/decorators/match.decorator';
-import { IsNotEmpty, MinLength } from 'class-validator';
+import { IsNotEmpty, Matches, MinLength } from 'class-validator';
 import type { ResetPasswordInput } from '@repo/shared';
 
 export class ResetPasswordDto implements ResetPasswordInput {
@@ -7,10 +7,11 @@ export class ResetPasswordDto implements ResetPasswordInput {
   sessionId: string;
 
   @IsNotEmpty()
+  @Matches(/^[0-9]{6}$/, { message: 'Code must contain exactly 6 digits' })
   code: string;
 
   @IsNotEmpty()
-  @MinLength(6)
+  @MinLength(8)
   password: string;
 
   @IsNotEmpty()

@@ -27,6 +27,24 @@ describe('ChangePasswordUseCase', () => {
     ).rejects.toThrow('Current password is incorrect');
   });
 
+  it('rejects password changes for an OAuth-only account', async () => {
+    const comparePassword = jest.fn();
+
+    await expect(
+      new ChangePasswordUseCase(
+        {
+          findById: jest.fn().mockResolvedValue({
+            id: 'user-1',
+            password: null,
+          }),
+        } as any,
+        { comparePassword } as any,
+      ).execute('user-1', dto),
+    ).rejects.toThrow('Current password is not configured');
+
+    expect(comparePassword).not.toHaveBeenCalled();
+  });
+
   it('rejects when new password matches current password', async () => {
     const useCase = new ChangePasswordUseCase(
       {
@@ -47,9 +65,7 @@ describe('ChangePasswordUseCase', () => {
       findById: jest
         .fn()
         .mockResolvedValue({ id: 'user-1', password: 'hashed-old' }),
-      updatePasswordAndClearRefreshToken: jest
-        .fn()
-        .mockResolvedValue(undefined),
+      updatePasswordAndRevokeSession: jest.fn().mockResolvedValue(undefined),
     };
     const bcryptService = {
       comparePassword: jest
@@ -65,8 +81,9 @@ describe('ChangePasswordUseCase', () => {
       ).execute('user-1', dto),
     ).resolves.toEqual({ success: true });
 
-    expect(
-      usersService.updatePasswordAndClearRefreshToken,
-    ).toHaveBeenCalledWith('user-1', 'new-password');
+    expect(usersService.updatePasswordAndRevokeSession).toHaveBeenCalledWith(
+      'user-1',
+      'new-password',
+    );
   });
 });
