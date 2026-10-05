@@ -55,8 +55,8 @@ export function Header() {
     <header
       className={`sticky top-0 z-50 w-full border-b transition-all duration-300 ${
         scrolled
-          ? "border-neutral-200/80 bg-surface/95 shadow-xs backdrop-blur-md"
-          : "border-neutral-200/40 bg-surface"
+          ? "border-border/80 bg-surface/95 shadow-xs backdrop-blur-md"
+          : "border-border/40 bg-surface"
       }`}
     >
       <LandingContainer className="flex h-20 items-center justify-between gap-4">
@@ -67,13 +67,13 @@ export function Header() {
           aria-label="BookingBase"
         >
           <span
-            className="flex size-10 sm:size-11 items-center justify-center rounded-xl bg-neutral-950 text-white font-black text-xl shadow-xs group-hover:scale-105 transition-transform"
+            className="flex size-10 sm:size-11 items-center justify-center rounded-xl bg-primary text-primary-foreground font-black text-xl shadow-xs group-hover:scale-105 transition-transform"
             aria-hidden="true"
           >
             B
           </span>
-          <span className="text-xl sm:text-2xl font-black tracking-tight text-neutral-950">
-            Booking<span className="text-neutral-500 font-extrabold">Base</span>
+          <span className="text-xl sm:text-2xl font-black tracking-tight text-foreground">
+            Booking<span className="text-primary font-extrabold">Base</span>
           </span>
         </Link>
 
@@ -91,7 +91,7 @@ export function Header() {
                   if (timeoutRef.current) clearTimeout(timeoutRef.current);
                   setOpenMenu(null);
                 }}
-                className="px-4 py-2.5 rounded-full text-sm sm:text-base font-bold text-neutral-700 hover:text-neutral-950 hover:bg-neutral-100 transition-all duration-150 select-none"
+                className="px-4 py-2.5 rounded-full text-sm sm:text-base font-bold text-foreground hover:text-foreground hover:bg-muted transition-all duration-150 select-none"
               >
                 {item.label}
               </a>
@@ -120,10 +120,10 @@ export function Header() {
                         setOpenMenu(openMenu === item.label ? null : item.label)
                       }
                       className={cn(
-                        "group inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-sm sm:text-base font-bold transition-all duration-150 select-none cursor-pointer focus-visible:outline-2 focus-visible:outline-neutral-950",
+                        "group inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-sm sm:text-base font-bold transition-all duration-150 select-none cursor-pointer focus-visible:outline-2 focus-visible:outline-ring",
                         openMenu === item.label
-                          ? "bg-neutral-100 text-neutral-950"
-                          : "text-neutral-700 hover:text-neutral-950 hover:bg-neutral-100",
+                          ? "bg-muted text-foreground"
+                          : "text-foreground hover:text-foreground hover:bg-muted",
                       )}
                     >
                       <span>{item.label}</span>
@@ -131,8 +131,8 @@ export function Header() {
                         className={cn(
                           "w-4 h-4 transition-transform duration-200",
                           openMenu === item.label
-                            ? "rotate-180 text-neutral-950"
-                            : "text-neutral-400 group-hover:text-neutral-950",
+                            ? "rotate-180 text-foreground"
+                            : "text-muted-foreground group-hover:text-foreground",
                         )}
                         aria-hidden="true"
                       />
@@ -144,28 +144,28 @@ export function Header() {
                     onMouseEnter={() => handleMouseEnter(item.label)}
                     onMouseLeave={handleMouseLeave}
                     onCloseAutoFocus={(e: Event) => e.preventDefault()}
-                    className="max-h-[75dvh] w-88 max-w-[calc(100vw-2rem)] overflow-y-auto p-3 rounded-2xl border border-neutral-200 bg-surface shadow-2xl before:absolute before:-top-3 before:left-0 before:right-0 before:h-3 before:content-['']"
+                    className="max-h-[75dvh] w-88 max-w-[calc(100vw-2rem)] overflow-y-auto p-3 rounded-2xl border border-border bg-surface shadow-2xl before:absolute before:-top-3 before:left-0 before:right-0 before:h-3 before:content-['']"
                   >
                     {item.items?.map((sub) => (
                       <DropdownMenuItem
                         key={sub.label}
                         asChild
-                        className="rounded-xl p-3 hover:bg-neutral-50 cursor-pointer"
+                        className="rounded-xl p-3 hover:bg-muted cursor-pointer"
                         onClick={() => setOpenMenu(null)}
                       >
                         <a href={sub.href} className="flex items-start gap-3.5">
-                          <div className="w-8 h-8 rounded-lg bg-neutral-100 border border-neutral-200/80 flex items-center justify-center shrink-0 mt-0.5">
+                          <div className="w-8 h-8 rounded-lg bg-muted border border-border/80 flex items-center justify-center shrink-0 mt-0.5">
                             <sub.icon
-                              className="w-4 h-4 text-neutral-900"
+                              className="w-4 h-4 text-foreground"
                               aria-hidden="true"
                             />
                           </div>
                           <div>
-                            <span className="block font-bold text-sm sm:text-base text-neutral-950">
+                            <span className="block font-bold text-sm sm:text-base text-foreground">
                               {sub.label}
                             </span>
                             {"description" in sub && (
-                              <span className="mt-0.5 block text-xs text-neutral-500 leading-snug">
+                              <span className="mt-0.5 block text-xs text-muted-foreground leading-snug">
                                 {sub.description}
                               </span>
                             )}
@@ -186,13 +186,13 @@ export function Header() {
             <LanguageSwitcher variant="landing" />
             <a
               href={loginUrl}
-              className="px-5 py-2.5 h-12 inline-flex items-center justify-center rounded-full text-sm sm:text-base font-bold text-neutral-800 hover:text-neutral-950 hover:bg-neutral-100 transition-all duration-150 select-none cursor-pointer"
+              className="px-5 py-2.5 h-12 inline-flex items-center justify-center rounded-full text-sm sm:text-base font-bold text-foreground hover:text-foreground hover:bg-muted transition-all duration-150 select-none cursor-pointer"
             >
               {t("login")}
             </a>
             <Link
               href="/signup-business"
-              className="inline-flex items-center justify-center h-12 px-7 rounded-full bg-neutral-950 hover:bg-neutral-800 text-white text-sm sm:text-base font-extrabold shadow-sm hover:shadow-md active:scale-[0.98] transition-all duration-200 cursor-pointer select-none"
+              className="inline-flex items-center justify-center h-12 px-7 rounded-full bg-primary hover:bg-primary-hover text-primary-foreground text-sm sm:text-base font-extrabold shadow-sm hover:shadow-md active:scale-[0.98] transition-all duration-200 cursor-pointer select-none"
             >
               {t("trial")}
             </Link>
@@ -203,7 +203,7 @@ export function Header() {
             <SheetTrigger asChild>
               <button
                 type="button"
-                className="w-12 h-12 rounded-full border border-neutral-300 hover:border-neutral-950 hover:bg-neutral-100 flex items-center justify-center text-neutral-800 xl:hidden transition-colors cursor-pointer shadow-xs"
+                className="w-12 h-12 rounded-full border border-input hover:border-primary hover:bg-muted flex items-center justify-center text-foreground xl:hidden transition-colors cursor-pointer shadow-xs"
                 aria-label={t("openMenu")}
               >
                 <Menu className="w-5 h-5" />
@@ -211,21 +211,21 @@ export function Header() {
             </SheetTrigger>
             <SheetContent
               aria-describedby={undefined}
-              className="w-[min(26rem,100vw)] overflow-y-auto p-6 sm:p-8 rounded-l-3xl border-l border-neutral-200 bg-surface shadow-2xl"
+              className="w-[min(26rem,100vw)] overflow-y-auto p-6 sm:p-8 rounded-l-3xl border-l border-border bg-surface shadow-2xl"
             >
               <div className="mb-8 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <span className="flex size-9 items-center justify-center rounded-xl bg-neutral-950 text-white font-black text-lg">
+                  <span className="flex size-9 items-center justify-center rounded-xl bg-primary text-primary-foreground font-black text-lg">
                     B
                   </span>
-                  <SheetTitle className="text-2xl font-black text-neutral-950 tracking-tight">
+                  <SheetTitle className="text-2xl font-black text-foreground tracking-tight">
                     BookingBase
                   </SheetTitle>
                 </div>
                 <SheetClose asChild>
                   <button
                     type="button"
-                    className="w-10 h-10 rounded-full border border-neutral-300 hover:bg-neutral-100 flex items-center justify-center text-neutral-700 transition cursor-pointer"
+                    className="w-10 h-10 rounded-full border border-input hover:bg-muted flex items-center justify-center text-foreground transition cursor-pointer"
                     aria-label={t("closeMenu")}
                   >
                     <X className="w-5 h-5" />
@@ -239,29 +239,29 @@ export function Header() {
                       key={item.label}
                       href={item.href}
                       onClick={() => setMobileOpen(false)}
-                      className="block px-4 py-3 rounded-2xl text-base font-bold text-neutral-900 hover:bg-neutral-100 transition-colors"
+                      className="block px-4 py-3 rounded-2xl text-base font-bold text-foreground hover:bg-muted transition-colors"
                     >
                       {item.label}
                     </a>
                   ) : (
                     <details
                       key={item.label}
-                      className="border-b border-neutral-200/80 py-3"
+                      className="border-b border-border/80 py-3"
                     >
-                      <summary className="cursor-pointer py-2 text-base font-bold text-neutral-900 flex items-center justify-between">
+                      <summary className="cursor-pointer py-2 text-base font-bold text-foreground flex items-center justify-between">
                         <span>{item.label}</span>
-                        <ChevronDown className="w-4 h-4 text-neutral-400" />
+                        <ChevronDown className="w-4 h-4 text-muted-foreground" />
                       </summary>
                       <div className="space-y-1.5 pl-3 pt-2">
                         {item.items?.map((sub) => (
                           <a
                             key={sub.label}
                             href={sub.href}
-                            className="flex items-center gap-3 py-2 px-3 rounded-xl text-sm font-semibold text-neutral-700 hover:bg-neutral-100 hover:text-neutral-950 transition-colors"
+                            className="flex items-center gap-3 py-2 px-3 rounded-xl text-sm font-semibold text-foreground hover:bg-muted hover:text-foreground transition-colors"
                             onClick={() => setMobileOpen(false)}
                           >
                             <sub.icon
-                              className="w-4 h-4 text-neutral-800"
+                              className="w-4 h-4 text-foreground"
                               aria-hidden="true"
                             />
                             {sub.label}
@@ -272,20 +272,20 @@ export function Header() {
                   ),
                 )}
               </nav>
-              <div className="mt-8 flex flex-col gap-3.5 pt-4 border-t border-neutral-200/80">
+              <div className="mt-8 flex flex-col gap-3.5 pt-4 border-t border-border/80">
                 <LanguageSwitcher
                   variant="landing"
                   className="w-full justify-between"
                 />
                 <a
                   href={loginUrl}
-                  className="w-full h-12 flex items-center justify-center rounded-full border border-neutral-300 text-sm font-bold text-neutral-900 hover:bg-neutral-100 transition-colors"
+                  className="w-full h-12 flex items-center justify-center rounded-full border border-input text-sm font-bold text-foreground hover:bg-muted transition-colors"
                 >
                   {t("login")}
                 </a>
                 <Link
                   href="/signup-business"
-                  className="w-full h-12 flex items-center justify-center rounded-full bg-neutral-950 text-white text-sm font-extrabold shadow-sm hover:bg-neutral-800 transition-colors"
+                  className="w-full h-12 flex items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-extrabold shadow-sm hover:bg-primary-hover transition-colors"
                 >
                   {t("trial")}
                 </Link>

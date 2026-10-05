@@ -97,7 +97,7 @@ export function LanguageSwitcher({
                 "flex items-center justify-between gap-3 px-4 py-2.5 rounded-full font-bold text-sm cursor-pointer transition-colors outline-none",
                 isSelected
                   ? variant === "landing"
-                    ? "bg-neutral-950 text-neutral-50 hover:bg-neutral-900 focus:bg-neutral-900 focus:text-neutral-50"
+                    ? "bg-accent text-accent-foreground hover:bg-accent focus:bg-accent focus:text-accent-foreground"
                     : "bg-primary text-primary-foreground hover:bg-primary-hover focus:bg-primary-hover focus:text-primary-foreground"
                   : "text-foreground hover:bg-muted hover:text-foreground focus:bg-muted focus:text-foreground",
               )}

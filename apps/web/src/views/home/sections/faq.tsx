@@ -19,10 +19,10 @@ export function FAQ() {
       <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center max-w-5xl mx-auto mb-14 sm:mb-16 space-y-4">
-          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-neutral-950 tracking-tight leading-[1.12] text-balance">
+          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-foreground tracking-tight leading-[1.12] text-balance">
             Questions before you&nbsp;start?
           </h2>
-          <p className="mt-5 text-base sm:text-lg lg:text-xl text-neutral-600 leading-relaxed max-w-3xl mx-auto">
+          <p className="mt-5 text-base sm:text-lg lg:text-xl text-muted-foreground leading-relaxed max-w-3xl mx-auto">
             Find quick answers about templates, booking pages, payments, trials
             and platform features.
           </p>
@@ -36,7 +36,7 @@ export function FAQ() {
               id={gidx === 0 ? "faq-product" : "faq-trial"}
               className="space-y-5 scroll-mt-28"
             >
-              <h3 className="text-xl sm:text-2xl font-extrabold text-neutral-950 border-b border-neutral-200 pb-3.5 select-none">
+              <h3 className="text-xl sm:text-2xl font-extrabold text-foreground border-b border-border pb-3.5 select-none">
                 {group.title}
               </h3>
               <div className="space-y-4">
@@ -48,20 +48,20 @@ export function FAQ() {
                       key={faq.id}
                       className={`rounded-3xl border p-6 sm:p-7 transition-all duration-300 ${
                         isOpen
-                          ? "border-neutral-950 bg-neutral-50/70 shadow-sm"
-                          : "border-neutral-200 bg-surface hover:border-neutral-300 shadow-2xs"
+                          ? "border-primary bg-muted/70 shadow-sm"
+                          : "border-border bg-surface hover:border-primary/40 shadow-2xs"
                       }`}
                     >
                       <button
                         type="button"
                         onClick={() => setOpenFaqKey(isOpen ? null : faq.id)}
-                        className="flex w-full items-center justify-between gap-4 text-left focus-visible:outline-2 focus-visible:outline-neutral-950 cursor-pointer rounded-lg select-none"
+                        className="flex w-full items-center justify-between gap-4 text-left focus-visible:outline-2 focus-visible:outline-ring cursor-pointer rounded-lg select-none"
                         aria-expanded={isOpen}
                         aria-controls={panelId}
                       >
                         <span
                           className={`text-base sm:text-lg font-bold transition-colors duration-200 ${
-                            isOpen ? "text-neutral-950" : "text-neutral-900"
+                            isOpen ? "text-primary" : "text-foreground"
                           }`}
                         >
                           {faq.question}
@@ -77,7 +77,7 @@ export function FAQ() {
                             ease: "easeOut",
                           }}
                           className={`shrink-0 transition-colors duration-200 ${
-                            isOpen ? "text-neutral-950" : "text-neutral-500"
+                            isOpen ? "text-primary" : "text-muted-foreground"
                           }`}
                         >
                           <ChevronDown className="h-5 w-5" />
@@ -104,7 +104,7 @@ export function FAQ() {
                             }}
                             className="overflow-hidden"
                           >
-                            <p className="pt-4 text-base text-neutral-600 leading-relaxed">
+                            <p className="pt-4 text-base text-muted-foreground leading-relaxed">
                               {faq.answer}
                             </p>
                           </motion.div>
@@ -119,11 +119,11 @@ export function FAQ() {
         </div>
 
         {/* FAQ CTA Card */}
-        <div className="text-center border border-neutral-200 bg-neutral-50/70 p-10 sm:p-14 rounded-3xl shadow-xs space-y-5 max-w-7xl mx-auto mt-14">
-          <h3 className="text-2xl sm:text-3xl font-extrabold text-neutral-950 tracking-tight">
+        <div className="text-center border border-border bg-muted/70 p-10 sm:p-14 rounded-3xl shadow-xs space-y-5 max-w-7xl mx-auto mt-14">
+          <h3 className="text-2xl sm:text-3xl font-extrabold text-foreground tracking-tight">
             Still have questions?
           </h3>
-          <p className="text-base sm:text-lg text-neutral-600 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
             Reach our support team, or book a 15-minute walkthrough with a
             product specialist.
           </p>
@@ -135,7 +135,7 @@ export function FAQ() {
                 (window.location.href =
                   "mailto:support@bookingbase.com?subject=BookingBase%20Support%20Inquiry")
               }
-              className="w-full sm:w-auto inline-flex h-13 items-center justify-center rounded-full bg-neutral-950 hover:bg-neutral-800 text-white shadow-sm px-8 text-sm sm:text-base font-bold transition-all duration-200 cursor-pointer select-none"
+              className="w-full sm:w-auto inline-flex h-13 items-center justify-center rounded-full bg-primary hover:bg-primary-hover text-primary-foreground shadow-sm px-8 text-sm sm:text-base font-bold transition-all duration-200 cursor-pointer select-none"
             >
               Contact support
             </motion.button>
@@ -143,7 +143,7 @@ export function FAQ() {
               whileHover={shouldReduceMotion ? undefined : { scale: 1.02 }}
               whileTap={shouldReduceMotion ? undefined : { scale: 0.98 }}
               href="mailto:demo@bookingbase.com?subject=BookingBase%20Demo%20Request"
-              className="w-full sm:w-auto inline-flex h-13 items-center justify-center rounded-full border border-neutral-300 bg-surface hover:bg-neutral-50 px-8 text-sm sm:text-base font-bold text-neutral-900 transition-all duration-200 cursor-pointer select-none"
+              className="w-full sm:w-auto inline-flex h-13 items-center justify-center rounded-full border border-input bg-surface hover:bg-muted px-8 text-sm sm:text-base font-bold text-foreground transition-all duration-200 cursor-pointer select-none"
             >
               Book a demo
             </motion.a>
