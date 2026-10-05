@@ -36,15 +36,11 @@ export function CustomizationSection() {
       {/* Centered Section Header */}
       <div className="max-w-5xl mx-auto px-4 text-center space-y-4 mb-14 sm:mb-16">
         <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-foreground leading-[1.12] text-balance">
-          Endless{" "}
-          <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary via-primary-hover to-primary-active">
-            customisation
-          </span>
-          {"\u00A0"}options
+          Make your booking page <span className="text-primary">your own</span>
         </h2>
         <p className="mt-5 text-base sm:text-lg lg:text-xl text-muted-foreground leading-relaxed max-w-3xl mx-auto">
-          Turn a generic scheduling link into a high-converting, branded
-          mini-site with modular interactive widgets.
+          Bring your brand to life with reviews, videos, FAQs, and custom
+          domains.
         </p>
 
         {/* Carousel Navigation Controls */}

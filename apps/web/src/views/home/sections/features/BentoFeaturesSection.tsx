@@ -23,12 +23,13 @@ export function BentoFeaturesSection() {
           {/* Section Header */}
           <div className="text-center max-w-5xl mx-auto space-y-4">
             <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-foreground leading-[1.12] text-balance">
-              Your all-purpose scheduling&nbsp;app
+              One platform for{" "}
+              <span className="text-primary">every appointment</span>
             </h2>
 
             <p className="mt-5 text-base sm:text-lg lg:text-xl text-muted-foreground leading-relaxed max-w-3xl mx-auto">
-              Discover a variety of our advanced features. Unlimited and free
-              for individual providers and growing salons.
+              Keep availability, booking links, calendar sync, and reminders
+              working together.
             </p>
 
             <div className="flex flex-wrap items-center justify-center gap-3.5 pt-2">
@@ -264,14 +265,21 @@ export function BentoFeaturesSection() {
           </div>
         </div>
 
-        {/* TIER 2: "...AND SO MUCH MORE!" SQUIRCLE CARDS (4-CORNER RIVET DOTS + FADED HOVER DESCRIPTION) */}
+        {/* TIER 2: CONFIGURABLE FEATURES */}
         <div className="space-y-12 pt-4">
-          <div className="text-center max-w-2xl mx-auto space-y-3">
-            <h3 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-foreground leading-tight">
-              ...and so much more!
+          <div className="text-center max-w-5xl mx-auto space-y-3">
+            <h3 className="text-xl sm:text-3xl lg:text-5xl font-extrabold tracking-tight text-foreground leading-tight">
+              <span className="block">
+                The <span className="text-primary">features you need.</span>
+              </span>
+              <span className="block">
+                A dashboard that{" "}
+                <span className="text-primary">stays focused.</span>
+              </span>
             </h3>
             <p className="text-base sm:text-lg text-muted-foreground max-w-xl mx-auto">
-              Full suite of features, built into one simple and elegant tool.
+              Show or hide features to match how you work, keeping unused tools
+              out of your way. Your plan and pricing stay the same.
             </p>
           </div>
 
