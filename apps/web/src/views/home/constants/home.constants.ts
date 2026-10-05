@@ -269,13 +269,13 @@ export const NAV_ITEMS = [
       {
         label: "Payments & deposits",
         description: "Accept deposits or full payments during booking.",
-        href: "#deposits-reminders", // links to no-show protection deposits section
+        href: "#features",
         icon: CreditCard,
       },
       {
         label: "Automated reminders",
         description: "Send reminders to reduce no-shows.",
-        href: "#deposits-reminders", // links to no-show protection reminders section
+        href: "#features",
         icon: Bell,
       },
       {
@@ -288,37 +288,37 @@ export const NAV_ITEMS = [
   },
   {
     label: "Industries",
-    href: "#industries", // links to the supported industries section
+    href: "#industry-solutions",
     type: "dropdown",
     items: [
       {
-        label: "Beauty & Wellness",
-        href: "#industries",
+        label: "Hair Salons",
+        href: "#industry-solutions",
         icon: Scissors,
       },
       {
-        label: "Healthcare",
-        href: "#industries",
+        label: "Nails & Lashes",
+        href: "#industry-solutions",
+        icon: Scissors,
+      },
+      {
+        label: "Spas & Wellness",
+        href: "#industry-solutions",
         icon: HeartPulse,
       },
       {
-        label: "Fitness & Yoga",
-        href: "#industries",
-        icon: Dumbbell,
+        label: "Clinics & Aesthetics",
+        href: "#industry-solutions",
+        icon: HeartPulse,
       },
       {
-        label: "Education",
-        href: "#industries",
-        icon: GraduationCap,
-      },
-      {
-        label: "Repair Services",
-        href: "#industries",
-        icon: Wrench,
+        label: "Barbershops & Studios",
+        href: "#industry-solutions",
+        icon: Scissors,
       },
       {
         label: "All industries",
-        href: "#industries",
+        href: "#industry-solutions",
         icon: BarChart3,
       },
     ],
@@ -342,11 +342,6 @@ export const NAV_ITEMS = [
         label: "Blog",
         href: "#faq",
         icon: BookOpen,
-      },
-      {
-        label: "How it works",
-        href: "#how-it-works",
-        icon: CalendarCheck,
       },
       {
         label: "FAQ",

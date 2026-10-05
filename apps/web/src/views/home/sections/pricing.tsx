@@ -4,20 +4,22 @@ import {
   DialogContent,
   DialogTitle,
   DialogDescription,
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  cn,
 } from "@repo/ui";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, ChevronDown, Lock, X, Globe } from "lucide-react";
 import { useToast } from "@repo/hooks";
 import { RepeatReveal } from "@/src/components/motion/RepeatReveal";
 import { RepeatStaggerReveal } from "@/src/components/motion/RepeatStaggerReveal";
 import { RepeatStaggerItem } from "@/src/components/motion/RepeatStaggerItem";
-import { MotionButton } from "@/src/components/motion/MotionButton";
-import {
-  PricingCard,
-  SectionHeading,
-} from "@/src/components/common/landing-compositions";
+import { PricingCard } from "@/src/components/common/landing-compositions";
 
 interface ComparisonRow {
   name: string;
@@ -55,6 +57,12 @@ const PLAN_PRICES = {
     pos: "suffix" as const,
   },
 };
+
+const CURRENCIES = [
+  { code: "USD" as const, label: "USD ($)", flag: "/flags/us.svg" },
+  { code: "EUR" as const, label: "EUR (€)", flag: "/flags/eu.svg" },
+  { code: "VND" as const, label: "VND (₫)", flag: "/flags/vi.svg" },
+];
 
 const PLANS = [
   {
@@ -319,28 +327,34 @@ export function Pricing() {
     <RepeatReveal
       as="section"
       id="pricing"
-      className="scroll-mt-20 md:scroll-mt-24 py-10 md:py-12 lg:py-14 bg-background border-t border-border relative overflow-hidden"
+      className="scroll-mt-20 md:scroll-mt-24 py-24 lg:py-32 bg-background border-t border-border relative overflow-hidden"
     >
-      <div className="mx-auto w-full max-w-landing px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="text-center max-w-3xl mx-auto mb-6 space-y-1.5">
-          <SectionHeading
-            eyebrow="Simple Pricing"
-            title="Choose a plan that grows with your service business"
-            description="Start with a 14-day trial. Upgrade, downgrade or cancel anytime — no long-term commitment."
-          />
+        <div className="text-center max-w-5xl mx-auto mb-14 sm:mb-16 space-y-4">
+          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-neutral-950 leading-[1.14] text-balance">
+            Choose a plan that grows
+            <br />
+            <span className="text-neutral-500 font-bold">
+              with your service&nbsp;business.
+            </span>
+          </h2>
+          <p className="mt-5 text-base sm:text-lg lg:text-xl text-neutral-600 leading-relaxed max-w-3xl mx-auto">
+            Start with a 14-day trial. Upgrade, downgrade or cancel anytime — no
+            long-term commitment.
+          </p>
         </div>
 
         {/* Toggle Row */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-5 select-none">
-          <div className="inline-flex items-center bg-surface border border-border rounded-full p-1 shadow-sm">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-10 select-none">
+          <div className="inline-flex items-center bg-surface border border-neutral-200 rounded-full p-1.5 shadow-xs">
             <button
               type="button"
               onClick={() => setBilling("monthly")}
-              className={`px-5 py-1.5 rounded-full text-xs font-bold transition-all duration-200 cursor-pointer ${
+              className={`px-7 py-2.5 rounded-full text-sm sm:text-base font-bold transition-all duration-200 cursor-pointer ${
                 billing === "monthly"
-                  ? "bg-primary text-primary-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
+                  ? "bg-neutral-950 text-white shadow-xs"
+                  : "text-neutral-600 hover:text-neutral-950"
               }`}
             >
               Monthly
@@ -348,17 +362,17 @@ export function Pricing() {
             <button
               type="button"
               onClick={() => setBilling("annual")}
-              className={`px-5 py-1.5 rounded-full text-xs font-bold transition-all duration-200 cursor-pointer flex items-center gap-1.5 ${
+              className={`px-7 py-2.5 rounded-full text-sm sm:text-base font-bold transition-all duration-200 cursor-pointer flex items-center gap-2 ${
                 billing === "annual"
-                  ? "bg-primary text-primary-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
+                  ? "bg-neutral-950 text-white shadow-xs"
+                  : "text-neutral-600 hover:text-neutral-950"
               }`}
             >
               <span>Annual</span>
               <span
-                className={`text-[9px] font-extrabold px-1.5 py-0.5 rounded ${
+                className={`text-xs font-extrabold px-2.5 py-0.5 rounded-full ${
                   billing === "annual"
-                    ? "bg-primary-400/30 text-primary-foreground"
+                    ? "bg-neutral-800 text-white"
                     : "bg-success-surface border border-success-border text-success-surface-foreground"
                 }`}
               >
@@ -367,39 +381,96 @@ export function Pricing() {
             </button>
           </div>
 
-          <div className="inline-flex items-center bg-surface border border-border rounded-xl px-3 py-1 shadow-sm gap-1.5">
-            <Globe className="w-3.5 h-3.5 text-muted-foreground" />
-            <span className="text-xs text-muted-foreground font-bold">
-              Currency:
-            </span>
-            <select
-              value={currency}
-              onChange={(e) =>
-                setCurrency(e.target.value as "USD" | "EUR" | "VND")
-              }
-              className="text-xs font-extrabold text-foreground bg-transparent focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2 cursor-pointer py-0.5"
+          <DropdownMenu modal={false}>
+            <DropdownMenuTrigger asChild>
+              <button
+                type="button"
+                className="group inline-flex items-center gap-2 rounded-full border border-neutral-200 bg-surface px-4 sm:px-5 py-2.5 text-sm font-bold text-neutral-900 transition-all duration-200 shadow-xs cursor-pointer select-none active:scale-[0.98] hover:border-neutral-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-950 focus-visible:ring-offset-2 data-[state=open]:border-neutral-900 data-[state=open]:bg-neutral-50"
+              >
+                <Globe className="w-4 h-4 text-neutral-500 transition-colors group-hover:text-neutral-900" />
+                <span className="text-sm text-neutral-500 font-semibold">
+                  Currency:
+                </span>
+                <span className="relative flex h-3.5 w-5 shrink-0 overflow-hidden rounded-xs shadow-xs ring-1 ring-neutral-900/10">
+                  <Image
+                    src={
+                      CURRENCIES.find((c) => c.code === currency)?.flag ??
+                      "/flags/us.svg"
+                    }
+                    alt=""
+                    width={20}
+                    height={14}
+                    className="h-full w-full object-cover"
+                  />
+                </span>
+                <span className="text-sm font-extrabold text-neutral-950">
+                  {currency} ({PLAN_PRICES[currency].symbol})
+                </span>
+                <ChevronDown
+                  className="w-3.5 h-3.5 text-neutral-500 transition-transform duration-200 group-data-[state=open]:rotate-180"
+                  aria-hidden="true"
+                />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              align="center"
+              sideOffset={8}
+              className="min-w-44 p-1.5 rounded-2xl border border-neutral-200 bg-surface shadow-xl space-y-1 z-50"
             >
-              <option value="USD">USD ($)</option>
-              <option value="EUR">EUR (€)</option>
-              <option value="VND">VND (₫)</option>
-            </select>
-          </div>
+              {CURRENCIES.map((c) => {
+                const isSelected = c.code === currency;
+                return (
+                  <DropdownMenuItem
+                    key={c.code}
+                    onClick={() => setCurrency(c.code)}
+                    className={cn(
+                      "flex items-center justify-between gap-3 px-4 py-2.5 rounded-full font-bold text-sm cursor-pointer transition-colors outline-none",
+                      isSelected
+                        ? "bg-neutral-950 text-white hover:bg-neutral-900 focus:bg-neutral-900 focus:text-white"
+                        : "text-neutral-700 hover:bg-neutral-100 hover:text-neutral-950 focus:bg-neutral-100 focus:text-neutral-950",
+                    )}
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <span className="relative flex h-3.5 w-5 shrink-0 overflow-hidden rounded-xs shadow-xs ring-1 ring-neutral-900/15">
+                        <Image
+                          src={c.flag}
+                          alt=""
+                          width={20}
+                          height={14}
+                          className="h-full w-full object-cover"
+                        />
+                      </span>
+                      <span>{c.label}</span>
+                    </div>
+                    {isSelected && (
+                      <Check
+                        className="w-4 h-4 shrink-0 text-white"
+                        aria-hidden="true"
+                      />
+                    )}
+                  </DropdownMenuItem>
+                );
+              })}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
         {/* Social Proof Line */}
-        <div className="text-center text-[11px] text-foreground select-none mb-5">
+        <div className="text-center text-sm text-neutral-600 select-none mb-10">
           <span>
-            <strong>12,400+ businesses</strong> trust BookingBase
+            <strong className="text-neutral-950">12,400+ businesses</strong>{" "}
+            trust BookingBase
           </span>
-          <span className="mx-2 text-input">·</span>
+          <span className="mx-2 text-neutral-300">·</span>
           <span className="text-warning-500 font-bold mr-1">★★★★★</span>
           <span>
-            <strong>4.8 avg rating</strong> from 1,820 customer reviews
+            <strong className="text-neutral-950">4.8 avg rating</strong> from
+            1,820 customer reviews
           </span>
         </div>
 
         {/* Pricing Cards Grid */}
-        <RepeatStaggerReveal className="grid gap-5 lg:grid-cols-3 items-stretch mb-6">
+        <RepeatStaggerReveal className="grid gap-6 lg:gap-8 lg:grid-cols-3 items-stretch mb-10">
           {PLANS.map((plan) => {
             const priceCfg = getPriceConfig(plan.id);
             const isContactSales = plan.id === "business";
@@ -417,36 +488,36 @@ export function Pricing() {
               <RepeatStaggerItem key={plan.id} className="h-full">
                 <PricingCard
                   featured={plan.popular}
-                  className={`h-full border rounded-2xl bg-surface p-5 flex flex-col justify-between transition-all duration-300 relative ${
+                  className={`h-full border rounded-3xl bg-surface p-7 sm:p-9 flex flex-col justify-between transition-all duration-300 relative select-none ${
                     plan.popular
-                      ? "border-primary ring-4 ring-primary/10 shadow-xl z-10 scale-[1.01]"
-                      : "border-border shadow-sm hover:border-input hover:shadow-md"
+                      ? "border-2 border-neutral-950 shadow-2xl z-10 scale-[1.02]"
+                      : "border border-neutral-200 shadow-xs hover:border-neutral-300 hover:shadow-lg"
                   }`}
                 >
                   {plan.popular && (
-                    <span className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-primary text-primary-foreground text-[8px] font-extrabold tracking-wider px-3 py-0.5 uppercase rounded-full shadow-md flex items-center justify-center select-none">
+                    <span className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-neutral-950 text-white text-[10px] font-extrabold tracking-wider px-4 py-1 uppercase rounded-full shadow-md flex items-center justify-center select-none">
                       Most popular
                     </span>
                   )}
 
-                  <div className="space-y-4">
-                    <div className="space-y-1">
-                      <h3 className="text-lg font-extrabold text-foreground">
+                  <div className="space-y-6">
+                    <div className="space-y-1.5">
+                      <h3 className="text-2xl font-black text-neutral-950 tracking-tight">
                         {plan.name}
                       </h3>
-                      <p className="text-[11px] text-muted-foreground leading-relaxed min-h-[34px]">
+                      <p className="text-xs sm:text-sm text-neutral-500 leading-relaxed min-h-[40px]">
                         {plan.description}
                       </p>
                     </div>
 
-                    <div className="flex items-baseline gap-0.5 pt-3 border-t border-border select-none">
+                    <div className="flex items-baseline gap-1 pt-4 border-t border-neutral-200 select-none">
                       {priceCfg.pos === "prefix" && (
-                        <span className="text-lg font-bold text-foreground">
+                        <span className="text-2xl font-bold text-neutral-950">
                           {priceCfg.symbol}
                         </span>
                       )}
 
-                      <div className="overflow-hidden min-h-[40px] flex items-baseline">
+                      <div className="overflow-hidden min-h-[48px] flex items-baseline">
                         <AnimatePresence mode="wait">
                           <motion.span
                             key={`${billing}-${currency}-${plan.id}`}
@@ -454,7 +525,7 @@ export function Pricing() {
                             animate={{ y: 0, opacity: 1 }}
                             exit={{ y: -6, opacity: 0 }}
                             transition={{ duration: 0.15, ease: "easeOut" }}
-                            className="text-3xl sm:text-4xl font-extrabold text-foreground tracking-tight inline-block"
+                            className="text-4xl sm:text-5xl lg:text-6xl font-black text-neutral-950 tracking-tight inline-block"
                           >
                             {priceCfg.value}
                           </motion.span>
@@ -462,22 +533,22 @@ export function Pricing() {
                       </div>
 
                       {priceCfg.pos === "suffix" && (
-                        <span className="text-base font-bold text-foreground ml-0.5">
+                        <span className="text-xl font-bold text-neutral-950 ml-0.5">
                           {priceCfg.symbol}
                         </span>
                       )}
-                      <span className="text-xs text-muted-foreground font-bold ml-0.5">
+                      <span className="text-sm text-neutral-500 font-semibold ml-1">
                         /month
                       </span>
                     </div>
 
-                    <div className="text-[10px] select-none min-h-[16px]">
+                    <div className="text-xs select-none min-h-[20px]">
                       {billing === "annual" ? (
-                        <span className="text-success-surface-foreground font-bold bg-success-surface border border-success-border px-2 py-0.5 rounded-md">
+                        <span className="text-success-surface-foreground font-bold bg-success-surface border border-success-border px-2.5 py-1 rounded-md">
                           {savingsText}
                         </span>
                       ) : (
-                        <span className="text-muted-foreground">
+                        <span className="text-neutral-500">
                           Billed monthly · cancel anytime
                         </span>
                       )}
@@ -485,7 +556,7 @@ export function Pricing() {
 
                     {/* EVERYTHING IN BADGE */}
                     <div
-                      className={`text-[9px] font-bold text-success-surface-foreground bg-success-surface/80 border border-success-border py-0.5 px-2 rounded text-center select-none ${
+                      className={`text-xs font-bold text-neutral-800 bg-neutral-100 border border-neutral-200 py-1.5 px-3 rounded-xl text-center select-none ${
                         plan.everything_in
                           ? ""
                           : "opacity-0 pointer-events-none select-none"
@@ -496,20 +567,20 @@ export function Pricing() {
                         : "Placeholder"}
                     </div>
 
-                    {/* TWO-COLUMN GROUPED FEATURES LIST */}
-                    <div className="grid grid-cols-2 gap-x-4 gap-y-3 pt-2 border-t border-border/50 min-h-[115px]">
+                    {/* SINGLE-COLUMN GROUPED FEATURES LIST */}
+                    <div className="space-y-4 pt-5 border-t border-neutral-200">
                       {plan.features.map((grp, gidx) => (
-                        <div key={gidx} className="space-y-1">
-                          <h4 className="text-[9px] font-extrabold text-muted-foreground uppercase tracking-wider select-none">
+                        <div key={gidx} className="space-y-2">
+                          <h4 className="text-xs font-bold text-neutral-500 uppercase tracking-wider select-none">
                             {grp.group}
                           </h4>
-                          <ul className="space-y-1.5">
+                          <ul className="space-y-2.5">
                             {grp.items.map((feat, fidx) => (
                               <li
                                 key={fidx}
-                                className="flex items-start gap-1.5 text-[10px] text-foreground leading-tight"
+                                className="flex items-start gap-2.5 text-sm font-medium text-neutral-800 leading-snug"
                               >
-                                <Check className="w-3.5 h-3.5 text-success-500 flex-shrink-0 mt-0.5" />
+                                <Check className="w-4 h-4 text-neutral-950 flex-shrink-0 mt-0.5" />
                                 <span>{feat}</span>
                               </li>
                             ))}
@@ -519,26 +590,30 @@ export function Pricing() {
                     </div>
                   </div>
 
-                  <div className="pt-4 space-y-1.5">
+                  <div className="pt-6 space-y-2">
                     {isContactSales ? (
                       <button
                         type="button"
                         onClick={() => handleCtaClick(plan.name, true)}
-                        className="w-full inline-flex h-9 items-center justify-center rounded-full border border-input hover:border-primary bg-surface hover:bg-accent/20 text-xs font-bold text-foreground hover:text-primary transition cursor-pointer select-none active:scale-[0.98]"
+                        className="w-full inline-flex h-13 sm:h-14 items-center justify-center rounded-full border-2 border-neutral-300 hover:border-neutral-950 bg-surface hover:bg-neutral-50 text-sm sm:text-base font-bold text-neutral-900 transition-all cursor-pointer select-none active:scale-[0.98] shadow-xs"
                       >
                         <span>{plan.cta}</span>
                       </button>
                     ) : (
-                      <MotionButton
-                        variant={plan.popular ? "primary" : "secondary"}
-                        className="w-full text-xs font-bold h-9 cursor-pointer select-none"
+                      <button
+                        type="button"
                         onClick={() => handleCtaClick(plan.name, false)}
+                        className={`w-full inline-flex h-13 sm:h-14 items-center justify-center rounded-full text-sm sm:text-base font-bold transition-all cursor-pointer select-none active:scale-[0.98] shadow-xs ${
+                          plan.popular
+                            ? "bg-neutral-950 hover:bg-neutral-800 text-white shadow-md"
+                            : "border-2 border-neutral-300 hover:border-neutral-950 bg-surface hover:bg-neutral-50 text-neutral-900"
+                        }`}
                       >
                         {plan.cta}
-                      </MotionButton>
+                      </button>
                     )}
 
-                    <p className="text-[9px] text-muted-foreground text-center select-none font-medium">
+                    <p className="text-[11px] text-neutral-500 text-center select-none font-medium">
                       {isContactSales
                         ? "Custom trial & support available"
                         : "14-day free trial included"}
@@ -551,14 +626,14 @@ export function Pricing() {
         </RepeatStaggerReveal>
 
         {/* Compare Features Trigger Button */}
-        <div className="text-center mt-2 mb-1">
+        <div className="text-center mt-8 mb-4">
           <button
             type="button"
             onClick={() => setIsCompareOpen(true)}
-            className="inline-flex items-center gap-1.5 px-5 py-1.5 rounded-full border border-border bg-surface hover:bg-background hover:border-input text-xs font-bold text-foreground hover:text-primary shadow-sm transition-all duration-200 cursor-pointer select-none active:scale-[0.98]"
+            className="inline-flex items-center gap-3 px-8 py-3.5 rounded-full border-2 border-neutral-300 bg-surface hover:bg-neutral-950 hover:text-white hover:border-neutral-950 text-sm sm:text-base font-extrabold text-neutral-900 shadow-sm transition-all duration-200 cursor-pointer select-none active:scale-[0.98] group"
           >
             <span>Compare all features in detail</span>
-            <ChevronDown className="w-3 h-3" />
+            <ChevronDown className="w-4 h-4 text-neutral-400 group-hover:text-white transition-colors" />
           </button>
         </div>
 
@@ -566,43 +641,48 @@ export function Pricing() {
         <AnimatePresence>
           {isCompareOpen && (
             <Dialog open={isCompareOpen} onOpenChange={setIsCompareOpen}>
-              <DialogContent className="w-[min(calc(100vw-2rem),56rem)] rounded-xl p-6 sm:p-8 max-h-[85dvh] flex flex-col">
+              <DialogContent className="w-[min(calc(100vw-2rem),76rem)] sm:w-[min(calc(100vw-3rem),84rem)] max-w-7xl max-h-[90dvh] h-[88vh] rounded-3xl p-6 sm:p-10 lg:p-12 flex flex-col bg-surface border border-neutral-200 shadow-2xl overflow-hidden">
                 {/* Modal Header */}
-                <div className="flex items-center justify-between border-b border-border pb-4 mb-4 shrink-0">
+                <div className="flex items-start justify-between border-b border-neutral-200/80 pb-6 mb-6 shrink-0 gap-6">
                   <div>
-                    <DialogTitle className="text-heading-4 font-bold text-foreground">
+                    <DialogTitle className="text-2xl sm:text-3xl lg:text-4xl font-black text-neutral-950 tracking-tight">
                       Detailed Feature Comparison
                     </DialogTitle>
-                    <DialogDescription className="text-label text-muted-foreground mt-0.5">
+                    <DialogDescription className="text-sm sm:text-base text-neutral-500 mt-2 font-medium">
                       Compare Starter, Professional, and Business tiers side by
-                      side
+                      side to pick the right plan for your team
                     </DialogDescription>
                   </div>
                   <button
                     type="button"
                     onClick={() => setIsCompareOpen(false)}
-                    className="p-1.5 rounded-lg text-muted-foreground hover:bg-background hover:text-foreground transition cursor-pointer"
+                    className="w-11 h-11 sm:w-12 sm:h-12 rounded-full border border-neutral-300 hover:border-neutral-900 bg-surface hover:bg-neutral-100 flex items-center justify-center text-neutral-700 hover:text-neutral-950 transition-all duration-200 cursor-pointer shadow-xs select-none shrink-0"
                     aria-label="Close"
                   >
-                    <X className="w-4 h-4" />
+                    <X className="w-5 h-5 sm:w-6 sm:h-6 stroke-[2.5]" />
                   </button>
                 </div>
 
                 {/* Scrollable table container */}
-                <div className="overflow-y-auto flex-1 border border-border rounded-xl">
-                  <table className="w-full border-collapse min-w-[600px]">
-                    <thead className="sticky top-0 bg-background z-10 select-none shadow-sm">
+                <div className="overflow-y-auto flex-1 rounded-2xl border border-neutral-200/90 bg-surface shadow-xs">
+                  <table className="w-full border-collapse min-w-[700px]">
+                    <thead className="sticky top-0 bg-neutral-50/95 backdrop-blur-md z-20 select-none border-b border-neutral-200 shadow-xs">
                       <tr>
-                        <th className="px-4 py-3 text-left text-[10px] font-extrabold text-muted-foreground uppercase tracking-wider border-b border-border">
+                        <th className="w-[37%] px-6 sm:px-8 py-5 text-left text-xs sm:text-sm font-black text-neutral-500 uppercase tracking-wider">
                           Feature
                         </th>
-                        <th className="px-4 py-3 text-left text-[10px] font-extrabold text-muted-foreground uppercase tracking-wider border-b border-border">
+                        <th className="w-[21%] px-6 sm:px-8 py-5 text-left text-xs sm:text-sm font-black text-neutral-500 uppercase tracking-wider">
                           Starter
                         </th>
-                        <th className="px-4 py-3 text-left text-[10px] font-extrabold text-primary uppercase tracking-wider border-b border-border bg-accent/20">
-                          Professional
+                        <th className="w-[21%] px-6 sm:px-8 py-5 text-left text-xs sm:text-sm font-black text-neutral-950 uppercase tracking-wider bg-neutral-100/80 border-x border-neutral-200">
+                          <div className="flex items-center gap-2">
+                            <span>Professional</span>
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-neutral-950 text-white tracking-normal uppercase">
+                              Popular
+                            </span>
+                          </div>
                         </th>
-                        <th className="px-4 py-3 text-left text-[10px] font-extrabold text-muted-foreground uppercase tracking-wider border-b border-border">
+                        <th className="w-[21%] px-6 sm:px-8 py-5 text-left text-xs sm:text-sm font-black text-neutral-500 uppercase tracking-wider">
                           Business
                         </th>
                       </tr>
@@ -610,10 +690,10 @@ export function Pricing() {
                     <tbody>
                       {COMPARISONS.map((group, gidx) => (
                         <React.Fragment key={gidx}>
-                          <tr className="bg-surface/50 select-none">
+                          <tr className="bg-neutral-100/60 select-none">
                             <td
                               colSpan={4}
-                              className="px-4 py-2.5 text-[10px] font-extrabold text-muted-foreground uppercase tracking-wider border-b border-border"
+                              className="px-6 sm:px-8 py-3.5 sm:py-4 text-xs sm:text-sm font-black text-neutral-950 uppercase tracking-wider border-b border-neutral-200"
                             >
                               {group.group}
                             </td>
@@ -621,61 +701,67 @@ export function Pricing() {
                           {group.rows.map((row, ridx) => (
                             <tr
                               key={ridx}
-                              className="hover:bg-background/25 transition"
+                              className="border-b border-neutral-200/70 hover:bg-neutral-50/80 transition-colors"
                             >
-                              <td className="px-4 py-3 border-b border-border">
-                                <span className="text-xs font-bold text-foreground block">
+                              <td className="px-6 sm:px-8 py-4 sm:py-5 align-top">
+                                <span className="text-sm sm:text-base font-bold text-neutral-950 block">
                                   {row.name}
                                 </span>
                                 {row.desc && (
-                                  <span className="text-[10px] text-muted-foreground block mt-0.5">
+                                  <span className="text-xs sm:text-sm text-neutral-500 block mt-1 leading-snug">
                                     {row.desc}
                                   </span>
                                 )}
                               </td>
-                              <td className="px-4 py-3 text-xs text-foreground border-b border-border">
+                              <td className="px-6 sm:px-8 py-4 sm:py-5 text-sm sm:text-base text-neutral-800 font-medium align-middle">
                                 {typeof row.starter === "boolean" ? (
                                   row.starter ? (
-                                    <span className="text-success-500 font-bold">
-                                      ✓
+                                    <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-neutral-950 text-white shadow-xs">
+                                      <Check className="w-4 h-4 stroke-[3]" />
                                     </span>
                                   ) : (
-                                    <span className="text-muted-foreground opacity-40">
+                                    <span className="text-neutral-300 font-medium text-lg select-none">
                                       —
                                     </span>
                                   )
                                 ) : (
-                                  row.starter
+                                  <span className="text-neutral-800 font-medium">
+                                    {row.starter}
+                                  </span>
                                 )}
                               </td>
-                              <td className="px-4 py-3 text-xs text-primary font-bold border-b border-border bg-accent/10">
+                              <td className="px-6 sm:px-8 py-4 sm:py-5 text-sm sm:text-base text-neutral-950 font-bold bg-neutral-50/40 border-x border-neutral-200/80 align-middle">
                                 {typeof row.professional === "boolean" ? (
                                   row.professional ? (
-                                    <span className="text-success-500 font-bold">
-                                      ✓
+                                    <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-neutral-950 text-white shadow-xs">
+                                      <Check className="w-4 h-4 stroke-[3]" />
                                     </span>
                                   ) : (
-                                    <span className="text-muted-foreground opacity-40">
+                                    <span className="text-neutral-300 font-medium text-lg select-none">
                                       —
                                     </span>
                                   )
                                 ) : (
-                                  row.professional
+                                  <span className="text-neutral-950 font-black">
+                                    {row.professional}
+                                  </span>
                                 )}
                               </td>
-                              <td className="px-4 py-3 text-xs text-foreground border-b border-border">
+                              <td className="px-6 sm:px-8 py-4 sm:py-5 text-sm sm:text-base text-neutral-800 font-medium align-middle">
                                 {typeof row.business === "boolean" ? (
                                   row.business ? (
-                                    <span className="text-success-500 font-bold">
-                                      ✓
+                                    <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-neutral-950 text-white shadow-xs">
+                                      <Check className="w-4 h-4 stroke-[3]" />
                                     </span>
                                   ) : (
-                                    <span className="text-muted-foreground opacity-40">
+                                    <span className="text-neutral-300 font-medium text-lg select-none">
                                       —
                                     </span>
                                   )
                                 ) : (
-                                  row.business
+                                  <span className="text-neutral-800 font-medium">
+                                    {row.business}
+                                  </span>
                                 )}
                               </td>
                             </tr>
@@ -684,6 +770,24 @@ export function Pricing() {
                       ))}
                     </tbody>
                   </table>
+                </div>
+
+                {/* Modal Footer */}
+                <div className="pt-4 sm:pt-6 mt-4 border-t border-neutral-200/80 flex flex-col sm:flex-row items-center justify-between gap-4 shrink-0">
+                  <p className="text-xs sm:text-sm text-neutral-500 flex items-center gap-2">
+                    <Lock className="w-4 h-4 text-neutral-400 shrink-0" />
+                    <span>
+                      All plans include a 14-day free trial. No credit card
+                      required.
+                    </span>
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setIsCompareOpen(false)}
+                    className="w-full sm:w-auto px-6 py-2.5 rounded-full border border-neutral-300 hover:bg-neutral-100 text-xs sm:text-sm font-bold text-neutral-800 transition cursor-pointer"
+                  >
+                    Close comparison
+                  </button>
                 </div>
               </DialogContent>
             </Dialog>

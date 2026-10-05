@@ -1,18 +1,13 @@
 "use client";
 
-import { useRef } from "react";
-import { Sparkles, Check } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
-import { useFloating } from "@/src/hooks/useFloating";
+import { Play, Check } from "lucide-react";
 import { MotionButton } from "@/src/components/motion/MotionButton";
-import { useHeroAutoplay } from "./hooks/useHeroAutoplay";
-import { DashboardMockup } from "./components/DashboardMockup";
-import { PhoneMockup } from "./components/PhoneMockup";
-import { SuccessToast } from "./components/SuccessToast";
 import {
   LandingSection,
   LandingContainer,
 } from "@/src/components/common/landing-compositions";
+import { TEMPLATES_SHOWCASE } from "./data/hero.data";
+import { TemplateCard } from "./components/TemplateCard";
 
 function getSignupPath() {
   const locale = window.location.pathname.split("/").filter(Boolean)[0] || "vi";
@@ -20,142 +15,111 @@ function getSignupPath() {
 }
 
 export function HeroSection() {
-  const dashboardFloating = useFloating({ distance: 8, duration: 6 });
-  const mobileFloating = useFloating({ distance: 12, duration: 5 });
-
-  const {
-    selectedTimeSlot,
-    selectedService,
-    bookingsCount,
-    revenueAmount,
-    isBookingLoading,
-    isBooked,
-    showToast,
-    flashBookings,
-    flashRevenue,
-    setIsAutoplayPaused,
-    handleSelectServiceManual,
-    handleSelectSlotManual,
-    handleBookManual,
-  } = useHeroAutoplay();
-
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  const handleScrollToTemplates = () => {
-    const el = document.getElementById("templates");
+  const handleLiveDemo = () => {
+    const el =
+      document.getElementById("pillars") ||
+      document.getElementById("how-it-works");
     if (el) el.scrollIntoView({ behavior: "smooth" });
   };
 
   return (
-    <LandingSection className="relative pt-12 pb-24 lg:pt-20 lg:pb-32 bg-surface overflow-hidden font-sans">
-      {/* Glow decorative blobs */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute top-1/3 left-10 w-[300px] h-[300px] bg-success-500/5 rounded-full blur-[100px] pointer-events-none" />
+    <LandingSection className="relative pt-20 pb-24 lg:pt-32 lg:pb-36 bg-surface text-foreground overflow-hidden font-sans border-b border-border">
+      {/* Subtle Light Ambient Wash */}
+      <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-neutral-100 rounded-full blur-[120px] pointer-events-none" />
 
-      {/* Grid Background */}
-      <div className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(to_right,var(--color-border)_1px,transparent_1px),linear-gradient(to_bottom,var(--color-border)_1px,transparent_1px)] bg-[size:48px_48px] opacity-[0.25]" />
+      {/* Blueprint Technical Grid Background */}
+      <div className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(to_right,var(--color-border)_1px,transparent_1px),linear-gradient(to_bottom,var(--color-border)_1px,transparent_1px)] bg-[size:36px_36px] opacity-40" />
 
-      <LandingContainer className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
-        {/* Left Hero Content */}
-        <div className="lg:col-span-6 space-y-8 flex flex-col justify-center text-center lg:text-left">
-          <div className="inline-flex self-center lg:self-start items-center gap-2 px-3 py-1 bg-accent rounded-full text-primary text-xs font-semibold">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Booking SaaS Platform for Service Businesses</span>
-          </div>
+      <LandingContainer className="flex flex-col items-center text-center">
+        {/* 1. Giant Centered Headline in Crisp Slate */}
+        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-neutral-950 leading-[1.1] max-w-5xl mx-auto text-balance">
+          One Intelligent Booking System
+          <br className="hidden sm:inline" /> for{" "}
+          <span className="bg-gradient-to-r from-neutral-950 via-neutral-800 to-neutral-600 bg-clip-text text-transparent">
+            Every Business&nbsp;Need
+          </span>
+        </h1>
 
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-foreground leading-[1.1] max-w-2xl mx-auto lg:mx-0">
-            Create an online booking page with{" "}
-            <span className="text-primary">your own brand</span>
-          </h1>
+        {/* 2. Centered Subtitle */}
+        <p className="mt-6 text-base sm:text-lg md:text-xl text-neutral-600 leading-relaxed max-w-2xl mx-auto">
+          Manage scheduling, appointments, payments, staff allocations, and
+          automated workflows in one flexible, high-performance platform.
+        </p>
 
-          <p className="text-base sm:text-lg text-muted-foreground leading-relaxed max-w-xl mx-auto lg:mx-0">
-            Allow customers to self-book 24/7, eliminating manual chats. Manage
-            staff, services, availability, and secure deposits on a single
-            dashboard.
-          </p>
-
-          <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
-            <MotionButton
-              variant="primary"
-              className="w-full sm:w-auto h-12 px-8 text-sm font-bold cursor-pointer"
-              onClick={() => window.location.assign(getSignupPath())}
-            >
-              Create Your Page Free
-            </MotionButton>
-            <MotionButton
-              variant="secondary"
-              className="w-full sm:w-auto h-12 px-8 text-sm font-bold cursor-pointer"
-              onClick={handleScrollToTemplates}
-            >
-              View Demo Page
-            </MotionButton>
-          </div>
-
-          <div className="flex flex-wrap items-center justify-center lg:justify-start gap-6 text-xs text-muted-foreground pt-4 border-t border-border">
-            <div className="flex items-center gap-1.5">
-              <Check className="w-4 h-4 text-success-500" />
-              <span>No credit card required</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <Check className="w-4 h-4 text-success-500" />
-              <span>5-minute setup</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <Check className="w-4 h-4 text-success-500" />
-              <span>14-day free trial</span>
-            </div>
-          </div>
+        {/* 3. Action CTA Buttons */}
+        <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto">
+          <MotionButton
+            variant="primary"
+            className="w-full sm:w-auto h-13 px-9 text-base font-semibold rounded-full shadow-sm cursor-pointer"
+            onClick={() => window.location.assign(getSignupPath())}
+          >
+            Start 14-Day Free Trial
+          </MotionButton>
+          <MotionButton
+            variant="secondary"
+            className="w-full sm:w-auto h-13 px-9 text-base font-semibold rounded-full border border-neutral-300 bg-surface text-neutral-800 hover:bg-neutral-50 hover:border-neutral-400 cursor-pointer shadow-xs inline-flex items-center justify-center gap-2"
+            onClick={handleLiveDemo}
+          >
+            <span>See Live Demo</span>
+            <Play className="w-4 h-4 text-neutral-700" />
+          </MotionButton>
         </div>
 
-        {/* Right Hero Interactive Mockups (Autoplay enabled) */}
-        <div
-          ref={containerRef}
-          onMouseEnter={() => setIsAutoplayPaused(true)}
-          onMouseLeave={() => setIsAutoplayPaused(false)}
-          className="lg:col-span-6 relative h-[450px] sm:h-[520px] w-full max-w-lg mx-auto lg:max-w-none flex items-center justify-center"
-        >
-          {/* 1. Main Seller Dashboard Mockup (Floating) */}
-          <motion.div
-            animate={dashboardFloating.animate}
-            transition={dashboardFloating.transition}
-            className="absolute left-0 top-12 w-[85%] sm:w-[88%] bg-surface border border-border rounded-[4px] shadow-2xl p-4 z-10 select-none origin-bottom-left"
-          >
-            <DashboardMockup
-              bookingsCount={bookingsCount}
-              revenueAmount={revenueAmount}
-              flashBookings={flashBookings}
-              flashRevenue={flashRevenue}
-            />
-          </motion.div>
-
-          {/* 2. Customer Phone Booking Mockup (Floating) */}
-          <motion.div
-            animate={mobileFloating.animate}
-            transition={mobileFloating.transition}
-            className="absolute right-0 bottom-4 w-[50%] sm:w-[48%] bg-surface border border-border rounded-[12px] shadow-2xl p-3 z-20 select-none origin-bottom-right"
-          >
-            <PhoneMockup
-              selectedService={selectedService}
-              selectedTimeSlot={selectedTimeSlot}
-              isBooked={isBooked}
-              isBookingLoading={isBookingLoading}
-              handleSelectServiceManual={handleSelectServiceManual}
-              handleSelectSlotManual={handleSelectSlotManual}
-              handleBookManual={handleBookManual}
-            />
-          </motion.div>
-
-          {/* 3. Floating Success Toast Notification (AnimatePresence added) */}
-          <AnimatePresence>
-            {showToast && (
-              <SuccessToast
-                selectedService={selectedService}
-                selectedTimeSlot={selectedTimeSlot}
-              />
-            )}
-          </AnimatePresence>
+        {/* 4. Trust Badges */}
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-6 sm:gap-8 text-xs text-neutral-500">
+          <div className="flex items-center gap-2">
+            <Check className="w-4 h-4 text-neutral-700" />
+            <span>No credit card required</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Check className="w-4 h-4 text-neutral-700" />
+            <span>5-minute instant setup</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Check className="w-4 h-4 text-neutral-700" />
+            <span>Multi-calendar 2-way sync</span>
+          </div>
         </div>
       </LandingContainer>
+
+      {/* 5. Infinite Seamless Scrolling Industry Templates Marquee */}
+      <div className="mt-14 sm:mt-18 w-full overflow-hidden relative">
+        {/* Left & Right Gradient Fade Masks */}
+        <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-16 sm:w-32 z-20 bg-gradient-to-r from-surface to-transparent" />
+        <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-16 sm:w-32 z-20 bg-gradient-to-l from-surface to-transparent" />
+
+        <style>{`
+          @keyframes infiniteHeroMarquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-100%); }
+          }
+          .hero-marquee-track {
+            display: flex;
+            width: max-content;
+            animation: infiniteHeroMarquee 38s linear infinite;
+          }
+          .hero-marquee-container:hover .hero-marquee-track {
+            animation-play-state: paused;
+          }
+        `}</style>
+
+        {/* Dual tracks for 100% seamless infinite scroll without jerk */}
+        <div className="hero-marquee-container flex overflow-hidden">
+          <div className="hero-marquee-track flex gap-6 pr-6">
+            {TEMPLATES_SHOWCASE.map((tmpl) => (
+              <TemplateCard key={tmpl.id} tmpl={tmpl} />
+            ))}
+          </div>
+          <div
+            className="hero-marquee-track flex gap-6 pr-6"
+            aria-hidden="true"
+          >
+            {TEMPLATES_SHOWCASE.map((tmpl) => (
+              <TemplateCard key={`${tmpl.id}-dup`} tmpl={tmpl} />
+            ))}
+          </div>
+        </div>
+      </div>
     </LandingSection>
   );
 }
