@@ -58,7 +58,7 @@ export function IndustrySolutionsSection() {
     };
   }, [emblaApi, onSelect]);
 
-  useEffect(() => {
+  const scrollActiveTabIntoView = useCallback((behavior: ScrollBehavior) => {
     const tabs = tabsRef.current;
     const activeTab = tabs?.querySelector<HTMLButtonElement>(
       '[aria-pressed="true"]',
@@ -68,8 +68,8 @@ export function IndustrySolutionsSection() {
     const tabBounds = activeTab.getBoundingClientRect();
     const tabsBounds = tabs.getBoundingClientRect();
     if (
-      tabBounds.left >= tabsBounds.left &&
-      tabBounds.right <= tabsBounds.right
+      tabBounds.left >= tabsBounds.left + 4 &&
+      tabBounds.right <= tabsBounds.right - 4
     ) {
       return;
     }
@@ -80,9 +80,24 @@ export function IndustrySolutionsSection() {
         tabBounds.left -
         tabsBounds.left -
         (tabs.clientWidth - tabBounds.width) / 2,
-      behavior: shouldReduceMotion ? "instant" : "smooth",
+      behavior,
     });
-  }, [selectedIndex, shouldReduceMotion]);
+  }, []);
+
+  useEffect(() => {
+    scrollActiveTabIntoView(shouldReduceMotion ? "instant" : "smooth");
+  }, [selectedIndex, shouldReduceMotion, scrollActiveTabIntoView]);
+
+  useEffect(() => {
+    const tabs = tabsRef.current;
+    if (!tabs) return;
+
+    const observer = new ResizeObserver(() => {
+      scrollActiveTabIntoView("instant");
+    });
+    observer.observe(tabs);
+    return () => observer.disconnect();
+  }, [scrollActiveTabIntoView]);
 
   return (
     <LandingSection
@@ -111,7 +126,7 @@ export function IndustrySolutionsSection() {
         <div className="mt-12 flex flex-col sm:flex-row items-center justify-between gap-5">
           <div
             ref={tabsRef}
-            className="flex min-w-0 items-center gap-3 overflow-x-auto pb-1 max-w-full scrollbar-none"
+            className="flex min-w-0 items-center gap-3 overflow-x-auto p-1 max-w-full scrollbar-none"
           >
             {INDUSTRIES_DATA.map((ind, idx) => {
               const isActive = idx === selectedIndex;
@@ -121,7 +136,7 @@ export function IndustrySolutionsSection() {
                   type="button"
                   aria-pressed={isActive}
                   onClick={() => scrollTo(idx)}
-                  className={`shrink-0 px-6 py-3 rounded-full text-sm sm:text-base font-bold transition-all duration-300 cursor-pointer shadow-xs ${
+                  className={`shrink-0 px-6 py-3 rounded-full text-sm sm:text-base font-bold transition-all duration-300 cursor-pointer shadow-xs focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${
                     isActive
                       ? "bg-primary text-primary-foreground border border-primary"
                       : "bg-surface border border-input text-foreground hover:border-primary/40 hover:text-foreground hover:bg-muted"

@@ -1,16 +1,28 @@
 "use client";
 
 import { useState } from "react";
+import { motion, useReducedMotion } from "framer-motion";
 import { ArrowRight, ChevronDown, Video, Link2 } from "lucide-react";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@repo/ui";
 import {
   LandingSection,
   LandingContainer,
 } from "@/src/components/common/landing-compositions";
 
-import { SQUIRCLE_FEATURES } from "./constants/bento-features.constants";
+import {
+  FEATURE_GROUPS,
+  FEATURE_PREVIEW_LIMIT,
+  FEATURE_MOBILE_PREVIEW_LIMIT,
+  SQUIRCLE_FEATURES,
+} from "./constants/bento-features.constants";
 
 export function BentoFeaturesSection() {
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
+  const [activeGroup, setActiveGroup] = useState<string>(FEATURE_GROUPS[0].id);
+  const shouldReduceMotion = useReducedMotion();
+  const activeGroupIndex = FEATURE_GROUPS.findIndex(
+    (group) => group.id === activeGroup,
+  );
 
   return (
     <LandingSection
@@ -32,17 +44,17 @@ export function BentoFeaturesSection() {
               working together.
             </p>
 
-            <div className="flex flex-wrap items-center justify-center gap-3.5 pt-2">
+            <div className="flex items-center justify-center gap-2 pt-2 sm:gap-3.5">
               <a
                 href="#pricing"
-                className="inline-flex items-center justify-center gap-2 px-7 py-3 rounded-full bg-primary text-primary-foreground text-sm sm:text-base font-bold hover:bg-primary-hover transition-colors shadow-xs"
+                className="inline-flex shrink-0 items-center justify-center gap-2 px-4 py-3 rounded-full bg-primary text-primary-foreground text-sm sm:text-base font-bold hover:bg-primary-hover transition-colors shadow-xs sm:px-7"
               >
                 <span>Get started</span>
                 <ArrowRight className="w-4 h-4" />
               </a>
               <a
                 href="#how-it-works"
-                className="inline-flex items-center justify-center gap-2 px-7 py-3 rounded-full bg-surface border border-input text-foreground text-sm sm:text-base font-bold hover:bg-muted transition-colors shadow-xs"
+                className="inline-flex shrink-0 items-center justify-center gap-2 px-4 py-3 rounded-full bg-surface border border-input text-foreground text-sm sm:text-base font-bold hover:bg-muted transition-colors shadow-xs sm:px-7"
               >
                 <span>Book a demo</span>
                 <ArrowRight className="w-4 h-4 text-muted-foreground" />
@@ -268,7 +280,7 @@ export function BentoFeaturesSection() {
         {/* TIER 2: CONFIGURABLE FEATURES */}
         <div className="space-y-12 pt-4">
           <div className="text-center max-w-5xl mx-auto space-y-3">
-            <h3 className="text-xl sm:text-3xl lg:text-5xl font-extrabold tracking-tight text-foreground leading-tight">
+            <h3 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-foreground leading-tight text-balance">
               <span className="block">
                 The <span className="text-primary">features you need.</span>
               </span>
@@ -283,70 +295,148 @@ export function BentoFeaturesSection() {
             </p>
           </div>
 
-          {/* 12 Squircle Cards Grid matching user screenshot */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5 sm:gap-6">
-            {SQUIRCLE_FEATURES.map((card, idx) => {
-              const Icon = card.icon;
-              const isHovered = hoveredIdx === idx;
-
-              return (
-                <div
-                  key={idx}
-                  onMouseEnter={() => setHoveredIdx(idx)}
-                  onMouseLeave={() => setHoveredIdx(null)}
-                  className="relative rounded-3xl border border-border bg-surface h-[220px] sm:h-[240px] shadow-xs hover:border-primary/40 hover:shadow-md transition-all duration-300 cursor-pointer overflow-hidden select-none active:scale-[0.98]"
-                >
-                  {/* STATE 1: DEFAULT STATE (MATCHING USER DEMO PHOTO 1) */}
-                  <div
-                    className={`absolute inset-0 p-6 flex flex-col items-center justify-center text-center transition-all duration-300 ${
-                      isHovered
-                        ? "opacity-0 scale-95 pointer-events-none"
-                        : "opacity-100 scale-100"
-                    }`}
+          <Tabs
+            value={activeGroup}
+            onValueChange={(value) => {
+              setHoveredIdx(null);
+              setActiveGroup(value);
+            }}
+            className="space-y-8"
+          >
+            <div className="text-center">
+              <TabsList
+                aria-label="Feature categories"
+                className="grid h-auto w-full grid-cols-3 gap-1 rounded-none bg-transparent p-0 sm:inline-flex sm:w-auto sm:gap-4"
+              >
+                {FEATURE_GROUPS.map((group) => (
+                  <TabsTrigger
+                    key={group.id}
+                    value={group.id}
+                    className="h-auto min-h-12 whitespace-normal rounded-none border-b-2 border-transparent px-2 py-3 text-sm text-muted-foreground hover:text-primary data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:shadow-none sm:whitespace-nowrap sm:px-4 sm:text-base"
                   >
-                    {/* Squircle Push-Button Badge with 4 Corner Rivets */}
-                    <div className="w-20 h-20 rounded-2xl bg-muted/90 border border-border/90 flex items-center justify-center relative shadow-xs">
-                      {/* 4 Corner Rivet Dots */}
-                      <span className="absolute top-2 left-2 w-1.5 h-1.5 rounded-full bg-input" />
-                      <span className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-input" />
-                      <span className="absolute bottom-2 left-2 w-1.5 h-1.5 rounded-full bg-input" />
-                      <span className="absolute bottom-2 right-2 w-1.5 h-1.5 rounded-full bg-input" />
+                    <span>
+                      {group.label.split(" ").map((word, index) => (
+                        <span key={word} className="block sm:inline">
+                          {index > 0 ? " " : ""}
+                          {word}
+                        </span>
+                      ))}
+                    </span>
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+            </div>
 
-                      <Icon className="w-8 h-8 text-primary" />
-                    </div>
-
-                    {/* Title */}
-                    <h4 className="text-sm sm:text-base font-bold text-foreground tracking-tight mt-4 leading-snug px-1">
-                      {card.title}
-                    </h4>
-                  </div>
-
-                  {/* STATE 2: HOVER STATE (MATCHING USER DEMO PHOTO 2) */}
-                  <div
-                    className={`absolute inset-0 p-7 flex flex-col items-center justify-center text-center transition-all duration-300 ${
-                      isHovered
-                        ? "opacity-100 scale-100"
-                        : "opacity-0 scale-95 pointer-events-none"
-                    }`}
+            <div className="relative h-[460px] sm:h-[504px]">
+              {FEATURE_GROUPS.map((group, groupIndex) => {
+                const isActive = group.id === activeGroup;
+                return (
+                  <TabsContent
+                    key={group.id}
+                    value={group.id}
+                    forceMount
+                    asChild
+                    className="absolute inset-0 mt-0"
                   >
-                    {/* 4 Corner Rivet Dots on the Card Itself! */}
-                    <span className="absolute top-4 left-4 w-1.5 h-1.5 rounded-full bg-input" />
-                    <span className="absolute top-4 right-4 w-1.5 h-1.5 rounded-full bg-input" />
-                    <span className="absolute bottom-4 left-4 w-1.5 h-1.5 rounded-full bg-input" />
-                    <span className="absolute bottom-4 right-4 w-1.5 h-1.5 rounded-full bg-input" />
+                    <motion.div
+                      initial={false}
+                      animate={{
+                        opacity: isActive ? 1 : 0,
+                        x:
+                          shouldReduceMotion || isActive
+                            ? 0
+                            : groupIndex > activeGroupIndex
+                              ? 8
+                              : -8,
+                      }}
+                      transition={{
+                        duration: shouldReduceMotion ? 0 : 0.25,
+                        ease: [0.22, 1, 0.36, 1],
+                      }}
+                      aria-hidden={!isActive}
+                      inert={!isActive}
+                      style={{ pointerEvents: isActive ? "auto" : "none" }}
+                    >
+                      <div className="grid h-[460px] grid-cols-2 grid-rows-2 gap-5 sm:h-[504px] sm:gap-6 lg:grid-cols-4">
+                        {SQUIRCLE_FEATURES.filter(
+                          (card) => card.group === group.id,
+                        )
+                          .slice(0, FEATURE_PREVIEW_LIMIT)
+                          .map((card, idx) => {
+                            const Icon = card.icon;
+                            const isHovered = hoveredIdx === idx;
 
-                    {/* Title & Description */}
-                    <h4 className="text-base sm:text-lg font-bold text-foreground tracking-tight">
-                      {card.title}
-                    </h4>
-                    <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed mt-2.5 max-w-[240px]">
-                      {card.description}
-                    </p>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+                            return (
+                              <div
+                                key={card.title}
+                                onMouseEnter={() => setHoveredIdx(idx)}
+                                onMouseLeave={() => setHoveredIdx(null)}
+                                className={`relative rounded-3xl border border-border bg-surface h-[220px] sm:h-[240px] shadow-xs hover:border-primary/40 hover:shadow-md transition-all duration-300 cursor-pointer overflow-hidden select-none active:scale-[0.98] ${
+                                  idx >= FEATURE_MOBILE_PREVIEW_LIMIT
+                                    ? "hidden lg:block"
+                                    : ""
+                                }`}
+                              >
+                                {/* STATE 1: DEFAULT STATE (MATCHING USER DEMO PHOTO 1) */}
+                                <div
+                                  className={`absolute inset-0 p-6 flex flex-col items-center justify-center text-center transition-all duration-300 ${
+                                    isHovered
+                                      ? "opacity-0 scale-95 pointer-events-none"
+                                      : "opacity-100 scale-100"
+                                  }`}
+                                >
+                                  {/* Squircle Push-Button Badge with 4 Corner Rivets */}
+                                  <div className="w-20 h-20 rounded-2xl bg-muted/90 border border-border/90 flex items-center justify-center relative shadow-xs">
+                                    {/* 4 Corner Rivet Dots */}
+                                    <span className="absolute top-2 left-2 w-1.5 h-1.5 rounded-full bg-input" />
+                                    <span className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-input" />
+                                    <span className="absolute bottom-2 left-2 w-1.5 h-1.5 rounded-full bg-input" />
+                                    <span className="absolute bottom-2 right-2 w-1.5 h-1.5 rounded-full bg-input" />
+
+                                    <Icon className="w-8 h-8 text-primary" />
+                                  </div>
+
+                                  {/* Title */}
+                                  <h4 className="text-sm sm:text-base font-bold text-foreground tracking-tight mt-4 leading-snug px-1">
+                                    {card.title}
+                                  </h4>
+                                </div>
+
+                                {/* STATE 2: HOVER STATE (MATCHING USER DEMO PHOTO 2) */}
+                                <div
+                                  className={`absolute inset-0 p-7 flex flex-col items-center justify-center text-center transition-all duration-300 ${
+                                    isHovered
+                                      ? "opacity-100 scale-100"
+                                      : "opacity-0 scale-95 pointer-events-none"
+                                  }`}
+                                >
+                                  {/* 4 Corner Rivet Dots on the Card Itself! */}
+                                  <span className="absolute top-4 left-4 w-1.5 h-1.5 rounded-full bg-input" />
+                                  <span className="absolute top-4 right-4 w-1.5 h-1.5 rounded-full bg-input" />
+                                  <span className="absolute bottom-4 left-4 w-1.5 h-1.5 rounded-full bg-input" />
+                                  <span className="absolute bottom-4 right-4 w-1.5 h-1.5 rounded-full bg-input" />
+
+                                  {/* Title & Description */}
+                                  <h4 className="text-base sm:text-lg font-bold text-foreground tracking-tight">
+                                    {card.title}
+                                  </h4>
+                                  <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed mt-2.5 max-w-[240px]">
+                                    {card.description}
+                                  </p>
+                                </div>
+                              </div>
+                            );
+                          })}
+                      </div>
+                    </motion.div>
+                  </TabsContent>
+                );
+              })}
+            </div>
+            <h3 className="text-center text-3xl font-extrabold tracking-tight text-foreground leading-tight sm:text-4xl lg:text-5xl">
+              …and so much more!
+            </h3>
+          </Tabs>
         </div>
       </LandingContainer>
     </LandingSection>

@@ -239,7 +239,7 @@ export function Header() {
                       key={item.label}
                       href={item.href}
                       onClick={() => setMobileOpen(false)}
-                      className="block px-4 py-3 rounded-2xl text-base font-bold text-foreground hover:bg-muted transition-colors"
+                      className="block py-3 rounded-2xl text-base font-bold text-foreground hover:bg-muted transition-colors"
                     >
                       {item.label}
                     </a>

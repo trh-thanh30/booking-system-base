@@ -456,16 +456,34 @@ export function Pricing() {
         </div>
 
         {/* Social Proof Line */}
-        <div className="text-center text-sm text-muted-foreground select-none mb-10">
-          <span>
-            <strong className="text-foreground">12,400+ businesses</strong>{" "}
-            trust BookingBase
+        <div className="mb-10 flex flex-col items-center gap-2 text-center text-sm leading-relaxed text-muted-foreground select-none sm:flex-row sm:flex-wrap sm:justify-center sm:gap-0">
+          <span className="text-balance">
+            <span className="sm:hidden">Trusted by </span>
+            <strong className="text-foreground">12,400+ businesses</strong>
+            <span className="hidden sm:inline"> trust BookingBase</span>
           </span>
-          <span className="mx-2 text-muted-foreground">·</span>
-          <span className="text-warning-500 font-bold mr-1">★★★★★</span>
-          <span>
-            <strong className="text-foreground">4.8 avg rating</strong> from
-            1,820 customer reviews
+          <span
+            className="mx-2 hidden text-muted-foreground sm:inline"
+            aria-hidden="true"
+          >
+            ·
+          </span>
+          <span className="flex flex-wrap items-center justify-center gap-x-1.5 gap-y-0.5">
+            <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
+              <span className="text-warning-500 font-bold" aria-hidden="true">
+                ★★★★★
+              </span>
+              <strong className="text-foreground">
+                <span className="sm:hidden">4.8 rating</span>
+                <span className="hidden sm:inline">4.8 avg rating</span>
+              </strong>
+            </span>
+            <span className="whitespace-nowrap">
+              <span className="sm:hidden">· 1,820 reviews</span>
+              <span className="hidden sm:inline">
+                from 1,820 customer reviews
+              </span>
+            </span>
           </span>
         </div>
 
