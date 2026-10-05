@@ -1,5 +1,6 @@
 "use client";
 
+import { Label, cn } from "@repo/ui";
 import {
   Children,
   cloneElement,
@@ -7,7 +8,6 @@ import {
   type AriaRole,
   type ReactNode,
 } from "react";
-import { Label, cn } from "@repo/ui";
 
 type FormFieldProps = {
   children: ReactNode;
@@ -18,6 +18,7 @@ type FormFieldProps = {
   htmlFor: string;
   label: string;
   required?: boolean;
+  className?: string;
 };
 
 export function FormField({
@@ -28,14 +29,15 @@ export function FormField({
   error,
   htmlFor,
   label,
+  className,
   required = false,
 }: FormFieldProps) {
   const childNodes = Children.toArray(children);
   const controlIndex = childNodes.findIndex((child) => isValidElement(child));
 
   return (
-    <div className="space-y-2">
-      <Label htmlFor={htmlFor}>
+    <div className="grid gap-2">
+      <Label className={className} htmlFor={htmlFor}>
         {label}
         {required ? (
           <span aria-hidden="true" className="ml-1 text-destructive">

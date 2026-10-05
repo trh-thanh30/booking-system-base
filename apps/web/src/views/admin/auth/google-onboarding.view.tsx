@@ -58,13 +58,23 @@ export function GoogleOnboardingView() {
       });
     } catch (error) {
       attempt.current = false;
-      setSubmitError(getGoogleOnboardingError(error));
+      const result = getGoogleOnboardingError(error);
+      setSubmitError(result);
+      toast.error(t(result.key));
     }
   }
 
-  const error =
-    submitError ??
-    (profile.isError ? getGoogleOnboardingError(profile.error) : null);
+  const profileError = profile.isError
+    ? getGoogleOnboardingError(profile.error)
+    : null;
+  const error = submitError ?? profileError;
+  useEffect(() => {
+    if (!profile.isError) return;
+    const currentError = getGoogleOnboardingError(profile.error);
+    toast.error(t(currentError.key), {
+      id: "google-onboarding-profile-error",
+    });
+  }, [profile.error, profile.errorUpdatedAt, profile.isError, t, toast]);
   return (
     <AuthShell
       title={t("google.onboardingTitle")}
@@ -78,14 +88,6 @@ export function GoogleOnboardingView() {
           />
         ) : (
           <>
-            {error ? (
-              <p
-                role="alert"
-                className="rounded-md border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive"
-              >
-                {t(error.key)}
-              </p>
-            ) : null}
             {profile.data && !error?.terminal ? (
               <GoogleBusinessForm
                 profile={profile.data}

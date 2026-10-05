@@ -480,7 +480,7 @@ Không viết business logic, React component implementation, constant lớn ho�
 - Trong app dùng alias `@/src/...`.
 - Import primitive từ `@repo/ui`.
 - Import shared type/schema/helper từ `@repo/shared`.
-- Notification trong component/hook frontend dùng `const { toast } = useToast()` từ `@repo/hooks`. Không import `toast` trực tiếp từ `sonner` trong Admin/Web; chỉ wrapper `packages/hooks` và Toaster primitive `packages/ui` phụ thuộc Sonner trực tiếp.
+- Notification trong component/hook frontend dùng `const { toast } = useToast()` từ `@repo/hooks`. Không import `toast` trực tiếp từ `sonner` trong Admin/Web; chỉ wrapper `packages/hooks` và Toaster primitive `packages/ui` phụ thuộc Sonner trực tiếp. Lỗi validation theo field nằm trong `FormField`; lỗi nghiệp vụ/toàn form dùng toast; banner chỉ dành cho trạng thái chặn trang hoặc cần hiển thị lâu dài. Không render đồng thời toast và banner cho cùng một thông báo.
 - View được import bởi `app/**/page.tsx`.
 - View có thể import `src/components/common`, `src/components/layout`, `src/hooks`, `src/services`, `src/utils`, `src/constants`.
 - `src/components/common` không import ngược vào `src/views`.

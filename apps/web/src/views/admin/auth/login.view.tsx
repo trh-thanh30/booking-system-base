@@ -17,7 +17,7 @@ import { Button } from "@repo/ui";
 import { useMutation } from "@tanstack/react-query";
 import { LogIn } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { AuthLoadingState, AuthShell } from "./components";
 import { getLoginErrorKey } from "./utils/auth.utils";
@@ -36,9 +36,6 @@ export function LoginView({
   const router = useRouter();
   const { login, isLoading, isAuthenticated } = useAuth();
   const { toast } = useToast();
-  const [submitError, setSubmitError] = useState<string | null>(
-    oauthError ? t(getOAuthErrorKey(oauthError)) : null,
-  );
   const handledOAuthError = useRef<string | null>(null);
   const google = useGoogleLogin(returnTo);
   useEffect(() => {
@@ -70,7 +67,6 @@ export function LoginView({
 
   async function onSubmit(input: LoginInput) {
     if (google.isRedirecting || loginMutation.isPending) return;
-    setSubmitError(null);
     const parsed = loginSchema.safeParse(input);
 
     if (!parsed.success) {
@@ -97,7 +93,7 @@ export function LoginView({
           await authService.resumeOwnerOnboarding(parsed.data);
           router.replace("/admin/onboarding/business?provider=email");
         } catch (resumeError) {
-          setSubmitError(t(getLoginErrorKey(resumeError)));
+          toast.error(t(getLoginErrorKey(resumeError)));
         }
         return;
       }
@@ -108,7 +104,7 @@ export function LoginView({
         return;
       }
 
-      setSubmitError(t(getLoginErrorKey(error)));
+      toast.error(t(getLoginErrorKey(error)));
     }
   }
 
@@ -121,14 +117,6 @@ export function LoginView({
         />
       ) : (
         <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
-          {submitError ? (
-            <p
-              role="alert"
-              className="rounded-md border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive"
-            >
-              {submitError}
-            </p>
-          ) : null}
           <FormField
             error={errors.usernameOrEmail?.message}
             htmlFor="usernameOrEmail"

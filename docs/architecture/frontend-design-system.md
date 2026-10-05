@@ -129,7 +129,7 @@ import { Toaster } from "@repo/ui/sonner";
 Trong client component, dùng shared hook thay vì import Sonner trực tiếp cho code mới:
 
 ```tsx
-import { useToast } from "@repo/hooks/toast";
+import { useToast } from "@repo/hooks";
 
 const { toast } = useToast();
 toast.success("Đã lưu thay đổi");
@@ -141,6 +141,25 @@ và custom toast. `Toaster` dùng semantic status token nên tự thích nghi li
 Component và feature hook phải lấy `toast` qua `useToast`; chỉ shared wrapper và
 Toaster primitive được import Sonner trực tiếp. Nhờ đó frontend dùng một API
 notification thống nhất và có thể thay provider tại shared package.
+
+### Quy tắc phản hồi form
+
+- Lỗi validation gắn với một field (sai định dạng, thiếu dữ liệu, mật khẩu không
+  khớp) hiển thị ngay dưới field bằng `FormField`; control phải có
+  `aria-invalid` và liên kết tới nội dung lỗi. Không dùng toast thay cho lỗi field.
+- Lỗi nghiệp vụ hoặc lỗi submit áp dụng cho toàn form (email đã tồn tại, thao tác
+  bị từ chối, lưu thất bại, lỗi mạng tạm thời) hiển thị bằng `toast.error` qua
+  `useToast`. Không tạo thêm banner đỏ bên trong form cho cùng lỗi đó.
+- Thành công sau một hành động submit dùng `toast.success`, trừ khi màn hình đã
+  chuyển sang một success state riêng có đầy đủ ngữ cảnh.
+- Banner/`StatePanel` chỉ dành cho trạng thái nội dung cần tồn tại lâu dài, ví dụ
+  không có quyền truy cập, tài nguyên không tồn tại hoặc một vùng dữ liệu không
+  thể tải. Không dùng banner như notification tạm thời. Session Auth hết hạn phải
+  dùng toast kèm recovery UI phù hợp (form yêu cầu mã mới, CTA đăng nhập lại),
+  không render thêm banner đỏ trong form.
+- Không lặp cùng một thông báo ở cả toast và banner. Khi cần vừa chỉ vị trí lỗi
+  vừa thông báo kết quả (ví dụ OTP sai), toast nêu lỗi nghiệp vụ còn field chỉ
+  hiển thị câu ngắn và visual invalid để hướng người dùng về đúng control.
 
 ## Component Rules
 

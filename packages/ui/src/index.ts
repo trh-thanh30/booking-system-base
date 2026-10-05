@@ -6,6 +6,7 @@ export * from "./checkbox";
 export * from "./dialog";
 export * from "./dropdown-menu";
 export * from "./input";
+export * from "./otp-input";
 export * from "./label";
 export * from "./lib/utils";
 export * from "./separator";

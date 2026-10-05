@@ -21,6 +21,7 @@ test("FormField marks required controls visually and semantically", () => {
     ),
   );
 
+  assert.match(required, /^<div class="grid gap-2">/);
   assert.match(required, /aria-hidden="true"[^>]*>\*<\/span>/);
   assert.match(required, /aria-required="true"/);
   assert.doesNotMatch(optional, />\*<\/span>|aria-required="true"/);

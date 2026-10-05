@@ -13,8 +13,9 @@ import {
 } from "@/src/components/common";
 import { Link, useRouter } from "@/src/i18n/navigation";
 import { authService } from "@/src/services/admin/auth.service";
-import { AuthShell, EmailAuthFeedback } from "./components";
+import { AuthShell } from "./components";
 import { useEmailAuthFeedback } from "./hooks/use-email-auth-feedback";
+import { useEffect } from "react";
 
 export function ResetPasswordView({
   initialSessionId = "",
@@ -30,6 +31,13 @@ export function ResetPasswordView({
     mutationFn: authService.resetPassword,
     retry: false,
   });
+  useEffect(() => {
+    if (!initialSessionId) {
+      toast.error(t("emailFlow.sessionExpired"), {
+        id: "reset-password-session-expired",
+      });
+    }
+  }, [initialSessionId, t, toast]);
   const {
     formState: { errors },
     handleSubmit,
@@ -81,7 +89,8 @@ export function ResetPasswordView({
       toast.success(t("reset.success"));
       router.replace("/admin/login");
     } catch (error) {
-      feedback.fail(error, "otp");
+      const result = feedback.fail(error, "otp");
+      toast.error(t(result.key));
     }
   }
 
@@ -89,12 +98,6 @@ export function ResetPasswordView({
   return (
     <AuthShell description={t("reset.description")} title={t("reset.title")}>
       <div className="space-y-4">
-        <EmailAuthFeedback
-          errorKey={
-            !initialSessionId ? "emailFlow.sessionExpired" : feedback.errorKey
-          }
-          remaining={feedback.remaining}
-        />
         {expired ? (
           <Button asChild className="w-full">
             <Link href="/admin/forgot-password">
@@ -166,7 +169,11 @@ export function ResetPasswordView({
               disabled={reset.isPending || feedback.remaining > 0}
               type="submit"
             >
-              {reset.isPending ? t("reset.submitting") : t("reset.submit")}
+              {reset.isPending
+                ? t("reset.submitting")
+                : feedback.remaining > 0
+                  ? t("emailFlow.retryIn", { seconds: feedback.remaining })
+                  : t("reset.submit")}
             </Button>
             <Button asChild className="w-full" variant="outline">
               <Link href="/admin/forgot-password">

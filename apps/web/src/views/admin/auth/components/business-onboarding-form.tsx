@@ -1,9 +1,12 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { useForm, type FieldPath } from "react-hook-form";
-import { useTranslations } from "next-intl";
-import { useQuery } from "@tanstack/react-query";
+import {
+  EmailInput,
+  FormField,
+  AuthInput as Input,
+} from "@/src/components/common";
+import { siteConfig } from "@/src/config/site.config";
+import { businessCategoriesService } from "@/src/services/admin/business-categories.service";
 import {
   completeOwnerBusinessSchema,
   type CompleteOwnerBusinessInput,
@@ -20,13 +23,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@repo/ui";
-import {
-  AuthInput as Input,
-  EmailInput,
-  FormField,
-} from "@/src/components/common";
-import { siteConfig } from "@/src/config/site.config";
-import { businessCategoriesService } from "@/src/services/admin/business-categories.service";
+import { useQuery } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
+import { useEffect, useRef, useState } from "react";
+import { useForm, type FieldPath } from "react-hook-form";
 import {
   createBookingHost,
   createBusinessSlug,
@@ -178,11 +178,13 @@ export function BusinessOnboardingForm({
             alt={profile.full_name ?? t("verifiedAccount")}
             referrerPolicy="no-referrer"
           />
-          <AvatarFallback>{profile.full_name?.[0] ?? "B"}</AvatarFallback>
+          <AvatarFallback>
+            {profile.full_name?.[0] ?? profile.email?.[0]}
+          </AvatarFallback>
         </Avatar>
         <div className="min-w-0">
           <p className="truncate font-medium">
-            {profile.full_name ?? t("verifiedAccount")}
+            {profile.full_name ?? profile.email ?? t("verifiedAccount")}
           </p>
           <p className="text-xs text-muted-foreground">
             {t("verifiedAccount")}

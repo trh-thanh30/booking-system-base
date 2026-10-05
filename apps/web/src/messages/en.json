@@ -319,7 +319,9 @@
       "title": "Reset password"
     },
     "verify": {
-      "codeHint": "Enter the 6-digit code sent to your email. The code expires after 15 minutes.",
+      "codeHint": "Enter the 6-digit code sent to your email.",
+      "expiresIn": "Code expires in {time}",
+      "codeExpired": "The verification code has expired. Send a new code.",
       "description": "Confirm your email before signing in to the tenant workspace.",
       "failed": "Could not verify email",
       "request": "Send verification code",
@@ -327,9 +329,11 @@
       "requesting": "Sending verification code",
       "requestSuccess": "If the account requires verification, a code has been sent",
       "resend": "Send a new code",
+      "resendIn": "Resend code in {seconds} seconds",
       "resendFailed": "Could not resend verification code",
       "resending": "Sending a new code",
       "resendSuccess": "A new verification code has been sent",
+      "invalidCodeInline": "The verification code is invalid or expired.",
       "submit": "Verify email",
       "submitting": "Verifying email",
       "success": "Email verified. You can now sign in.",

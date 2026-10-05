@@ -52,3 +52,16 @@ test("Landing registration only collects account details before verification and
   assert.match(html, /src="\/icons\/google.svg"/);
   assert.match(html, /data-nimg="1"/);
 });
+
+test("registration uses toast for submit errors instead of an in-form error banner", () => {
+  const source = readFileSync(
+    new URL(
+      "../src/views/signup-business/signup-business.view.tsx",
+      import.meta.url,
+    ),
+    "utf8",
+  );
+  assert.match(source, /toast\.error\(/);
+  assert.doesNotMatch(source, /role="alert"/);
+  assert.doesNotMatch(source, /border-destructive\/30 bg-destructive\/10/);
+});

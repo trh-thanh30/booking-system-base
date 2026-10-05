@@ -19,7 +19,6 @@ import {
 import { Button } from "@repo/ui";
 import { useMutation } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 export function SignupBusinessView() {
@@ -28,7 +27,6 @@ export function SignupBusinessView() {
   const router = useRouter();
   const { toast } = useToast();
   const google = useGoogleLogin();
-  const [error, setError] = useState("");
   const form = useForm<RegisterOwnerAccountInput>({
     defaultValues: { email: "", password: "", confirmPassword: "" },
   });
@@ -44,7 +42,6 @@ export function SignupBusinessView() {
   async function submit(input: RegisterOwnerAccountInput) {
     if (registration.isPending || google.isRedirecting) return;
     form.clearErrors();
-    setError("");
     const parsed = registerOwnerAccountSchema.safeParse(input);
     if (!parsed.success) {
       for (const issue of parsed.error.issues)
@@ -61,7 +58,7 @@ export function SignupBusinessView() {
         `/admin/verify-email?${new URLSearchParams({ sessionId: result.sessionId, onboarding: "1" })}`,
       );
     } catch (failure) {
-      setError(
+      toast.error(
         t(
           failure instanceof HttpClientError && failure.status === 409
             ? "accountExists"
@@ -95,14 +92,6 @@ export function SignupBusinessView() {
           {auth("google.or")}
           <span className="h-px flex-1 bg-border" />
         </div>
-        {error ? (
-          <p
-            role="alert"
-            className="rounded-md border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive"
-          >
-            {error}
-          </p>
-        ) : null}
         <fieldset disabled={busy} className="space-y-5">
           <legend className="sr-only">{t("accountDetails")}</legend>
           <FormField

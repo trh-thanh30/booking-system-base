@@ -2,7 +2,7 @@
 
 import { useLocale, useTranslations } from "next-intl";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useState, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useToast } from "@repo/hooks";
 import { HttpClientError, type CompleteOwnerBusinessInput } from "@repo/shared";
 import { Button } from "@repo/ui";
@@ -16,7 +16,6 @@ export function OwnerOnboardingView() {
   const router = useRouter();
   const { toast } = useToast();
   const submitted = useRef(false);
-  const [error, setError] = useState("");
   const [expired, setExpired] = useState(false);
   const profile = useQuery({
     queryKey: ["owner-onboarding-profile"],
@@ -33,19 +32,22 @@ export function OwnerOnboardingView() {
   async function submit(input: CompleteOwnerBusinessInput) {
     if (submitted.current) return;
     submitted.current = true;
-    setError("");
     try {
       await completion.mutateAsync(input);
       toast.success(t("businessCreated"));
       router.replace("/admin/login");
     } catch (failure) {
       submitted.current = false;
-      setExpired(failure instanceof HttpClientError && failure.status === 401);
-      setError(
+      const sessionExpired =
+        failure instanceof HttpClientError && failure.status === 401;
+      setExpired(sessionExpired);
+      toast.error(
         t(
-          failure instanceof HttpClientError && failure.status === 409
-            ? "detailsConflict"
-            : "completionFailed",
+          sessionExpired
+            ? "sessionExpired"
+            : failure instanceof HttpClientError && failure.status === 409
+              ? "detailsConflict"
+              : "completionFailed",
         ),
       );
     }
@@ -53,6 +55,17 @@ export function OwnerOnboardingView() {
   const terminal =
     expired ||
     (profile.error instanceof HttpClientError && profile.error.status === 401);
+  const profileErrorKey = profile.isError
+    ? terminal
+      ? "sessionExpired"
+      : "completionFailed"
+    : null;
+  useEffect(() => {
+    if (!profileErrorKey) return;
+    toast.error(t(profileErrorKey), {
+      id: "owner-onboarding-profile-error",
+    });
+  }, [profile.errorUpdatedAt, profileErrorKey, t, toast]);
   return (
     <AuthShell
       title={t("businessTitle")}
@@ -60,15 +73,6 @@ export function OwnerOnboardingView() {
     >
       <div className="space-y-5">
         {profile.isPending ? <p role="status">{t("loading")}</p> : null}
-        {terminal ? (
-          <p role="alert" className="text-sm text-destructive">
-            {t("sessionExpired")}
-          </p>
-        ) : error || profile.isError ? (
-          <p role="alert" className="text-sm text-destructive">
-            {error || t("completionFailed")}
-          </p>
-        ) : null}
         {profile.data && !terminal ? (
           <BusinessOnboardingForm
             profile={profile.data}

@@ -35,7 +35,16 @@ test("verification handoff renders OTP without displaying or editing its session
   const html = render(VerifyEmailView, { initialSessionId: "secret-session" });
   assert.match(html, /autoComplete="one-time-code"/i);
   assert.match(html, /maxLength="6"/i);
-  assert.ok(html.includes(messages.Auth.verify.resend));
+  assert.equal((html.match(/data-slot="input-otp-slot"/g) ?? []).length, 6);
+  assert.match(html, /15:00/);
+  const resendAction = html.match(
+    new RegExp(
+      `<button[^>]*>${messages.Auth.verify.resend.replace(/[.*+?^${}()|[\\]\\]/g, "\\$&")}<\\/button>`,
+    ),
+  )?.[0];
+  assert.ok(resendAction);
+  assert.match(resendAction, /text-primary/);
+  assert.doesNotMatch(resendAction, /border-border/);
   assert.doesNotMatch(html, /secret-session|name="sessionId"|type="email"/);
 });
 
@@ -52,10 +61,31 @@ test("verification without a session renders the public email request form", () 
 
 test("reset without a session has actionable expired state and no editable session field", () => {
   const html = render(ResetPasswordView);
-  assert.match(html, /role="alert"/);
-  assert.match(html, /invalid or expired/i);
   assert.match(html, /forgot-password/);
+  assert.doesNotMatch(html, /role="alert"|border-destructive/);
   assert.doesNotMatch(html, /name="sessionId"|type="password"/);
+});
+
+test("Auth API notifications do not render destructive banners inside forms", () => {
+  const viewFiles = [
+    "forgot-password.view.tsx",
+    "google-onboarding.view.tsx",
+    "login.view.tsx",
+    "owner-onboarding.view.tsx",
+    "reset-password.view.tsx",
+    "verify-email.view.tsx",
+  ];
+  const source = viewFiles
+    .map((file) =>
+      readFileSync(
+        new URL(`../src/views/admin/auth/${file}`, import.meta.url),
+        "utf8",
+      ),
+    )
+    .join("\n");
+
+  assert.doesNotMatch(source, /<EmailAuthFeedback\b/);
+  assert.doesNotMatch(source, /border-destructive\/30\s+bg-destructive\/10/);
 });
 
 test("valid reset session renders OTP and matching password fields without exposing the session", () => {

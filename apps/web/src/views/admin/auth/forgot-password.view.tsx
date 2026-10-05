@@ -9,7 +9,7 @@ import { Button } from "@repo/ui";
 import { EmailInput, FormField } from "@/src/components/common";
 import { Link, useRouter } from "@/src/i18n/navigation";
 import { authService } from "@/src/services/admin/auth.service";
-import { AuthShell, EmailAuthFeedback } from "./components";
+import { AuthShell } from "./components";
 import { useEmailAuthFeedback } from "./hooks/use-email-auth-feedback";
 import { getSessionUrl } from "./utils/email-auth.utils";
 
@@ -43,17 +43,14 @@ export function ForgotPasswordView() {
       toast.success(t("forgot.success"));
       router.replace(getSessionUrl("reset-password", result.sessionId));
     } catch (error) {
-      feedback.fail(error, "request");
+      const result = feedback.fail(error, "request");
+      toast.error(t(result.key));
     }
   }
 
   return (
     <AuthShell description={t("forgot.description")} title={t("forgot.title")}>
       <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
-        <EmailAuthFeedback
-          errorKey={feedback.errorKey}
-          remaining={feedback.remaining}
-        />
         <FormField
           error={errors.email?.message}
           htmlFor="email"
@@ -76,7 +73,11 @@ export function ForgotPasswordView() {
           disabled={request.isPending || feedback.remaining > 0}
           type="submit"
         >
-          {request.isPending ? t("forgot.submitting") : t("forgot.submit")}
+          {request.isPending
+            ? t("forgot.submitting")
+            : feedback.remaining > 0
+              ? t("emailFlow.retryIn", { seconds: feedback.remaining })
+              : t("forgot.submit")}
         </Button>
         <Button asChild className="w-full" variant="ghost">
           <Link href="/admin/login">{t("backToLogin")}</Link>

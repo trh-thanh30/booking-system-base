@@ -1,8 +1,8 @@
 {
   "AuthJourney": {
     "placeholders": {
-      "email": "ban@example.com",
-      "usernameOrEmail": "ban@example.com hoặc tên đăng nhập",
+      "email": "example@gmail.com",
+      "usernameOrEmail": "example@gmail.com hoặc tên đăng nhập",
       "password": "Nhập mật khẩu của bạn",
       "newPassword": "Sử dụng ít nhất 8 ký tự",
       "confirmPassword": "Nhập lại mật khẩu",
@@ -319,7 +319,9 @@
       "title": "Đặt lại mật khẩu"
     },
     "verify": {
-      "codeHint": "Nhập mã gồm 6 chữ số đã gửi tới email của bạn. Mã có hiệu lực trong 15 phút.",
+      "codeHint": "Nhập mã gồm 6 chữ số đã gửi tới email của bạn.",
+      "expiresIn": "Mã có hiệu lực trong {time}",
+      "codeExpired": "Mã xác minh đã hết hạn. Hãy gửi mã mới.",
       "description": "Xác nhận email trước khi đăng nhập vào workspace của doanh nghiệp.",
       "failed": "Không thể xác minh email",
       "request": "Gửi mã xác minh",
@@ -327,9 +329,11 @@
       "requesting": "Đang gửi mã xác minh",
       "requestSuccess": "Nếu tài khoản cần xác minh, mã đã được gửi tới email",
       "resend": "Gửi mã mới",
+      "resendIn": "Gửi lại mã sau {seconds} giây",
       "resendFailed": "Không thể gửi lại mã xác minh",
       "resending": "Đang gửi mã mới",
       "resendSuccess": "Mã xác minh mới đã được gửi",
+      "invalidCodeInline": "Mã xác minh không hợp lệ hoặc đã hết hạn.",
       "submit": "Xác minh email",
       "submitting": "Đang xác minh",
       "success": "Email đã được xác minh. Bạn có thể đăng nhập.",

@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { useMutation } from "@tanstack/react-query";
-import { useTranslations } from "next-intl";
+import { EmailInput, FormField } from "@/src/components/common";
+import { Link, useRouter } from "@/src/i18n/navigation";
+import { getLoginUrl } from "@/src/lib/admin/auth-routing";
+import { authService } from "@/src/services/admin/auth.service";
 import { useToast } from "@repo/hooks";
 import {
   emailRequestSchema,
@@ -11,18 +11,22 @@ import {
   type EmailRequestInput,
   type VerifyEmailInput,
 } from "@repo/shared";
-import { Button } from "@repo/ui";
 import {
-  AuthInput as Input,
-  EmailInput,
-  FormField,
-} from "@/src/components/common";
-import { Link, useRouter } from "@/src/i18n/navigation";
-import { getLoginUrl } from "@/src/lib/admin/auth-routing";
-import { authService } from "@/src/services/admin/auth.service";
-import { AuthShell, EmailAuthFeedback } from "./components";
+  Button,
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+  REGEXP_ONLY_DIGITS,
+} from "@repo/ui";
+import { useMutation } from "@tanstack/react-query";
+import { Clock3 } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { AuthShell } from "./components";
 import { useEmailAuthFeedback } from "./hooks/use-email-auth-feedback";
-import { getSessionUrl } from "./utils/email-auth.utils";
+import { useVerificationCountdown } from "./hooks/use-verification-countdown";
+import { formatCountdown, getSessionUrl } from "./utils/email-auth.utils";
 
 export function VerifyEmailView({
   initialSessionId = "",
@@ -39,6 +43,7 @@ export function VerifyEmailView({
   const router = useRouter();
   const [sessionId, setSessionId] = useState(initialSessionId);
   const feedback = useEmailAuthFeedback();
+  const expiry = useVerificationCountdown(sessionId);
   const request = useMutation({
     mutationFn: authService.requestVerification,
     retry: false,
@@ -70,6 +75,7 @@ export function VerifyEmailView({
     feedback.clear();
     try {
       const result = await request.mutateAsync(parsed.data);
+      expiry.clear();
       setSessionId(result.sessionId);
       feedback.resetSession();
       feedback.cooldown();
@@ -80,7 +86,8 @@ export function VerifyEmailView({
       );
       toast.success(t("verify.requestSuccess"));
     } catch (error) {
-      feedback.fail(error, "request");
+      const result = feedback.fail(error, "request");
+      toast.error(t(result.key));
     }
   }
 
@@ -100,6 +107,7 @@ export function VerifyEmailView({
     feedback.clear();
     try {
       const result = await verify.mutateAsync(parsed.data);
+      expiry.clear();
       toast.success(t("verify.success"));
       router.replace(
         result.onboarding_required
@@ -107,7 +115,16 @@ export function VerifyEmailView({
           : loginUrl,
       );
     } catch (error) {
-      feedback.fail(error, "otp");
+      const result = feedback.fail(error, "otp");
+      if (result.key === "emailFlow.invalidCode") {
+        feedback.clear();
+        verifyForm.setError(
+          "code",
+          { message: t("verify.invalidCodeInline") },
+          { shouldFocus: true },
+        );
+      }
+      toast.error(t(result.key));
     }
   }
 
@@ -116,69 +133,117 @@ export function VerifyEmailView({
     feedback.clear();
     try {
       await resend.mutateAsync({ sessionId });
+      expiry.restart();
       feedback.cooldown();
       verifyForm.reset({ code: "", sessionId });
       toast.success(t("verify.resendSuccess"));
     } catch (error) {
-      feedback.fail(error, "otp");
+      const result = feedback.fail(error, "otp");
+      toast.error(t(result.key));
     }
   }
 
   return (
     <AuthShell description={t("verify.description")} title={t("verify.title")}>
       <div className="space-y-4">
-        <EmailAuthFeedback
-          errorKey={feedback.errorKey}
-          remaining={feedback.remaining}
-        />
         {sessionId && !feedback.expired ? (
           <form
             className="space-y-4"
             onSubmit={verifyForm.handleSubmit(verifyCode)}
           >
-            <p className="rounded-md border bg-muted p-4 text-sm text-muted-foreground">
-              {t("verify.codeHint")}
-            </p>
-            <FormField
-              error={verifyForm.formState.errors.code?.message}
-              htmlFor="code"
-              label={t("fields.code")}
-              required
-            >
-              <Input
-                id="code"
-                placeholder={placeholders("code")}
-                autoComplete="one-time-code"
-                inputMode="numeric"
-                maxLength={6}
-                aria-invalid={Boolean(verifyForm.formState.errors.code)}
-                aria-describedby={
-                  verifyForm.formState.errors.code ? "code-error" : undefined
+            <div className="space-y-2 rounded-md border bg-muted p-4 text-sm text-muted-foreground">
+              <p>{t("verify.codeHint")}</p>
+              <p
+                role="timer"
+                aria-live="off"
+                className={
+                  expiry.expired
+                    ? "flex items-center gap-2 font-medium text-destructive"
+                    : "flex items-center gap-2 font-medium text-foreground"
                 }
-                className="tracking-[0.3em]"
-                disabled={pending}
-                {...verifyForm.register("code")}
-              />
-            </FormField>
+              >
+                <Clock3 aria-hidden="true" className="size-4" />
+                {expiry.expired
+                  ? t("verify.codeExpired")
+                  : t("verify.expiresIn", {
+                      time: formatCountdown(expiry.remaining),
+                    })}
+              </p>
+            </div>
+            <div className="space-y-2">
+              <FormField
+                className="mb-1.5"
+                error={verifyForm.formState.errors.code?.message}
+                htmlFor="code"
+                label={t("fields.code")}
+                required
+              >
+                <Controller
+                  control={verifyForm.control}
+                  name="code"
+                  render={({ field }) => {
+                    const invalid = Boolean(verifyForm.formState.errors.code);
+                    return (
+                      <InputOTP
+                        {...field}
+                        id="code"
+                        maxLength={6}
+                        pattern={REGEXP_ONLY_DIGITS}
+                        autoComplete="one-time-code"
+                        inputMode="numeric"
+                        aria-invalid={invalid}
+                        aria-describedby={invalid ? "code-error" : undefined}
+                        containerClassName="w-full justify-center"
+                        disabled={pending || expiry.expired}
+                        onChange={(value) => {
+                          field.onChange(value);
+                          if (verifyForm.formState.errors.code) {
+                            verifyForm.clearErrors("code");
+                          }
+                        }}
+                      >
+                        <InputOTPGroup className="gap-1.5 sm:gap-2">
+                          {Array.from({ length: 6 }, (_, index) => (
+                            <InputOTPSlot
+                              key={index}
+                              index={index}
+                              aria-invalid={invalid}
+                            />
+                          ))}
+                        </InputOTPGroup>
+                      </InputOTP>
+                    );
+                  }}
+                />
+              </FormField>
+              <Button
+                className="ml-auto flex h-auto min-h-0 px-0 py-0 text-sm text-primary hover:bg-transparent hover:text-primary-hover disabled:bg-transparent disabled:text-primary/60"
+                disabled={pending || feedback.remaining > 0}
+                onClick={() => void resendCode()}
+                type="button"
+                variant="ghost"
+              >
+                {resend.isPending
+                  ? t("verify.resending")
+                  : feedback.remaining > 0
+                    ? t("verify.resendIn", {
+                        seconds: feedback.remaining,
+                      })
+                    : t("verify.resend")}
+              </Button>
+            </div>
             <Button
               className="w-full"
               disabled={
                 pending ||
+                expiry.expired ||
+                verifyForm.watch("code").length !== 6 ||
                 (feedback.errorKey === "emailFlow.rateLimited" &&
                   feedback.remaining > 0)
               }
               type="submit"
             >
               {verify.isPending ? t("verify.submitting") : t("verify.submit")}
-            </Button>
-            <Button
-              className="w-full"
-              disabled={pending || feedback.remaining > 0}
-              onClick={() => void resendCode()}
-              type="button"
-              variant="outline"
-            >
-              {resend.isPending ? t("verify.resending") : t("verify.resend")}
             </Button>
           </form>
         ) : (
