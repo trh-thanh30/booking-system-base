@@ -297,6 +297,7 @@
       "failed": "Đăng nhập thất bại",
       "forgotPassword": "Quên mật khẩu?",
       "verificationRequired": "Hãy xác minh email để tiếp tục",
+      "onboardingRequired": "Đăng nhập thành công. Vui lòng hoàn tất thông tin doanh nghiệp để tiếp tục.",
       "verifyEmail": "Xác minh email",
       "submit": "Đăng nhập",
       "submitting": "Đang đăng nhập",

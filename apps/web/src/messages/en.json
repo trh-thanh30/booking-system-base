@@ -297,6 +297,7 @@
       "failed": "Login failed",
       "forgotPassword": "Forgot password?",
       "verificationRequired": "Verify your email to continue",
+      "onboardingRequired": "Signed in successfully. Complete your business information to continue.",
       "verifyEmail": "Verify email",
       "submit": "Sign in",
       "submitting": "Signing in",

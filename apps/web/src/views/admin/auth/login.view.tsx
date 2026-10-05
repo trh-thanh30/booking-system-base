@@ -40,6 +40,7 @@ export function LoginView({
   const { login, isLoading, isAuthenticated } = useAuth();
   const { toast } = useToast();
   const handledOAuthError = useRef<string | null>(null);
+  const manualLoginRedirect = useRef(false);
   const google = useGoogleLogin(returnTo);
   useEffect(() => {
     if (!oauthError || handledOAuthError.current === oauthError) return;
@@ -54,7 +55,9 @@ export function LoginView({
   const loginMutation = useMutation({ mutationFn: login, retry: false });
   const destination = getSafeReturnTo(returnTo);
   useEffect(() => {
-    if (!isLoading && isAuthenticated) router.replace(destination);
+    if (!manualLoginRedirect.current && !isLoading && isAuthenticated) {
+      router.replace(destination);
+    }
   }, [destination, isAuthenticated, isLoading, router]);
   const {
     formState: { errors, isSubmitting },
@@ -84,16 +87,19 @@ export function LoginView({
     }
 
     try {
+      manualLoginRedirect.current = true;
       await loginMutation.mutateAsync(parsed.data);
       toast.success(t("login.success"));
       router.replace(destination);
     } catch (error) {
+      manualLoginRedirect.current = false;
       if (
         error instanceof HttpClientError &&
         error.code === "OWNER_ONBOARDING_REQUIRED"
       ) {
         try {
           await authService.resumeOwnerOnboarding(parsed.data);
+          toast.success(t("login.onboardingRequired"));
           router.replace("/admin/onboarding/business?provider=email");
         } catch (resumeError) {
           toast.error(t(getLoginErrorKey(resumeError)));
