@@ -87,7 +87,7 @@ export function IndustrySolutionsSection() {
   return (
     <LandingSection
       id="industry-solutions"
-      className="scroll-mt-24 py-24 lg:py-32 bg-surface text-foreground font-sans border-b border-border overflow-hidden"
+      className="scroll-mt-24 py-24 lg:py-32 bg-surface bg-gradient-to-br from-accent from-50% to-surface text-foreground font-sans overflow-hidden"
     >
       <LandingContainer className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}

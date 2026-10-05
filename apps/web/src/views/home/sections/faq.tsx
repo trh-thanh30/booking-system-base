@@ -14,7 +14,7 @@ export function FAQ() {
     <Reveal
       as="section"
       id="faq"
-      className="scroll-mt-20 md:scroll-mt-24 py-24 lg:py-32 bg-surface border-t border-border"
+      className="scroll-mt-20 md:scroll-mt-24 py-24 lg:py-32 bg-surface bg-gradient-to-br from-accent from-50% to-surface"
     >
       <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header */}

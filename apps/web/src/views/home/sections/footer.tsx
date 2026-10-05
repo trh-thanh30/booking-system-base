@@ -49,7 +49,7 @@ function TypewriterWatermark() {
 
 export function Footer() {
   return (
-    <footer className="w-full bg-surface border-t border-border/90 pt-20 sm:pt-28 pb-16 sm:pb-20 text-muted-foreground select-none overflow-hidden">
+    <footer className="w-full bg-surface pt-20 sm:pt-28 pb-16 sm:pb-20 text-muted-foreground select-none overflow-hidden">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Main Footer Links Grid */}
         <div className="grid grid-cols-2 md:grid-cols-6 gap-10 lg:gap-14 pb-16 sm:pb-20 border-b border-border/80">

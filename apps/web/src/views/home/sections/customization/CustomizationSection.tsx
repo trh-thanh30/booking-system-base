@@ -31,7 +31,7 @@ export function CustomizationSection() {
   return (
     <LandingSection
       id="customization"
-      className="scroll-mt-24 py-24 lg:py-32 bg-surface text-foreground font-sans border-b border-border overflow-hidden"
+      className="scroll-mt-24 py-24 lg:py-32 bg-surface bg-gradient-to-br from-accent from-50% to-surface text-foreground font-sans overflow-hidden"
     >
       {/* Centered Section Header */}
       <div className="max-w-5xl mx-auto px-4 text-center space-y-4 mb-14 sm:mb-16">
@@ -74,7 +74,7 @@ export function CustomizationSection() {
       >
         <div className="flex gap-6 sm:gap-8 px-6 sm:px-12 lg:px-20 py-2">
           {/* SLIDE 1: TESTIMONIALS (LARGE CARD MATCHING REFERENCE SCREENSHOT) */}
-          <div className="flex-[0_0_auto] w-[340px] sm:w-[400px] md:w-[450px] lg:w-[480px] h-[480px] sm:h-[510px] md:h-[530px] rounded-3xl border border-border bg-muted/70 p-6 sm:p-7 flex flex-col justify-start overflow-hidden shadow-xs hover:border-primary/40 transition-all select-none">
+          <div className="flex-[0_0_auto] w-[340px] sm:w-[400px] md:w-[450px] lg:w-[480px] h-[480px] sm:h-[510px] md:h-[530px] rounded-3xl border border-border bg-surface p-6 sm:p-7 flex flex-col justify-start overflow-hidden shadow-xs hover:border-primary/40 transition-all select-none">
             <h3 className="text-2xl sm:text-[26px] font-bold tracking-tight text-foreground text-center mb-6">
               Testimonials
             </h3>
@@ -117,7 +117,7 @@ export function CustomizationSection() {
           </div>
 
           {/* SLIDE 2: FAQ (SPIRAL NOTEBOOK GADGET MATCHING REFERENCE SCREENSHOT) */}
-          <div className="flex-[0_0_auto] w-[340px] sm:w-[400px] md:w-[450px] lg:w-[480px] h-[480px] sm:h-[510px] md:h-[530px] rounded-3xl border border-border bg-muted/70 p-6 sm:p-7 flex flex-col justify-start overflow-hidden shadow-xs hover:border-primary/40 transition-all select-none">
+          <div className="flex-[0_0_auto] w-[340px] sm:w-[400px] md:w-[450px] lg:w-[480px] h-[480px] sm:h-[510px] md:h-[530px] rounded-3xl border border-border bg-surface p-6 sm:p-7 flex flex-col justify-start overflow-hidden shadow-xs hover:border-primary/40 transition-all select-none">
             <h3 className="text-2xl sm:text-[26px] font-bold tracking-tight text-foreground text-center mb-6">
               FAQ
             </h3>
@@ -188,7 +188,7 @@ export function CustomizationSection() {
           </div>
 
           {/* SLIDE 3: FILES (ATTACHMENTS DASHBOARD MATCHING REFERENCE SCREENSHOT) */}
-          <div className="flex-[0_0_auto] w-[340px] sm:w-[400px] md:w-[450px] lg:w-[480px] h-[480px] sm:h-[510px] md:h-[530px] rounded-3xl border border-border bg-muted/70 p-6 sm:p-7 flex flex-col justify-start overflow-hidden shadow-xs hover:border-primary/40 transition-all select-none">
+          <div className="flex-[0_0_auto] w-[340px] sm:w-[400px] md:w-[450px] lg:w-[480px] h-[480px] sm:h-[510px] md:h-[530px] rounded-3xl border border-border bg-surface p-6 sm:p-7 flex flex-col justify-start overflow-hidden shadow-xs hover:border-primary/40 transition-all select-none">
             <h3 className="text-2xl sm:text-[26px] font-bold tracking-tight text-foreground text-center mb-6">
               Files
             </h3>
@@ -252,7 +252,7 @@ export function CustomizationSection() {
           </div>
 
           {/* SLIDE 4: ABOUT (TABLET BIOGRAPHY MATCHING REFERENCE SCREENSHOT) */}
-          <div className="flex-[0_0_auto] w-[340px] sm:w-[400px] md:w-[450px] lg:w-[480px] h-[480px] sm:h-[510px] md:h-[530px] rounded-3xl border border-border bg-muted/70 p-6 sm:p-7 flex flex-col justify-start overflow-hidden shadow-xs hover:border-primary/40 transition-all select-none">
+          <div className="flex-[0_0_auto] w-[340px] sm:w-[400px] md:w-[450px] lg:w-[480px] h-[480px] sm:h-[510px] md:h-[530px] rounded-3xl border border-border bg-surface p-6 sm:p-7 flex flex-col justify-start overflow-hidden shadow-xs hover:border-primary/40 transition-all select-none">
             <h3 className="text-2xl sm:text-[26px] font-bold tracking-tight text-foreground text-center mb-6">
               About
             </h3>
@@ -287,7 +287,7 @@ export function CustomizationSection() {
           </div>
 
           {/* SLIDE 5: VIDEOS (VIDEO GREETING CARD) */}
-          <div className="flex-[0_0_auto] w-[340px] sm:w-[400px] md:w-[450px] lg:w-[480px] h-[480px] sm:h-[510px] md:h-[530px] rounded-3xl border border-border bg-muted/70 p-6 sm:p-7 flex flex-col justify-start overflow-hidden shadow-xs hover:border-primary/40 transition-all select-none">
+          <div className="flex-[0_0_auto] w-[340px] sm:w-[400px] md:w-[450px] lg:w-[480px] h-[480px] sm:h-[510px] md:h-[530px] rounded-3xl border border-border bg-surface p-6 sm:p-7 flex flex-col justify-start overflow-hidden shadow-xs hover:border-primary/40 transition-all select-none">
             <h3 className="text-2xl sm:text-[26px] font-bold tracking-tight text-foreground text-center mb-6">
               Videos
             </h3>
@@ -324,7 +324,7 @@ export function CustomizationSection() {
           </div>
 
           {/* SLIDE 6: CUSTOM DOMAIN & BRANDING */}
-          <div className="flex-[0_0_auto] w-[340px] sm:w-[400px] md:w-[450px] lg:w-[480px] h-[480px] sm:h-[510px] md:h-[530px] rounded-3xl border border-border bg-muted/70 p-6 sm:p-7 flex flex-col justify-start overflow-hidden shadow-xs hover:border-primary/40 transition-all select-none">
+          <div className="flex-[0_0_auto] w-[340px] sm:w-[400px] md:w-[450px] lg:w-[480px] h-[480px] sm:h-[510px] md:h-[530px] rounded-3xl border border-border bg-surface p-6 sm:p-7 flex flex-col justify-start overflow-hidden shadow-xs hover:border-primary/40 transition-all select-none">
             <h3 className="text-2xl sm:text-[26px] font-bold tracking-tight text-foreground text-center mb-6">
               Custom Domain
             </h3>

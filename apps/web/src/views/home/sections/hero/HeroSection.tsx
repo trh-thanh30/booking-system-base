@@ -23,7 +23,7 @@ export function HeroSection() {
   };
 
   return (
-    <LandingSection className="relative pt-20 pb-24 lg:pt-32 lg:pb-36 bg-surface text-foreground overflow-hidden font-sans border-b border-border">
+    <LandingSection className="relative pt-20 pb-24 lg:pt-32 lg:pb-36 bg-surface bg-gradient-to-br from-accent from-50% to-surface text-foreground overflow-hidden font-sans">
       {/* Subtle Light Ambient Wash */}
       <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-accent rounded-full blur-[120px] pointer-events-none" />
 
@@ -85,7 +85,7 @@ export function HeroSection() {
       {/* 5. Infinite Seamless Scrolling Industry Templates Marquee */}
       <div className="mt-14 sm:mt-18 w-full overflow-hidden relative">
         {/* Left & Right Gradient Fade Masks */}
-        <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-16 sm:w-32 z-20 bg-gradient-to-r from-surface to-transparent" />
+        <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-16 sm:w-32 z-20 bg-gradient-to-r from-accent to-transparent" />
         <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-16 sm:w-32 z-20 bg-gradient-to-l from-surface to-transparent" />
 
         <style>{`

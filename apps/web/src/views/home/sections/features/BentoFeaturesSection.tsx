@@ -15,7 +15,7 @@ export function BentoFeaturesSection() {
   return (
     <LandingSection
       id="features"
-      className="scroll-mt-24 py-24 lg:py-32 bg-surface text-foreground font-sans border-b border-border overflow-hidden"
+      className="scroll-mt-24 py-24 lg:py-32 bg-surface text-foreground font-sans overflow-hidden"
     >
       <LandingContainer className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-24">
         {/* TIER 1: 4 COMPACT, SQUARE-PROPORTIONED BENEFIT CARDS (CAL.COM STYLE) */}

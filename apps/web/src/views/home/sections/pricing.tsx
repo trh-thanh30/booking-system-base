@@ -327,7 +327,7 @@ export function Pricing() {
     <RepeatReveal
       as="section"
       id="pricing"
-      className="scroll-mt-20 md:scroll-mt-24 py-24 lg:py-32 bg-background border-t border-border relative overflow-hidden"
+      className="scroll-mt-20 md:scroll-mt-24 py-24 lg:py-32 bg-surface relative overflow-hidden"
     >
       <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
