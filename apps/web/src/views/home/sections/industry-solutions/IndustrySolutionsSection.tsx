@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
+import { useReducedMotion } from "framer-motion";
 import useEmblaCarousel, { UseEmblaCarouselType } from "embla-carousel-react";
 import Image from "next/image";
 import { ArrowRight, Check, ChevronLeft, ChevronRight } from "lucide-react";
@@ -14,6 +15,8 @@ export function IndustrySolutionsSection() {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [prevBtnDisabled, setPrevBtnDisabled] = useState(true);
   const [nextBtnDisabled, setNextBtnDisabled] = useState(false);
+  const tabsRef = useRef<HTMLDivElement>(null);
+  const shouldReduceMotion = useReducedMotion();
 
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: false,
@@ -48,7 +51,38 @@ export function IndustrySolutionsSection() {
     onSelect(emblaApi);
     emblaApi.on("select", onSelect);
     emblaApi.on("reInit", onSelect);
+
+    return () => {
+      emblaApi.off("select", onSelect);
+      emblaApi.off("reInit", onSelect);
+    };
   }, [emblaApi, onSelect]);
+
+  useEffect(() => {
+    const tabs = tabsRef.current;
+    const activeTab = tabs?.querySelector<HTMLButtonElement>(
+      '[aria-pressed="true"]',
+    );
+    if (!tabs || !activeTab) return;
+
+    const tabBounds = activeTab.getBoundingClientRect();
+    const tabsBounds = tabs.getBoundingClientRect();
+    if (
+      tabBounds.left >= tabsBounds.left &&
+      tabBounds.right <= tabsBounds.right
+    ) {
+      return;
+    }
+
+    tabs.scrollTo({
+      left:
+        tabs.scrollLeft +
+        tabBounds.left -
+        tabsBounds.left -
+        (tabs.clientWidth - tabBounds.width) / 2,
+      behavior: shouldReduceMotion ? "instant" : "smooth",
+    });
+  }, [selectedIndex, shouldReduceMotion]);
 
   return (
     <LandingSection
@@ -75,13 +109,17 @@ export function IndustrySolutionsSection() {
 
         {/* Industry Switcher Tabs + Navigation Buttons */}
         <div className="mt-12 flex flex-col sm:flex-row items-center justify-between gap-5">
-          <div className="flex items-center gap-3 overflow-x-auto pb-1 max-w-full scrollbar-none">
+          <div
+            ref={tabsRef}
+            className="flex min-w-0 items-center gap-3 overflow-x-auto pb-1 max-w-full scrollbar-none"
+          >
             {INDUSTRIES_DATA.map((ind, idx) => {
               const isActive = idx === selectedIndex;
               return (
                 <button
                   key={ind.id}
                   type="button"
+                  aria-pressed={isActive}
                   onClick={() => scrollTo(idx)}
                   className={`shrink-0 px-6 py-3 rounded-full text-sm sm:text-base font-bold transition-all duration-300 cursor-pointer shadow-xs ${
                     isActive
