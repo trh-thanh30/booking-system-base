@@ -11,7 +11,7 @@ import { useAuth } from "@/src/app/providers/admin";
 import { Link, useRouter } from "@/src/i18n/navigation";
 import { getSafeReturnTo } from "@/src/lib/admin/auth-routing";
 import { authService } from "@/src/services/admin/auth.service";
-import { AuthShell, GoogleBusinessForm } from "./components";
+import { AuthLoadingState, AuthShell, GoogleBusinessForm } from "./components";
 import { GOOGLE_ONBOARDING_QUERY_KEY } from "./constants/google-onboarding.constants";
 import { useGoogleLogin } from "@/src/hooks/use-google-login";
 import { getGoogleOnboardingError } from "./utils/google-auth.utils";
@@ -72,9 +72,10 @@ export function GoogleOnboardingView() {
     >
       <div className="space-y-4">
         {isLoading || isAuthenticated || profile.isPending ? (
-          <p role="status" className="text-muted-foreground">
-            {t("checkingSession")}
-          </p>
+          <AuthLoadingState
+            title={t("checkingSession")}
+            description={t("checkingSessionDescription")}
+          />
         ) : (
           <>
             {error ? (

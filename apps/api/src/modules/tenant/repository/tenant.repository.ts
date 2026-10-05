@@ -89,6 +89,7 @@ export class TenantRepository {
       defaultBusinessSlug?: string;
       settings?: Record<string, unknown>;
       defaultBusinessSettings?: Record<string, unknown>;
+      businessCategoryId?: string;
     };
     owner: {
       existingUserId?: string;
@@ -139,6 +140,7 @@ export class TenantRepository {
                 input.tenant.settings ??
                 {}) as Prisma.InputJsonValue,
               is_default: true,
+              business_category_id: input.tenant.businessCategoryId,
             },
           },
         },

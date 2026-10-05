@@ -19,7 +19,7 @@ import { LogIn } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { AuthShell } from "./components";
+import { AuthLoadingState, AuthShell } from "./components";
 import { getLoginErrorKey } from "./utils/auth.utils";
 import { getUnverifiedEmailUrl } from "./utils/email-auth.utils";
 import { getOAuthErrorKey, stripOAuthError } from "./utils/google-auth.utils";
@@ -115,9 +115,10 @@ export function LoginView({
   return (
     <AuthShell description={t("login.description")} title={t("login.title")}>
       {isLoading || isAuthenticated ? (
-        <p role="status" className="text-muted-foreground">
-          {t("checkingSession")}
-        </p>
+        <AuthLoadingState
+          title={t("checkingSession")}
+          description={t("checkingSessionDescription")}
+        />
       ) : (
         <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
           {submitError ? (

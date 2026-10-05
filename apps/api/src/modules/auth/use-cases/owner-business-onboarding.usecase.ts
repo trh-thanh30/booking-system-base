@@ -88,6 +88,7 @@ export class OwnerBusinessOnboardingUseCase {
         slug: dto.slug,
         timezone: dto.timezone,
         locale: dto.locale,
+        businessCategoryId: dto.business_category_id,
         defaultBusinessSettings: { onboarding: dto.business_profile },
       },
       owner: {

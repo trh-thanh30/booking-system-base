@@ -192,27 +192,47 @@ model Tenant {
 }
 
 model Business {
-  id         String          @id @default(uuid()) @db.Uuid
-  tenant_id  String          @db.Uuid
-  slug       String
-  name       String
-  status     business_status @default(ACTIVE)
-  timezone   String          @default("Asia/Ho_Chi_Minh")
-  locale     String          @default("vi")
-  settings   Json?
-  is_default Boolean         @default(false)
-  created_at DateTime        @default(now())
-  updated_at DateTime        @updatedAt
+  id                   String          @id @default(uuid()) @db.Uuid
+  tenant_id            String          @db.Uuid
+  business_category_id String?         @db.Uuid
+  slug                 String
+  name                 String
+  status               business_status @default(ACTIVE)
+  timezone             String          @default("Asia/Ho_Chi_Minh")
+  locale               String          @default("vi")
+  settings             Json?
+  is_default           Boolean         @default(false)
+  created_at           DateTime        @default(now())
+  updated_at           DateTime        @updatedAt
 
-  tenant      Tenant               @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
-  categories  Category[]
-  services    Service[]
-  memberships BusinessMembership[]
+  tenant            Tenant               @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
+  business_category BusinessCategory?    @relation(fields: [business_category_id], references: [id], onDelete: SetNull)
+  categories        Category[]
+  services          Service[]
+  memberships       BusinessMembership[]
 
   @@unique([tenant_id, slug])
   @@index([tenant_id])
+  @@index([business_category_id])
   @@index([status])
   @@map("business")
+}
+
+model BusinessCategory {
+  id         String                   @id @default(uuid()) @db.Uuid
+  slug       String                   @unique
+  name_vi    String
+  name_en    String
+  status     business_category_status @default(ACTIVE)
+  sort_order Int                      @default(0)
+  metadata   Json?
+  created_at DateTime                 @default(now())
+  updated_at DateTime                 @updatedAt
+
+  businesses Business[]
+
+  @@index([status, sort_order])
+  @@map("business_category")
 }
 
 model BusinessMembership {
@@ -472,6 +492,12 @@ enum business_status {
   ACTIVE
   SUSPENDED
   DISABLED
+}
+
+enum business_category_status {
+  ACTIVE
+  INACTIVE
+  ARCHIVED
 }
 
 enum category_type {

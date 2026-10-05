@@ -10,6 +10,7 @@
       "username": "e.g. alex.owner",
       "fullName": "e.g. Alex Nguyen",
       "businessName": "e.g. Lotus Spa",
+      "businessCategory": "Choose the category that best fits your business",
       "phone": "e.g. +84 912 345 678",
       "timezone": "e.g. Asia/Ho_Chi_Minh",
       "country": "e.g. Vietnam",
@@ -55,7 +56,9 @@
     "username": "Your username",
     "phone": "Business phone (optional)",
     "timezone": "Timezone",
-    "language": "Business language",
+    "businessCategory": "Business category",
+    "businessCategoryLoading": "Loading categories…",
+    "businessCategoryLoadFailed": "Business categories could not be loaded.",
     "country": "Country",
     "state": "Province / State (optional)",
     "city": "City",
@@ -261,6 +264,7 @@
   },
   "Auth": {
     "checkingSession": "Checking your session…",
+    "checkingSessionDescription": "Please wait a moment. You will be redirected automatically when your session is ready.",
     "logoutFailed": "The session was cleared on this device, but server logout could not be confirmed. Please retry when connected.",
     "accessDenied": "You do not have permission to access this page.",
     "shell": {

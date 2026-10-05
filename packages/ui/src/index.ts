@@ -9,6 +9,7 @@ export * from "./input";
 export * from "./label";
 export * from "./lib/utils";
 export * from "./separator";
+export * from "./select";
 export * from "./sheet";
 export * from "./skeleton";
 export * from "./switch";

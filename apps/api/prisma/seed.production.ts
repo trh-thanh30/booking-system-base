@@ -1,13 +1,12 @@
 import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '@prisma/client';
 import { Pool } from 'pg';
+import { seedBusinessCategories } from './seeds/business-categories.seed';
 
 let prisma: PrismaClient | undefined;
 
 async function main() {
   console.log('Seeding production database...');
-  console.log('Production seed is intentionally empty for the base repo.');
-
   const connectionString = process.env.DATABASE_URL;
   if (!connectionString) {
     throw new Error('DATABASE_URL is not defined');
@@ -16,6 +15,8 @@ async function main() {
   const pool = new Pool({ connectionString });
   const adapter = new PrismaPg(pool);
   prisma = new PrismaClient({ adapter });
+
+  await seedBusinessCategories(prisma);
 
   console.log('Production database seed completed successfully.');
 }

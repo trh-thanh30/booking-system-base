@@ -12,6 +12,7 @@ const owner = {
   avatar_url: null,
 };
 const input = {
+  business_category_id: '2518359c-6d0d-4ad8-a7ce-10f00eb36074',
   name: 'Demo',
   slug: 'demo',
   timezone: 'Asia/Ho_Chi_Minh',
@@ -78,6 +79,7 @@ describe('OwnerBusinessOnboardingUseCase', () => {
       expect.objectContaining({
         owner: expect.objectContaining({ existingUserId: 'owner' }),
         tenant: expect.objectContaining({
+          businessCategoryId: input.business_category_id,
           defaultBusinessSettings: { onboarding: input.business_profile },
         }),
       }),

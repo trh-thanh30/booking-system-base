@@ -74,6 +74,7 @@ export class CompleteGoogleOwnerOnboardingUseCase {
         name: dto.name,
         timezone: dto.timezone,
         locale: dto.locale ?? session.locale,
+        businessCategoryId: dto.business_category_id,
         primaryDomain: dto.primary_domain,
         defaultBusinessName: dto.default_business_name,
         defaultBusinessSlug: dto.default_business_slug,

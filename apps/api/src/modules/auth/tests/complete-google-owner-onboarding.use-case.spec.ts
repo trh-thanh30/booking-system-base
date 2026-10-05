@@ -11,6 +11,7 @@ const onboardingSession = {
 };
 
 const input = {
+  business_category_id: '2518359c-6d0d-4ad8-a7ce-10f00eb36074',
   slug: 'demo-spa',
   name: 'Demo Spa',
   default_business_name: 'Demo Spa Hồ Tây',
@@ -90,6 +91,7 @@ describe('CompleteGoogleOwnerOnboardingUseCase', () => {
         name: 'Demo Spa',
         defaultBusinessName: 'Demo Spa Hồ Tây',
         defaultBusinessSlug: 'demo-spa-ho-tay',
+        businessCategoryId: input.business_category_id,
       }),
       owner: {
         avatar_url: 'https://example.com/avatar.png',

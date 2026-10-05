@@ -55,6 +55,7 @@ export const businessProfileSchema = z.object({
 export type BusinessOnboardingProfile = z.infer<typeof businessProfileSchema>;
 
 export const completeOwnerBusinessSchema = z.object({
+  business_category_id: z.string().uuid(),
   name: z.string().trim().min(1).max(160),
   slug: z
     .string()

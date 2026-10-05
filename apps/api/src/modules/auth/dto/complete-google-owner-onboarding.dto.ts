@@ -2,6 +2,7 @@ import type { CompleteGoogleOwnerOnboardingInput } from '@repo/shared';
 import type { BusinessOnboardingProfile } from '@repo/shared';
 import { Type } from 'class-transformer';
 import {
+  IsUUID,
   IsObject,
   IsOptional,
   IsString,
@@ -23,6 +24,9 @@ class GoogleOwnerIdentityDto {
 }
 
 export class CompleteGoogleOwnerOnboardingDto implements CompleteGoogleOwnerOnboardingInput {
+  @IsUUID()
+  business_category_id: string;
+
   @IsString()
   @MinLength(2)
   @MaxLength(80)

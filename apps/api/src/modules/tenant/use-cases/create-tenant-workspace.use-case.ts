@@ -4,6 +4,8 @@ import { TenantRepository } from '@/modules/tenant/repository/tenant.repository'
 import { normalizeHost, toTenantContext } from '@/modules/tenant/tenant.types';
 import { Injectable } from '@nestjs/common';
 import type { identity_provider } from '@prisma/client';
+import { BusinessCategoryRepository } from '@/modules/business-category/repository/business-category.repository';
+import { BadRequestError } from '@/common/response';
 
 export interface CreateTenantWorkspaceInput {
   tenant: {
@@ -16,6 +18,7 @@ export interface CreateTenantWorkspaceInput {
     defaultBusinessSlug?: string;
     settings?: Record<string, unknown>;
     defaultBusinessSettings?: Record<string, unknown>;
+    businessCategoryId?: string;
   };
   owner: {
     existingUserId?: string;
@@ -36,9 +39,22 @@ export interface CreateTenantWorkspaceInput {
 
 @Injectable()
 export class CreateTenantWorkspaceUseCase {
-  constructor(private readonly tenantRepository: TenantRepository) {}
+  constructor(
+    private readonly tenantRepository: TenantRepository,
+    private readonly businessCategories: BusinessCategoryRepository,
+  ) {}
 
   async execute(input: CreateTenantWorkspaceInput) {
+    if (input.tenant.businessCategoryId) {
+      const category = await this.businessCategories.findActiveById(
+        input.tenant.businessCategoryId,
+      );
+      if (!category)
+        throw new BadRequestError(
+          'Business category is not available',
+          'BUSINESS_CATEGORY_INVALID',
+        );
+    }
     await this.assertTenantIsUnique(
       input.tenant.slug,
       input.tenant.primaryDomain,

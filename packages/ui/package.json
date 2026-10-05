@@ -16,6 +16,7 @@
     "./label": "./src/label.tsx",
     "./lib/utils": "./src/lib/utils.ts",
     "./separator": "./src/separator.tsx",
+    "./select": "./src/select.tsx",
     "./sheet": "./src/sheet.tsx",
     "./skeleton": "./src/skeleton.tsx",
     "./switch": "./src/switch.tsx",

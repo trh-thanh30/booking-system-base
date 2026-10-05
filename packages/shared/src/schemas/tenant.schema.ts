@@ -54,6 +54,7 @@ export type RegisterOwnerInput = z.input<typeof registerOwnerSchema>;
 export const completeGoogleOwnerOnboardingSchema = createTenantSchema
   .omit({ status: true })
   .extend({
+    business_category_id: z.string().uuid(),
     business_profile: businessProfileSchema.optional(),
     owner: z.object({
       username: z.string().min(1).max(80),

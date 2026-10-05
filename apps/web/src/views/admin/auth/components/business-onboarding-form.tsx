@@ -3,18 +3,30 @@
 import { useEffect, useRef, useState } from "react";
 import { useForm, type FieldPath } from "react-hook-form";
 import { useTranslations } from "next-intl";
+import { useQuery } from "@tanstack/react-query";
 import {
   completeOwnerBusinessSchema,
   type CompleteOwnerBusinessInput,
   type OwnerOnboardingProfile,
 } from "@repo/shared";
-import { Avatar, AvatarFallback, AvatarImage, Button } from "@repo/ui";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+  Button,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@repo/ui";
 import {
   AuthInput as Input,
   EmailInput,
   FormField,
 } from "@/src/components/common";
 import { siteConfig } from "@/src/config/site.config";
+import { businessCategoriesService } from "@/src/services/admin/business-categories.service";
 import {
   createBookingHost,
   createBusinessSlug,
@@ -33,6 +45,11 @@ export function BusinessOnboardingForm({
   onSubmit: (input: CompleteOwnerBusinessInput) => Promise<void>;
 }) {
   const t = useTranslations("AuthJourney");
+  const categories = useQuery({
+    queryKey: ["business-categories", "active"],
+    queryFn: businessCategoriesService.listActive,
+    staleTime: 5 * 60 * 1000,
+  });
   const [step, setStep] = useState(0);
   const heading = useRef<HTMLHeadingElement>(null);
   const previousStep = useRef<number | null>(null);
@@ -43,6 +60,7 @@ export function BusinessOnboardingForm({
   }, [step]);
   const form = useForm<CompleteOwnerBusinessInput>({
     defaultValues: {
+      business_category_id: "",
       name: "",
       slug: "",
       owner: { username: "", phone: "" },
@@ -86,6 +104,7 @@ export function BusinessOnboardingForm({
         ? completeOwnerBusinessSchema
             .pick({
               name: true,
+              business_category_id: true,
               slug: true,
               owner: true,
               timezone: true,
@@ -225,18 +244,60 @@ export function BusinessOnboardingForm({
             {field("owner.phone", "phone", "tel", false)}
             {field("timezone", "timezone")}
             <FormField
-              htmlFor="workspace-locale"
-              label={t("language")}
+              htmlFor="business-category"
+              label={t("businessCategory")}
+              error={
+                form.formState.errors.business_category_id?.message ||
+                (categories.isError
+                  ? t("businessCategoryLoadFailed")
+                  : undefined)
+              }
               required
             >
-              <select
-                id="workspace-locale"
-                className="h-11 w-full rounded-md border border-input bg-card px-3"
-                {...form.register("locale")}
+              <Select
+                value={form.watch("business_category_id") || undefined}
+                disabled={busy || categories.isPending || categories.isError}
+                onValueChange={(value) =>
+                  form.setValue("business_category_id", value, {
+                    shouldDirty: true,
+                    shouldValidate: true,
+                  })
+                }
               >
-                <option value="vi">Tiếng Việt</option>
-                <option value="en">English</option>
-              </select>
+                <SelectTrigger
+                  id="business-category"
+                  aria-invalid={
+                    Boolean(form.formState.errors.business_category_id) ||
+                    categories.isError
+                  }
+                >
+                  <SelectValue
+                    placeholder={
+                      categories.isPending
+                        ? t("businessCategoryLoading")
+                        : t("placeholders.businessCategory")
+                    }
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  {categories.data?.map((category) => (
+                    <SelectItem key={category.id} value={category.id}>
+                      {locale === "en" ? category.name_en : category.name_vi}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {categories.isError ? (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="h-auto justify-start px-0 py-1"
+                  disabled={categories.isFetching}
+                  onClick={() => void categories.refetch()}
+                >
+                  {t("retry")}
+                </Button>
+              ) : null}
             </FormField>
           </>
         ) : null}
