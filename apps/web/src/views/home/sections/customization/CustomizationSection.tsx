@@ -269,9 +269,9 @@ export function CustomizationSection() {
 
               <div className="my-auto space-y-3">
                 <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed font-normal">
-                  Hi! 🏡 I&apos;m Jessica Martinez, a licensed consultant with
-                  10+ years of experience in helping clients achieve their
-                  goals. Whether you&apos;re a first-time booker or scaling your
+                  Hi! I&apos;m Jessica Martinez, a licensed consultant with 10+
+                  years of experience in helping clients achieve their goals.
+                  Whether you&apos;re a first-time booker or scaling your
                   routine, I provide expert advice and personalized guidance
                   every step of the way.
                 </p>
