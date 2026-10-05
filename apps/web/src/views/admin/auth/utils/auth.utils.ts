@@ -1,5 +1,13 @@
 import { HttpClientError } from "@repo/shared";
 
+export function getLoginValidationErrorKey(
+  field: "usernameOrEmail" | "password" | undefined,
+) {
+  return field === "password"
+    ? "login.passwordRequired"
+    : "login.usernameOrEmailRequired";
+}
+
 export function getLoginErrorKey(error: unknown) {
   if (error instanceof Error && error.message === "ADMIN_PROFILE_INVALID")
     return "login.invalidWorkspace";

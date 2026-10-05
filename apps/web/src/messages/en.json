@@ -287,6 +287,8 @@
       "createAccount": "Sign up now",
       "noAccount": "Don't have an account?",
       "invalidCredentials": "Incorrect email, username, or password.",
+      "usernameOrEmailRequired": "Enter your email or username.",
+      "passwordRequired": "Enter your password.",
       "inactive": "Your account is inactive. Please contact support.",
       "invalidWorkspace": "This account cannot access this business workspace.",
       "networkError": "Could not connect to the server. Please try again.",
@@ -342,6 +344,7 @@
     "invitation": {
       "description": "Accept your tenant invitation and create your staff account.",
       "failed": "Could not accept invitation",
+      "invalidField": "Please check this field.",
       "notFoundDescription": "This invitation is invalid, expired, or already accepted.",
       "notFoundTitle": "Invitation unavailable",
       "submit": "Accept invitation",

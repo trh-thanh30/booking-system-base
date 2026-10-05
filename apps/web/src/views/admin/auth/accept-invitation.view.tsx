@@ -52,7 +52,7 @@ export function AcceptInvitationView({ token }: { token: string }) {
       const field = issue?.path[0] as keyof AcceptInvitationInput | undefined;
 
       if (field && issue) {
-        setError(field, { message: issue.message });
+        setError(field, { message: t("invitation.invalidField") });
       }
 
       return;
@@ -62,10 +62,8 @@ export function AcceptInvitationView({ token }: { token: string }) {
       await authService.acceptInvitation(parsed.data);
       toast.success(t("invitation.success"));
       router.replace("/admin/login");
-    } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : t("invitation.failed"),
-      );
+    } catch {
+      toast.error(t("invitation.failed"));
     }
   }
 

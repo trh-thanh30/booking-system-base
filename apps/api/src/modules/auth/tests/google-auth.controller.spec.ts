@@ -241,6 +241,7 @@ describe('GoogleAuthController', () => {
     });
     authProfileService.getByUserId.mockResolvedValue({ id: 'owner-id' });
     const body = {
+      business_category_id: '11111111-1111-4111-8111-111111111111',
       slug: 'demo-spa',
       name: 'Demo Spa',
       owner: { username: 'owner' },

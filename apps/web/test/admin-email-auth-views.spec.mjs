@@ -68,6 +68,7 @@ test("reset without a session has actionable expired state and no editable sessi
 
 test("Auth API notifications do not render destructive banners inside forms", () => {
   const viewFiles = [
+    "accept-invitation.view.tsx",
     "forgot-password.view.tsx",
     "google-onboarding.view.tsx",
     "login.view.tsx",
@@ -86,6 +87,7 @@ test("Auth API notifications do not render destructive banners inside forms", ()
 
   assert.doesNotMatch(source, /<EmailAuthFeedback\b/);
   assert.doesNotMatch(source, /border-destructive\/30\s+bg-destructive\/10/);
+  assert.doesNotMatch(source, /message:\s*issue\.message|error\.message/);
 });
 
 test("valid reset session renders OTP and matching password fields without exposing the session", () => {

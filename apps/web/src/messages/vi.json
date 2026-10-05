@@ -287,6 +287,8 @@
       "createAccount": "Đăng ký ngay",
       "noAccount": "Chưa có tài khoản?",
       "invalidCredentials": "Email, tên đăng nhập hoặc mật khẩu không đúng.",
+      "usernameOrEmailRequired": "Vui lòng nhập email hoặc tên đăng nhập.",
+      "passwordRequired": "Vui lòng nhập mật khẩu.",
       "inactive": "Tài khoản đang bị vô hiệu hóa. Vui lòng liên hệ hỗ trợ.",
       "invalidWorkspace": "Tài khoản không có quyền truy cập không gian doanh nghiệp này.",
       "networkError": "Không thể kết nối máy chủ. Vui lòng thử lại.",
@@ -342,6 +344,7 @@
     "invitation": {
       "description": "Chấp nhận lời mời tenant và tạo tài khoản nhân sự.",
       "failed": "Không thể chấp nhận lời mời",
+      "invalidField": "Vui lòng kiểm tra thông tin của trường này.",
       "notFoundDescription": "Lời mời không hợp lệ, hết hạn hoặc đã được chấp nhận.",
       "notFoundTitle": "Lời mời không khả dụng",
       "submit": "Chấp nhận lời mời",

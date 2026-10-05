@@ -20,7 +20,10 @@ import { useTranslations } from "next-intl";
 import { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { AuthLoadingState, AuthShell } from "./components";
-import { getLoginErrorKey } from "./utils/auth.utils";
+import {
+  getLoginErrorKey,
+  getLoginValidationErrorKey,
+} from "./utils/auth.utils";
 import { getUnverifiedEmailUrl } from "./utils/email-auth.utils";
 import { getOAuthErrorKey, stripOAuthError } from "./utils/google-auth.utils";
 
@@ -74,7 +77,7 @@ export function LoginView({
       const field = issue?.path[0] as keyof LoginInput | undefined;
 
       if (field && issue) {
-        setError(field, { message: issue.message });
+        setError(field, { message: t(getLoginValidationErrorKey(field)) });
       }
 
       return;

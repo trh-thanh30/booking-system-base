@@ -147,6 +147,9 @@ notification thống nhất và có thể thay provider tại shared package.
 - Lỗi validation gắn với một field (sai định dạng, thiếu dữ liệu, mật khẩu không
   khớp) hiển thị ngay dưới field bằng `FormField`; control phải có
   `aria-invalid` và liên kết tới nội dung lỗi. Không dùng toast thay cho lỗi field.
+  Không render trực tiếp `ZodIssue.message` hoặc `Error.message`: schema dùng
+  chung không biết locale hiện tại và backend message có thể không phù hợp để
+  công khai. View phải map field/error code sang translation key rồi gọi `t(...)`.
 - Lỗi nghiệp vụ hoặc lỗi submit áp dụng cho toàn form (email đã tồn tại, thao tác
   bị từ chối, lưu thất bại, lỗi mạng tạm thời) hiển thị bằng `toast.error` qua
   `useToast`. Không tạo thêm banner đỏ bên trong form cho cùng lỗi đó.
