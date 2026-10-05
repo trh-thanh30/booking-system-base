@@ -144,12 +144,6 @@ notification thống nhất và có thể thay provider tại shared package.
 
 ## Component Rules
 
-# <<<<<<< Updated upstream
-
-# <<<<<<< Updated upstream
-
-> > > > > > > Stashed changes
-
 - Các input trong luồng Auth/onboarding dùng `AuthInput` compose shared `Input`
   với nền `bg-card`, không lấy nền trang `bg-background` làm nền field.
   Trường email dùng `EmailInput` chung với icon mail bên trái; login dùng cùng
@@ -160,19 +154,17 @@ notification thống nhất và có thể thay provider tại shared package.
   ghi example vào `defaultValue` như dữ liệu người dùng. Hidden/checkbox/radio,
   native time/date/color không có placeholder hiển thị: dùng label và hint/example
   thích hợp; readonly field hiển thị giá trị thật. Không dùng mật khẩu thật làm ví dụ.
+- Trường bắt buộc phải truyền `required` cho `FormField`. `FormField` chịu trách
+  nhiệm hiển thị dấu `*` bằng semantic `text-destructive` và gắn
+  `aria-required` cho control. Prop này phải khớp schema/contract; trường tùy
+  chọn không được có dấu `*`. Không tự nối dấu `*` vào translation hoặc label
+  của từng màn hình.
 - `PasswordInput` dùng lock bên trái, eye toggle bên phải; eye không đổi nền/màu
   khi hover nhưng vẫn giữ focus-visible, aria-label, disabled và vùng bấm 44px.
 - Nút Google dùng `GoogleIcon` chung với asset màu tại `public/icons/google.svg`.
-  <<<<<<< Updated upstream
+  Component dùng `Image` từ `next/image`, kích thước 20×20 và `alt=""` vì tên
+  hành động đã có trong button; không thay bằng native img để lách test runner.
   Màu trong asset logo là ngoại lệ brand bên thứ ba, không phải token giao diện.
-
-=======
-Component dùng `Image` từ `next/image`, kích thước 20×20 và `alt=""` vì tên
-hành động đã có trong button; không thay bằng native img để lách test runner.
-Màu trong asset logo là ngoại lệ brand bên thứ ba, không phải token giao diện.
-
-> > > > > > > Stashed changes
-> > > > > > > Stashed changes
 
 - Shared primitive nằm ở `packages/ui` và dùng semantic token làm mặc định.
 - API public hiện tại của component phải được giữ ổn định khi chỉ đổi styling.

@@ -211,6 +211,11 @@ src/components/
 - `EmptyState`
 - `ConfirmDialog`
 
+Form dùng `FormField` chung. Trường bắt buộc phải truyền prop `required` để
+component hiển thị dấu `*` và khai báo `aria-required`; trạng thái này phải khớp
+schema/API contract. Không viết dấu `*` trực tiếp trong label/translation và
+không đánh dấu trường tùy chọn là bắt buộc.
+
 `layout/` dùng cho shell và navigation:
 
 - `DashboardShell`

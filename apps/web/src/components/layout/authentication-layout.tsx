@@ -1,7 +1,7 @@
 "use client";
 
-import type { ReactNode } from "react";
 import { useTranslations } from "next-intl";
+import type { ReactNode } from "react";
 import { SiteHeader } from "./site-header";
 
 export function AuthenticationLayout({
@@ -25,7 +25,7 @@ export function AuthenticationLayout({
       <SiteHeader />
       <section
         id="auth-content"
-        className="mx-auto w-full max-w-lg px-4 pb-12 pt-5 sm:pt-10"
+        className="mx-auto w-full max-w-2xl px-4 pb-12 pt-5 sm:pt-10"
       >
         <div className="mb-6 px-1">
           <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">

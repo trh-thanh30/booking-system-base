@@ -135,6 +135,7 @@ export function AcceptInvitationView({ token }: { token: string }) {
           error={errors.username?.message}
           htmlFor="username"
           label={t("fields.username")}
+          required
         >
           <Input
             autoComplete="username"
@@ -160,6 +161,7 @@ export function AcceptInvitationView({ token }: { token: string }) {
           error={errors.password?.message}
           htmlFor="password"
           label={t("fields.password")}
+          required
         >
           <PasswordInput
             autoComplete="new-password"
@@ -174,6 +176,7 @@ export function AcceptInvitationView({ token }: { token: string }) {
           error={errors.confirmPassword?.message}
           htmlFor="confirmPassword"
           label={t("fields.confirmPassword")}
+          required
         >
           <PasswordInput
             autoComplete="new-password"

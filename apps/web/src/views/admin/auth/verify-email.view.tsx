@@ -143,6 +143,7 @@ export function VerifyEmailView({
               error={verifyForm.formState.errors.code?.message}
               htmlFor="code"
               label={t("fields.code")}
+              required
             >
               <Input
                 id="code"
@@ -189,6 +190,7 @@ export function VerifyEmailView({
               error={requestForm.formState.errors.email?.message}
               htmlFor="email"
               label={t("fields.email")}
+              required
             >
               <EmailInput
                 id="email"

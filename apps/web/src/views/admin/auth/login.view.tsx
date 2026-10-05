@@ -1,28 +1,28 @@
 "use client";
 
-import { LogIn } from "lucide-react";
-import { useTranslations } from "next-intl";
-import { useForm } from "react-hook-form";
-import { useEffect, useRef, useState } from "react";
-import { useMutation } from "@tanstack/react-query";
-import { useToast } from "@repo/hooks";
-import { HttpClientError, loginSchema, type LoginInput } from "@repo/shared";
+import { useAuth } from "@/src/app/providers/admin";
 import {
-  PasswordInput,
-  GoogleIcon,
   EmailInput,
   FormField,
+  GoogleIcon,
+  PasswordInput,
 } from "@/src/components/common";
-import { authService } from "@/src/services/admin/auth.service";
-import { Button } from "@repo/ui";
-import { useAuth } from "@/src/app/providers/admin";
+import { useGoogleLogin } from "@/src/hooks/use-google-login";
 import { Link, useRouter } from "@/src/i18n/navigation";
-import { AuthShell } from "./components";
 import { getSafeReturnTo } from "@/src/lib/admin/auth-routing";
+import { authService } from "@/src/services/admin/auth.service";
+import { useToast } from "@repo/hooks";
+import { HttpClientError, loginSchema, type LoginInput } from "@repo/shared";
+import { Button } from "@repo/ui";
+import { useMutation } from "@tanstack/react-query";
+import { LogIn } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { useEffect, useRef, useState } from "react";
+import { useForm } from "react-hook-form";
+import { AuthShell } from "./components";
 import { getLoginErrorKey } from "./utils/auth.utils";
 import { getUnverifiedEmailUrl } from "./utils/email-auth.utils";
 import { getOAuthErrorKey, stripOAuthError } from "./utils/google-auth.utils";
-import { useGoogleLogin } from "@/src/hooks/use-google-login";
 
 export function LoginView({
   returnTo,
@@ -132,6 +132,7 @@ export function LoginView({
             error={errors.usernameOrEmail?.message}
             htmlFor="usernameOrEmail"
             label={t("fields.usernameOrEmail")}
+            required
           >
             <EmailInput
               type="text"
@@ -150,6 +151,7 @@ export function LoginView({
             error={errors.password?.message}
             htmlFor="password"
             label={t("fields.password")}
+            required
           >
             <PasswordInput
               aria-invalid={Boolean(errors.password)}
@@ -203,7 +205,7 @@ export function LoginView({
             <GoogleIcon />
             {google.isRedirecting ? t("google.redirecting") : t("google.login")}
           </Button>
-          <p className="pt-4 text-center text-sm text-muted-foreground">
+          <p className="text-center text-sm text-muted-foreground">
             {t("login.noAccount")}
           </p>
           <Button

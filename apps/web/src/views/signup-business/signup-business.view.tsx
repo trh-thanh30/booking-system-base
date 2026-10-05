@@ -109,6 +109,7 @@ export function SignupBusinessView() {
             htmlFor="owner-email"
             label={auth("fields.email")}
             error={form.formState.errors.email?.message}
+            required
           >
             <EmailInput
               id="owner-email"
@@ -122,6 +123,7 @@ export function SignupBusinessView() {
             htmlFor="owner-password"
             label={auth("fields.password")}
             error={form.formState.errors.password?.message}
+            required
           >
             <PasswordInput
               id="owner-password"
@@ -144,6 +146,7 @@ export function SignupBusinessView() {
             htmlFor="owner-confirm-password"
             label={t("confirmPassword")}
             error={form.formState.errors.confirmPassword?.message}
+            required
           >
             <PasswordInput
               id="owner-confirm-password"

@@ -107,6 +107,7 @@ export function ResetPasswordView({
               error={errors.code?.message}
               htmlFor="code"
               label={t("fields.code")}
+              required
             >
               <Input
                 id="code"
@@ -126,6 +127,7 @@ export function ResetPasswordView({
               htmlFor="password"
               label={t("fields.password")}
               description={t("emailFlow.passwordLength")}
+              required
             >
               <PasswordInput
                 id="password"
@@ -144,6 +146,7 @@ export function ResetPasswordView({
               error={errors.confirmPassword?.message}
               htmlFor="confirmPassword"
               label={t("fields.confirmPassword")}
+              required
             >
               <PasswordInput
                 id="confirmPassword"

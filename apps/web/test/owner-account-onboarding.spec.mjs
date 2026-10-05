@@ -4,6 +4,10 @@ import {
   registerOwnerAccountSchema,
   completeOwnerBusinessSchema,
 } from "@repo/shared";
+import {
+  createBookingHost,
+  createBusinessSlug,
+} from "../src/views/admin/auth/utils/business-onboarding.utils.ts";
 
 const input = {
   name: "Demo",
@@ -48,6 +52,14 @@ test("account-first registration normalizes email and rejects mismatched/short p
     }).success,
     false,
   );
+});
+test("business booking host is derived from the localized business name", () => {
+  assert.equal(createBusinessSlug("  Lotus Spa Tây Hồ  "), "lotus-spa-tay-ho");
+  assert.equal(
+    createBookingHost(createBusinessSlug("Lotus Spa"), "bookingbase.com"),
+    "lotus-spa.bookingbase.com",
+  );
+  assert.ok(createBusinessSlug("A".repeat(100)).length <= 80);
 });
 test("business completion validates geographic bounds, timezone and unique daily intervals", () => {
   assert.equal(completeOwnerBusinessSchema.safeParse(input).success, true);

@@ -113,6 +113,7 @@ function CreateBusinessDialog({
             error={errors.name?.message}
             htmlFor="business-name"
             label="Business name"
+            required
           >
             <Input id="business-name" {...register("name")} />
           </FormField>
@@ -120,6 +121,7 @@ function CreateBusinessDialog({
             error={errors.slug?.message}
             htmlFor="business-slug"
             label="Slug"
+            required
           >
             <Input id="business-slug" {...register("slug")} />
           </FormField>

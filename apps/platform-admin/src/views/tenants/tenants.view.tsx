@@ -133,15 +133,25 @@ function CreateTenantDialog({
             error={errors.name?.message}
             htmlFor="tenant-name"
             label="Business name"
+            required
           >
-            <Input id="tenant-name" {...register("name")} />
+            <Input
+              aria-required="true"
+              id="tenant-name"
+              {...register("name")}
+            />
           </FormField>
           <FormField
             error={errors.slug?.message}
             htmlFor="tenant-slug"
             label="Slug"
+            required
           >
-            <Input id="tenant-slug" {...register("slug")} />
+            <Input
+              aria-required="true"
+              id="tenant-slug"
+              {...register("slug")}
+            />
           </FormField>
           <FormField
             error={errors.primary_domain?.message}

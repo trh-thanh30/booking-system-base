@@ -40,12 +40,13 @@ test("Google onboarding displays verified identity, read-only email and workspac
     "owner.username",
     "owner.phone",
     "name",
-    "slug",
     "timezone",
     "locale",
   ]) {
     assert.ok(html.includes(`name="${name}"`));
   }
+  assert.ok(!html.includes('name="slug"'));
+  assert.match(html, /your-business\.bookingbase\.com/);
   assert.doesNotMatch(
     html,
     /name="owner.email"|type="password"|name="password"/,

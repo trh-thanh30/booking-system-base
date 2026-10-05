@@ -9,6 +9,7 @@ type FormFieldProps = {
   error?: string;
   htmlFor: string;
   label: string;
+  required?: boolean;
 };
 
 export function FormField({
@@ -17,10 +18,18 @@ export function FormField({
   error,
   htmlFor,
   label,
+  required = false,
 }: FormFieldProps) {
   return (
     <div className="space-y-2">
-      <Label htmlFor={htmlFor}>{label}</Label>
+      <Label htmlFor={htmlFor}>
+        {label}
+        {required ? (
+          <span aria-hidden="true" className="ml-1 text-destructive">
+            *
+          </span>
+        ) : null}
+      </Label>
       {Children.map(children, (child) =>
         isValidElement<Record<string, unknown>>(child)
           ? cloneElement(child, {
@@ -31,6 +40,7 @@ export function FormField({
                   : undefined,
               ),
               "aria-invalid": Boolean(error),
+              "aria-required": required || undefined,
               "aria-describedby":
                 [
                   child.props["aria-describedby"],

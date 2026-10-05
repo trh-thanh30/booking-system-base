@@ -58,6 +58,7 @@ export function ForgotPasswordView() {
           error={errors.email?.message}
           htmlFor="email"
           label={t("fields.email")}
+          required
         >
           <EmailInput
             id="email"

@@ -14,6 +14,11 @@ import {
   EmailInput,
   FormField,
 } from "@/src/components/common";
+import { siteConfig } from "@/src/config/site.config";
+import {
+  createBookingHost,
+  createBusinessSlug,
+} from "../utils/business-onboarding.utils";
 import { BusinessLocationMap } from "./business-location-map";
 
 export function BusinessOnboardingForm({
@@ -62,11 +67,20 @@ export function BusinessOnboardingForm({
     },
   });
   const busy = isPending || form.formState.isSubmitting;
+  const businessSlug = createBusinessSlug(form.watch("name"));
+  const bookingHost = createBookingHost(
+    businessSlug || t("bookingUrlFallback"),
+    siteConfig.bookingDomain,
+  );
   const location = form.watch("business_profile.address.location");
   const days = form.watch("business_profile.opening_hours");
   async function submit(input: CompleteOwnerBusinessInput) {
     if (isPending) return;
     form.clearErrors();
+    const normalizedInput = {
+      ...input,
+      slug: createBusinessSlug(input.name),
+    };
     const parsed =
       step === 0
         ? completeOwnerBusinessSchema
@@ -77,18 +91,20 @@ export function BusinessOnboardingForm({
               timezone: true,
               locale: true,
             })
-            .safeParse(input)
+            .safeParse(normalizedInput)
         : step === 1
           ? completeOwnerBusinessSchema.shape.business_profile.shape.address.safeParse(
-              input.business_profile.address,
+              normalizedInput.business_profile.address,
             )
-          : completeOwnerBusinessSchema.safeParse(input);
+          : completeOwnerBusinessSchema.safeParse(normalizedInput);
     if (!parsed.success) {
       for (const issue of parsed.error.issues) {
         const path =
           step === 1
             ? ["business_profile", "address", ...issue.path]
-            : issue.path;
+            : issue.path[0] === "slug"
+              ? ["name"]
+              : issue.path;
         form.setError(
           path.join(".") as FieldPath<CompleteOwnerBusinessInput>,
           { message: t("invalidField") },
@@ -101,13 +117,14 @@ export function BusinessOnboardingForm({
       setStep(step + 1);
       return;
     }
-    const result = completeOwnerBusinessSchema.safeParse(input);
+    const result = completeOwnerBusinessSchema.safeParse(normalizedInput);
     if (result.success) await onSubmit(result.data);
   }
   function field(
     name: FieldPath<CompleteOwnerBusinessInput>,
     label: string,
     type = "text",
+    required = true,
   ) {
     const error = form.getFieldState(name, form.formState).error;
     const id = name.replaceAll(".", "-");
@@ -117,6 +134,7 @@ export function BusinessOnboardingForm({
         htmlFor={id}
         label={t(label)}
         error={error?.message}
+        required={required}
       >
         <Input
           id={id}
@@ -197,12 +215,20 @@ export function BusinessOnboardingForm({
         {step === 0 ? (
           <>
             {field("name", "businessName")}
-            {field("slug", "businessSlug")}
-            <p className="text-xs text-muted-foreground">{t("slugHint")}</p>
+            <p
+              aria-live="polite"
+              className="-mt-2 break-all text-xs text-muted-foreground"
+            >
+              {t("bookingUrlPreview", { url: bookingHost })}
+            </p>
             {field("owner.username", "username")}
-            {field("owner.phone", "phone", "tel")}
+            {field("owner.phone", "phone", "tel", false)}
             {field("timezone", "timezone")}
-            <FormField htmlFor="workspace-locale" label={t("language")}>
+            <FormField
+              htmlFor="workspace-locale"
+              label={t("language")}
+              required
+            >
               <select
                 id="workspace-locale"
                 className="h-11 w-full rounded-md border border-input bg-card px-3"
@@ -218,9 +244,14 @@ export function BusinessOnboardingForm({
           <>
             <div className="grid gap-4 sm:grid-cols-2">
               {field("business_profile.address.country", "country")}
-              {field("business_profile.address.state", "state")}
+              {field("business_profile.address.state", "state", "text", false)}
               {field("business_profile.address.city", "city")}
-              {field("business_profile.address.postal_code", "postalCode")}
+              {field(
+                "business_profile.address.postal_code",
+                "postalCode",
+                "text",
+                false,
+              )}
             </div>
             {field("business_profile.address.street", "street")}
             <BusinessLocationMap
