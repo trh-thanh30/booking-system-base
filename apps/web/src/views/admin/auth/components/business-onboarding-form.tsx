@@ -24,6 +24,10 @@ import {
   SelectValue,
   PhoneNumberInput,
   TimezoneSelect,
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
 } from "@repo/ui";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
@@ -32,19 +36,27 @@ import { Controller, useForm, type FieldPath } from "react-hook-form";
 import {
   createBookingHost,
   createBusinessSlug,
+  getCountryFromTimezone,
+  getBrowserCountryName,
+  getBrowserPhoneCountry,
+  getBrowserTimezone,
 } from "../utils/business-onboarding.utils";
 import { BusinessLocationMap } from "./business-location-map";
+import { useBusinessOnboardingDraft } from "../hooks/use-business-onboarding-draft";
+import type { PhoneCountry } from "@repo/ui";
 
 export function BusinessOnboardingForm({
   profile,
   locale,
   isPending,
   onSubmit,
+  onDraftStateChange,
 }: {
   profile: OwnerOnboardingProfile;
   locale: string;
   isPending: boolean;
   onSubmit: (input: CompleteOwnerBusinessInput) => Promise<void>;
+  onDraftStateChange?: (hasDraft: boolean, clearDraft: () => void) => void;
 }) {
   const t = useTranslations("AuthJourney");
   const categories = useQuery({
@@ -86,6 +98,32 @@ export function BusinessOnboardingForm({
       },
     },
   });
+  const draft = useBusinessOnboardingDraft({
+    form,
+    profileEmail: profile.email,
+    step,
+    setStep,
+    isPending,
+    onDraftStateChange,
+  });
+  const [phoneCountry, setPhoneCountry] = useState<PhoneCountry>("VN");
+  useEffect(() => {
+    if (!draft.hydrated || draft.hasRestoredDraft) return;
+    const browserTimezone = getBrowserTimezone();
+    const browserCountry =
+      getCountryFromTimezone(browserTimezone) ?? getBrowserPhoneCountry();
+    setPhoneCountry(browserCountry);
+    if (form.getValues("business_profile.address.country") === "Vietnam") {
+      form.setValue(
+        "business_profile.address.country",
+        getBrowserCountryName(browserCountry, locale),
+        { shouldDirty: false },
+      );
+    }
+    if (form.getValues("timezone") === "Asia/Ho_Chi_Minh") {
+      form.setValue("timezone", browserTimezone, { shouldDirty: false });
+    }
+  }, [draft.hasRestoredDraft, draft.hydrated, form, locale]);
   const busy = isPending || form.formState.isSubmitting;
   const businessSlug = createBusinessSlug(form.watch("name"));
   const bookingHost = createBookingHost(
@@ -226,12 +264,21 @@ export function BusinessOnboardingForm({
         aria-valuenow={step + 1}
         className="grid grid-cols-3 gap-1"
       >
-        {[0, 1, 2].map((part) => (
-          <span
-            key={part}
-            className={`h-1 rounded-full ${part <= step ? "bg-primary" : "bg-muted"}`}
-          />
-        ))}
+        <TooltipProvider delayDuration={100} skipDelayDuration={100}>
+          <div className="contents">
+            {[0, 1, 2].map((part) => (
+              <Tooltip key={part}>
+                <TooltipTrigger asChild>
+                  <span
+                    aria-label={t(titles[part]!)}
+                    className={`h-1 cursor-help rounded-full ${part <= step ? "bg-primary" : "bg-muted"}`}
+                  />
+                </TooltipTrigger>
+                <TooltipContent>{t(titles[part]!)}</TooltipContent>
+              </Tooltip>
+            ))}
+          </div>
+        </TooltipProvider>
       </div>
       <fieldset disabled={busy} className="space-y-4">
         <legend className="sr-only">{t(titles[step]!)}</legend>
@@ -257,8 +304,10 @@ export function BusinessOnboardingForm({
                   <PhoneNumberInput
                     {...phoneField}
                     id="owner-phone"
+                    key={phoneCountry}
                     invalid={Boolean(form.formState.errors.owner?.phone)}
                     placeholder={t("placeholders.phone")}
+                    defaultCountry={phoneCountry}
                     value={phoneField.value || undefined}
                     onChange={phoneField.onChange}
                   />

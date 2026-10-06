@@ -7,6 +7,7 @@ import {
 import {
   createBookingHost,
   createBusinessSlug,
+  getCountryFromTimezone,
 } from "../src/views/admin/auth/utils/business-onboarding.utils.ts";
 
 const input = {
@@ -61,6 +62,11 @@ test("business booking host is derived from the localized business name", () => 
     "lotus-spa.bookingbase.com",
   );
   assert.ok(createBusinessSlug("A".repeat(100)).length <= 80);
+});
+test("onboarding derives the default country from the detected timezone", () => {
+  assert.equal(getCountryFromTimezone("Asia/Ho_Chi_Minh"), "VN");
+  assert.equal(getCountryFromTimezone("America/New_York"), "US");
+  assert.equal(getCountryFromTimezone("not-a-timezone"), undefined);
 });
 test("business completion validates geographic bounds, timezone and unique daily intervals", () => {
   assert.equal(completeOwnerBusinessSchema.safeParse(input).success, true);

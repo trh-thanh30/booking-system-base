@@ -25,13 +25,44 @@ type TimezoneSelectProps = {
   emptyMessage?: string;
 };
 
-function getTimezones() {
-  const supportedValuesOf = (
-    Intl as typeof Intl & {
-      supportedValuesOf?: (key: "timeZone") => string[];
-    }
-  ).supportedValuesOf;
-  return supportedValuesOf?.("timeZone") ?? ["UTC"];
+// Keep onboarding focused on the timezones most users recognize. The selected
+// value is added back below when a browser or existing record uses another
+// valid IANA timezone, so we never hide an already saved value.
+const COMMON_TIMEZONES = [
+  "UTC",
+  "Pacific/Auckland",
+  "Australia/Sydney",
+  "Asia/Tokyo",
+  "Asia/Seoul",
+  "Asia/Shanghai",
+  "Asia/Singapore",
+  "Asia/Ho_Chi_Minh",
+  "Asia/Bangkok",
+  "Asia/Jakarta",
+  "Asia/Kolkata",
+  "Asia/Dubai",
+  "Asia/Riyadh",
+  "Europe/London",
+  "Europe/Paris",
+  "Europe/Berlin",
+  "Europe/Moscow",
+  "Africa/Cairo",
+  "Africa/Johannesburg",
+  "America/Sao_Paulo",
+  "America/Mexico_City",
+  "America/Toronto",
+  "America/New_York",
+  "America/Chicago",
+  "America/Denver",
+  "America/Los_Angeles",
+  "America/Vancouver",
+] as const;
+
+function getTimezones(selectedValue?: string) {
+  return selectedValue &&
+    !COMMON_TIMEZONES.some((timezone) => timezone === selectedValue)
+    ? [selectedValue, ...COMMON_TIMEZONES]
+    : COMMON_TIMEZONES;
 }
 
 function getOffset(timeZone: string) {
@@ -62,11 +93,11 @@ export function TimezoneSelect({
   const [open, setOpen] = useState(false);
   const options = useMemo(
     () =>
-      getTimezones().map((timeZone) => ({
+      getTimezones(value).map((timeZone) => ({
         timeZone,
         offset: getOffset(timeZone),
       })),
-    [],
+    [value],
   );
   const selected = options.find((option) => option.timeZone === value);
 

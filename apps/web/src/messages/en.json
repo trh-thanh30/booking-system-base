@@ -7,7 +7,7 @@
       "newPassword": "Use at least 8 characters",
       "confirmPassword": "Enter your password again",
       "code": "123456",
-      "username": "e.g. alex.owner",
+      "username": "e.g. example user",
       "fullName": "e.g. Alex Nguyen",
       "businessName": "e.g. Lotus Spa",
       "businessCategory": "Choose the category that best fits your business",
@@ -100,7 +100,13 @@
     "detailsConflict": "Username, phone or booking URL is already in use. Check your information.",
     "completionFailed": "Unable to complete business setup. Your form has been kept; please try again.",
     "retry": "Try again",
-    "backToLogin": "Back to login"
+    "backToLogin": "Back to login",
+    "leaveDialog": {
+      "title": "Leave setup?",
+      "description": "Your business information is saved for this session. Do you want to delete the draft and return to login?",
+      "stay": "Continue editing",
+      "leave": "Leave and delete draft"
+    }
   },
   "Navigation": {
     "language": "Choose language",

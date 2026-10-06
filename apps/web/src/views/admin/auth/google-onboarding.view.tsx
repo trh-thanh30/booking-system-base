@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useToast } from "@repo/hooks";
@@ -24,6 +24,7 @@ export function GoogleOnboardingView() {
   const { isLoading, isAuthenticated, completeGoogleOnboarding } = useAuth();
   const google = useGoogleLogin();
   const attempt = useRef(false);
+  const clearDraftRef = useRef<() => void>(() => undefined);
   const [submitError, setSubmitError] = useState<ReturnType<
     typeof getGoogleOnboardingError
   > | null>(null);
@@ -52,6 +53,7 @@ export function GoogleOnboardingView() {
     setSubmitError(null);
     try {
       const result = await completion.mutateAsync(input);
+      clearDraftRef.current();
       toast.success(t("google.success"));
       router.replace(getSafeReturnTo(result.return_to), {
         locale: result.locale === "en" ? "en" : "vi",
@@ -68,6 +70,13 @@ export function GoogleOnboardingView() {
     ? getGoogleOnboardingError(profile.error)
     : null;
   const error = submitError ?? profileError;
+  const handleDraftStateChange = useCallback(
+    (hasDraft: boolean, clearDraft: () => void) => {
+      void hasDraft;
+      clearDraftRef.current = clearDraft;
+    },
+    [],
+  );
   useEffect(() => {
     if (!profile.isError) return;
     const currentError = getGoogleOnboardingError(profile.error);
@@ -94,6 +103,7 @@ export function GoogleOnboardingView() {
                 locale={locale}
                 isPending={completion.isPending}
                 onSubmit={submit}
+                onDraftStateChange={handleDraftStateChange}
               />
             ) : null}
             {profile.isError && !error?.terminal ? (

@@ -7,7 +7,7 @@
       "newPassword": "Sử dụng ít nhất 8 ký tự",
       "confirmPassword": "Nhập lại mật khẩu",
       "code": "123456",
-      "username": "Ví dụ: thanh.owner",
+      "username": "Ví dụ: example user",
       "fullName": "Ví dụ: Nguyễn Thanh",
       "businessName": "Ví dụ: Lotus Spa",
       "businessCategory": "Chọn lĩnh vực phù hợp với doanh nghiệp của bạn",
@@ -100,7 +100,13 @@
     "detailsConflict": "Tên đăng nhập, điện thoại hoặc đường dẫn đã được sử dụng. Vui lòng kiểm tra lại.",
     "completionFailed": "Chưa hoàn tất được thiết lập. Thông tin trên form vẫn được giữ, hãy thử lại.",
     "retry": "Thử lại",
-    "backToLogin": "Quay lại đăng nhập"
+    "backToLogin": "Quay lại đăng nhập",
+    "leaveDialog": {
+      "title": "Rời khỏi quá trình thiết lập?",
+      "description": "Thông tin doanh nghiệp bạn đã nhập sẽ được lưu trong phiên này. Bạn có muốn xóa bản nháp và quay lại đăng nhập không?",
+      "stay": "Tiếp tục chỉnh sửa",
+      "leave": "Rời khỏi và xóa bản nháp"
+    }
   },
   "Navigation": {
     "language": "Chọn ngôn ngữ",
