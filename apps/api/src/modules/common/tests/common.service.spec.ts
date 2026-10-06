@@ -102,4 +102,41 @@ describe('CommonService geocoding', () => {
       }),
     ).resolves.toBeNull();
   });
+
+  it('logs diagnostic details when the geocoding provider error has no message', async () => {
+    const loggerError = jest
+      .spyOn(service['logger'], 'error')
+      .mockImplementation(() => undefined);
+    forwardGeocode.mockRejectedValue({
+      name: 'AxiosError',
+      message: '',
+      code: 'ERR_BAD_RESPONSE',
+      response: {
+        status: 429,
+        statusText: 'Too Many Requests',
+        data: { error: 'rate limited' },
+      },
+    });
+
+    await service.forwardGeocode({
+      countryCode: 'VN',
+      addressLine1: '12 Nguyen Trai',
+      addressLine2: '',
+      locality: 'Hanoi',
+      administrativeAreaLevel1: '',
+      administrativeAreaLevel2: '',
+      postalCode: '',
+      locale: 'en',
+    });
+
+    expect(loggerError).toHaveBeenCalledWith(
+      expect.stringContaining('code=ERR_BAD_RESPONSE'),
+    );
+    expect(loggerError).toHaveBeenCalledWith(
+      expect.stringContaining('status=429 Too Many Requests'),
+    );
+    expect(loggerError).toHaveBeenCalledWith(
+      expect.stringContaining('response={"error":"rate limited"}'),
+    );
+  });
 });
