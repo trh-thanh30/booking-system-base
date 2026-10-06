@@ -70,17 +70,17 @@ export function HeroSection() {
         </div>
 
         {/* 4. Trust Badges */}
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-6 sm:gap-8 text-xs text-muted-foreground">
+        <div className="mt-8 grid grid-cols-1 gap-4 text-left md:flex md:items-center md:justify-center md:gap-8 text-xs text-muted-foreground">
           <div className="flex items-center gap-2">
-            <Check className="w-4 h-4 text-primary" />
+            <Check className="w-4 h-4 shrink-0 text-primary" />
             <span>{t("trust.noCard")}</span>
           </div>
           <div className="flex items-center gap-2">
-            <Check className="w-4 h-4 text-primary" />
+            <Check className="w-4 h-4 shrink-0 text-primary" />
             <span>{t("trust.quickSetup")}</span>
           </div>
           <div className="flex items-center gap-2">
-            <Check className="w-4 h-4 text-primary" />
+            <Check className="w-4 h-4 shrink-0 text-primary" />
             <span>{t("trust.calendarSync")}</span>
           </div>
         </div>
