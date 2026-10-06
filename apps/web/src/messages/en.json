@@ -13,6 +13,8 @@
       "businessCategory": "Choose the category that best fits your business",
       "phone": "e.g. +84 912 345 678",
       "timezone": "e.g. Asia/Ho_Chi_Minh",
+      "timezoneSearch": "Search timezone...",
+      "timezoneEmpty": "No timezone found.",
       "country": "e.g. Vietnam",
       "state": "e.g. Hanoi",
       "city": "e.g. Hanoi",

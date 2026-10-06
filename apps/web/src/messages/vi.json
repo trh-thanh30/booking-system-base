@@ -13,6 +13,8 @@
       "businessCategory": "Chọn lĩnh vực phù hợp với doanh nghiệp của bạn",
       "phone": "Ví dụ: +84 912 345 678",
       "timezone": "Ví dụ: Asia/Ho_Chi_Minh",
+      "timezoneSearch": "Tìm múi giờ...",
+      "timezoneEmpty": "Không tìm thấy múi giờ.",
       "country": "Ví dụ: Việt Nam",
       "state": "Ví dụ: Hà Nội",
       "city": "Ví dụ: Hà Nội",

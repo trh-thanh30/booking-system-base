@@ -22,11 +22,13 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
+  PhoneNumberInput,
+  TimezoneSelect,
 } from "@repo/ui";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
-import { useForm, type FieldPath } from "react-hook-form";
+import { Controller, useForm, type FieldPath } from "react-hook-form";
 import {
   createBookingHost,
   createBusinessSlug,
@@ -243,8 +245,50 @@ export function BusinessOnboardingForm({
               {t("bookingUrlPreview", { url: bookingHost })}
             </p>
             {field("owner.username", "username")}
-            {field("owner.phone", "phone", "tel", false)}
-            {field("timezone", "timezone")}
+            <FormField
+              htmlFor="owner-phone"
+              label={t("phone")}
+              error={form.formState.errors.owner?.phone?.message}
+            >
+              <Controller
+                control={form.control}
+                name="owner.phone"
+                render={({ field: phoneField }) => (
+                  <PhoneNumberInput
+                    {...phoneField}
+                    id="owner-phone"
+                    invalid={Boolean(form.formState.errors.owner?.phone)}
+                    placeholder={t("placeholders.phone")}
+                    value={phoneField.value || undefined}
+                    onChange={phoneField.onChange}
+                  />
+                )}
+              />
+            </FormField>
+            <FormField
+              htmlFor="timezone"
+              label={t("timezone")}
+              error={form.formState.errors.timezone?.message}
+              required
+            >
+              <Controller
+                control={form.control}
+                name="timezone"
+                render={({ field: timezoneField }) => (
+                  <TimezoneSelect
+                    id="timezone"
+                    name="timezone"
+                    value={timezoneField.value}
+                    onChange={timezoneField.onChange}
+                    disabled={busy}
+                    aria-invalid={Boolean(form.formState.errors.timezone)}
+                    placeholder={t("placeholders.timezone")}
+                    searchPlaceholder={t("placeholders.timezoneSearch")}
+                    emptyMessage={t("placeholders.timezoneEmpty")}
+                  />
+                )}
+              />
+            </FormField>
             <FormField
               htmlFor="business-category"
               label={t("businessCategory")}
