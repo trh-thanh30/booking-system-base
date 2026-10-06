@@ -129,7 +129,7 @@ export function CountrySelect({
                   key={option.code}
                   value={`${option.name} ${option.englishName} ${option.code}`}
                   onSelect={() => {
-                    onChange(option.name);
+                    onChange(option.code);
                     setOpen(false);
                   }}
                 >

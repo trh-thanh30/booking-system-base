@@ -10,6 +10,7 @@ import { businessCategoriesService } from "@/src/services/admin/business-categor
 import {
   completeOwnerBusinessSchema,
   type CompleteOwnerBusinessInput,
+  type GeocodingAddress,
   type OwnerOnboardingProfile,
 } from "@repo/shared";
 import type { PhoneCountry } from "@repo/ui";
@@ -41,7 +42,6 @@ import { useBusinessOnboardingDraft } from "../hooks/use-business-onboarding-dra
 import {
   createBookingHost,
   createBusinessSlug,
-  getBrowserCountryName,
   getBrowserPhoneCountry,
   getBrowserTimezone,
   getCountryFromTimezone,
@@ -85,11 +85,14 @@ export function BusinessOnboardingForm({
       locale: locale === "en" ? "en" : "vi",
       business_profile: {
         address: {
-          country: "Vietnam",
-          city: "",
-          state: "",
-          postal_code: "",
-          street: "",
+          countryCode: "VN",
+          addressLine1: "",
+          addressLine2: "",
+          locality: "",
+          administrativeAreaLevel1: "",
+          administrativeAreaLevel2: "",
+          postalCode: "",
+          formattedAddress: "",
           location: null,
         },
         opening_hours: Array.from({ length: 7 }, (_, day) => ({
@@ -121,12 +124,10 @@ export function BusinessOnboardingForm({
     const browserCountry =
       getCountryFromTimezone(browserTimezone) ?? getBrowserPhoneCountry();
     setPhoneCountry(browserCountry);
-    if (form.getValues("business_profile.address.country") === "Vietnam") {
-      form.setValue(
-        "business_profile.address.country",
-        getBrowserCountryName(browserCountry, locale),
-        { shouldDirty: false },
-      );
+    if (form.getValues("business_profile.address.countryCode") === "VN") {
+      form.setValue("business_profile.address.countryCode", browserCountry, {
+        shouldDirty: false,
+      });
     }
     if (form.getValues("timezone") === "Asia/Ho_Chi_Minh") {
       form.setValue("timezone", browserTimezone, { shouldDirty: false });
@@ -143,7 +144,8 @@ export function BusinessOnboardingForm({
     businessSlug || t("bookingUrlFallback"),
     siteConfig.bookingDomain,
   );
-  const location = form.watch("business_profile.address.location");
+  const businessAddress = form.watch("business_profile.address");
+  const location = businessAddress.location;
   const days = form.watch("business_profile.opening_hours");
   async function submit(input: CompleteOwnerBusinessInput) {
     if (isPending) return;
@@ -228,6 +230,9 @@ export function BusinessOnboardingForm({
   ) {
     const error = form.getFieldState(name, form.formState).error;
     const id = name.replaceAll(".", "-");
+    const resetsFormattedAddress =
+      name.startsWith("business_profile.address.") &&
+      name !== "business_profile.address.formattedAddress";
     return (
       <FormField
         key={name}
@@ -240,7 +245,16 @@ export function BusinessOnboardingForm({
           id={id}
           type={type}
           placeholder={t(`placeholders.${label}`)}
-          {...form.register(name)}
+          {...form.register(name, {
+            onChange: resetsFormattedAddress
+              ? () =>
+                  form.setValue(
+                    "business_profile.address.formattedAddress",
+                    "",
+                    { shouldDirty: true },
+                  )
+              : undefined,
+          })}
         />
       </FormField>
     );
@@ -503,54 +517,140 @@ export function BusinessOnboardingForm({
         ) : null}
         {step === 1 ? (
           <>
+            <FormField
+              htmlFor="business-profile-address-countryCode"
+              label={t("country")}
+              error={
+                form.formState.errors.business_profile?.address?.countryCode
+                  ?.message
+              }
+              required
+            >
+              <Controller
+                control={form.control}
+                name="business_profile.address.countryCode"
+                render={({ field: countryField }) => (
+                  <CountrySelect
+                    id="business-profile-address-countryCode"
+                    locale={locale}
+                    value={countryField.value}
+                    onChange={(value) => {
+                      countryField.onChange(value);
+                      form.setValue(
+                        "business_profile.address.formattedAddress",
+                        "",
+                        { shouldDirty: true },
+                      );
+                    }}
+                    disabled={busy}
+                    aria-invalid={Boolean(
+                      form.formState.errors.business_profile?.address
+                        ?.countryCode,
+                    )}
+                    placeholder={t("placeholders.country")}
+                    searchPlaceholder={t("placeholders.countrySearch")}
+                    emptyMessage={t("placeholders.countryEmpty")}
+                  />
+                )}
+              />
+            </FormField>
+            {field("business_profile.address.addressLine1", "addressLine1")}
+            {field(
+              "business_profile.address.addressLine2",
+              "addressLine2",
+              "text",
+              false,
+            )}
             <div className="grid gap-4 sm:grid-cols-2">
-              <FormField
-                htmlFor="business-profile-address-country"
-                label={t("country")}
-                error={
-                  form.formState.errors.business_profile?.address?.country
-                    ?.message
-                }
-                required
-              >
-                <Controller
-                  control={form.control}
-                  name="business_profile.address.country"
-                  render={({ field: countryField }) => (
-                    <CountrySelect
-                      id="business-profile-address-country"
-                      locale={locale}
-                      value={countryField.value}
-                      onChange={countryField.onChange}
-                      disabled={busy}
-                      aria-invalid={Boolean(
-                        form.formState.errors.business_profile?.address
-                          ?.country,
-                      )}
-                      placeholder={t("placeholders.country")}
-                      searchPlaceholder={t("placeholders.countrySearch")}
-                      emptyMessage={t("placeholders.countryEmpty")}
-                    />
-                  )}
-                />
-              </FormField>
-              {field("business_profile.address.state", "state", "text", false)}
-              {field("business_profile.address.city", "city")}
+              {field("business_profile.address.locality", "locality")}
               {field(
-                "business_profile.address.postal_code",
+                "business_profile.address.postalCode",
                 "postalCode",
                 "text",
                 false,
               )}
             </div>
-            {field("business_profile.address.street", "street")}
+            <div className="grid gap-4 sm:grid-cols-2">
+              {field(
+                "business_profile.address.administrativeAreaLevel1",
+                "administrativeAreaLevel1",
+                "text",
+                false,
+              )}
+              {field(
+                "business_profile.address.administrativeAreaLevel2",
+                "administrativeAreaLevel2",
+                "text",
+                false,
+              )}
+            </div>
             <BusinessLocationMap
               value={location}
+              address={{
+                countryCode: businessAddress.countryCode,
+                addressLine1: businessAddress.addressLine1,
+                addressLine2: businessAddress.addressLine2 ?? "",
+                locality: businessAddress.locality,
+                administrativeAreaLevel1:
+                  businessAddress.administrativeAreaLevel1 ?? "",
+                administrativeAreaLevel2:
+                  businessAddress.administrativeAreaLevel2 ?? "",
+                postalCode: businessAddress.postalCode ?? "",
+              }}
               disabled={busy}
               onChange={(value) =>
                 form.setValue("business_profile.address.location", value, {
                   shouldDirty: true,
                 })
+              }
+              onAddressChange={(address: GeocodingAddress) => {
+                form.setValue(
+                  "business_profile.address.countryCode",
+                  address.countryCode,
+                  { shouldDirty: true },
+                );
+                form.setValue(
+                  "business_profile.address.addressLine1",
+                  address.addressLine1,
+                  { shouldDirty: true },
+                );
+                form.setValue(
+                  "business_profile.address.addressLine2",
+                  address.addressLine2,
+                  { shouldDirty: true },
+                );
+                form.setValue(
+                  "business_profile.address.locality",
+                  address.locality,
+                  { shouldDirty: true },
+                );
+                form.setValue(
+                  "business_profile.address.administrativeAreaLevel1",
+                  address.administrativeAreaLevel1,
+                  { shouldDirty: true },
+                );
+                form.setValue(
+                  "business_profile.address.administrativeAreaLevel2",
+                  address.administrativeAreaLevel2,
+                  { shouldDirty: true },
+                );
+                form.setValue(
+                  "business_profile.address.postalCode",
+                  address.postalCode,
+                  { shouldDirty: true },
+                );
+                form.setValue(
+                  "business_profile.address.formattedAddress",
+                  address.formattedAddress,
+                  { shouldDirty: true },
+                );
+              }}
+              onFormattedAddressChange={(formattedAddress) =>
+                form.setValue(
+                  "business_profile.address.formattedAddress",
+                  formattedAddress,
+                  { shouldDirty: true },
+                )
               }
             />
             {form.formState.errors.business_profile?.address?.location ? (

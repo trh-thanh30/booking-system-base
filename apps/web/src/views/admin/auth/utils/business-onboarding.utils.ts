@@ -73,15 +73,3 @@ export function getCountryFromTimezone(
 ): PhoneCountry | undefined {
   return getCountryForTimezone(timezone)?.id as PhoneCountry | undefined;
 }
-
-export function getBrowserCountryName(region: PhoneCountry, locale: string) {
-  try {
-    return (
-      new Intl.DisplayNames([locale === "en" ? "en" : "vi"], {
-        type: "region",
-      }).of(region) ?? "Vietnam"
-    );
-  } catch {
-    return region === "VN" ? "Vietnam" : region;
-  }
-}

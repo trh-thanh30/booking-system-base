@@ -21,8 +21,12 @@ restriction in ADR 0002; preserves its Auth → Tenant boundary.
   conditionally attaches the verified, active Owner whose tenant is still null.
   A competing/replayed attach throws inside the transaction, rolling back the
   competing workspace. The existing password/identity is preserved.
-- Address, optional pin coordinates and seven daily same-day opening intervals
-  are validated using shared schemas and stored in `Business.settings.onboarding`.
+- A country-neutral address contract stores `countryCode` (ISO alpha-2),
+  `addressLine1`, optional `addressLine2`, `locality`, optional administrative
+  levels 1/2, postal code, provider-formatted address and optional pin
+  coordinates. It does not hard-code ward/district/state semantics into storage.
+  Address and seven daily same-day opening intervals are validated using shared
+  schemas and stored in `Business.settings.onboarding`.
   They are not copied into Tenant settings. Slot availability integration is a
   separate booking feature; these settings alone do not enforce bookable slots.
 - Manual completion returns workspace information and redirects to login;
@@ -39,6 +43,8 @@ Under the configured API prefix:
 | POST /auth/admin/onboarding/login    | Resume pending verified Owner with valid credentials      |
 | GET /auth/admin/onboarding           | Read verified pending Owner profile using ticket          |
 | POST /auth/admin/onboarding          | Complete business setup using ticket                      |
+| GET /common/geocoding/forward        | Resolve an explicitly submitted address to coordinates    |
+| GET /common/geocoding/reverse        | Resolve an explicitly selected coordinate to an address   |
 
 The legacy `POST /auth/register` remains compatible during cutover; the Web UI
 no longer calls it. Existing OTP request/resend/password recovery endpoints are
@@ -48,8 +54,15 @@ they expire; new tickets bind to the persisted Owner.
 ## Map and privacy
 
 Leaflet loads client-side. OSM tiles show visible attribution; endpoint is
-configurable. No Nominatim geocoding/autocomplete or tile prefetch is added.
-Geolocation runs only after explicit user action; denied permissions do not block
-manual address entry. No password, JWT or onboarding ticket is stored in URLs,
-localStorage or sessionStorage. Reload preserves account eligibility, not unsaved
-Business form values; users can resume onboarding by logging in again.
+configurable. Forward geocoding runs only when the user chooses **Find on map**;
+reverse geocoding runs after an explicit map pin selection, drag or browser
+location action. Public Nominatim is called through the API proxy with caching,
+timeout and serialized rate limiting; it is never used for per-keystroke
+autocomplete or tile prefetching. Provider-specific output is normalized into
+the shared country-neutral address contract.
+
+Denied location permissions and unavailable geocoding do not block manual entry.
+No password, JWT or onboarding ticket is stored in URLs, localStorage or
+sessionStorage. The Business form draft may be stored in sessionStorage under a
+versioned key and is schema-validated before restoration; it remains independent
+from authentication credentials.

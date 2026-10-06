@@ -6,8 +6,7 @@ import {
   completeOwnerBusinessSchema,
   type CompleteOwnerBusinessInput,
 } from "@repo/shared";
-
-const STORAGE_KEY = "booking:owner-business-onboarding-draft:v1";
+import { BUSINESS_ONBOARDING_DRAFT_STORAGE_KEY } from "../constants/business-onboarding-draft.constants";
 
 type Draft = {
   profileEmail: string;
@@ -38,7 +37,7 @@ export function useBusinessOnboardingDraft({
   const restoredDraft = useRef(false);
 
   const clearDraft = useCallback(() => {
-    window.sessionStorage.removeItem(STORAGE_KEY);
+    window.sessionStorage.removeItem(BUSINESS_ONBOARDING_DRAFT_STORAGE_KEY);
     restoredDraft.current = false;
     setHasDraft(false);
   }, []);
@@ -54,7 +53,10 @@ export function useBusinessOnboardingDraft({
         values: values as CompleteOwnerBusinessInput,
         updatedAt: Date.now(),
       };
-      window.sessionStorage.setItem(STORAGE_KEY, JSON.stringify(draft));
+      window.sessionStorage.setItem(
+        BUSINESS_ONBOARDING_DRAFT_STORAGE_KEY,
+        JSON.stringify(draft),
+      );
       setHasDraft(true);
     },
     [form.formState.isDirty, hydrated, profileEmail, step, values],
@@ -62,7 +64,9 @@ export function useBusinessOnboardingDraft({
 
   useEffect(() => {
     try {
-      const raw = window.sessionStorage.getItem(STORAGE_KEY);
+      const raw = window.sessionStorage.getItem(
+        BUSINESS_ONBOARDING_DRAFT_STORAGE_KEY,
+      );
       if (!raw) return;
       const draft = JSON.parse(raw) as Partial<Draft>;
       if (draft.profileEmail !== profileEmail || !draft.values) {

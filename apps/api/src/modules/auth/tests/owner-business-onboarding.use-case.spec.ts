@@ -20,9 +20,14 @@ const input = {
   owner: { username: 'owner' },
   business_profile: {
     address: {
-      country: 'Vietnam',
-      city: 'Hanoi',
-      street: '1 Example',
+      countryCode: 'VN',
+      addressLine1: '1 Example',
+      addressLine2: '',
+      locality: 'Hanoi',
+      administrativeAreaLevel1: 'Hanoi',
+      administrativeAreaLevel2: '',
+      postalCode: '100000',
+      formattedAddress: '1 Example, Hanoi, Vietnam',
       location: null,
     },
     opening_hours: Array.from({ length: 7 }, (_, day) => ({

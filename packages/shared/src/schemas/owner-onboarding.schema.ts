@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { globalAddressSchema } from "./location.schema.ts";
 
 export const registerOwnerAccountSchema = z
   .object({
@@ -15,19 +16,7 @@ export type RegisterOwnerAccountInput = z.input<
 >;
 
 export const businessProfileSchema = z.object({
-  address: z.object({
-    country: z.string().trim().min(2).max(80),
-    state: z.string().trim().max(100).optional(),
-    city: z.string().trim().min(1).max(100),
-    postal_code: z.string().trim().max(20).optional(),
-    street: z.string().trim().min(1).max(255),
-    location: z
-      .object({
-        latitude: z.number().min(-90).max(90),
-        longitude: z.number().min(-180).max(180),
-      })
-      .nullable(),
-  }),
+  address: globalAddressSchema,
   opening_hours: z
     .array(
       z

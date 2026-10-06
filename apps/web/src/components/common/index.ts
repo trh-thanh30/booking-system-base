@@ -7,4 +7,5 @@ export * from "./email-input";
 export * from "./google-icon";
 export * from "./password-input";
 export * from "./language-switcher";
+export * from "./location-picker";
 export * from "./landing-compositions";

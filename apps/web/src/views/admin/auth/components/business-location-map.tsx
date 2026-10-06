@@ -1,105 +1,111 @@
 "use client";
 
+import { AuthInput as Input, LocationPickerMap } from "@/src/components/common";
+import { geocodingService } from "@/src/services/admin/geocoding.service";
+import { useToast } from "@repo/hooks";
+import type {
+  ForwardGeocodingInput,
+  GeocodingAddress,
+  LocationCoordinates,
+} from "@repo/shared";
+import {
+  Button,
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@repo/ui";
+import { LoaderCircle, LocateFixed, MapPin, X } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
-import type { Map, Marker } from "leaflet";
-import { useTranslations } from "next-intl";
-import { Button } from "@repo/ui";
-import { AuthInput as Input } from "@/src/components/common";
-import { LocateFixed } from "lucide-react";
-import { mapConfig } from "@/src/config/map.config";
-
-type Location = { latitude: number; longitude: number } | null;
 
 export function BusinessLocationMap({
   value,
+  address,
   onChange,
+  onAddressChange,
+  onFormattedAddressChange,
   disabled,
 }: {
-  value: Location;
-  onChange: (location: Location) => void;
+  value: LocationCoordinates | null;
+  address: Omit<ForwardGeocodingInput, "locale">;
+  onChange: (location: LocationCoordinates | null) => void;
+  onAddressChange: (address: GeocodingAddress) => void;
+  onFormattedAddressChange: (address: string) => void;
   disabled?: boolean;
 }) {
   const t = useTranslations("AuthJourney");
-  const container = useRef<HTMLDivElement>(null);
-  const map = useRef<Map | null>(null);
-  const marker = useRef<Marker | null>(null);
+  const locale = useLocale() === "en" ? "en" : "vi";
+  const { toast } = useToast();
   const change = useRef(onChange);
   change.current = onChange;
-  const currentValue = useRef(value);
-  currentValue.current = value;
-  const isDisabled = useRef(disabled);
-  isDisabled.current = disabled;
+  const changeAddress = useRef(onAddressChange);
+  changeAddress.current = onAddressChange;
   const [error, setError] = useState("");
   const [locating, setLocating] = useState(false);
+  const [geocoding, setGeocoding] = useState<"forward" | "reverse" | null>(
+    null,
+  );
+  const geocodingRequest = useRef(0);
   const mounted = useRef(true);
   useEffect(() => {
     mounted.current = true;
-    let cancelled = false;
-    void import("leaflet")
-      .then((L) => {
-        if (cancelled || !container.current) return;
-        const center = currentValue.current ?? mapConfig.initialCenter;
-        const instance = L.map(container.current).setView(
-          [center.latitude, center.longitude],
-          13,
-        );
-        map.current = instance;
-        L.tileLayer(mapConfig.tileUrl, {
-          attribution: mapConfig.attribution,
-          maxZoom: 19,
-        })
-          .on("tileerror", () => {
-            if (!cancelled) setError("mapUnavailable");
-          })
-          .addTo(instance);
-        const pin = L.marker([center.latitude, center.longitude], {
-          draggable: true,
-          icon: L.divIcon({
-            className: "business-map-pin",
-            html: '<span aria-hidden="true"></span>',
-            iconSize: [28, 36],
-            iconAnchor: [14, 36],
-          }),
-        });
-        marker.current = pin;
-        if (currentValue.current) pin.addTo(instance);
-        pin.on("dragend", () => {
-          if (isDisabled.current) return;
-          const point = pin.getLatLng();
-          change.current({
-            latitude: Math.max(-90, Math.min(90, point.lat)),
-            longitude: ((((point.lng + 180) % 360) + 360) % 360) - 180,
-          });
-        });
-        instance.on("click", (event) => {
-          if (!isDisabled.current)
-            change.current({
-              latitude: Math.max(-90, Math.min(90, event.latlng.lat)),
-              longitude: ((((event.latlng.lng + 180) % 360) + 360) % 360) - 180,
-            });
-        });
-      })
-      .catch(() => {
-        if (!cancelled) setError("mapUnavailable");
-      });
     return () => {
-      cancelled = true;
       mounted.current = false;
-      map.current?.remove();
-      map.current = null;
-      marker.current = null;
     };
   }, []);
-  useEffect(() => {
-    const pin = marker.current;
-    const instance = map.current;
-    if (value && pin && instance) {
-      pin.setLatLng([value.latitude, value.longitude]).addTo(instance);
-      instance.panTo([value.latitude, value.longitude]);
-    } else if (pin && instance) instance.removeLayer(pin);
-    if (disabled) pin?.dragging?.disable();
-    else pin?.dragging?.enable();
-  }, [value, disabled]);
+
+  async function fillAddress(location: LocationCoordinates) {
+    const request = ++geocodingRequest.current;
+    setGeocoding("reverse");
+    try {
+      const result = await geocodingService.reverse({ ...location, locale });
+      if (request !== geocodingRequest.current || !mounted.current) return;
+      if (!result) {
+        toast.error(t("addressNotFound"));
+        return;
+      }
+      changeAddress.current(result.address);
+    } catch {
+      if (request === geocodingRequest.current && mounted.current) {
+        toast.error(t("geocodingFailed"));
+      }
+    } finally {
+      if (request === geocodingRequest.current && mounted.current) {
+        setGeocoding(null);
+      }
+    }
+  }
+
+  function selectLocation(location: LocationCoordinates) {
+    change.current(location);
+    void fillAddress(location);
+  }
+
+  async function findOnMap() {
+    if (disabled || geocoding) return;
+    const request = ++geocodingRequest.current;
+    setGeocoding("forward");
+    try {
+      const result = await geocodingService.forward({ ...address, locale });
+      if (request !== geocodingRequest.current || !mounted.current) return;
+      if (!result) {
+        toast.error(t("addressNotFound"));
+        return;
+      }
+      change.current(result.location);
+      onFormattedAddressChange(result.displayName);
+    } catch {
+      if (request === geocodingRequest.current && mounted.current) {
+        toast.error(t("geocodingFailed"));
+      }
+    } finally {
+      if (request === geocodingRequest.current && mounted.current) {
+        setGeocoding(null);
+      }
+    }
+  }
+
   function locate() {
     if (disabled || locating) return;
     if (!navigator.geolocation) {
@@ -112,7 +118,7 @@ export function BusinessLocationMap({
       (position) => {
         if (!mounted.current) return;
         setLocating(false);
-        change.current({
+        selectLocation({
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
         });
@@ -126,31 +132,74 @@ export function BusinessLocationMap({
       { timeout: 10000, maximumAge: 60000 },
     );
   }
+  const canFindOnMap = Boolean(
+    address.countryCode.trim() &&
+    address.locality.trim() &&
+    address.addressLine1.trim(),
+  );
   return (
     <div className="space-y-3">
       <p className="text-sm text-muted-foreground">{t("mapHint")}</p>
-      <Button
-        type="button"
-        variant="outline"
-        className="min-h-11 rounded-full"
-        disabled={disabled || locating}
-        onClick={locate}
-      >
-        <LocateFixed className="size-4" />
-        {t(locating ? "locating" : "locateMe")}
-      </Button>
-      <div
-        ref={container}
-        role="region"
-        aria-label={t("mapLabel")}
-        className="relative z-0 h-64 overflow-hidden rounded-md border bg-muted"
-      />
+      <div className="flex flex-wrap gap-2">
+        <Button
+          type="button"
+          variant="outline"
+          className="min-h-11 rounded-full"
+          disabled={disabled || !canFindOnMap || Boolean(geocoding)}
+          onClick={() => void findOnMap()}
+        >
+          {geocoding === "forward" ? (
+            <LoaderCircle aria-hidden="true" className="size-4 animate-spin" />
+          ) : (
+            <MapPin aria-hidden="true" className="size-4" />
+          )}
+          {t(geocoding === "forward" ? "findingOnMap" : "findOnMap")}
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          className="min-h-11 rounded-full"
+          disabled={disabled || locating || Boolean(geocoding)}
+          onClick={locate}
+        >
+          {locating ? (
+            <LoaderCircle aria-hidden="true" className="size-4 animate-spin" />
+          ) : (
+            <LocateFixed aria-hidden="true" className="size-4" />
+          )}
+          {t(locating ? "locating" : "locateMe")}
+        </Button>
+      </div>
+      <div className="relative">
+        <LocationPickerMap
+          value={value}
+          disabled={disabled}
+          ariaLabel={t("mapLabel")}
+          onChange={selectLocation}
+          onUnavailable={() => setError("mapUnavailable")}
+        />
+        {geocoding === "reverse" ? (
+          <div
+            role="status"
+            className="absolute left-3 top-3 z-[400] flex items-center gap-2 rounded-full border bg-card px-3 py-2 text-sm shadow-sm"
+          >
+            <LoaderCircle aria-hidden="true" className="size-4 animate-spin" />
+            {t("findingAddress")}
+          </div>
+        ) : null}
+      </div>
       {error ? (
         <p role="status" className="text-sm text-destructive">
           {t(error)}
         </p>
       ) : null}
-      <div className="grid grid-cols-2 gap-3">
+      <div
+        className={
+          value
+            ? "grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_2.75rem] items-end gap-3"
+            : "grid grid-cols-2 gap-3"
+        }
+      >
         {(["latitude", "longitude"] as const).map((coordinate) => (
           <label key={coordinate} className="space-y-2 text-sm">
             {t(coordinate)}
@@ -178,17 +227,27 @@ export function BusinessLocationMap({
             />
           </label>
         ))}
+        {value ? (
+          <TooltipProvider delayDuration={100}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="size-11 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                  disabled={disabled}
+                  aria-label={t("clearLocation")}
+                  onClick={() => onChange(null)}
+                >
+                  <X aria-hidden="true" className="size-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>{t("clearLocation")}</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        ) : null}
       </div>
-      {value ? (
-        <Button
-          type="button"
-          variant="ghost"
-          disabled={disabled}
-          onClick={() => onChange(null)}
-        >
-          {t("clearLocation")}
-        </Button>
-      ) : null}
     </div>
   );
 }
