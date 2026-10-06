@@ -4,7 +4,7 @@ import type {
   CompleteGoogleOwnerOnboardingInput,
   GoogleOnboardingProfile,
 } from "@repo/shared";
-import { BusinessOnboardingForm } from "./business-onboarding-form";
+import { BusinessOnboardingForm } from "./business-onboarding";
 
 export function GoogleBusinessForm({
   profile,
