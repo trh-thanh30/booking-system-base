@@ -20,9 +20,14 @@ token từ `@repo/ui/styles.css`, không duy trì brand palette riêng trong t�
 - `AuthenticationLayout` trong `src/components/layout` dùng chung cho đăng ký và Auth.
   Header dùng `src/components/layout/site-header.tsx`; Home chỉ compose navigation,
   Auth dùng cùng header không navigation. Không tạo một logo/header riêng cho Auth.
-  `PasswordInput` ở `src/components/common`; Business wizard/map nằm ở
-  `src/views/admin/auth/components`. Google redirect hook dùng chung ở `src/hooks`;
+  `PasswordInput` và Leaflet `LocationPickerMap` ở `src/components/common`;
+  Business wizard cùng field compose vị trí nằm ở `src/views/admin/auth/components`.
+  Google redirect hook dùng chung ở `src/hooks`;
   marketing không import Admin AuthProvider hoặc private API client để khởi tạo OAuth.
+- Form địa chỉ đa quốc gia lưu mã quốc gia ISO alpha-2 và contract trung lập gồm
+  `addressLine1/2`, `locality`, `administrativeAreaLevel1/2`, `postalCode`,
+  `formattedAddress`, `location`. Tên quốc gia và nhãn hành chính được dịch ở UI;
+  không lưu tên quốc gia đã dịch hoặc ép mọi quốc gia vào `ward/district/state`.
 - `app/[locale]/admin/(dashboard)`: protected dashboard shell/routes.
 - `app/[locale]/admin/layout.tsx`: một AuthProvider và private QueryClient dùng chung xuyên suốt Admin; marketing không bootstrap Admin.
 - `src/views/admin/<feature>`: các màn hình Admin, giữ role folders như rule dưới đây.
