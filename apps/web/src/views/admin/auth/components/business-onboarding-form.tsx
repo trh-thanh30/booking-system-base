@@ -187,6 +187,7 @@ export function BusinessOnboardingForm({
       return;
     }
     if (step < 2) {
+      draft.persistDraft(step + 1);
       setStep(step + 1);
       return;
     }
@@ -609,6 +610,7 @@ export function BusinessOnboardingForm({
               className="min-h-11 rounded-full flex-1"
               onClick={() => {
                 form.clearErrors();
+                draft.persistDraft(step - 1);
                 setStep(step - 1);
               }}
             >

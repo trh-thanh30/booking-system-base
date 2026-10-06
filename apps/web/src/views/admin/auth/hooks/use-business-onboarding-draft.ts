@@ -43,6 +43,23 @@ export function useBusinessOnboardingDraft({
     setHasDraft(false);
   }, []);
 
+  const persistDraft = useCallback(
+    (nextStep = step) => {
+      if (!hydrated || (!form.formState.isDirty && !restoredDraft.current)) {
+        return;
+      }
+      const draft: Draft = {
+        profileEmail,
+        step: nextStep,
+        values: values as CompleteOwnerBusinessInput,
+        updatedAt: Date.now(),
+      };
+      window.sessionStorage.setItem(STORAGE_KEY, JSON.stringify(draft));
+      setHasDraft(true);
+    },
+    [form.formState.isDirty, hydrated, profileEmail, step, values],
+  );
+
   useEffect(() => {
     try {
       const raw = window.sessionStorage.getItem(STORAGE_KEY);
@@ -77,17 +94,15 @@ export function useBusinessOnboardingDraft({
   }, [clearDraft, form, profileEmail, setStep]);
 
   useEffect(() => {
-    if (!hydrated || (!form.formState.isDirty && !restoredDraft.current))
-      return;
-    const draft: Draft = {
-      profileEmail,
-      step,
-      values: values as CompleteOwnerBusinessInput,
-      updatedAt: Date.now(),
-    };
-    window.sessionStorage.setItem(STORAGE_KEY, JSON.stringify(draft));
-    setHasDraft(true);
-  }, [form.formState.isDirty, hydrated, profileEmail, step, values]);
+    persistDraft();
+  }, [persistDraft]);
+
+  useEffect(() => {
+    if (!hydrated) return;
+    const handlePageHide = () => persistDraft();
+    window.addEventListener("pagehide", handlePageHide);
+    return () => window.removeEventListener("pagehide", handlePageHide);
+  }, [hydrated, persistDraft]);
 
   useEffect(() => {
     onDraftStateChange?.(hasDraft, clearDraft);
@@ -103,5 +118,5 @@ export function useBusinessOnboardingDraft({
     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
   }, [hasDraft, isPending]);
 
-  return { clearDraft, hasDraft, hasRestoredDraft, hydrated };
+  return { clearDraft, hasDraft, hasRestoredDraft, hydrated, persistDraft };
 }
