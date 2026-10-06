@@ -19,6 +19,7 @@ import {
   AvatarFallback,
   AvatarImage,
   Button,
+  CountrySelect,
   PhoneNumberInput,
   Select,
   SelectContent,
@@ -502,7 +503,36 @@ export function BusinessOnboardingForm({
         {step === 1 ? (
           <>
             <div className="grid gap-4 sm:grid-cols-2">
-              {field("business_profile.address.country", "country")}
+              <FormField
+                htmlFor="business-profile-address-country"
+                label={t("country")}
+                error={
+                  form.formState.errors.business_profile?.address?.country
+                    ?.message
+                }
+                required
+              >
+                <Controller
+                  control={form.control}
+                  name="business_profile.address.country"
+                  render={({ field: countryField }) => (
+                    <CountrySelect
+                      id="business-profile-address-country"
+                      locale={locale}
+                      value={countryField.value}
+                      onChange={countryField.onChange}
+                      disabled={busy}
+                      aria-invalid={Boolean(
+                        form.formState.errors.business_profile?.address
+                          ?.country,
+                      )}
+                      placeholder={t("placeholders.country")}
+                      searchPlaceholder={t("placeholders.countrySearch")}
+                      emptyMessage={t("placeholders.countryEmpty")}
+                    />
+                  )}
+                />
+              </FormField>
               {field("business_profile.address.state", "state", "text", false)}
               {field("business_profile.address.city", "city")}
               {field(

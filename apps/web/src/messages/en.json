@@ -16,6 +16,8 @@
       "timezoneSearch": "Search timezone...",
       "timezoneEmpty": "No timezone found.",
       "country": "e.g. Vietnam",
+      "countrySearch": "Search country...",
+      "countryEmpty": "No country found.",
       "state": "e.g. Hanoi",
       "city": "e.g. Hanoi",
       "postalCode": "e.g. 100000",
