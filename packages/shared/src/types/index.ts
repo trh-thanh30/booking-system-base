@@ -3,6 +3,7 @@ export * from "./api-response.types.ts";
 export * from "./asset.types.ts";
 export * from "./booking.types.ts";
 export * from "./business-category.types.ts";
+export * from "./business-slug.types.ts";
 export * from "./category.types.ts";
 export * from "./notification.types.ts";
 export * from "./pagination.types.ts";

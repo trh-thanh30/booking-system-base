@@ -1,6 +1,6 @@
 import { Public } from '@/common/decorators/public.decorator';
 import { ApiSuccess } from '@/common/decorators';
-import { Body, Controller, Get, Post, Req, Res } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, Req, Res } from '@nestjs/common';
 import type { Request, Response } from 'express';
 import { AuthCookieService } from '../services/auth-cookie.service';
 import { OwnerBusinessOnboardingUseCase } from '../use-cases/owner-business-onboarding.usecase';
@@ -9,6 +9,8 @@ import { RegisterOwnerAccountDto } from '../dto/register-owner-account.dto';
 import { VerifyEmailDto } from '../dto/verify-email.dto';
 import { LoginDto } from '../dto/login.dto';
 import { CompleteOwnerBusinessDto } from '../dto/complete-owner-business.dto';
+import { CheckBusinessSlugDto } from '../dto/check-business-slug.dto';
+import { CheckOwnerBusinessSlugUseCase } from '../use-cases/check-owner-business-slug.usecase';
 
 @Public()
 @Controller('auth/admin/onboarding')
@@ -17,6 +19,7 @@ export class OwnerOnboardingController {
     private readonly onboarding: OwnerBusinessOnboardingUseCase,
     private readonly registration: RegisterOwnerAccountUseCase,
     private readonly cookies: AuthCookieService,
+    private readonly checkBusinessSlug: CheckOwnerBusinessSlugUseCase,
   ) {}
 
   @Post('register')
@@ -53,6 +56,12 @@ export class OwnerOnboardingController {
     return this.onboarding.profile(
       this.cookies.getOwnerOnboardingCookie(request),
     );
+  }
+
+  @Get('check-slug')
+  @ApiSuccess('Business URL availability checked')
+  checkSlug(@Query() input: CheckBusinessSlugDto) {
+    return this.checkBusinessSlug.execute(input.slug);
   }
 
   @Post()

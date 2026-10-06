@@ -12,6 +12,7 @@ import type {
   CompleteGoogleOwnerOnboardingInput,
   GoogleOnboardingProfile,
   GoogleOwnerOnboardingResult,
+  BusinessSlugAvailability,
 } from "@repo/shared";
 import { unwrapApiData } from "@repo/shared";
 import { apiClient, publicAuthClient } from "@/src/lib/admin/api-client";
@@ -68,6 +69,13 @@ export const authService = {
     return unwrapApiData(
       await publicAuthClient.get<OwnerOnboardingProfile>(
         "/auth/admin/onboarding",
+      ),
+    );
+  },
+  async checkOwnerBusinessSlug(slug: string) {
+    return unwrapApiData(
+      await publicAuthClient.get<BusinessSlugAvailability>(
+        `/auth/admin/onboarding/check-slug?slug=${encodeURIComponent(slug)}`,
       ),
     );
   },

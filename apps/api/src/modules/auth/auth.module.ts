@@ -39,6 +39,7 @@ import { Module } from '@nestjs/common';
 import { OwnerOnboardingController } from './controllers/owner-onboarding.controller';
 import { OwnerOnboardingSessionService } from './services/owner-onboarding-session.service';
 import { OwnerBusinessOnboardingUseCase } from './use-cases/owner-business-onboarding.usecase';
+import { CheckOwnerBusinessSlugUseCase } from './use-cases/check-owner-business-slug.usecase';
 import { RegisterOwnerAccountUseCase } from './use-cases/register-owner-account.usecase';
 import { ConfigModule } from '@nestjs/config';
 
@@ -54,6 +55,7 @@ import { ConfigModule } from '@nestjs/config';
     RegisterOwnerUseCase,
     RegisterOwnerAccountUseCase,
     OwnerBusinessOnboardingUseCase,
+    CheckOwnerBusinessSlugUseCase,
     OwnerOnboardingSessionService,
     LoginUserUseCase,
     StartGoogleLoginUseCase,

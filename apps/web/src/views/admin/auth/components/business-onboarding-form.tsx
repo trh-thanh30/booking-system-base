@@ -12,17 +12,19 @@ import {
   type CompleteOwnerBusinessInput,
   type OwnerOnboardingProfile,
 } from "@repo/shared";
+import type { PhoneCountry } from "@repo/ui";
+import { Check, CircleX, LoaderCircle } from "lucide-react";
 import {
   Avatar,
   AvatarFallback,
   AvatarImage,
   Button,
+  PhoneNumberInput,
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-  PhoneNumberInput,
   TimezoneSelect,
   Tooltip,
   TooltipContent,
@@ -33,17 +35,17 @@ import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 import { Controller, useForm, type FieldPath } from "react-hook-form";
+import { authService } from "@/src/services/admin/auth.service";
+import { useBusinessOnboardingDraft } from "../hooks/use-business-onboarding-draft";
 import {
   createBookingHost,
   createBusinessSlug,
-  getCountryFromTimezone,
   getBrowserCountryName,
   getBrowserPhoneCountry,
   getBrowserTimezone,
+  getCountryFromTimezone,
 } from "../utils/business-onboarding.utils";
 import { BusinessLocationMap } from "./business-location-map";
-import { useBusinessOnboardingDraft } from "../hooks/use-business-onboarding-draft";
-import type { PhoneCountry } from "@repo/ui";
 
 export function BusinessOnboardingForm({
   profile,
@@ -107,6 +109,11 @@ export function BusinessOnboardingForm({
     onDraftStateChange,
   });
   const [phoneCountry, setPhoneCountry] = useState<PhoneCountry>("VN");
+  const [businessNameStatus, setBusinessNameStatus] = useState<
+    "idle" | "checking" | "available" | "unavailable" | "invalid" | "error"
+  >("idle");
+  const lastCheckedSlug = useRef("");
+  const availabilityRequest = useRef(0);
   useEffect(() => {
     if (!draft.hydrated || draft.hasRestoredDraft) return;
     const browserTimezone = getBrowserTimezone();
@@ -126,6 +133,11 @@ export function BusinessOnboardingForm({
   }, [draft.hasRestoredDraft, draft.hydrated, form, locale]);
   const busy = isPending || form.formState.isSubmitting;
   const businessSlug = createBusinessSlug(form.watch("name"));
+  useEffect(() => {
+    if (lastCheckedSlug.current === businessSlug) return;
+    availabilityRequest.current += 1;
+    setBusinessNameStatus("idle");
+  }, [businessSlug]);
   const bookingHost = createBookingHost(
     businessSlug || t("bookingUrlFallback"),
     siteConfig.bookingDomain,
@@ -134,6 +146,7 @@ export function BusinessOnboardingForm({
   const days = form.watch("business_profile.opening_hours");
   async function submit(input: CompleteOwnerBusinessInput) {
     if (isPending) return;
+    if (step === 0 && businessNameStatus !== "available") return;
     form.clearErrors();
     const normalizedInput = {
       ...input,
@@ -179,6 +192,32 @@ export function BusinessOnboardingForm({
     const result = completeOwnerBusinessSchema.safeParse(normalizedInput);
     if (result.success) await onSubmit(result.data);
   }
+  async function checkBusinessName() {
+    const name = form.getValues("name");
+    const slug = createBusinessSlug(name);
+    if (slug === lastCheckedSlug.current && businessNameStatus !== "error") {
+      return;
+    }
+    lastCheckedSlug.current = slug;
+    const validName =
+      completeOwnerBusinessSchema.shape.name.safeParse(name).success;
+    if (!validName || slug.length < 2) {
+      setBusinessNameStatus("invalid");
+      return;
+    }
+    const request = ++availabilityRequest.current;
+    setBusinessNameStatus("checking");
+    try {
+      const result = await authService.checkOwnerBusinessSlug(slug);
+      if (request !== availabilityRequest.current) return;
+      setBusinessNameStatus(result.available ? "available" : "unavailable");
+    } catch {
+      if (request === availabilityRequest.current) {
+        lastCheckedSlug.current = "";
+        setBusinessNameStatus("error");
+      }
+    }
+  }
   function field(
     name: FieldPath<CompleteOwnerBusinessInput>,
     label: string,
@@ -201,6 +240,70 @@ export function BusinessOnboardingForm({
           placeholder={t(`placeholders.${label}`)}
           {...form.register(name)}
         />
+      </FormField>
+    );
+  }
+  function businessNameField() {
+    const fieldError = form.getFieldState("name", form.formState).error
+      ?.message;
+    const statusError =
+      businessNameStatus === "unavailable" || businessNameStatus === "invalid"
+        ? t(
+            businessNameStatus === "unavailable"
+              ? "businessNameUnavailable"
+              : "businessNameInvalid",
+          )
+        : undefined;
+    const statusMessage =
+      businessNameStatus === "error" ? t("businessNameCheckFailed") : undefined;
+    const hasStatusError = Boolean(statusError || fieldError);
+    const statusIcon =
+      businessNameStatus === "checking" ? (
+        <LoaderCircle
+          aria-label={t("businessNameChecking")}
+          className="size-4 animate-spin text-muted-foreground"
+        />
+      ) : businessNameStatus === "available" ? (
+        <Check
+          aria-label={t("businessNameAvailable")}
+          className="size-4 text-success-600"
+        />
+      ) : hasStatusError || businessNameStatus === "error" ? (
+        <CircleX
+          aria-label={t("businessNameUnavailable")}
+          className="size-4 text-destructive"
+        />
+      ) : null;
+    return (
+      <FormField
+        htmlFor="name"
+        label={t("businessName")}
+        error={fieldError || statusError}
+        description={statusMessage}
+        descriptionRole="status"
+        descriptionClassName={
+          businessNameStatus === "error" ? "text-destructive" : undefined
+        }
+        required
+      >
+        <div className="relative">
+          <Input
+            id="name"
+            type="text"
+            placeholder={t("placeholders.businessName")}
+            className={hasStatusError ? "border-destructive pr-10" : "pr-10"}
+            aria-invalid={hasStatusError}
+            aria-required="true"
+            {...form.register("name", {
+              onBlur: () => void checkBusinessName(),
+            })}
+          />
+          {statusIcon ? (
+            <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
+              {statusIcon}
+            </span>
+          ) : null}
+        </div>
       </FormField>
     );
   }
@@ -284,7 +387,7 @@ export function BusinessOnboardingForm({
         <legend className="sr-only">{t(titles[step]!)}</legend>
         {step === 0 ? (
           <>
-            {field("name", "businessName")}
+            {businessNameField()}
             <p
               aria-live="polite"
               className="-mt-2 break-all text-xs text-muted-foreground"
@@ -468,12 +571,12 @@ export function BusinessOnboardingForm({
             ) : null}
           </>
         ) : null}
-        <div className="flex gap-3 pt-3">
+        <div className="flex gap-2 pt-3">
           {step > 0 ? (
             <Button
               type="button"
               variant="outline"
-              className="min-h-11 rounded-full"
+              className="min-h-11 rounded-full flex-1"
               onClick={() => {
                 form.clearErrors();
                 setStep(step - 1);
@@ -483,8 +586,10 @@ export function BusinessOnboardingForm({
             </Button>
           ) : null}
           <Button
-            className="min-h-11 flex-1 rounded-full"
-            disabled={busy}
+            className="min-h-11 rounded-full flex-1"
+            disabled={
+              busy || (step === 0 && businessNameStatus !== "available")
+            }
             type="submit"
           >
             {t(isPending ? "completing" : step === 2 ? "complete" : "continue")}
