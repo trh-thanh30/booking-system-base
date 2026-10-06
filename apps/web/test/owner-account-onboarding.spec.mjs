@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import test from "node:test";
 import {
   registerOwnerAccountSchema,
@@ -9,6 +10,21 @@ import {
   createBusinessSlug,
   getCountryFromTimezone,
 } from "../src/views/admin/auth/utils/business-onboarding.utils.ts";
+
+const businessInformationStepSource = readFileSync(
+  new URL(
+    "../src/views/admin/auth/components/business-onboarding/business-information-step.tsx",
+    import.meta.url,
+  ),
+  "utf8",
+);
+const businessOnboardingFormSource = readFileSync(
+  new URL(
+    "../src/views/admin/auth/components/business-onboarding/business-onboarding-form.tsx",
+    import.meta.url,
+  ),
+  "utf8",
+);
 
 const input = {
   business_category_id: "2518359c-6d0d-4ad8-a7ce-10f00eb36074",
@@ -73,6 +89,25 @@ test("onboarding derives the default country from the detected timezone", () => 
   assert.equal(getCountryFromTimezone("America/New_York"), "US");
   assert.equal(getCountryFromTimezone("not-a-timezone"), undefined);
 });
+
+test("business category is registered as a controlled form field", () => {
+  assert.match(
+    businessInformationStepSource,
+    /<Controller[\s\S]*?name="business_category_id"[\s\S]*?<Select/,
+  );
+  assert.match(
+    businessInformationStepSource,
+    /onValueChange=\{field\.onChange\}/,
+  );
+});
+
+test("a restored step-one business name is checked for availability once", () => {
+  assert.match(
+    businessOnboardingFormSource,
+    /draft\.hydrated[\s\S]*?draft\.hasRestoredDraft[\s\S]*?step !== 0[\s\S]*?checkBusinessName\(\)/,
+  );
+});
+
 test("business completion validates geographic bounds, timezone and unique daily intervals", () => {
   assert.equal(completeOwnerBusinessSchema.safeParse(input).success, true);
   assert.equal(

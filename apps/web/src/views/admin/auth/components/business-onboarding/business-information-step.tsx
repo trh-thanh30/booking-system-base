@@ -173,39 +173,40 @@ export function BusinessInformationStep({
         }
         required
       >
-        <Select
-          value={form.watch("business_category_id") || undefined}
-          disabled={disabled || categories.isPending || categories.isError}
-          onValueChange={(value) =>
-            form.setValue("business_category_id", value, {
-              shouldDirty: true,
-              shouldValidate: true,
-            })
-          }
-        >
-          <SelectTrigger
-            id="business-category"
-            aria-invalid={
-              Boolean(form.formState.errors.business_category_id) ||
-              categories.isError
-            }
-          >
-            <SelectValue
-              placeholder={
-                categories.isPending
-                  ? t("businessCategoryLoading")
-                  : t("placeholders.businessCategory")
-              }
-            />
-          </SelectTrigger>
-          <SelectContent>
-            {categories.data?.map((category) => (
-              <SelectItem key={category.id} value={category.id}>
-                {locale === "en" ? category.name_en : category.name_vi}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <Controller
+          control={form.control}
+          name="business_category_id"
+          render={({ field }) => (
+            <Select
+              value={field.value || undefined}
+              disabled={disabled || categories.isPending || categories.isError}
+              onValueChange={field.onChange}
+            >
+              <SelectTrigger
+                id="business-category"
+                aria-invalid={
+                  Boolean(form.formState.errors.business_category_id) ||
+                  categories.isError
+                }
+              >
+                <SelectValue
+                  placeholder={
+                    categories.isPending
+                      ? t("businessCategoryLoading")
+                      : t("placeholders.businessCategory")
+                  }
+                />
+              </SelectTrigger>
+              <SelectContent>
+                {categories.data?.map((category) => (
+                  <SelectItem key={category.id} value={category.id}>
+                    {locale === "en" ? category.name_en : category.name_vi}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+        />
         {categories.isError ? (
           <Button
             type="button"

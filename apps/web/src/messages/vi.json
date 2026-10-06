@@ -115,14 +115,19 @@
     "sessionExpired": "Phiên thiết lập đã hết hạn. Đăng nhập để tiếp tục thông tin doanh nghiệp.",
     "detailsConflict": "Tên đăng nhập, điện thoại hoặc đường dẫn đã được sử dụng. Vui lòng kiểm tra lại.",
     "completionFailed": "Chưa hoàn tất được thiết lập. Thông tin trên form vẫn được giữ, hãy thử lại.",
+    "draftRestored": "Đã khôi phục bản nháp của bạn.",
+    "draftSaving": "Đang lưu bản nháp…",
+    "draftSaved": "Đã tự động lưu bản nháp.",
+    "draftSaveFailed": "Chưa thể lưu bản nháp. Hãy giữ tab này mở và thử lại.",
+    "discardDraft": "Xóa bản nháp đã lưu",
+    "discardDraftDialog": {
+      "title": "Xóa bản nháp đã lưu?",
+      "description": "Thông tin đang hiển thị vẫn được giữ, nhưng sẽ không được khôi phục sau khi bạn rời trang nếu bạn không chỉnh sửa thêm.",
+      "cancel": "Giữ bản nháp",
+      "confirm": "Xóa bản nháp"
+    },
     "retry": "Thử lại",
-    "backToLogin": "Quay lại đăng nhập",
-    "leaveDialog": {
-      "title": "Rời khỏi quá trình thiết lập?",
-      "description": "Thông tin doanh nghiệp bạn đã nhập sẽ được lưu trong phiên này. Bạn có muốn xóa bản nháp và quay lại đăng nhập không?",
-      "stay": "Tiếp tục chỉnh sửa",
-      "leave": "Rời khỏi và xóa bản nháp"
-    }
+    "backToLogin": "Quay lại đăng nhập"
   },
   "Navigation": {
     "language": "Chọn ngôn ngữ",

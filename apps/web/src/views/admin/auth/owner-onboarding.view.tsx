@@ -5,13 +5,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useToast } from "@repo/hooks";
 import { HttpClientError, type CompleteOwnerBusinessInput } from "@repo/shared";
-import {
-  Button,
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogTitle,
-} from "@repo/ui";
+import { Button } from "@repo/ui";
 import { useRouter } from "@/src/i18n/navigation";
 import { authService } from "@/src/services/admin/auth.service";
 import { AuthShell, BusinessOnboardingForm } from "./components";
@@ -24,8 +18,6 @@ export function OwnerOnboardingView() {
   const submitted = useRef(false);
   const clearDraftRef = useRef<() => void>(() => undefined);
   const [expired, setExpired] = useState(false);
-  const [hasDraft, setHasDraft] = useState(false);
-  const [leaveDialogOpen, setLeaveDialogOpen] = useState(false);
   const profile = useQuery({
     queryKey: ["owner-onboarding-profile"],
     queryFn: authService.getOwnerOnboardingProfile,
@@ -50,7 +42,6 @@ export function OwnerOnboardingView() {
       submitted.current = false;
       const sessionExpired =
         failure instanceof HttpClientError && failure.status === 401;
-      if (sessionExpired) clearDraftRef.current();
       setExpired(sessionExpired);
       toast.error(
         t(
@@ -73,7 +64,6 @@ export function OwnerOnboardingView() {
     : null;
   useEffect(() => {
     if (!profileErrorKey) return;
-    if (terminal) clearDraftRef.current();
     toast.error(t(profileErrorKey), {
       id: "owner-onboarding-profile-error",
     });
@@ -81,15 +71,10 @@ export function OwnerOnboardingView() {
   const handleDraftStateChange = useCallback(
     (nextHasDraft: boolean, clearDraft: () => void) => {
       clearDraftRef.current = clearDraft;
-      setHasDraft(nextHasDraft);
+      void nextHasDraft;
     },
     [],
   );
-  const leaveToLogin = () => {
-    clearDraftRef.current();
-    setLeaveDialogOpen(false);
-    router.push("/admin/login");
-  };
   return (
     <AuthShell
       title={t("businessTitle")}
@@ -119,34 +104,12 @@ export function OwnerOnboardingView() {
         <Button
           variant="ghost"
           className="w-full"
-          onClick={() =>
-            hasDraft ? setLeaveDialogOpen(true) : router.push("/admin/login")
-          }
+          onClick={() => router.push("/admin/login")}
           type="button"
         >
           {t("backToLogin")}
         </Button>
       </div>
-      <Dialog open={leaveDialogOpen} onOpenChange={setLeaveDialogOpen}>
-        <DialogContent>
-          <DialogTitle>{t("leaveDialog.title")}</DialogTitle>
-          <DialogDescription className="mt-2">
-            {t("leaveDialog.description")}
-          </DialogDescription>
-          <div className="mt-5 flex justify-end gap-3">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setLeaveDialogOpen(false)}
-            >
-              {t("leaveDialog.stay")}
-            </Button>
-            <Button type="button" variant="destructive" onClick={leaveToLogin}>
-              {t("leaveDialog.leave")}
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
     </AuthShell>
   );
 }

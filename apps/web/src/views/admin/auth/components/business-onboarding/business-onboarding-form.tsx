@@ -11,6 +11,7 @@ import {
   AvatarFallback,
   AvatarImage,
   Button,
+  ConfirmDialog,
   Tooltip,
   TooltipContent,
   TooltipProvider,
@@ -54,8 +55,10 @@ export function BusinessOnboardingForm({
 }) {
   const t = useTranslations("AuthJourney");
   const [step, setStep] = useState<BusinessOnboardingStep>(0);
+  const [discardDialogOpen, setDiscardDialogOpen] = useState(false);
   const heading = useRef<HTMLHeadingElement>(null);
   const previousStep = useRef<BusinessOnboardingStep | null>(null);
+  const checkedRestoredBusinessName = useRef(false);
   const form = useForm<CompleteOwnerBusinessInput>({
     defaultValues: {
       business_category_id: "",
@@ -89,13 +92,43 @@ export function BusinessOnboardingForm({
     form,
     profileEmail: profile.email,
     step,
-    setStep: (value) => setStep(value as BusinessOnboardingStep),
+    setStep,
     isPending,
     onDraftStateChange,
   });
   const [phoneCountry, setPhoneCountry] = useState<PhoneCountry>("VN");
-  const businessName = useBusinessNameAvailability(form.watch("name"));
+  const {
+    check: checkBusinessName,
+    slug: businessSlug,
+    status: businessNameStatus,
+  } = useBusinessNameAvailability(form.watch("name"));
   const busy = isPending || form.formState.isSubmitting;
+
+  useEffect(() => {
+    if (
+      !draft.hydrated ||
+      !draft.hasRestoredDraft ||
+      step !== 0 ||
+      checkedRestoredBusinessName.current
+    ) {
+      return;
+    }
+    const restoredSlug = createBusinessSlug(form.getValues("name"));
+    if (!restoredSlug) {
+      checkedRestoredBusinessName.current = true;
+      return;
+    }
+    if (businessSlug !== restoredSlug) return;
+    checkedRestoredBusinessName.current = true;
+    void checkBusinessName();
+  }, [
+    businessSlug,
+    checkBusinessName,
+    draft.hasRestoredDraft,
+    draft.hydrated,
+    form,
+    step,
+  ]);
 
   useEffect(() => {
     if (previousStep.current !== null && previousStep.current !== step) {
@@ -122,7 +155,7 @@ export function BusinessOnboardingForm({
 
   async function submit(input: CompleteOwnerBusinessInput) {
     if (isPending) return;
-    if (step === 0 && businessName.status !== "available") return;
+    if (step === 0 && businessNameStatus !== "available") return;
     form.clearErrors();
     const normalizedInput = {
       ...input,
@@ -181,7 +214,7 @@ export function BusinessOnboardingForm({
   return (
     <FormProvider {...form}>
       <form
-        className="space-y-5"
+        className="space-y-1.5"
         noValidate
         onSubmit={form.handleSubmit(submit)}
       >
@@ -258,6 +291,37 @@ export function BusinessOnboardingForm({
             </div>
           </TooltipProvider>
         </div>
+        <div className="flex min-h-5 items-center justify-between ">
+          <p
+            aria-live="polite"
+            role="status"
+            className={`text-xs ${
+              draft.saveStatus === "error"
+                ? "text-destructive"
+                : "text-muted-foreground"
+            }`}
+          >
+            {draft.saveStatus === "restored"
+              ? t("draftRestored")
+              : draft.saveStatus === "saving"
+                ? t("draftSaving")
+                : draft.saveStatus === "saved"
+                  ? t("draftSaved")
+                  : draft.saveStatus === "error"
+                    ? t("draftSaveFailed")
+                    : null}
+          </p>
+          {draft.hasDraft ? (
+            <Button
+              type="button"
+              variant="ghost"
+              className="min-h-11 shrink-0 px-2 text-xs text-destructive hover:bg-transparent hover:text-destructive/80"
+              onClick={() => setDiscardDialogOpen(true)}
+            >
+              {t("discardDraft")}
+            </Button>
+          ) : null}
+        </div>
         <fieldset disabled={busy} className="space-y-4">
           <legend className="sr-only">{t(STEP_TITLES[step])}</legend>
           {step === 0 ? (
@@ -265,9 +329,9 @@ export function BusinessOnboardingForm({
               locale={locale}
               disabled={busy}
               phoneCountry={phoneCountry}
-              businessSlug={businessName.slug}
-              businessNameStatus={businessName.status}
-              onCheckBusinessName={businessName.check}
+              businessSlug={businessSlug}
+              businessNameStatus={businessNameStatus}
+              onCheckBusinessName={checkBusinessName}
             />
           ) : null}
           {step === 1 ? (
@@ -288,7 +352,7 @@ export function BusinessOnboardingForm({
             <Button
               className="min-h-11 rounded-full flex-1"
               disabled={
-                busy || (step === 0 && businessName.status !== "available")
+                busy || (step === 0 && businessNameStatus !== "available")
               }
               type="submit"
             >
@@ -299,6 +363,18 @@ export function BusinessOnboardingForm({
           </div>
         </fieldset>
       </form>
+      <ConfirmDialog
+        open={discardDialogOpen}
+        onOpenChange={setDiscardDialogOpen}
+        title={t("discardDraftDialog.title")}
+        description={t("discardDraftDialog.description")}
+        cancelLabel={t("discardDraftDialog.cancel")}
+        confirmLabel={t("discardDraftDialog.confirm")}
+        onConfirm={() => {
+          draft.clearDraft();
+          setDiscardDialogOpen(false);
+        }}
+      />
     </FormProvider>
   );
 }

@@ -2,18 +2,18 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useWatch, type UseFormReturn } from "react-hook-form";
+import type { CompleteOwnerBusinessInput } from "@repo/shared";
+import { BUSINESS_ONBOARDING_DRAFT_AUTOSAVE_DELAY_MS } from "../constants/business-onboarding-draft.constants";
+import type {
+  BusinessOnboardingDraftSaveStatus,
+  BusinessOnboardingStep,
+} from "../types/business-onboarding.types";
 import {
-  completeOwnerBusinessSchema,
-  type CompleteOwnerBusinessInput,
-} from "@repo/shared";
-import { BUSINESS_ONBOARDING_DRAFT_STORAGE_KEY } from "../constants/business-onboarding-draft.constants";
-
-type Draft = {
-  profileEmail: string;
-  step: number;
-  values: CompleteOwnerBusinessInput;
-  updatedAt: number;
-};
+  clearBusinessOnboardingDraft,
+  createBusinessOnboardingDraft,
+  loadBusinessOnboardingDraft,
+  saveBusinessOnboardingDraft,
+} from "../utils/business-onboarding-draft.utils";
 
 export function useBusinessOnboardingDraft({
   form,
@@ -25,8 +25,8 @@ export function useBusinessOnboardingDraft({
 }: {
   form: UseFormReturn<CompleteOwnerBusinessInput>;
   profileEmail: string;
-  step: number;
-  setStep: (step: number) => void;
+  step: BusinessOnboardingStep;
+  setStep: (step: BusinessOnboardingStep) => void;
   isPending: boolean;
   onDraftStateChange?: (hasDraft: boolean, clearDraft: () => void) => void;
 }) {
@@ -34,72 +34,80 @@ export function useBusinessOnboardingDraft({
   const [hydrated, setHydrated] = useState(false);
   const [hasDraft, setHasDraft] = useState(false);
   const [hasRestoredDraft, setHasRestoredDraft] = useState(false);
+  const [saveStatus, setSaveStatus] =
+    useState<BusinessOnboardingDraftSaveStatus>("idle");
   const restoredDraft = useRef(false);
+  const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const writeDraftRef = useRef<() => boolean | null>(() => null);
 
   const clearDraft = useCallback(() => {
-    window.sessionStorage.removeItem(BUSINESS_ONBOARDING_DRAFT_STORAGE_KEY);
+    if (saveTimer.current) clearTimeout(saveTimer.current);
+    clearBusinessOnboardingDraft(window.localStorage);
+    form.reset(form.getValues(), {
+      keepErrors: true,
+      keepTouched: true,
+    });
     restoredDraft.current = false;
+    setHasRestoredDraft(false);
     setHasDraft(false);
-  }, []);
+    setSaveStatus("idle");
+  }, [form]);
+
+  const writeDraft = useCallback(
+    (nextStep = step) => {
+      if (!hydrated || (!form.formState.isDirty && !restoredDraft.current)) {
+        return null;
+      }
+      const draft = createBusinessOnboardingDraft({
+        profileEmail,
+        step: nextStep,
+        values: form.getValues(),
+      });
+      return saveBusinessOnboardingDraft(window.localStorage, draft);
+    },
+    [form, hydrated, profileEmail, step],
+  );
+  writeDraftRef.current = writeDraft;
 
   const persistDraft = useCallback(
     (nextStep = step) => {
-      if (!hydrated || (!form.formState.isDirty && !restoredDraft.current)) {
-        return;
-      }
-      const draft: Draft = {
-        profileEmail,
-        step: nextStep,
-        values: values as CompleteOwnerBusinessInput,
-        updatedAt: Date.now(),
-      };
-      window.sessionStorage.setItem(
-        BUSINESS_ONBOARDING_DRAFT_STORAGE_KEY,
-        JSON.stringify(draft),
-      );
-      setHasDraft(true);
+      const saved = writeDraft(nextStep);
+      if (saved === null) return true;
+      setHasDraft(saved);
+      setSaveStatus(saved ? "saved" : "error");
+      return saved;
     },
-    [form.formState.isDirty, hydrated, profileEmail, step, values],
+    [step, writeDraft],
   );
 
   useEffect(() => {
-    try {
-      const raw = window.sessionStorage.getItem(
-        BUSINESS_ONBOARDING_DRAFT_STORAGE_KEY,
-      );
-      if (!raw) return;
-      const draft = JSON.parse(raw) as Partial<Draft>;
-      if (draft.profileEmail !== profileEmail || !draft.values) {
-        clearDraft();
-        return;
-      }
-      const parsed = completeOwnerBusinessSchema
-        .partial()
-        .safeParse(draft.values);
-      if (
-        !parsed.success ||
-        typeof draft.step !== "number" ||
-        draft.step < 0 ||
-        draft.step > 2
-      ) {
-        clearDraft();
-        return;
-      }
-      form.reset(parsed.data as CompleteOwnerBusinessInput);
+    const draft = loadBusinessOnboardingDraft(
+      window.localStorage,
+      profileEmail,
+    );
+    if (draft) {
+      form.reset(draft.values);
       setStep(draft.step);
       restoredDraft.current = true;
       setHasRestoredDraft(true);
       setHasDraft(true);
-    } catch {
-      clearDraft();
-    } finally {
-      setHydrated(true);
+      setSaveStatus("restored");
     }
-  }, [clearDraft, form, profileEmail, setStep]);
+    setHydrated(true);
+  }, [form, profileEmail, setStep]);
 
   useEffect(() => {
-    persistDraft();
-  }, [persistDraft]);
+    if (!hydrated || !form.formState.isDirty) return;
+    setSaveStatus("saving");
+    if (saveTimer.current) clearTimeout(saveTimer.current);
+    saveTimer.current = setTimeout(
+      () => persistDraft(),
+      BUSINESS_ONBOARDING_DRAFT_AUTOSAVE_DELAY_MS,
+    );
+    return () => {
+      if (saveTimer.current) clearTimeout(saveTimer.current);
+    };
+  }, [form.formState.isDirty, hydrated, persistDraft, values]);
 
   useEffect(() => {
     if (!hydrated) return;
@@ -108,19 +116,38 @@ export function useBusinessOnboardingDraft({
     return () => window.removeEventListener("pagehide", handlePageHide);
   }, [hydrated, persistDraft]);
 
+  useEffect(
+    () => () => {
+      if (saveTimer.current) clearTimeout(saveTimer.current);
+      writeDraftRef.current();
+    },
+    [],
+  );
+
   useEffect(() => {
     onDraftStateChange?.(hasDraft, clearDraft);
   }, [clearDraft, hasDraft, onDraftStateChange]);
 
   useEffect(() => {
-    if (!hasDraft || isPending) return;
+    if (isPending || (saveStatus !== "saving" && saveStatus !== "error")) {
+      return;
+    }
     const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-      event.preventDefault();
-      event.returnValue = "";
+      if (!persistDraft()) {
+        event.preventDefault();
+        event.returnValue = "";
+      }
     };
     window.addEventListener("beforeunload", handleBeforeUnload);
     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
-  }, [hasDraft, isPending]);
+  }, [isPending, persistDraft, saveStatus]);
 
-  return { clearDraft, hasDraft, hasRestoredDraft, hydrated, persistDraft };
+  return {
+    clearDraft,
+    hasDraft,
+    hasRestoredDraft,
+    hydrated,
+    persistDraft,
+    saveStatus,
+  };
 }
