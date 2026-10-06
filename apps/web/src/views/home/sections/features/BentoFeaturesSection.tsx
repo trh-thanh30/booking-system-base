@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { ArrowRight, ChevronDown, Video, Link2 } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@repo/ui";
+import { useTranslations } from "next-intl";
 import {
   LandingSection,
   LandingContainer,
@@ -17,6 +18,7 @@ import {
 } from "./constants/bento-features.constants";
 
 export function BentoFeaturesSection() {
+  const t = useTranslations("landing_page_home.features");
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
   const [activeGroup, setActiveGroup] = useState<string>(FEATURE_GROUPS[0].id);
   const shouldReduceMotion = useReducedMotion();
@@ -35,13 +37,15 @@ export function BentoFeaturesSection() {
           {/* Section Header */}
           <div className="text-center max-w-5xl mx-auto space-y-4">
             <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-foreground leading-[1.12] text-balance">
-              One platform for{" "}
-              <span className="text-primary">every appointment</span>
+              {t.rich("title", {
+                highlight: (chunks) => (
+                  <span className="text-primary">{chunks}</span>
+                ),
+              })}
             </h2>
 
             <p className="mt-5 text-base sm:text-lg lg:text-xl text-muted-foreground leading-relaxed max-w-3xl mx-auto">
-              Keep availability, booking links, calendar sync, and reminders
-              working together.
+              {t("description")}
             </p>
 
             <div className="flex items-center justify-center gap-2 pt-2 sm:gap-3.5">
@@ -49,14 +53,14 @@ export function BentoFeaturesSection() {
                 href="#pricing"
                 className="inline-flex shrink-0 items-center justify-center gap-2 px-4 py-3 rounded-full bg-primary text-primary-foreground text-sm sm:text-base font-bold hover:bg-primary-hover transition-colors shadow-xs sm:px-7"
               >
-                <span>Get started</span>
+                <span>{t("getStarted")}</span>
                 <ArrowRight className="w-4 h-4" />
               </a>
               <a
                 href="#how-it-works"
                 className="inline-flex shrink-0 items-center justify-center gap-2 px-4 py-3 rounded-full bg-surface border border-input text-foreground text-sm sm:text-base font-bold hover:bg-muted transition-colors shadow-xs sm:px-7"
               >
-                <span>Book a demo</span>
+                <span>{t("bookDemo")}</span>
                 <ArrowRight className="w-4 h-4 text-muted-foreground" />
               </a>
             </div>
@@ -68,26 +72,25 @@ export function BentoFeaturesSection() {
             <div className="rounded-3xl border border-border bg-muted/70 p-8 sm:p-10 flex flex-col justify-between space-y-6 shadow-xs hover:border-primary/40 transition-all min-h-[340px]">
               <div className="space-y-2">
                 <h3 className="text-xl sm:text-2xl font-extrabold text-foreground tracking-tight">
-                  Avoid meeting overload
+                  {t("benefits.overload.title")}
                 </h3>
                 <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-                  Set daily limits and add buffers around events to sanitize and
-                  reset.
+                  {t("benefits.overload.description")}
                 </p>
               </div>
 
               {/* Compact Mockup: Notice & Buffers */}
               <div className="rounded-2xl border border-border bg-surface p-5 space-y-3.5 shadow-xs">
                 <p className="text-xs sm:text-sm font-bold text-foreground">
-                  Notice and buffers
+                  {t("benefits.overload.panelTitle")}
                 </p>
                 <div className="space-y-2.5 text-xs sm:text-sm">
                   <div className="space-y-1">
                     <span className="text-xs font-semibold text-muted-foreground">
-                      Minimum notice
+                      {t("benefits.overload.minimumNotice")}
                     </span>
                     <div className="flex items-center justify-between px-3.5 py-2 rounded-xl border border-border bg-muted text-foreground font-medium">
-                      <span>24 hours</span>
+                      <span>{t("benefits.overload.hours")}</span>
                       <ChevronDown className="w-4 h-4 text-muted-foreground" />
                     </div>
                   </div>
@@ -95,19 +98,19 @@ export function BentoFeaturesSection() {
                   <div className="grid grid-cols-2 gap-3">
                     <div className="space-y-1">
                       <span className="text-xs font-semibold text-muted-foreground">
-                        Buffer before
+                        {t("benefits.overload.before")}
                       </span>
                       <div className="flex items-center justify-between px-3.5 py-2 rounded-xl border border-border bg-muted text-foreground font-medium">
-                        <span>15 mins</span>
+                        <span>{t("benefits.overload.minutes")}</span>
                         <ChevronDown className="w-4 h-4 text-muted-foreground" />
                       </div>
                     </div>
                     <div className="space-y-1">
                       <span className="text-xs font-semibold text-muted-foreground">
-                        Buffer after
+                        {t("benefits.overload.after")}
                       </span>
                       <div className="flex items-center justify-between px-3.5 py-2 rounded-xl border border-border bg-muted text-foreground font-medium">
-                        <span>15 mins</span>
+                        <span>{t("benefits.overload.minutes")}</span>
                         <ChevronDown className="w-4 h-4 text-muted-foreground" />
                       </div>
                     </div>
@@ -120,11 +123,10 @@ export function BentoFeaturesSection() {
             <div className="rounded-3xl border border-border bg-muted/70 p-8 sm:p-10 flex flex-col justify-between space-y-6 shadow-xs hover:border-primary/40 transition-all min-h-[340px]">
               <div className="space-y-2">
                 <h3 className="text-xl sm:text-2xl font-extrabold text-foreground tracking-tight">
-                  Stand out with a custom booking link
+                  {t("benefits.link.title")}
                 </h3>
                 <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-                  Short, clean link that clients easily remember without messy
-                  URLs.
+                  {t("benefits.link.description")}
                 </p>
               </div>
 
@@ -133,7 +135,7 @@ export function BentoFeaturesSection() {
                 <div className="flex justify-center">
                   <div className="px-4 py-1 rounded-full border border-border bg-surface shadow-xs text-xs font-mono text-foreground font-semibold inline-flex items-center gap-1.5">
                     <Link2 className="w-3.5 h-3.5 text-muted-foreground" />
-                    <span>cal.com/bailey</span>
+                    <span>bookingbase.com/{t("benefits.link.slug")}</span>
                   </div>
                 </div>
 
@@ -144,10 +146,10 @@ export function BentoFeaturesSection() {
                     </div>
                     <div>
                       <p className="text-xs text-muted-foreground">
-                        Bailey Pumfleet
+                        {t("benefits.link.author")}
                       </p>
                       <p className="text-sm font-bold text-foreground">
-                        Business meeting
+                        {t("benefits.link.meeting")}
                       </p>
                     </div>
                   </div>
@@ -171,7 +173,7 @@ export function BentoFeaturesSection() {
                     <span className="inline-flex items-center gap-1.5">
                       <Video className="w-3.5 h-3.5" /> Zoom
                     </span>
-                    <span>North America/California</span>
+                    <span>{t("benefits.link.timezone")}</span>
                   </div>
                 </div>
               </div>
@@ -181,11 +183,10 @@ export function BentoFeaturesSection() {
             <div className="rounded-3xl border border-border bg-muted/70 p-8 sm:p-10 flex flex-col justify-between space-y-6 shadow-xs hover:border-primary/40 transition-all min-h-[340px]">
               <div className="space-y-2">
                 <h3 className="text-xl sm:text-2xl font-extrabold text-foreground tracking-tight">
-                  Streamline your bookers&apos; experience
+                  {t("benefits.experience.title")}
                 </h3>
                 <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-                  Let bookers overlay their calendar and reschedule with zero
-                  friction.
+                  {t("benefits.experience.description")}
                 </p>
               </div>
 
@@ -196,7 +197,7 @@ export function BentoFeaturesSection() {
                     <div className="w-6 h-3.5 rounded-full bg-primary relative p-0.5">
                       <div className="w-2.5 h-2.5 rounded-full bg-primary-foreground ml-auto" />
                     </div>
-                    <span>Overlay my calendar</span>
+                    <span>{t("benefits.experience.overlay")}</span>
                   </div>
                   <span className="text-muted-foreground font-semibold">
                     12h / 24h
@@ -206,34 +207,34 @@ export function BentoFeaturesSection() {
                 <div className="grid grid-cols-4 gap-2 text-center text-xs">
                   <div className="space-y-1">
                     <span className="font-semibold text-muted-foreground">
-                      Wed 06
+                      {t("benefits.experience.wed")}
                     </span>
                     <div className="p-1.5 rounded-lg bg-muted text-foreground font-medium truncate text-[11px]">
-                      Lunch date
+                      {t("benefits.experience.lunch")}
                     </div>
                   </div>
                   <div className="space-y-1">
                     <span className="font-semibold text-muted-foreground">
-                      Thu 07
+                      {t("benefits.experience.thu")}
                     </span>
                     <div className="p-1.5 rounded-lg bg-primary text-primary-foreground font-medium truncate text-[11px]">
-                      Coffee 11am
+                      {t("benefits.experience.coffee")}
                     </div>
                   </div>
                   <div className="space-y-1">
                     <span className="font-semibold text-muted-foreground">
-                      Fri 08
+                      {t("benefits.experience.fri")}
                     </span>
                     <div className="p-1.5 rounded-lg border border-dashed border-input text-muted-foreground text-[11px]">
-                      Open slot
+                      {t("benefits.experience.open")}
                     </div>
                   </div>
                   <div className="space-y-1">
                     <span className="font-semibold text-muted-foreground">
-                      Sat 09
+                      {t("benefits.experience.sat")}
                     </span>
                     <div className="p-1.5 rounded-lg bg-muted text-foreground font-medium truncate text-[11px]">
-                      Hiring call
+                      {t("benefits.experience.hiring")}
                     </div>
                   </div>
                 </div>
@@ -244,11 +245,10 @@ export function BentoFeaturesSection() {
             <div className="rounded-3xl border border-border bg-muted/70 p-8 sm:p-10 flex flex-col justify-between space-y-6 shadow-xs hover:border-primary/40 transition-all min-h-[340px]">
               <div className="space-y-2">
                 <h3 className="text-xl sm:text-2xl font-extrabold text-foreground tracking-tight">
-                  Reduce no-shows with automated reminders
+                  {t("benefits.reminders.title")}
                 </h3>
                 <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-                  Instant confirmation and multi-step reminders before every
-                  session.
+                  {t("benefits.reminders.description")}
                 </p>
               </div>
 
@@ -256,19 +256,19 @@ export function BentoFeaturesSection() {
               <div className="py-3 flex items-center justify-center">
                 <div className="w-full rounded-2xl border border-border bg-surface p-4 shadow-xs flex items-center gap-3.5">
                   <div className="w-10 h-10 rounded-xl bg-primary text-primary-foreground flex items-center justify-center font-bold text-xs shrink-0">
-                    Cal
+                    B
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center justify-between">
                       <p className="text-xs sm:text-sm font-bold text-foreground truncate">
-                        New booking confirmed
+                        {t("benefits.reminders.confirmed")}
                       </p>
                       <span className="text-[11px] text-muted-foreground shrink-0">
-                        Just now
+                        {t("benefits.reminders.now")}
                       </span>
                     </div>
                     <p className="text-xs text-muted-foreground truncate mt-0.5">
-                      James Oliver booked a 30min discovery call.
+                      {t("benefits.reminders.notification")}
                     </p>
                   </div>
                 </div>
@@ -281,17 +281,15 @@ export function BentoFeaturesSection() {
         <div className="space-y-12 pt-4">
           <div className="text-center max-w-5xl mx-auto space-y-3">
             <h3 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-foreground leading-tight text-balance">
-              <span className="block">
-                The <span className="text-primary">features you need.</span>
-              </span>
-              <span className="block">
-                A dashboard that{" "}
-                <span className="text-primary">stays focused.</span>
-              </span>
+              {t.rich("configurable.title", {
+                line: (chunks) => <span className="block">{chunks}</span>,
+                highlight: (chunks) => (
+                  <span className="text-primary">{chunks}</span>
+                ),
+              })}
             </h3>
             <p className="text-base sm:text-lg text-muted-foreground max-w-xl mx-auto">
-              Show or hide features to match how you work, keeping unused tools
-              out of your way. Your plan and pricing stay the same.
+              {t("configurable.description")}
             </p>
           </div>
 
@@ -305,7 +303,7 @@ export function BentoFeaturesSection() {
           >
             <div className="text-center">
               <TabsList
-                aria-label="Feature categories"
+                aria-label={t("configurable.categoriesLabel")}
                 className="grid h-auto w-full grid-cols-3 gap-1 rounded-none bg-transparent p-0 sm:inline-flex sm:w-auto sm:gap-4"
               >
                 {FEATURE_GROUPS.map((group) => (
@@ -315,12 +313,12 @@ export function BentoFeaturesSection() {
                     className="h-auto min-h-12 whitespace-normal rounded-none border-b-2 border-transparent px-2 py-3 text-sm text-muted-foreground hover:text-primary data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:shadow-none sm:whitespace-nowrap sm:px-4 sm:text-base"
                   >
                     <span>
-                      {group.label.split(" ").map((word, index) => (
-                        <span key={word} className="block sm:inline">
-                          {index > 0 ? " " : ""}
-                          {word}
-                        </span>
-                      ))}
+                      <span className="block sm:inline">
+                        {t(`groups.${group.id}.line1`)}
+                      </span>{" "}
+                      <span className="block sm:inline">
+                        {t(`groups.${group.id}.line2`)}
+                      </span>
                     </span>
                   </TabsTrigger>
                 ))}
@@ -368,7 +366,7 @@ export function BentoFeaturesSection() {
 
                             return (
                               <div
-                                key={card.title}
+                                key={card.id}
                                 onMouseEnter={() => setHoveredIdx(idx)}
                                 onMouseLeave={() => setHoveredIdx(null)}
                                 className={`relative rounded-3xl border border-border bg-surface h-[220px] sm:h-[240px] shadow-xs hover:border-primary/40 hover:shadow-md transition-all duration-300 cursor-pointer overflow-hidden select-none active:scale-[0.98] ${
@@ -398,7 +396,7 @@ export function BentoFeaturesSection() {
 
                                   {/* Title */}
                                   <h4 className="text-sm sm:text-base font-bold text-foreground tracking-tight mt-4 leading-snug px-1">
-                                    {card.title}
+                                    {t(`items.${card.id}.title`)}
                                   </h4>
                                 </div>
 
@@ -418,10 +416,10 @@ export function BentoFeaturesSection() {
 
                                   {/* Title & Description */}
                                   <h4 className="text-base sm:text-lg font-bold text-foreground tracking-tight">
-                                    {card.title}
+                                    {t(`items.${card.id}.title`)}
                                   </h4>
                                   <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed mt-2.5 max-w-[240px]">
-                                    {card.description}
+                                    {t(`items.${card.id}.description`)}
                                   </p>
                                 </div>
                               </div>
@@ -434,7 +432,7 @@ export function BentoFeaturesSection() {
               })}
             </div>
             <h3 className="text-center text-3xl font-extrabold tracking-tight text-foreground leading-tight sm:text-4xl lg:text-5xl">
-              …and so much more!
+              {t("andMore")}
             </h3>
           </Tabs>
         </div>

@@ -1,6 +1,7 @@
 {
   "Navigation": {
     "language": "Choose language",
+    "languageChanged": "Language switched to English.",
     "mainNavigation": "Main navigation",
     "openMenu": "Open menu",
     "closeMenu": "Close menu",

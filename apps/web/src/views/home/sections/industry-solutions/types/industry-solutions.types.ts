@@ -1,14 +1,14 @@
 export interface IndustryHighlight {
-  title: string;
-  description: string;
+  titleKey: string;
+  descriptionKey: string;
 }
 
 export interface IndustryItem {
   id: string;
-  label: string;
-  badge: string;
-  title: string;
-  description: string;
+  labelKey: string;
+  badgeKey: string;
+  titleKey: string;
+  descriptionKey: string;
   image: string;
   highlights: IndustryHighlight[];
   mockup: {

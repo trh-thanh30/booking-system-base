@@ -3,28 +3,23 @@ import type { IndustryItem } from "../types/industry-solutions.types";
 export const INDUSTRIES_DATA: IndustryItem[] = [
   {
     id: "hair",
-    label: "Hair Salons",
-    badge: "HAIR SALON & COLOR STUDIOS",
-    title:
-      "Automate chair rotations, processing buffer times & commission splits.",
-    description:
-      "Designed specifically for high-volume salons and independent colorists. Let clients book complex multi-step treatments with built-in gap times to take walk-ins while color sets.",
+    labelKey: "industries.hair.label",
+    badgeKey: "industries.hair.badge",
+    titleKey: "industries.hair.title",
+    descriptionKey: "industries.hair.description",
     image: "/images/landing/industry-solutions/hair-salon.webp",
     highlights: [
       {
-        title: "Processing Buffer Times",
-        description:
-          "Automatically open slots for blowout or quick trims while a client's balayage color processes.",
+        titleKey: "industries.hair.highlights.h0.title",
+        descriptionKey: "industries.hair.highlights.h0.description",
       },
       {
-        title: "Station & Chair Management",
-        description:
-          "Prevent double-booking washing stations and hot styling chairs with resource allocation rules.",
+        titleKey: "industries.hair.highlights.h1.title",
+        descriptionKey: "industries.hair.highlights.h1.description",
       },
       {
-        title: "Tiered Stylist Pricing & Commissions",
-        description:
-          "Set independent pricing and commission splits automatically based on junior vs. senior stylist levels.",
+        titleKey: "industries.hair.highlights.h2.title",
+        descriptionKey: "industries.hair.highlights.h2.description",
       },
     ],
     mockup: {
@@ -45,27 +40,23 @@ export const INDUSTRIES_DATA: IndustryItem[] = [
   },
   {
     id: "nails",
-    label: "Nails & Lashes",
-    badge: "NAILS, LASH & BROW ATELIERS",
-    title: "Visual menu add-ons, shape tiers and fast station turnaround.",
-    description:
-      "Give clients visual lookbooks to pick nail length, shaping, gel art tiers, and lash extensions before they sit in the chair—eliminating checkout surprise and timing delays.",
+    labelKey: "industries.nails.label",
+    badgeKey: "industries.nails.badge",
+    titleKey: "industries.nails.title",
+    descriptionKey: "industries.nails.description",
     image: "/images/landing/industry-solutions/nails-lash.webp",
     highlights: [
       {
-        title: "Visual Lookbook & Art Tier Selection",
-        description:
-          "Clients pick nail art complexity (Chrome, 3D Charms, French) upfront with exact time estimates.",
+        titleKey: "industries.nails.highlights.h0.title",
+        descriptionKey: "industries.nails.highlights.h0.description",
       },
       {
-        title: "Combo Service Booking",
-        description:
-          "Let clients book simultaneous mani-pedi or lash + brow appointments across two technicians.",
+        titleKey: "industries.nails.highlights.h1.title",
+        descriptionKey: "industries.nails.highlights.h1.description",
       },
       {
-        title: "Automated Fill-in Reminders",
-        description:
-          "Prompt clients automatically at 2 and 3 weeks for lash fills or gel maintenance before nails grow out.",
+        titleKey: "industries.nails.highlights.h2.title",
+        descriptionKey: "industries.nails.highlights.h2.description",
       },
     ],
     mockup: {
@@ -86,27 +77,23 @@ export const INDUSTRIES_DATA: IndustryItem[] = [
   },
   {
     id: "spa",
-    label: "Spas & Wellness",
-    badge: "DAY SPAS, MASSAGE & RETREATS",
-    title: "Room assignment, therapist preferences and intake health forms.",
-    description:
-      "Manage private treatment suites, sauna rotations, and massage rooms automatically. Collect intake questionnaires and health allergy disclosures prior to arrival.",
+    labelKey: "industries.spa.label",
+    badgeKey: "industries.spa.badge",
+    titleKey: "industries.spa.title",
+    descriptionKey: "industries.spa.description",
     image: "/images/landing/industry-solutions/spa-wellness.webp",
     highlights: [
       {
-        title: "Private Room & Suite Allocation",
-        description:
-          "Link appointments to specialized private rooms (Aromatherapy Suite, Vichy Shower, Sauna Cabins).",
+        titleKey: "industries.spa.highlights.h0.title",
+        descriptionKey: "industries.spa.highlights.h0.description",
       },
       {
-        title: "Digital Health Intake Forms",
-        description:
-          "Clients complete allergy, pressure preference, and injury disclosures digitally before check-in.",
+        titleKey: "industries.spa.highlights.h1.title",
+        descriptionKey: "industries.spa.highlights.h1.description",
       },
       {
-        title: "Custom Membership & Package Credits",
-        description:
-          "Sell 5-pack massage packages and monthly wellness subscriptions that redeem automatically at checkout.",
+        titleKey: "industries.spa.highlights.h2.title",
+        descriptionKey: "industries.spa.highlights.h2.description",
       },
     ],
     mockup: {
@@ -127,28 +114,23 @@ export const INDUSTRIES_DATA: IndustryItem[] = [
   },
   {
     id: "clinics",
-    label: "Clinics & Aesthetics",
-    badge: "MEDICAL AESTHETICS & DERMATOLOGY",
-    title:
-      "Practitioner scheduling, consent signing and clinical treatment logs.",
-    description:
-      "Enterprise-grade reliability for medical aesthetics, skin clinics, and cosmetic injectors. Secure patient notes, repeat appointment sequences, and strict deposit protection.",
+    labelKey: "industries.clinics.label",
+    badgeKey: "industries.clinics.badge",
+    titleKey: "industries.clinics.title",
+    descriptionKey: "industries.clinics.description",
     image: "/images/landing/industry-solutions/clinics.webp",
     highlights: [
       {
-        title: "Multi-Session Treatment Plans",
-        description:
-          "Schedule recurring series (e.g. 4-session Laser or Microneedling spaced 4 weeks apart) in one click.",
+        titleKey: "industries.clinics.highlights.h0.title",
+        descriptionKey: "industries.clinics.highlights.h0.description",
       },
       {
-        title: "Digital Consent & Before/After Vault",
-        description:
-          "Store signed procedure consents and private clinical progress photos directly in the client file.",
+        titleKey: "industries.clinics.highlights.h1.title",
+        descriptionKey: "industries.clinics.highlights.h1.description",
       },
       {
-        title: "Deposit Protection for High-Value Slots",
-        description:
-          "Secure non-refundable consult deposits with automated card pre-authorization to eliminate empty doctor hours.",
+        titleKey: "industries.clinics.highlights.h2.title",
+        descriptionKey: "industries.clinics.highlights.h2.description",
       },
     ],
     mockup: {
@@ -169,27 +151,23 @@ export const INDUSTRIES_DATA: IndustryItem[] = [
   },
   {
     id: "barber",
-    label: "Barbershops & Studios",
-    badge: "BARBERSHOPS & INDEPENDENT PROS",
-    title: "Live walk-in waitlists, 15-minute fades and chair rental payouts.",
-    description:
-      "Keep barber chairs full all day with combined appointment bookings and live online walk-in queueing. Allow independent barbers to track their own payouts and tips seamlessly.",
+    labelKey: "industries.barber.label",
+    badgeKey: "industries.barber.badge",
+    titleKey: "industries.barber.title",
+    descriptionKey: "industries.barber.description",
     image: "/images/landing/industry-solutions/barbershop.webp",
     highlights: [
       {
-        title: "Hybrid Booking & Live Waitlist",
-        description:
-          "Blend online reservations with real-time digital walk-in queueing so chairs never sit empty.",
+        titleKey: "industries.barber.highlights.h0.title",
+        descriptionKey: "industries.barber.highlights.h0.description",
       },
       {
-        title: "Fast 15/30-Minute Time Slots",
-        description:
-          "Tight slot scheduling optimized for rapid fades, beard trims, and hot towel line-ups.",
+        titleKey: "industries.barber.highlights.h1.title",
+        descriptionKey: "industries.barber.highlights.h1.description",
       },
       {
-        title: "Individual Barber Accounts & Cashout",
-        description:
-          "Each barber has their own login, calendar, tip tracker, and daily booth rental ledger.",
+        titleKey: "industries.barber.highlights.h2.title",
+        descriptionKey: "industries.barber.highlights.h2.description",
       },
     ],
     mockup: {

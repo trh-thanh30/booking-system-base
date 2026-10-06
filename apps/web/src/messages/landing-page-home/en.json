@@ -1,0 +1,939 @@
+{
+  "navigation": {
+    "features": "Features",
+    "industries": "Industries",
+    "pricing": "Pricing",
+    "resources": "Resources",
+    "onlineBooking": "Online booking",
+    "staffScheduling": "Staff scheduling",
+    "calendarManagement": "Calendar management",
+    "payments": "Payments & deposits",
+    "reminders": "Automated reminders",
+    "reports": "Reports & analytics",
+    "description1": "Let customers book services online 24/7.",
+    "description2": "Manage staff availability and working hours.",
+    "description3": "Avoid double bookings with smart availability.",
+    "description4": "Accept deposits or full payments during booking.",
+    "description5": "Send reminders to reduce no-shows.",
+    "description6": "Track bookings, revenue and business performance.",
+    "hair": "Hair Salons",
+    "nails": "Nails & Lashes",
+    "spas": "Spas & Wellness",
+    "clinics": "Clinics & Aesthetics",
+    "barbers": "Barbershops & Studios",
+    "allIndustries": "All industries",
+    "help": "Help Center",
+    "blog": "Blog",
+    "faq": "FAQ",
+    "login": "Log in",
+    "trial": "Start free trial"
+  },
+  "hero": {
+    "title": "One Intelligent Booking System<br></br> for <highlight>Every Business Need</highlight>",
+    "description": "Manage scheduling, appointments, payments, staff allocations, and automated workflows in one flexible, high-performance platform.",
+    "startTrial": "Start 14-Day Free Trial",
+    "liveDemo": "See Live Demo",
+    "trust": {
+      "noCard": "No credit card required",
+      "quickSetup": "5-minute instant setup",
+      "calendarSync": "Multi-calendar 2-way sync"
+    },
+    "reviews": "{count, number} reviews",
+    "minutes": "{count, number} mins",
+    "availableToday": "Available Today",
+    "instantBooking": "Instant Booking",
+    "templates": {
+      "coaching": {
+        "name": "Green Meadows Coaching",
+        "avatarText": "G",
+        "category": "Executive Coaching",
+        "tagline": "Executive Leadership & Business Advisory",
+        "services": {
+          "leadership": "1-on-1 Leadership Strategy",
+          "scaling": "Business Scaling Discovery"
+        },
+        "cta": "Book Consultation"
+      },
+      "beauty": {
+        "name": "Lumière Spa & Beauty",
+        "avatarText": "L",
+        "category": "Spa & Wellness",
+        "tagline": "Relaxation Treatments & Skin Rejuvenation",
+        "services": {
+          "massage": "Hot Stone Therapy Massage",
+          "facial": "Deep Cleansing Facial"
+        },
+        "cta": "Book Appointment"
+      },
+      "health": {
+        "name": "BrightCare Dental Clinic",
+        "avatarText": "B",
+        "category": "Healthcare & Clinic",
+        "tagline": "Specialist Dental Care • No Waiting",
+        "services": {
+          "checkup": "General Dental Checkup",
+          "whitening": "Laser Whitening Care"
+        },
+        "cta": "Book Dental Visit"
+      },
+      "fitness": {
+        "name": "Apex Flow Yoga & Fitness",
+        "avatarText": "A",
+        "category": "Fitness & Studio",
+        "tagline": "Small Group Classes & Personal Training",
+        "services": {
+          "vinyasa": "Morning Vinyasa Group",
+          "pilates": "Private Reformer Pilates"
+        },
+        "cta": "Book Workout Session"
+      },
+      "consulting": {
+        "name": "CodeCraft Advisory",
+        "avatarText": "C",
+        "category": "Tech Mentorship",
+        "tagline": "System Architecture & Senior Tech Lead Development",
+        "services": {
+          "architecture": "System Architecture Review",
+          "interview": "Mock Interview & Feedback"
+        },
+        "cta": "Book Advisory Call"
+      },
+      "creative": {
+        "name": "Kroma Visual Studio",
+        "avatarText": "K",
+        "category": "Photography & Studio",
+        "tagline": "Portrait Photography & Brand Lookbooks",
+        "services": {
+          "portrait": "Personal Branding Portrait",
+          "lookbook": "Lookbook Concept Session"
+        },
+        "cta": "Book Photo Shoot"
+      }
+    }
+  },
+  "pillars": {
+    "title": "The all-in-one platform<br></br><highlight>for booking, payments and more.</highlight>",
+    "description": "Everything you need to run your service business, manage client appointments, and accept payments seamlessly.",
+    "seeFeatures": "See top features",
+    "cards": {
+      "scheduling": {
+        "title": "Simplify scheduling",
+        "description": "Manage your availability from the app and enable customers to book appointments or classes online.",
+        "features": {
+          "f0": "Mobile app for iOS and Android to manage appointments on the go",
+          "f1": "Free customer booking website",
+          "f2": "Automated email and SMS reminders with smart assistant",
+          "f3": "Recurring appointments",
+          "f4": "Multi-location management",
+          "f5": "Instagram and Google integration",
+          "f6": "Cancellation and no-show fees",
+          "f7": "Let clients book multiple services with different providers online",
+          "f8": "Class booking"
+        }
+      },
+      "pos": {
+        "title": "Maximize your POS",
+        "description": "Check out at the counter, keep a card on file or send an invoice—our point of sale is flexible.",
+        "features": {
+          "f0": "Contactless, in-person payments",
+          "f1": "Card on file",
+          "f2": "Prepayment before visits",
+          "f3": "Unlimited items and item search",
+          "f4": "Key in payments",
+          "f5": "Professional invoices",
+          "f6": "Digital and physical gift cards",
+          "f7": "Accept offline payments",
+          "f8": "PCI-compliant data security"
+        }
+      },
+      "people": {
+        "title": "Put people first",
+        "description": "Prioritize your customers and your staff with client profiles and team management tools.",
+        "features": {
+          "f0": "Client profiles with appointment history",
+          "f1": "Custom client notes and formula logs",
+          "f2": "Team member permissions and access levels",
+          "f3": "Staff commission and tip tracking",
+          "f4": "Individual staff calendars and shifts",
+          "f5": "Client loyalty tags",
+          "f6": "Time-off requests and approvals",
+          "f7": "Automated feedback and reviews"
+        }
+      },
+      "business": {
+        "title": "Run your business",
+        "description": "Sell on social channels, sync your inventory and manage operations without added office time.",
+        "features": {
+          "f0": "Bookings directly from social profiles",
+          "f1": "Two-way sync with Google and Apple calendars",
+          "f2": "Embeddable booking widget for any website",
+          "f3": "Automated waitlist notifications",
+          "f4": "Sales, tips and staff performance reports",
+          "f5": "Customer directory export for accounting",
+          "f6": "Automated email and SMS campaigns",
+          "f7": "24/7 client self-service rescheduling"
+        }
+      }
+    },
+    "demo": {
+      "november2026": "November 2026",
+      "day": "Day",
+      "week": "Week",
+      "weekdays": {
+        "d0": "S",
+        "d1": "M",
+        "d2": "T",
+        "d3": "W",
+        "d4": "T",
+        "d5": "F",
+        "d6": "S"
+      },
+      "shortHair": "Short Hair Cut & Styling • Station 2",
+      "facial": "Deep Cleansing Facial • Sarah J.",
+      "beard": "Classic Beard Grooming",
+      "quickServices": "Services",
+      "favorites": "Favorites",
+      "services": {
+        "hairCut": "Hair Cut",
+        "facialCare": "Facial Care",
+        "manicure": "Manicure",
+        "blowdry": "Blowdry",
+        "hotStone": "Hot Stone",
+        "lookbook": "Lookbook"
+      },
+      "currentSale": "Current Sale (2)",
+      "hairCutStyle": "Hair Cut & Style",
+      "manicureSet": "Manicure Set",
+      "tax": "Tax (8%)",
+      "charge": "Charge {amount}",
+      "clientsStaff": "Clients",
+      "totalClients": "{count, number} total",
+      "clientSince": "Client since 2024 • Preferred: Sarah J.",
+      "preferences": "Preferences",
+      "allergy": "• Allergic to lavender scents",
+      "cardEnding": "• Card on file ending in ···· 4242",
+      "attendance": "• 0 no-shows (100% attendance)",
+      "lifetimeSpend": "Lifetime Spend:",
+      "following": "Following",
+      "hydration": "Hydration Therapy Glow",
+      "hydrationDescription": "Instant 60-min revitalizing facial. Tap below to book the next available slot today.",
+      "bookWebsite": "Book on Website",
+      "shareLink": "Share Link",
+      "atelier": "Hair & Beauty Atelier",
+      "socialBioLine1": "Modern Balayage & Lived-in Blonde Specialists.",
+      "socialBioLine2": "Book appointments directly below",
+      "bookNow": "Book Now",
+      "instantInApp": "INSTANT IN-APP BOOKING",
+      "checkout": "30s checkout",
+      "balayage": "Balayage & Hair Care",
+      "tomorrow": "Tomorrow • 10:30 AM (Sarah J.)",
+      "confirm": "Confirm in 1 Tap →",
+      "names": {
+        "christina": "Christina Lay",
+        "derrick": "Derrick Thornton",
+        "cliff": "Cliff Bowman",
+        "lauren": "Lauren N.",
+        "elisa": "Elisa Rizzo",
+        "emi": "Emi Watanabe",
+        "cameron": "Cameron Riley",
+        "natalia": "Natalia Keogh"
+      }
+    },
+    "growth": {
+      "badge": "Growth",
+      "title": "Turn social followers into instant bookings.",
+      "description": "Embed your booking link directly in Instagram, TikTok, Facebook Bio and Google Maps. Clients browsing your portfolio can lock in appointments in 30 seconds without leaving their social app.",
+      "learnMore": "Learn more about social bio booking"
+    },
+    "migration": {
+      "title": "Switching from another system?",
+      "description": "We provide free 1-on-1 migration for your client records, service menus and calendar schedules in under 24 hours.",
+      "cta": "Let's have a talk"
+    }
+  },
+  "features": {
+    "title": "One platform for <highlight>every appointment</highlight>",
+    "description": "Keep availability, booking links, calendar sync, and reminders working together.",
+    "getStarted": "Get started",
+    "bookDemo": "Book a demo",
+    "benefits": {
+      "overload": {
+        "title": "Avoid meeting overload",
+        "description": "Set daily limits and add buffers around events to sanitize and reset.",
+        "panelTitle": "Notice and buffers",
+        "minimumNotice": "Minimum notice",
+        "hours": "24 hours",
+        "before": "Buffer before",
+        "after": "Buffer after",
+        "minutes": "15 mins"
+      },
+      "link": {
+        "title": "Stand out with a custom booking link",
+        "description": "Use a short, clean link that clients can remember without messy URLs.",
+        "meeting": "Business meeting",
+        "timezone": "North America/California",
+        "author": "Bailey Pumfleet",
+        "slug": "bailey"
+      },
+      "experience": {
+        "title": "Streamline your bookers' experience",
+        "description": "Let bookers overlay their calendar and reschedule with zero friction.",
+        "overlay": "Overlay my calendar",
+        "wed": "Wed 06",
+        "thu": "Thu 07",
+        "fri": "Fri 08",
+        "sat": "Sat 09",
+        "lunch": "Lunch date",
+        "coffee": "Coffee 11am",
+        "open": "Open slot",
+        "hiring": "Hiring call"
+      },
+      "reminders": {
+        "title": "Reduce no-shows with automated reminders",
+        "description": "Send instant confirmations and multi-step reminders before every session.",
+        "confirmed": "New booking confirmed",
+        "now": "Just now",
+        "notification": "James Oliver booked a 30min discovery call."
+      }
+    },
+    "configurable": {
+      "title": "<line>The <highlight>features you need.</highlight></line><line>A dashboard that <highlight>stays focused.</highlight></line>",
+      "description": "Show or hide features to match how you work, keeping unused tools out of your way. Your plan and pricing stay the same.",
+      "categoriesLabel": "Feature categories"
+    },
+    "groups": {
+      "core": {
+        "line1": "Core",
+        "line2": "Features"
+      },
+      "business": {
+        "line1": "Business",
+        "line2": "Essentials"
+      },
+      "client": {
+        "line1": "Client",
+        "line2": "Experience"
+      }
+    },
+    "items": {
+      "payments": {
+        "title": "Accept payments",
+        "description": "Monetize your bookings through our Stripe integration."
+      },
+      "video": {
+        "title": "Video Introductions",
+        "description": "Welcome clients with a personal greeting or salon tour before booking."
+      },
+      "socialProof": {
+        "title": "Live Social Proof",
+        "description": "Display verified reviews and client quotes directly on your booking page."
+      },
+      "faqWidgets": {
+        "title": "FAQ Widgets",
+        "description": "Answer questions about deposits, parking and preparation upfront."
+      },
+      "themes": {
+        "title": "Brand Themes & Colors",
+        "description": "Tailor colors, dark mode and typography to match your brand."
+      },
+      "domain": {
+        "title": "Custom Domain",
+        "description": "Use your branded URL with automatic SSL included."
+      },
+      "waivers": {
+        "title": "Intake & Waivers",
+        "description": "Collect consultation questionnaires and waivers before arrival."
+      },
+      "packages": {
+        "title": "Packages & Passes",
+        "description": "Sell multi-session bundles, prepaid passes and memberships."
+      },
+      "embeds": {
+        "title": "Flexible Embeds",
+        "description": "Embed a calendar, floating booking button or popup modal."
+      },
+      "documents": {
+        "title": "Document Sharing",
+        "description": "Automatically share aftercare guides and preparation instructions."
+      },
+      "languages": {
+        "title": "Multi-Language",
+        "description": "Offer localized booking flows in Vietnamese and English."
+      },
+      "privacy": {
+        "title": "Privacy First",
+        "description": "Handle client data responsibly with PCI-compliant card authorizations."
+      },
+      "notifications": {
+        "title": "Custom Notifications",
+        "description": "Create personalized SMS and Zalo reminders in your brand voice."
+      },
+      "onlineBooking": {
+        "title": "Online Booking",
+        "description": "Let clients choose a service, provider and available appointment time."
+      },
+      "availability": {
+        "title": "Smart Availability",
+        "description": "Set working hours, minimum notice and buffer times."
+      },
+      "calendarSync": {
+        "title": "Calendar Sync",
+        "description": "Keep connected calendars aligned and avoid overlapping appointments."
+      },
+      "recurring": {
+        "title": "Recurring Appointments",
+        "description": "Schedule repeat visits and treatment series efficiently."
+      },
+      "deposits": {
+        "title": "Booking Deposits",
+        "description": "Collect an upfront deposit to protect valuable appointment slots."
+      },
+      "team": {
+        "title": "Team Management",
+        "description": "Organize schedules, service assignments and access permissions."
+      },
+      "locations": {
+        "title": "Multiple Locations",
+        "description": "Manage appointments and teams across all your locations."
+      },
+      "reports": {
+        "title": "Business Reports",
+        "description": "Review revenue, booking trends and staff performance."
+      },
+      "rescheduling": {
+        "title": "Self-Service Rescheduling",
+        "description": "Let clients move appointments within your booking rules."
+      },
+      "reminders": {
+        "title": "Appointment Reminders",
+        "description": "Send confirmations and reminders before every visit."
+      },
+      "profiles": {
+        "title": "Client Profiles",
+        "description": "Keep history, preferences and service notes together."
+      }
+    },
+    "andMore": "…and so much more!"
+  },
+  "industrySolutions": {
+    "title": "Tailored workflows for<br></br><highlight>your exact trade.</highlight>",
+    "description": "Whether you run a high-volume salon, a private medical aesthetic clinic, or a boutique wellness sanctuary, our platform adapts to your booking mechanics.",
+    "previous": "Previous industry",
+    "next": "Next industry",
+    "explore": "Explore {industry} setup",
+    "industries": {
+      "hair": {
+        "label": "Hair Salons",
+        "badge": "HAIR SALON & COLOR STUDIOS",
+        "title": "Automate chair rotations, processing buffer times & commission splits.",
+        "description": "Designed specifically for high-volume salons and independent colorists. Let clients book complex multi-step treatments with built-in gap times to take walk-ins while color sets.",
+        "highlights": {
+          "h0": {
+            "title": "Processing Buffer Times",
+            "description": "Automatically open slots for blowout or quick trims while a client's balayage color processes."
+          },
+          "h1": {
+            "title": "Station & Chair Management",
+            "description": "Prevent double-booking washing stations and hot styling chairs with resource allocation rules."
+          },
+          "h2": {
+            "title": "Tiered Stylist Pricing & Commissions",
+            "description": "Set independent pricing and commission splits automatically based on junior vs. senior stylist levels."
+          }
+        }
+      },
+      "nails": {
+        "label": "Nails & Lashes",
+        "badge": "NAILS, LASH & BROW ATELIERS",
+        "title": "Visual menu add-ons, shape tiers and fast station turnaround.",
+        "description": "Give clients visual lookbooks to pick nail length, shaping, gel art tiers, and lash extensions before they sit in the chair—eliminating checkout surprise and timing delays.",
+        "highlights": {
+          "h0": {
+            "title": "Visual Lookbook & Art Tier Selection",
+            "description": "Clients pick nail art complexity (Chrome, 3D Charms, French) upfront with exact time estimates."
+          },
+          "h1": {
+            "title": "Combo Service Booking",
+            "description": "Let clients book simultaneous mani-pedi or lash + brow appointments across two technicians."
+          },
+          "h2": {
+            "title": "Automated Fill-in Reminders",
+            "description": "Prompt clients automatically at 2 and 3 weeks for lash fills or gel maintenance before nails grow out."
+          }
+        }
+      },
+      "spa": {
+        "label": "Spas & Wellness",
+        "badge": "DAY SPAS, MASSAGE & RETREATS",
+        "title": "Room assignment, therapist preferences and intake health forms.",
+        "description": "Manage private treatment suites, sauna rotations, and massage rooms automatically. Collect intake questionnaires and health allergy disclosures prior to arrival.",
+        "highlights": {
+          "h0": {
+            "title": "Private Room & Suite Allocation",
+            "description": "Link appointments to specialized private rooms (Aromatherapy Suite, Vichy Shower, Sauna Cabins)."
+          },
+          "h1": {
+            "title": "Digital Health Intake Forms",
+            "description": "Clients complete allergy, pressure preference, and injury disclosures digitally before check-in."
+          },
+          "h2": {
+            "title": "Custom Membership & Package Credits",
+            "description": "Sell 5-pack massage packages and monthly wellness subscriptions that redeem automatically at checkout."
+          }
+        }
+      },
+      "clinics": {
+        "label": "Clinics & Aesthetics",
+        "badge": "MEDICAL AESTHETICS & DERMATOLOGY",
+        "title": "Practitioner scheduling, consent signing and clinical treatment logs.",
+        "description": "Enterprise-grade reliability for medical aesthetics, skin clinics, and cosmetic injectors. Secure patient notes, repeat appointment sequences, and strict deposit protection.",
+        "highlights": {
+          "h0": {
+            "title": "Multi-Session Treatment Plans",
+            "description": "Schedule recurring series (e.g. 4-session Laser or Microneedling spaced 4 weeks apart) in one click."
+          },
+          "h1": {
+            "title": "Digital Consent & Before/After Vault",
+            "description": "Store signed procedure consents and private clinical progress photos directly in the client file."
+          },
+          "h2": {
+            "title": "Deposit Protection for High-Value Slots",
+            "description": "Secure non-refundable consult deposits with automated card pre-authorization to eliminate empty doctor hours."
+          }
+        }
+      },
+      "barber": {
+        "label": "Barbershops & Studios",
+        "badge": "BARBERSHOPS & INDEPENDENT PROS",
+        "title": "Live walk-in waitlists, 15-minute fades and chair rental payouts.",
+        "description": "Keep barber chairs full all day with combined appointment bookings and live online walk-in queueing. Allow independent barbers to track their own payouts and tips seamlessly.",
+        "highlights": {
+          "h0": {
+            "title": "Hybrid Booking & Live Waitlist",
+            "description": "Blend online reservations with real-time digital walk-in queueing so chairs never sit empty."
+          },
+          "h1": {
+            "title": "Fast 15/30-Minute Time Slots",
+            "description": "Tight slot scheduling optimized for rapid fades, beard trims, and hot towel line-ups."
+          },
+          "h2": {
+            "title": "Individual Barber Accounts & Cashout",
+            "description": "Each barber has their own login, calendar, tip tracker, and daily booth rental ledger."
+          }
+        }
+      }
+    }
+  },
+  "customization": {
+    "title": "Make your booking page <highlight>your own</highlight>",
+    "description": "Bring your brand to life with reviews, videos, FAQs and custom domains.",
+    "previous": "Previous customization slide",
+    "explore": "Drag or swipe to explore",
+    "next": "Next customization slide",
+    "testimonials": {
+      "title": "Testimonials",
+      "rating": "5.0 Star Rating",
+      "verifiedClient": "Verified Client",
+      "role": "Director of Sales Operations",
+      "quote": "Switching from HubSpot to Salesforce was a gamechanger for us. With SmartRoute, our lead response time dropped by 80% and we saw a 30% jump in conversions in the first month.",
+      "synced": "Google & Yelp Synced",
+      "verified": "100% Verified",
+      "author": "Alex Martinez"
+    },
+    "faq": {
+      "title": "FAQ",
+      "heading": "FAQs",
+      "liveWidget": "Live Widget",
+      "question1": "1. What is your pricing?",
+      "answer1": "Our plans start at {minimum} per user and go up to {maximum} per user for enterprise-grade features.",
+      "question2": "2. How long does implementation take?",
+      "answer2": "Most businesses launch their booking flow in under 15 minutes with zero coding.",
+      "footer": "Expandable accordion on client checkout"
+    },
+    "files": {
+      "title": "Files",
+      "heading": "Documents & Intake",
+      "autoSent": "Auto-sent",
+      "documents": "Documents",
+      "intake": "Intake & Waivers",
+      "delivery": "Automatic email & SMS delivery",
+      "total": "1.4 MB Total"
+    },
+    "about": {
+      "title": "About",
+      "heading": "About me",
+      "bio": "Hi! I'm Jessica Martinez, a licensed consultant with 10+ years of experience helping clients achieve their goals. Whether you're a first-time booker or scaling your routine, I provide expert advice and personalized guidance every step of the way.",
+      "sessions": "1,200+ Sessions Completed",
+      "verified": "Verified Pro"
+    },
+    "videos": {
+      "title": "Videos",
+      "featured": "Featured Greeting",
+      "tour": "Studio Tour",
+      "description": "Meet your specialist before your session",
+      "author": "Elena Rostova"
+    },
+    "domain": {
+      "title": "Custom Domain",
+      "colors": "Brand Color Presets",
+      "checkout": "Custom Styled Checkout",
+      "whiteLabel": "100% white-label with zero third-party badges"
+    }
+  },
+  "faq": {
+    "title": "Questions before you start?",
+    "description": "Find quick answers about templates, booking pages, payments, trials and platform features.",
+    "groups": [
+      {
+        "title": "Product & booking",
+        "items": {
+          "coding-skills": {
+            "question": "Do I need coding skills to create my booking page?",
+            "answer": "No. Start from a template, customize your services, branding and booking rules, then publish without coding."
+          },
+          "reduce-no-shows": {
+            "question": "How does BookingBase help reduce no-shows?",
+            "answer": "Online deposits, confirmations and automated SMS or email reminders help reduce missed appointments."
+          },
+          "download-app": {
+            "question": "Do customers need to download an app to book?",
+            "answer": "No. Customers can book from your public page in any mobile, tablet or desktop browser."
+          },
+          "multi-location": {
+            "question": "Can I manage multiple locations and staff shifts?",
+            "answer": "Yes. Manage locations, staff availability, service assignments and shifts from your dashboard."
+          },
+          "custom-domain": {
+            "question": "Can I use my own custom domain?",
+            "answer": "Yes. Selected plans let you publish your booking page under your own brand."
+          }
+        }
+      },
+      {
+        "title": "Trial & Early Access",
+        "items": {
+          "trial-card": {
+            "question": "Do I need a credit card for the 14-day trial?",
+            "answer": "No. Start the 14-day trial without a card and you will not be auto-charged."
+          },
+          "after-trial": {
+            "question": "What happens after the 14-day trial?",
+            "answer": "Choose a paid plan, contact us for setup help, or let the trial end without an automatic charge."
+          },
+          "feedback-rewards": {
+            "question": "What feedback may qualify for Early Access rewards?",
+            "answer": "Workflow ideas, bug reports, integration requests and detailed booking notes may qualify."
+          },
+          "rewards-guaranteed": {
+            "question": "Are Early Access rewards guaranteed?",
+            "answer": "No. Rewards are reviewed case by case and are not guaranteed."
+          },
+          "submit-feedback": {
+            "question": "Where can I submit feedback?",
+            "answer": "Email feedback@bookingbase.com or use the feedback link in the Early Access section."
+          }
+        }
+      }
+    ],
+    "cta": {
+      "title": "Still have questions?",
+      "description": "Reach our support team, or book a 15-minute walkthrough with a product specialist.",
+      "contact": "Contact support",
+      "demo": "Book a demo"
+    }
+  },
+  "footer": {
+    "description": "The high-performance booking platform and scheduling engine for modern service businesses.",
+    "social": {
+      "linkedin": "LinkedIn",
+      "x": "X",
+      "youtube": "YouTube",
+      "github": "GitHub"
+    },
+    "columns": {
+      "product": {
+        "title": "Product",
+        "features": "Features",
+        "pricing": "Pricing",
+        "templates": "Templates",
+        "integrations": "Integrations",
+        "changelog": "Changelog"
+      },
+      "company": {
+        "title": "Company",
+        "about": "About",
+        "blog": "Blog",
+        "careers": "Careers",
+        "pressKit": "Press kit",
+        "contactSales": "Contact sales"
+      },
+      "resources": {
+        "title": "Resources",
+        "help": "Help center",
+        "docs": "Documentation",
+        "api": "API reference",
+        "community": "Community",
+        "status": "Status"
+      },
+      "legal": {
+        "title": "Legal",
+        "privacy": "Privacy policy",
+        "terms": "Terms of service",
+        "cookies": "Cookie policy",
+        "gdpr": "GDPR",
+        "dpa": "DPA"
+      }
+    },
+    "copyright": "© 2026 BookingBase Ltd. All rights reserved."
+  },
+  "pricing": {
+    "title": "Choose a plan that grows",
+    "titleHighlight": "with your service business.",
+    "description": "Start with a 14-day trial. Upgrade, downgrade or cancel anytime — no long-term commitment.",
+    "monthly": "Monthly",
+    "annual": "Annual",
+    "save20": "Save 20%",
+    "currency": "Currency:",
+    "mostPopular": "Most popular",
+    "perMonth": "/month",
+    "billedMonthly": "Billed monthly · cancel anytime",
+    "annualSavings": "Save {amount}/year",
+    "everythingIn": "Everything in {plan}",
+    "everythingInExtra": "Plus the additional features below",
+    "starterSummary": {
+      "title": "All the essentials to start",
+      "description": "Manage bookings, services and clients."
+    },
+    "customTrial": "Custom trial & support available",
+    "trialIncluded": "14-day free trial included",
+    "compare": "Compare all features in detail",
+    "footerNote": "No credit card required. Trial accounts will not be auto-charged.",
+    "toast": {
+      "contact": "Opening contact form…",
+      "redirect": "Redirecting to {plan} trial registration →"
+    },
+    "social": {
+      "trustedMobile": "Trusted by",
+      "businesses": "12,400+ businesses",
+      "trustedDesktop": "trust BookingBase",
+      "ratingShort": "4.8 rating",
+      "ratingLong": "4.8 avg rating",
+      "reviews": "1,820 reviews",
+      "reviewsLong": "from 1,820 customer reviews"
+    },
+    "plans": {
+      "starter": {
+        "name": "Starter",
+        "description": "For solo providers and small teams launching their first booking site.",
+        "cta": "Start free trial →",
+        "groups": [
+          {
+            "title": "Core platform",
+            "items": [
+              "1 location",
+              "Up to 3 staff",
+              "Unlimited services",
+              "Branded booking page"
+            ]
+          },
+          {
+            "title": "Communication",
+            "items": ["Email notifications"]
+          },
+          {
+            "title": "Insights",
+            "items": ["Basic analytics"]
+          }
+        ]
+      },
+      "professional": {
+        "name": "Professional",
+        "description": "For growing service teams that need deposits, reminders and CRM.",
+        "cta": "Try Professional free →",
+        "groups": [
+          {
+            "title": "Core platform",
+            "items": [
+              "2 locations / branches",
+              "Up to 15 staff members",
+              "Custom domain support"
+            ]
+          },
+          {
+            "title": "Payments & bookings",
+            "items": ["Online payments & deposits"]
+          },
+          {
+            "title": "Communication",
+            "items": ["SMS & email reminders", "Customer CRM & history"]
+          },
+          {
+            "title": "Insights",
+            "items": ["Advanced revenue reports"]
+          }
+        ]
+      },
+      "business": {
+        "name": "Business",
+        "description": "For multi-location teams that need advanced control and support.",
+        "cta": "Talk to sales →",
+        "groups": [
+          {
+            "title": "Core platform",
+            "items": ["Unlimited locations", "Unlimited staff members"]
+          },
+          {
+            "title": "Customization",
+            "items": [
+              "Advanced localization",
+              "API & webhooks access",
+              "Custom styling"
+            ]
+          },
+          {
+            "title": "Enterprise support",
+            "items": [
+              "Priority 24/7 support",
+              "Dedicated manager",
+              "99.9% uptime SLA"
+            ]
+          }
+        ]
+      }
+    },
+    "comparison": {
+      "title": "Detailed Feature Comparison",
+      "description": "Compare Starter, Professional and Business tiers side by side to pick the right plan for your team",
+      "close": "Close comparison",
+      "feature": "Feature",
+      "footer": "All plans include a 14-day free trial. No credit card required.",
+      "groups": [
+        {
+          "title": "Core platform",
+          "rows": [
+            {
+              "name": "Locations",
+              "desc": "Number of physical service locations",
+              "starter": "1",
+              "professional": "2 branches",
+              "business": "Unlimited"
+            },
+            {
+              "name": "Staff members",
+              "desc": "Service providers you can add",
+              "starter": "Up to 3",
+              "professional": "Up to 15",
+              "business": "Unlimited"
+            },
+            {
+              "name": "Services",
+              "desc": "Service listings on your booking page",
+              "starter": "Unlimited",
+              "professional": "Unlimited",
+              "business": "Unlimited"
+            },
+            {
+              "name": "Booking page",
+              "desc": "Customer-facing experience",
+              "starter": "Branded template",
+              "professional": "Custom domain",
+              "business": "Fully custom"
+            }
+          ]
+        },
+        {
+          "title": "Payments & checkout",
+          "rows": [
+            {
+              "name": "Online payments",
+              "desc": "Accept card payments on booking",
+              "starter": "Included",
+              "professional": "Included",
+              "business": "Included"
+            },
+            {
+              "name": "Deposits & prepay",
+              "desc": "Collect partial payment upfront",
+              "starter": "Not included",
+              "professional": "Included",
+              "business": "Included"
+            },
+            {
+              "name": "Tips, upsells, packages",
+              "desc": "Advanced checkout flows",
+              "starter": "Not included",
+              "professional": "Not included",
+              "business": "Included"
+            }
+          ]
+        },
+        {
+          "title": "Communication",
+          "rows": [
+            {
+              "name": "Email notifications",
+              "desc": "Confirmations, reminders to customers",
+              "starter": "Included",
+              "professional": "Included",
+              "business": "Included"
+            },
+            {
+              "name": "SMS reminders",
+              "desc": "Reduce no-shows with text alerts",
+              "starter": "Not included",
+              "professional": "Included",
+              "business": "Included"
+            },
+            {
+              "name": "Customer CRM",
+              "desc": "Notes, history, contact profiles",
+              "starter": "Not included",
+              "professional": "Included",
+              "business": "Included"
+            },
+            {
+              "name": "Marketing automations",
+              "desc": "Drip campaigns, re-engagement",
+              "starter": "Not included",
+              "professional": "Not included",
+              "business": "Included"
+            }
+          ]
+        },
+        {
+          "title": "Insights & support",
+          "rows": [
+            {
+              "name": "Analytics",
+              "desc": "Bookings, revenue, customer metrics",
+              "starter": "Basic",
+              "professional": "Advanced",
+              "business": "Custom dashboards"
+            },
+            {
+              "name": "Revenue reports",
+              "desc": "Export-ready financial breakdowns",
+              "starter": "Not included",
+              "professional": "Included",
+              "business": "Included"
+            },
+            {
+              "name": "API & webhooks",
+              "desc": "Build custom integrations",
+              "starter": "Not included",
+              "professional": "Not included",
+              "business": "Included"
+            },
+            {
+              "name": "Support level",
+              "desc": "How fast we respond",
+              "starter": "Email · 48h",
+              "professional": "Priority · 24h",
+              "business": "Dedicated · 4h"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

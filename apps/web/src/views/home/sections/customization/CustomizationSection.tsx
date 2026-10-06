@@ -12,8 +12,12 @@ import {
   Check,
 } from "lucide-react";
 import { LandingSection } from "@/src/components/common/landing-compositions";
+import { useLocale, useTranslations } from "next-intl";
+import { formatDemoPrice } from "../../utils/demo-currency.utils";
 
 export function CustomizationSection() {
+  const locale = useLocale();
+  const t = useTranslations("landing_page_home.customization");
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: false,
     align: "start",
@@ -36,11 +40,14 @@ export function CustomizationSection() {
       {/* Centered Section Header */}
       <div className="max-w-5xl mx-auto px-4 text-center space-y-4 mb-14 sm:mb-16">
         <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-foreground leading-[1.12] text-balance">
-          Make your booking page <span className="text-primary">your own</span>
+          {t.rich("title", {
+            highlight: (chunks) => (
+              <span className="text-primary">{chunks}</span>
+            ),
+          })}
         </h2>
         <p className="mt-5 text-base sm:text-lg lg:text-xl text-muted-foreground leading-relaxed max-w-3xl mx-auto">
-          Bring your brand to life with reviews, videos, FAQs, and custom
-          domains.
+          {t("description")}
         </p>
 
         {/* Carousel Navigation Controls */}
@@ -49,18 +56,18 @@ export function CustomizationSection() {
             type="button"
             onClick={scrollPrev}
             className="w-12 h-12 rounded-full border border-input bg-surface hover:bg-muted flex items-center justify-center text-foreground transition-colors shadow-xs active:scale-95 cursor-pointer"
-            aria-label="Previous customization slide"
+            aria-label={t("previous")}
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
           <span className="text-sm font-semibold text-muted-foreground px-2">
-            Drag or swipe to explore
+            {t("explore")}
           </span>
           <button
             type="button"
             onClick={scrollNext}
             className="w-12 h-12 rounded-full border border-input bg-surface hover:bg-muted flex items-center justify-center text-foreground transition-colors shadow-xs active:scale-95 cursor-pointer"
-            aria-label="Next customization slide"
+            aria-label={t("next")}
           >
             <ChevronRight className="w-5 h-5" />
           </button>
@@ -76,7 +83,7 @@ export function CustomizationSection() {
           {/* SLIDE 1: TESTIMONIALS (LARGE CARD MATCHING REFERENCE SCREENSHOT) */}
           <div className="flex-[0_0_auto] w-[340px] sm:w-[400px] md:w-[450px] lg:w-[480px] h-[480px] sm:h-[510px] md:h-[530px] rounded-3xl border border-border bg-surface p-6 sm:p-7 flex flex-col justify-start overflow-hidden shadow-xs hover:border-primary/40 transition-all select-none">
             <h3 className="text-2xl sm:text-[26px] font-bold tracking-tight text-foreground text-center mb-6">
-              Testimonials
+              {t("testimonials.title")}
             </h3>
 
             {/* Tablet Card Mockup with Review */}
@@ -84,33 +91,31 @@ export function CustomizationSection() {
               <div className="flex items-center justify-between pb-3 border-b border-border">
                 <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                   <Star className="w-4 h-4 fill-primary text-primary" />
-                  <span className="font-bold">5.0 Star Rating</span>
+                  <span className="font-bold">{t("testimonials.rating")}</span>
                 </div>
                 <span className="text-[11px] text-muted-foreground">
-                  Verified Client
+                  {t("testimonials.verifiedClient")}
                 </span>
               </div>
 
               <div className="space-y-4 my-auto">
                 <div className="space-y-1">
                   <p className="text-base sm:text-lg font-bold text-foreground tracking-tight">
-                    Alex Martinez
+                    {t("testimonials.author")}
                   </p>
                   <p className="text-xs sm:text-sm text-muted-foreground font-medium">
-                    Director of Sales Operations
+                    {t("testimonials.role")}
                   </p>
                 </div>
                 <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed font-normal">
-                  Switching from HubSpot to Salesforce was a gamechanger for us.
-                  With SmartRoute, our lead response time dropped by 80% and we
-                  saw a 30% jump in conversions in the first month.
+                  {t("testimonials.quote")}
                 </p>
               </div>
 
               <div className="pt-3 border-t border-border flex justify-between items-center text-[11px] text-muted-foreground">
-                <span>Google &amp; Yelp Synced</span>
+                <span>{t("testimonials.synced")}</span>
                 <span className="text-foreground font-semibold">
-                  100% Verified
+                  {t("testimonials.verified")}
                 </span>
               </div>
             </div>
@@ -119,7 +124,7 @@ export function CustomizationSection() {
           {/* SLIDE 2: FAQ (SPIRAL NOTEBOOK GADGET MATCHING REFERENCE SCREENSHOT) */}
           <div className="flex-[0_0_auto] w-[340px] sm:w-[400px] md:w-[450px] lg:w-[480px] h-[480px] sm:h-[510px] md:h-[530px] rounded-3xl border border-border bg-surface p-6 sm:p-7 flex flex-col justify-start overflow-hidden shadow-xs hover:border-primary/40 transition-all select-none">
             <h3 className="text-2xl sm:text-[26px] font-bold tracking-tight text-foreground text-center mb-6">
-              FAQ
+              {t("faq.title")}
             </h3>
 
             {/* Illustrated Spiral Binder / Notebook Mockup */}
@@ -152,36 +157,37 @@ export function CustomizationSection() {
               <div className="flex-1 rounded-2xl bg-surface border-2 border-primary p-4 sm:p-5 flex flex-col justify-between shadow-md">
                 <div className="border-b-2 border-primary pb-2 mb-2 flex items-center justify-between">
                   <span className="font-extrabold text-base sm:text-lg text-foreground tracking-tight">
-                    FAQs
+                    {t("faq.heading")}
                   </span>
                   <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-muted text-foreground border border-input">
-                    Live Widget
+                    {t("faq.liveWidget")}
                   </span>
                 </div>
 
                 <div className="space-y-3.5 text-xs text-foreground leading-snug my-auto">
                   <div>
                     <p className="font-bold text-foreground text-xs sm:text-sm">
-                      1. What is your pricing?
+                      {t("faq.question1")}
                     </p>
                     <p className="text-muted-foreground text-[11px] sm:text-xs mt-0.5 leading-relaxed">
-                      Our plans start at $5 per user and go up to $25 per user
-                      for enterprise grade features.
+                      {t("faq.answer1", {
+                        minimum: formatDemoPrice(5, locale),
+                        maximum: formatDemoPrice(25, locale),
+                      })}
                     </p>
                   </div>
                   <div>
                     <p className="font-bold text-foreground text-xs sm:text-sm">
-                      2. How long does implementation take?
+                      {t("faq.question2")}
                     </p>
                     <p className="text-muted-foreground text-[11px] sm:text-xs mt-0.5 leading-relaxed">
-                      Most businesses launch their booking flow in under 15
-                      minutes with zero coding.
+                      {t("faq.answer2")}
                     </p>
                   </div>
                 </div>
 
                 <div className="text-[10px] text-muted-foreground font-medium pt-2 border-t border-border">
-                  Expandable accordion on client checkout
+                  {t("faq.footer")}
                 </div>
               </div>
             </div>
@@ -190,7 +196,7 @@ export function CustomizationSection() {
           {/* SLIDE 3: FILES (ATTACHMENTS DASHBOARD MATCHING REFERENCE SCREENSHOT) */}
           <div className="flex-[0_0_auto] w-[340px] sm:w-[400px] md:w-[450px] lg:w-[480px] h-[480px] sm:h-[510px] md:h-[530px] rounded-3xl border border-border bg-surface p-6 sm:p-7 flex flex-col justify-start overflow-hidden shadow-xs hover:border-primary/40 transition-all select-none">
             <h3 className="text-2xl sm:text-[26px] font-bold tracking-tight text-foreground text-center mb-6">
-              Files
+              {t("files.title")}
             </h3>
 
             {/* Files Dashboard */}
@@ -199,11 +205,11 @@ export function CustomizationSection() {
                 <div className="flex items-center gap-2">
                   <FileText className="w-4 h-4 text-muted-foreground" />
                   <span className="font-bold text-sm text-foreground">
-                    Documents &amp; Intake
+                    {t("files.heading")}
                   </span>
                 </div>
                 <span className="text-[10px] font-semibold text-muted-foreground">
-                  Auto-sent
+                  {t("files.autoSent")}
                 </span>
               </div>
 
@@ -216,10 +222,10 @@ export function CustomizationSection() {
                   </div>
                   <div>
                     <p className="text-xs font-bold text-foreground">
-                      Documents
+                      {t("files.documents")}
                     </p>
                     <p className="text-[10px] text-muted-foreground mt-0.5">
-                      Intake &amp; Waivers
+                      {t("files.intake")}
                     </p>
                   </div>
                 </div>
@@ -243,9 +249,9 @@ export function CustomizationSection() {
               </div>
 
               <div className="pt-3 border-t border-border flex justify-between items-center text-[11px] text-muted-foreground">
-                <span>Automatic email &amp; SMS delivery</span>
+                <span>{t("files.delivery")}</span>
                 <span className="text-foreground font-semibold">
-                  1.4 MB Total
+                  {t("files.total")}
                 </span>
               </div>
             </div>
@@ -254,7 +260,7 @@ export function CustomizationSection() {
           {/* SLIDE 4: ABOUT (TABLET BIOGRAPHY MATCHING REFERENCE SCREENSHOT) */}
           <div className="flex-[0_0_auto] w-[340px] sm:w-[400px] md:w-[450px] lg:w-[480px] h-[480px] sm:h-[510px] md:h-[530px] rounded-3xl border border-border bg-surface p-6 sm:p-7 flex flex-col justify-start overflow-hidden shadow-xs hover:border-primary/40 transition-all select-none">
             <h3 className="text-2xl sm:text-[26px] font-bold tracking-tight text-foreground text-center mb-6">
-              About
+              {t("about.title")}
             </h3>
 
             {/* Tablet Frame with About Me Pill & Bio */}
@@ -262,25 +268,21 @@ export function CustomizationSection() {
               <div className="flex items-center justify-between pb-3 border-b border-border">
                 <Grid className="w-4 h-4 text-muted-foreground" />
                 <div className="px-4 py-1 rounded-full bg-muted border border-border text-xs font-semibold text-foreground">
-                  About me
+                  {t("about.heading")}
                 </div>
                 <div className="w-4" />
               </div>
 
               <div className="my-auto space-y-3">
                 <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed font-normal">
-                  Hi! I&apos;m Jessica Martinez, a licensed consultant with 10+
-                  years of experience in helping clients achieve their goals.
-                  Whether you&apos;re a first-time booker or scaling your
-                  routine, I provide expert advice and personalized guidance
-                  every step of the way.
+                  {t("about.bio")}
                 </p>
               </div>
 
               <div className="pt-3 border-t border-border flex justify-between items-center text-[11px] text-muted-foreground">
-                <span>1,200+ Sessions Completed</span>
+                <span>{t("about.sessions")}</span>
                 <span className="text-foreground font-semibold">
-                  Verified Pro
+                  {t("about.verified")}
                 </span>
               </div>
             </div>
@@ -289,14 +291,14 @@ export function CustomizationSection() {
           {/* SLIDE 5: VIDEOS (VIDEO GREETING CARD) */}
           <div className="flex-[0_0_auto] w-[340px] sm:w-[400px] md:w-[450px] lg:w-[480px] h-[480px] sm:h-[510px] md:h-[530px] rounded-3xl border border-border bg-surface p-6 sm:p-7 flex flex-col justify-start overflow-hidden shadow-xs hover:border-primary/40 transition-all select-none">
             <h3 className="text-2xl sm:text-[26px] font-bold tracking-tight text-foreground text-center mb-6">
-              Videos
+              {t("videos.title")}
             </h3>
 
             {/* Tablet Frame with Video Player */}
             <div className="rounded-2xl bg-accent border border-border p-6 text-foreground shadow-xl flex-1 flex flex-col justify-between">
               <div className="flex items-center justify-between pb-2 border-b border-border text-[11px] text-muted-foreground">
                 <span className="px-2 py-0.5 rounded-full bg-muted border border-border text-[10px] font-semibold text-foreground">
-                  Featured Greeting
+                  {t("videos.featured")}
                 </span>
                 <span>0:45</span>
               </div>
@@ -309,10 +311,10 @@ export function CustomizationSection() {
                 </div>
                 <div className="text-center space-y-0.5">
                   <p className="text-sm font-bold text-foreground">
-                    Elena Rostova • Studio Tour
+                    {t("videos.author")} • {t("videos.tour")}
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    Meet your specialist before your session
+                    {t("videos.description")}
                   </p>
                 </div>
               </div>
@@ -326,7 +328,7 @@ export function CustomizationSection() {
           {/* SLIDE 6: CUSTOM DOMAIN & BRANDING */}
           <div className="flex-[0_0_auto] w-[340px] sm:w-[400px] md:w-[450px] lg:w-[480px] h-[480px] sm:h-[510px] md:h-[530px] rounded-3xl border border-border bg-surface p-6 sm:p-7 flex flex-col justify-start overflow-hidden shadow-xs hover:border-primary/40 transition-all select-none">
             <h3 className="text-2xl sm:text-[26px] font-bold tracking-tight text-foreground text-center mb-6">
-              Custom Domain
+              {t("domain.title")}
             </h3>
 
             {/* Browser Address & Color Palette Mockup */}
@@ -342,7 +344,7 @@ export function CustomizationSection() {
 
               <div className="space-y-3 my-auto">
                 <p className="text-xs font-bold text-foreground">
-                  Brand Color Presets
+                  {t("domain.colors")}
                 </p>
                 <div className="flex gap-2.5">
                   <span className="w-9 h-9 rounded-xl bg-primary border border-primary shadow-xs flex items-center justify-center text-primary-foreground text-xs">
@@ -353,12 +355,12 @@ export function CustomizationSection() {
                   <span className="w-9 h-9 rounded-xl bg-primary/40 border border-input shadow-xs" />
                 </div>
                 <div className="w-full py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold text-xs text-center">
-                  Custom Styled Checkout
+                  {t("domain.checkout")}
                 </div>
               </div>
 
               <div className="text-[11px] text-muted-foreground text-center pt-2 border-t border-border">
-                100% white-label with zero third-party badges
+                {t("domain.whiteLabel")}
               </div>
             </div>
           </div>

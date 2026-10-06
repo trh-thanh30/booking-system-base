@@ -1,6 +1,7 @@
 "use client";
 
 import { Play, Check } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { MotionButton } from "@/src/components/motion/MotionButton";
 import {
   LandingSection,
@@ -15,6 +16,7 @@ function getSignupPath() {
 }
 
 export function HeroSection() {
+  const t = useTranslations("landing_page_home.hero");
   const handleLiveDemo = () => {
     const el =
       document.getElementById("pillars") ||
@@ -33,17 +35,19 @@ export function HeroSection() {
       <LandingContainer className="relative z-10 flex flex-col items-center text-center">
         {/* 1. Giant Centered Headline in Crisp Slate */}
         <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-foreground leading-[1.1] max-w-5xl mx-auto text-balance">
-          One Intelligent Booking System
-          <br className="hidden sm:inline" /> for{" "}
-          <span className="bg-gradient-to-r from-primary via-primary-hover to-primary-active bg-clip-text text-transparent">
-            Every Business&nbsp;Need
-          </span>
+          {t.rich("title", {
+            br: () => <br className="hidden sm:inline" />,
+            highlight: (chunks) => (
+              <span className="bg-gradient-to-r from-primary via-primary-hover to-primary-active bg-clip-text text-transparent">
+                {chunks}
+              </span>
+            ),
+          })}
         </h1>
 
         {/* 2. Centered Subtitle */}
         <p className="mt-6 text-base sm:text-lg md:text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto">
-          Manage scheduling, appointments, payments, staff allocations, and
-          automated workflows in one flexible, high-performance platform.
+          {t("description")}
         </p>
 
         {/* 3. Action CTA Buttons */}
@@ -53,14 +57,14 @@ export function HeroSection() {
             className="w-full sm:w-auto h-13 px-9 text-base font-semibold rounded-full shadow-sm cursor-pointer"
             onClick={() => window.location.assign(getSignupPath())}
           >
-            Start 14-Day Free Trial
+            {t("startTrial")}
           </MotionButton>
           <MotionButton
             variant="secondary"
             className="w-full sm:w-auto h-13 px-9 text-base font-semibold rounded-full border border-input bg-surface text-foreground hover:bg-muted hover:border-primary/40 cursor-pointer shadow-xs inline-flex items-center justify-center gap-2"
             onClick={handleLiveDemo}
           >
-            <span>See Live Demo</span>
+            <span>{t("liveDemo")}</span>
             <Play className="w-4 h-4 text-foreground" />
           </MotionButton>
         </div>
@@ -69,15 +73,15 @@ export function HeroSection() {
         <div className="mt-8 flex flex-wrap items-center justify-center gap-6 sm:gap-8 text-xs text-muted-foreground">
           <div className="flex items-center gap-2">
             <Check className="w-4 h-4 text-primary" />
-            <span>No credit card required</span>
+            <span>{t("trust.noCard")}</span>
           </div>
           <div className="flex items-center gap-2">
             <Check className="w-4 h-4 text-primary" />
-            <span>5-minute instant setup</span>
+            <span>{t("trust.quickSetup")}</span>
           </div>
           <div className="flex items-center gap-2">
             <Check className="w-4 h-4 text-primary" />
-            <span>Multi-calendar 2-way sync</span>
+            <span>{t("trust.calendarSync")}</span>
           </div>
         </div>
       </LandingContainer>

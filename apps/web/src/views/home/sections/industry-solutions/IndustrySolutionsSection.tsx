@@ -3,6 +3,7 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import { useReducedMotion } from "framer-motion";
 import useEmblaCarousel, { UseEmblaCarouselType } from "embla-carousel-react";
+import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { ArrowRight, Check, ChevronLeft, ChevronRight } from "lucide-react";
 import {
@@ -12,6 +13,7 @@ import {
 import { INDUSTRIES_DATA } from "./data/industry-solutions.data";
 
 export function IndustrySolutionsSection() {
+  const t = useTranslations("landing_page_home.industrySolutions");
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [prevBtnDisabled, setPrevBtnDisabled] = useState(true);
   const [nextBtnDisabled, setNextBtnDisabled] = useState(false);
@@ -108,17 +110,18 @@ export function IndustrySolutionsSection() {
         {/* Section Header */}
         <div className="text-center max-w-5xl mx-auto space-y-4">
           <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-foreground leading-[1.14] text-balance">
-            Tailored workflows for
-            <br />
-            <span className="text-muted-foreground font-bold">
-              your exact&nbsp;trade.
-            </span>
+            {t.rich("title", {
+              br: () => <br />,
+              highlight: (chunks) => (
+                <span className="text-muted-foreground font-bold">
+                  {chunks}
+                </span>
+              ),
+            })}
           </h2>
 
           <p className="mt-5 text-base sm:text-lg lg:text-xl text-muted-foreground leading-relaxed max-w-3xl mx-auto">
-            Whether you run a high-volume salon, a private medical aesthetic
-            clinic, or a boutique wellness sanctuary, our platform adapts to
-            your booking mechanics.
+            {t("description")}
           </p>
         </div>
 
@@ -142,7 +145,7 @@ export function IndustrySolutionsSection() {
                       : "bg-surface border border-input text-foreground hover:border-primary/40 hover:text-foreground hover:bg-muted"
                   }`}
                 >
-                  {ind.label}
+                  {t(ind.labelKey)}
                 </button>
               );
             })}
@@ -155,7 +158,7 @@ export function IndustrySolutionsSection() {
               onClick={scrollPrev}
               disabled={prevBtnDisabled}
               className="w-12 h-12 rounded-full border border-input bg-surface flex items-center justify-center text-foreground hover:bg-muted hover:border-primary disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-xs cursor-pointer"
-              aria-label="Previous industry"
+              aria-label={t("previous")}
             >
               <ChevronLeft className="w-5 h-5" />
             </button>
@@ -164,7 +167,7 @@ export function IndustrySolutionsSection() {
               onClick={scrollNext}
               disabled={nextBtnDisabled}
               className="w-12 h-12 rounded-full border border-input bg-surface flex items-center justify-center text-foreground hover:bg-muted hover:border-primary disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-xs cursor-pointer"
-              aria-label="Next industry"
+              aria-label={t("next")}
             >
               <ChevronRight className="w-5 h-5" />
             </button>
@@ -183,13 +186,13 @@ export function IndustrySolutionsSection() {
                       <div className="space-y-6">
                         <div className="space-y-3">
                           <span className="text-xs sm:text-sm font-extrabold uppercase tracking-wider text-muted-foreground block">
-                            {ind.badge}
+                            {t(ind.badgeKey)}
                           </span>
                           <h3 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-foreground tracking-tight leading-tight">
-                            {ind.title}
+                            {t(ind.titleKey)}
                           </h3>
                           <p className="text-base sm:text-lg text-muted-foreground leading-relaxed pt-1">
-                            {ind.description}
+                            {t(ind.descriptionKey)}
                           </p>
                         </div>
 
@@ -204,10 +207,10 @@ export function IndustrySolutionsSection() {
                               </div>
                               <div className="space-y-1">
                                 <p className="text-sm sm:text-base font-bold text-foreground">
-                                  {item.title}
+                                  {t(item.titleKey)}
                                 </p>
                                 <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-                                  {item.description}
+                                  {t(item.descriptionKey)}
                                 </p>
                               </div>
                             </div>
@@ -220,7 +223,9 @@ export function IndustrySolutionsSection() {
                           href="#faq"
                           className="inline-flex items-center gap-2.5 px-8 py-3.5 rounded-full border border-input bg-surface hover:bg-muted text-sm sm:text-base font-bold text-foreground transition-all cursor-pointer shadow-xs"
                         >
-                          <span>Explore {ind.label} Setup</span>
+                          <span>
+                            {t("explore", { industry: t(ind.labelKey) })}
+                          </span>
                           <ArrowRight className="w-4 h-4 text-foreground" />
                         </a>
                       </div>
@@ -230,7 +235,7 @@ export function IndustrySolutionsSection() {
                     <div className="lg:col-span-6 relative min-h-[380px] sm:min-h-[460px] lg:min-h-full overflow-hidden bg-muted flex items-center justify-center">
                       <Image
                         src={ind.image}
-                        alt={ind.title}
+                        alt={t(ind.titleKey)}
                         fill
                         sizes="(max-width: 1024px) 100vw, 50vw"
                         className="object-cover"

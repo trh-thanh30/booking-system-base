@@ -23,6 +23,7 @@ import { NAV_ITEMS } from "../constants/home.constants";
 
 export function Header() {
   const t = useTranslations("Navigation");
+  const homeT = useTranslations("landing_page_home.navigation");
   const locale = useLocale();
   const scrolled = useScrollHeader(12);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -79,37 +80,37 @@ export function Header() {
 
         {/* Center Navigation Links (Studio Style with Hover & Click Support) */}
         <nav
-          className="hidden items-center gap-1.5 xl:flex"
+          className="hidden shrink-0 items-center gap-1 xl:flex 2xl:gap-1.5"
           aria-label={t("mainNavigation")}
         >
           {NAV_ITEMS.map((item) =>
             item.type === "link" ? (
               <a
-                key={item.label}
+                key={item.id}
                 href={item.href}
                 onMouseEnter={() => {
                   if (timeoutRef.current) clearTimeout(timeoutRef.current);
                   setOpenMenu(null);
                 }}
-                className="px-4 py-2.5 rounded-full text-sm sm:text-base font-bold text-foreground hover:text-foreground hover:bg-muted transition-all duration-150 select-none"
+                className="whitespace-nowrap px-3 py-2.5 rounded-full text-sm 2xl:px-4 2xl:text-base font-bold text-foreground hover:text-foreground hover:bg-muted transition-all duration-150 select-none"
               >
-                {item.label}
+                {homeT(item.labelKey)}
               </a>
             ) : (
               <div
-                key={item.label}
-                onMouseEnter={() => handleMouseEnter(item.label)}
+                key={item.id}
+                onMouseEnter={() => handleMouseEnter(item.id)}
                 onMouseLeave={handleMouseLeave}
                 className="relative inline-block"
               >
                 <DropdownMenu
                   modal={false}
-                  open={openMenu === item.label}
+                  open={openMenu === item.id}
                   onOpenChange={(open) => {
-                    if (!open && openMenu === item.label) {
+                    if (!open && openMenu === item.id) {
                       setOpenMenu(null);
                     } else if (open) {
-                      setOpenMenu(item.label);
+                      setOpenMenu(item.id);
                     }
                   }}
                 >
@@ -117,20 +118,20 @@ export function Header() {
                     <button
                       type="button"
                       onClick={() =>
-                        setOpenMenu(openMenu === item.label ? null : item.label)
+                        setOpenMenu(openMenu === item.id ? null : item.id)
                       }
                       className={cn(
-                        "group inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-sm sm:text-base font-bold transition-all duration-150 select-none cursor-pointer focus-visible:outline-2 focus-visible:outline-ring",
-                        openMenu === item.label
+                        "group inline-flex items-center gap-1.5 whitespace-nowrap px-3 py-2.5 rounded-full text-sm 2xl:px-4 2xl:text-base font-bold transition-all duration-150 select-none cursor-pointer focus-visible:outline-2 focus-visible:outline-ring",
+                        openMenu === item.id
                           ? "bg-muted text-foreground"
                           : "text-foreground hover:text-foreground hover:bg-muted",
                       )}
                     >
-                      <span>{item.label}</span>
+                      <span>{homeT(item.labelKey)}</span>
                       <ChevronDown
                         className={cn(
-                          "w-4 h-4 transition-transform duration-200",
-                          openMenu === item.label
+                          "w-4 h-4 shrink-0 transition-transform duration-200",
+                          openMenu === item.id
                             ? "rotate-180 text-foreground"
                             : "text-muted-foreground group-hover:text-foreground",
                         )}
@@ -141,14 +142,14 @@ export function Header() {
                   <DropdownMenuContent
                     align="center"
                     sideOffset={8}
-                    onMouseEnter={() => handleMouseEnter(item.label)}
+                    onMouseEnter={() => handleMouseEnter(item.id)}
                     onMouseLeave={handleMouseLeave}
                     onCloseAutoFocus={(e: Event) => e.preventDefault()}
                     className="max-h-[75dvh] w-88 max-w-[calc(100vw-2rem)] overflow-y-auto p-3 rounded-2xl border border-border bg-surface shadow-2xl before:absolute before:-top-3 before:left-0 before:right-0 before:h-3 before:content-['']"
                   >
                     {item.items?.map((sub) => (
                       <DropdownMenuItem
-                        key={sub.label}
+                        key={sub.id}
                         asChild
                         className="rounded-xl p-3 hover:bg-muted cursor-pointer"
                         onClick={() => setOpenMenu(null)}
@@ -162,11 +163,11 @@ export function Header() {
                           </div>
                           <div>
                             <span className="block font-bold text-sm sm:text-base text-foreground">
-                              {sub.label}
+                              {homeT(sub.labelKey)}
                             </span>
-                            {"description" in sub && (
+                            {"descriptionKey" in sub && (
                               <span className="mt-0.5 block text-xs text-muted-foreground leading-snug">
-                                {sub.description}
+                                {homeT(sub.descriptionKey)}
                               </span>
                             )}
                           </div>
@@ -181,20 +182,20 @@ export function Header() {
         </nav>
 
         {/* Right Action CTA Buttons */}
-        <div className="flex items-center gap-3">
-          <div className="hidden items-center gap-3 xl:flex">
+        <div className="flex shrink-0 items-center gap-3">
+          <div className="hidden shrink-0 items-center gap-2 xl:flex 2xl:gap-3">
             <LanguageSwitcher variant="landing" />
             <a
               href={loginUrl}
-              className="px-5 py-2.5 h-12 inline-flex items-center justify-center rounded-full text-sm sm:text-base font-bold text-foreground hover:text-foreground hover:bg-muted transition-all duration-150 select-none cursor-pointer"
+              className="shrink-0 whitespace-nowrap px-4 py-2.5 h-12 inline-flex items-center justify-center rounded-full text-sm 2xl:px-5 2xl:text-base font-bold text-foreground hover:text-foreground hover:bg-muted transition-all duration-150 select-none cursor-pointer"
             >
-              {t("login")}
+              {homeT("login")}
             </a>
             <Link
               href="/signup-business"
-              className="inline-flex items-center justify-center h-12 px-7 rounded-full bg-primary hover:bg-primary-hover text-primary-foreground text-sm sm:text-base font-extrabold shadow-sm hover:shadow-md active:scale-[0.98] transition-all duration-200 cursor-pointer select-none"
+              className="inline-flex shrink-0 items-center justify-center h-12 whitespace-nowrap px-5 2xl:px-7 rounded-full bg-primary hover:bg-primary-hover text-primary-foreground text-sm 2xl:text-base font-extrabold shadow-sm hover:shadow-md active:scale-[0.98] transition-all duration-200 cursor-pointer select-none"
             >
-              {t("trial")}
+              {homeT("trial")}
             </Link>
           </div>
 
@@ -236,26 +237,26 @@ export function Header() {
                 {NAV_ITEMS.map((item) =>
                   item.type === "link" ? (
                     <a
-                      key={item.label}
+                      key={item.id}
                       href={item.href}
                       onClick={() => setMobileOpen(false)}
                       className="block py-3 rounded-2xl text-base font-bold text-foreground hover:bg-muted transition-colors"
                     >
-                      {item.label}
+                      {homeT(item.labelKey)}
                     </a>
                   ) : (
                     <details
-                      key={item.label}
+                      key={item.id}
                       className="border-b border-border/80 py-3"
                     >
                       <summary className="cursor-pointer py-2 text-base font-bold text-foreground flex items-center justify-between">
-                        <span>{item.label}</span>
+                        <span>{homeT(item.labelKey)}</span>
                         <ChevronDown className="w-4 h-4 text-muted-foreground" />
                       </summary>
                       <div className="space-y-1.5 pl-3 pt-2">
                         {item.items?.map((sub) => (
                           <a
-                            key={sub.label}
+                            key={sub.id}
                             href={sub.href}
                             className="flex items-center gap-3 py-2 px-3 rounded-xl text-sm font-semibold text-foreground hover:bg-muted hover:text-foreground transition-colors"
                             onClick={() => setMobileOpen(false)}
@@ -264,7 +265,7 @@ export function Header() {
                               className="w-4 h-4 text-foreground"
                               aria-hidden="true"
                             />
-                            {sub.label}
+                            {homeT(sub.labelKey)}
                           </a>
                         ))}
                       </div>
@@ -281,13 +282,13 @@ export function Header() {
                   href={loginUrl}
                   className="w-full h-12 flex items-center justify-center rounded-full border border-input text-sm font-bold text-foreground hover:bg-muted transition-colors"
                 >
-                  {t("login")}
+                  {homeT("login")}
                 </a>
                 <Link
                   href="/signup-business"
                   className="w-full h-12 flex items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-extrabold shadow-sm hover:bg-primary-hover transition-colors"
                 >
-                  {t("trial")}
+                  {homeT("trial")}
                 </Link>
               </div>
             </SheetContent>

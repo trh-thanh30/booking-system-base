@@ -5,10 +5,12 @@ import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 import { Reveal } from "@/src/components/motion/Reveal";
 import { FAQ_GROUPS } from "../constants/home.constants";
+import { useTranslations } from "next-intl";
 
 export function FAQ() {
   const [openFaqKey, setOpenFaqKey] = useState<string | null>("coding-skills");
   const shouldReduceMotion = useReducedMotion();
+  const t = useTranslations("landing_page_home.faq");
 
   return (
     <Reveal
@@ -20,11 +22,10 @@ export function FAQ() {
         {/* Header */}
         <div className="text-center max-w-5xl mx-auto mb-14 sm:mb-16 space-y-4">
           <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-foreground tracking-tight leading-[1.12] text-balance">
-            Questions before you&nbsp;start?
+            {t("title")}
           </h2>
           <p className="mt-5 text-base sm:text-lg lg:text-xl text-muted-foreground leading-relaxed max-w-3xl mx-auto">
-            Find quick answers about templates, booking pages, payments, trials
-            and platform features.
+            {t("description")}
           </p>
         </div>
 
@@ -37,7 +38,7 @@ export function FAQ() {
               className="space-y-5 scroll-mt-28"
             >
               <h3 className="text-xl sm:text-2xl font-extrabold text-foreground border-b border-border pb-3.5 select-none">
-                {group.title}
+                {t(`groups.${gidx}.title`)}
               </h3>
               <div className="space-y-4">
                 {group.items.map((faq) => {
@@ -64,7 +65,7 @@ export function FAQ() {
                             isOpen ? "text-primary" : "text-foreground"
                           }`}
                         >
-                          {faq.question}
+                          {t(`groups.${gidx}.items.${faq.id}.question`)}
                         </span>
                         <motion.span
                           animate={
@@ -105,7 +106,7 @@ export function FAQ() {
                             className="overflow-hidden"
                           >
                             <p className="pt-4 text-base text-muted-foreground leading-relaxed">
-                              {faq.answer}
+                              {t(`groups.${gidx}.items.${faq.id}.answer`)}
                             </p>
                           </motion.div>
                         )}
@@ -121,11 +122,10 @@ export function FAQ() {
         {/* FAQ CTA Card */}
         <div className="text-center border border-border bg-muted/70 p-10 sm:p-14 rounded-3xl shadow-xs space-y-5 max-w-7xl mx-auto mt-14">
           <h3 className="text-2xl sm:text-3xl font-extrabold text-foreground tracking-tight">
-            Still have questions?
+            {t("cta.title")}
           </h3>
           <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            Reach our support team, or book a 15-minute walkthrough with a
-            product specialist.
+            {t("cta.description")}
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 pt-2">
             <motion.button
@@ -137,7 +137,7 @@ export function FAQ() {
               }
               className="w-full sm:w-auto inline-flex h-13 items-center justify-center rounded-full bg-primary hover:bg-primary-hover text-primary-foreground shadow-sm px-8 text-sm sm:text-base font-bold transition-all duration-200 cursor-pointer select-none"
             >
-              Contact support
+              {t("cta.contact")}
             </motion.button>
             <motion.a
               whileHover={shouldReduceMotion ? undefined : { scale: 1.02 }}
@@ -145,7 +145,7 @@ export function FAQ() {
               href="mailto:demo@bookingbase.com?subject=BookingBase%20Demo%20Request"
               className="w-full sm:w-auto inline-flex h-13 items-center justify-center rounded-full border border-input bg-surface hover:bg-muted px-8 text-sm sm:text-base font-bold text-foreground transition-all duration-200 cursor-pointer select-none"
             >
-              Book a demo
+              {t("cta.demo")}
             </motion.a>
           </div>
         </div>

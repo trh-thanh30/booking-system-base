@@ -2,7 +2,15 @@ import { existsSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import ts from "typescript";
 
-export function resolve(specifier, context, nextResolve) {
+export async function resolve(specifier, context, nextResolve) {
+  if (specifier === "next/image") {
+    const { url } = await nextResolve("next/image.js", context);
+    const source = `import image from ${JSON.stringify(url)}; export default image.default ?? image;`;
+    return {
+      url: `data:text/javascript,${encodeURIComponent(source)}`,
+      shortCircuit: true,
+    };
+  }
   if (["next/server", "next/link", "next/navigation"].includes(specifier))
     specifier += ".js";
   if (specifier.startsWith("@/")) {

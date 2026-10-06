@@ -4,22 +4,18 @@ import {
   DialogContent,
   DialogTitle,
   DialogDescription,
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  cn,
 } from "@repo/ui";
 
-import { useState, useEffect } from "react";
-import Image from "next/image";
+import { Fragment, useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, ChevronDown, Lock, X, Globe } from "lucide-react";
+import { Check, ChevronDown, Lock, X } from "lucide-react";
 import { useToast } from "@repo/hooks";
 import { RepeatReveal } from "@/src/components/motion/RepeatReveal";
 import { RepeatStaggerReveal } from "@/src/components/motion/RepeatStaggerReveal";
 import { RepeatStaggerItem } from "@/src/components/motion/RepeatStaggerItem";
 import { PricingCard } from "@/src/components/common/landing-compositions";
+import { useLocale, useTranslations } from "next-intl";
+import { getLocaleCurrency } from "../utils/demo-currency.utils";
 
 interface ComparisonRow {
   name: string;
@@ -57,12 +53,6 @@ const PLAN_PRICES = {
     pos: "suffix" as const,
   },
 };
-
-const CURRENCIES = [
-  { code: "USD" as const, label: "USD ($)", flag: "/flags/us.svg" },
-  { code: "EUR" as const, label: "EUR (€)", flag: "/flags/eu.svg" },
-  { code: "VND" as const, label: "VND (₫)", flag: "/flags/vi.svg" },
-];
 
 const PLANS = [
   {
@@ -274,9 +264,11 @@ const COMPARISONS: ComparisonGroup[] = [
 ];
 
 export function Pricing() {
+  const locale = useLocale();
+  const t = useTranslations("landing_page_home.pricing");
   const { toast } = useToast();
   const [billing, setBilling] = useState<"monthly" | "annual">("monthly");
-  const [currency, setCurrency] = useState<"USD" | "EUR" | "VND">("USD");
+  const currency = getLocaleCurrency(locale);
   const [isCompareOpen, setIsCompareOpen] = useState(false);
 
   useEffect(() => {
@@ -292,13 +284,11 @@ export function Pricing() {
 
   const handleCtaClick = (planName: string, isContactSales: boolean) => {
     if (isContactSales) {
-      toast.success(
-        "Opening contact form... Redirection to Sales Support scheduled.",
-      );
+      toast.success(t("toast.contact"));
       window.location.href =
         "mailto:sales@bookingbase.com?subject=BookingBase%20Business%20Plan%20Inquiry";
     } else {
-      toast.success(`Redirecting to ${planName} trial registration →`);
+      toast.success(t("toast.redirect", { plan: planName }));
       window.location.href = "/sign-up";
     }
   };
@@ -333,15 +323,14 @@ export function Pricing() {
         {/* Header */}
         <div className="text-center max-w-5xl mx-auto mb-14 sm:mb-16 space-y-4">
           <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-foreground leading-[1.14] text-balance">
-            Choose a plan that grows
+            {t("title")}
             <br />
             <span className="text-muted-foreground font-bold">
-              with your service&nbsp;business.
+              {t("titleHighlight")}
             </span>
           </h2>
           <p className="mt-5 text-base sm:text-lg lg:text-xl text-muted-foreground leading-relaxed max-w-3xl mx-auto">
-            Start with a 14-day trial. Upgrade, downgrade or cancel anytime — no
-            long-term commitment.
+            {t("description")}
           </p>
         </div>
 
@@ -357,7 +346,7 @@ export function Pricing() {
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
-              Monthly
+              {t("monthly")}
             </button>
             <button
               type="button"
@@ -368,7 +357,7 @@ export function Pricing() {
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
-              <span>Annual</span>
+              <span>{t("annual")}</span>
               <span
                 className={`text-xs font-extrabold px-2.5 py-0.5 rounded-full ${
                   billing === "annual"
@@ -376,91 +365,23 @@ export function Pricing() {
                     : "bg-success-surface border border-success-border text-success-surface-foreground"
                 }`}
               >
-                Save 20%
+                {t("save20")}
               </span>
             </button>
           </div>
-
-          <DropdownMenu modal={false}>
-            <DropdownMenuTrigger asChild>
-              <button
-                type="button"
-                className="group inline-flex items-center gap-2 rounded-full border border-border bg-surface px-4 sm:px-5 py-2.5 text-sm font-bold text-foreground transition-all duration-200 shadow-xs cursor-pointer select-none active:scale-[0.98] hover:border-primary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 data-[state=open]:border-primary data-[state=open]:bg-muted"
-              >
-                <Globe className="w-4 h-4 text-muted-foreground transition-colors group-hover:text-foreground" />
-                <span className="text-sm text-muted-foreground font-semibold">
-                  Currency:
-                </span>
-                <span className="relative flex h-3.5 w-5 shrink-0 overflow-hidden rounded-xs shadow-xs ring-1 ring-foreground/10">
-                  <Image
-                    src={
-                      CURRENCIES.find((c) => c.code === currency)?.flag ??
-                      "/flags/us.svg"
-                    }
-                    alt=""
-                    width={20}
-                    height={14}
-                    className="h-full w-full object-cover"
-                  />
-                </span>
-                <span className="text-sm font-extrabold text-foreground">
-                  {currency} ({PLAN_PRICES[currency].symbol})
-                </span>
-                <ChevronDown
-                  className="w-3.5 h-3.5 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180"
-                  aria-hidden="true"
-                />
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-              align="center"
-              sideOffset={8}
-              className="min-w-44 p-1.5 rounded-2xl border border-border bg-surface shadow-xl space-y-1 z-50"
-            >
-              {CURRENCIES.map((c) => {
-                const isSelected = c.code === currency;
-                return (
-                  <DropdownMenuItem
-                    key={c.code}
-                    onClick={() => setCurrency(c.code)}
-                    className={cn(
-                      "flex items-center justify-between gap-3 px-4 py-2.5 rounded-full font-bold text-sm cursor-pointer transition-colors outline-none",
-                      isSelected
-                        ? "bg-primary text-primary-foreground hover:bg-primary-hover focus:bg-primary-hover focus:text-primary-foreground"
-                        : "text-foreground hover:bg-muted hover:text-foreground focus:bg-muted focus:text-foreground",
-                    )}
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <span className="relative flex h-3.5 w-5 shrink-0 overflow-hidden rounded-xs shadow-xs ring-1 ring-foreground/15">
-                        <Image
-                          src={c.flag}
-                          alt=""
-                          width={20}
-                          height={14}
-                          className="h-full w-full object-cover"
-                        />
-                      </span>
-                      <span>{c.label}</span>
-                    </div>
-                    {isSelected && (
-                      <Check
-                        className="w-4 h-4 shrink-0 text-primary-foreground"
-                        aria-hidden="true"
-                      />
-                    )}
-                  </DropdownMenuItem>
-                );
-              })}
-            </DropdownMenuContent>
-          </DropdownMenu>
         </div>
 
         {/* Social Proof Line */}
         <div className="mb-10 flex flex-col items-center gap-2 text-center text-sm leading-relaxed text-muted-foreground select-none sm:flex-row sm:flex-wrap sm:justify-center sm:gap-0">
           <span className="text-balance">
-            <span className="sm:hidden">Trusted by </span>
-            <strong className="text-foreground">12,400+ businesses</strong>
-            <span className="hidden sm:inline"> trust BookingBase</span>
+            <span className="sm:hidden">{t("social.trustedMobile")} </span>
+            <strong className="text-foreground">
+              {t("social.businesses")}
+            </strong>
+            <span className="hidden sm:inline">
+              {" "}
+              {t("social.trustedDesktop")}
+            </span>
           </span>
           <span
             className="mx-2 hidden text-muted-foreground sm:inline"
@@ -474,14 +395,16 @@ export function Pricing() {
                 ★★★★★
               </span>
               <strong className="text-foreground">
-                <span className="sm:hidden">4.8 rating</span>
-                <span className="hidden sm:inline">4.8 avg rating</span>
+                <span className="sm:hidden">{t("social.ratingShort")}</span>
+                <span className="hidden sm:inline">
+                  {t("social.ratingLong")}
+                </span>
               </strong>
             </span>
             <span className="whitespace-nowrap">
-              <span className="sm:hidden">· 1,820 reviews</span>
+              <span className="sm:hidden">· {t("social.reviews")}</span>
               <span className="hidden sm:inline">
-                from 1,820 customer reviews
+                {t("social.reviewsLong")}
               </span>
             </span>
           </span>
@@ -496,9 +419,13 @@ export function Pricing() {
             let savingsText = "";
             if (billing === "annual") {
               if (currency === "VND") {
-                savingsText = `Save ${priceCfg.savings.toLocaleString("vi-VN")} ₫/year`;
+                savingsText = t("annualSavings", {
+                  amount: `${priceCfg.savings.toLocaleString("vi-VN")} ₫`,
+                });
               } else {
-                savingsText = `Save ${priceCfg.symbol}${priceCfg.savings}/year`;
+                savingsText = t("annualSavings", {
+                  amount: `${priceCfg.symbol}${priceCfg.savings}`,
+                });
               }
             }
 
@@ -506,36 +433,36 @@ export function Pricing() {
               <RepeatStaggerItem key={plan.id} className="h-full">
                 <PricingCard
                   featured={plan.popular}
-                  className={`h-full border rounded-3xl bg-surface p-7 sm:p-9 flex flex-col justify-between transition-all duration-300 relative select-none ${
+                  className={`h-full border-2 rounded-3xl bg-surface p-7 sm:p-9 flex flex-col justify-between transition-all duration-300 relative select-none ${
                     plan.popular
-                      ? "border-2 border-primary shadow-2xl z-10 scale-[1.02]"
-                      : "border border-border shadow-xs hover:border-primary/40 hover:shadow-lg"
+                      ? "border-primary shadow-2xl z-10"
+                      : "border-border shadow-xs hover:border-primary/40 hover:shadow-lg"
                   }`}
                 >
                   {plan.popular && (
                     <span className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-primary text-primary-foreground text-[10px] font-extrabold tracking-wider px-4 py-1 uppercase rounded-full shadow-md flex items-center justify-center select-none">
-                      Most popular
+                      {t("mostPopular")}
                     </span>
                   )}
 
                   <div className="space-y-6">
                     <div className="space-y-1.5">
                       <h3 className="text-2xl font-black text-foreground tracking-tight">
-                        {plan.name}
+                        {t(`plans.${plan.id}.name`)}
                       </h3>
-                      <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed min-h-[40px]">
-                        {plan.description}
+                      <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed min-h-[40px] lg:min-h-18 xl:min-h-[40px]">
+                        {t(`plans.${plan.id}.description`)}
                       </p>
                     </div>
 
-                    <div className="flex items-baseline gap-1 pt-4 border-t border-border select-none">
+                    <div className="flex flex-wrap items-baseline gap-x-1 gap-y-1 pt-4 lg:min-h-24 border-t border-border select-none">
                       {priceCfg.pos === "prefix" && (
                         <span className="text-2xl font-bold text-foreground">
                           {priceCfg.symbol}
                         </span>
                       )}
 
-                      <div className="overflow-hidden min-h-[48px] flex items-baseline">
+                      <div className="min-w-0 max-w-full flex items-baseline">
                         <AnimatePresence mode="wait">
                           <motion.span
                             key={`${billing}-${currency}-${plan.id}`}
@@ -543,7 +470,11 @@ export function Pricing() {
                             animate={{ y: 0, opacity: 1 }}
                             exit={{ y: -6, opacity: 0 }}
                             transition={{ duration: 0.15, ease: "easeOut" }}
-                            className="text-4xl sm:text-5xl lg:text-6xl font-black text-foreground tracking-tight inline-block"
+                            className={
+                              currency === "VND"
+                                ? "text-4xl sm:text-5xl lg:text-4xl xl:text-5xl font-black text-foreground tracking-tight inline-block whitespace-nowrap"
+                                : "text-4xl sm:text-5xl lg:text-6xl font-black text-foreground tracking-tight inline-block whitespace-nowrap"
+                            }
                           >
                             {priceCfg.value}
                           </motion.span>
@@ -555,8 +486,12 @@ export function Pricing() {
                           {priceCfg.symbol}
                         </span>
                       )}
-                      <span className="text-sm text-muted-foreground font-semibold ml-1">
-                        /month
+                      <span
+                        className={`text-sm text-muted-foreground font-semibold ${
+                          locale === "vi" ? "basis-full" : "ml-1"
+                        }`}
+                      >
+                        {t("perMonth")}
                       </span>
                     </div>
 
@@ -567,22 +502,33 @@ export function Pricing() {
                         </span>
                       ) : (
                         <span className="text-muted-foreground">
-                          Billed monthly · cancel anytime
+                          {t("billedMonthly")}
                         </span>
                       )}
                     </div>
 
-                    {/* EVERYTHING IN BADGE */}
-                    <div
-                      className={`text-xs font-bold text-foreground bg-muted border border-border py-1.5 px-3 rounded-xl text-center select-none ${
-                        plan.everything_in
-                          ? ""
-                          : "opacity-0 pointer-events-none select-none"
-                      }`}
-                    >
-                      {plan.everything_in
-                        ? `✓ Everything in ${plan.everything_in}, plus:`
-                        : "Placeholder"}
+                    {/* Keep plan summaries aligned across the cards. */}
+                    <div className="min-h-18 lg:min-h-28 xl:min-h-18 flex items-start gap-2.5 rounded-2xl border border-border bg-muted/70 px-3.5 py-3 text-left select-none">
+                      <Check
+                        className="mt-0.5 size-4 shrink-0 text-primary"
+                        aria-hidden="true"
+                      />
+                      <div className="min-w-0 space-y-1">
+                        <p className="text-sm font-bold leading-snug text-foreground">
+                          {plan.everything_in
+                            ? t("everythingIn", {
+                                plan: t(
+                                  `plans.${plan.everything_in.toLowerCase()}.name`,
+                                ),
+                              })
+                            : t("starterSummary.title")}
+                        </p>
+                        <p className="text-xs leading-relaxed text-muted-foreground">
+                          {plan.everything_in
+                            ? t("everythingInExtra")
+                            : t("starterSummary.description")}
+                        </p>
+                      </div>
                     </div>
 
                     {/* SINGLE-COLUMN GROUPED FEATURES LIST */}
@@ -590,7 +536,7 @@ export function Pricing() {
                       {plan.features.map((grp, gidx) => (
                         <div key={gidx} className="space-y-2">
                           <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wider select-none">
-                            {grp.group}
+                            {t(`plans.${plan.id}.groups.${gidx}.title`)}
                           </h4>
                           <ul className="space-y-2.5">
                             {grp.items.map((feat, fidx) => (
@@ -599,7 +545,11 @@ export function Pricing() {
                                 className="flex items-start gap-2.5 text-sm font-medium text-foreground leading-snug"
                               >
                                 <Check className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                                <span>{feat}</span>
+                                <span>
+                                  {t(
+                                    `plans.${plan.id}.groups.${gidx}.items.${fidx}`,
+                                  )}
+                                </span>
                               </li>
                             ))}
                           </ul>
@@ -612,29 +562,31 @@ export function Pricing() {
                     {isContactSales ? (
                       <button
                         type="button"
-                        onClick={() => handleCtaClick(plan.name, true)}
+                        onClick={() =>
+                          handleCtaClick(t(`plans.${plan.id}.name`), true)
+                        }
                         className="w-full inline-flex h-13 sm:h-14 items-center justify-center rounded-full border-2 border-input hover:border-primary bg-surface hover:bg-muted text-sm sm:text-base font-bold text-foreground transition-all cursor-pointer select-none active:scale-[0.98] shadow-xs"
                       >
-                        <span>{plan.cta}</span>
+                        <span>{t(`plans.${plan.id}.cta`)}</span>
                       </button>
                     ) : (
                       <button
                         type="button"
-                        onClick={() => handleCtaClick(plan.name, false)}
+                        onClick={() =>
+                          handleCtaClick(t(`plans.${plan.id}.name`), false)
+                        }
                         className={`w-full inline-flex h-13 sm:h-14 items-center justify-center rounded-full text-sm sm:text-base font-bold transition-all cursor-pointer select-none active:scale-[0.98] shadow-xs ${
                           plan.popular
                             ? "bg-primary hover:bg-primary-hover text-primary-foreground shadow-md"
                             : "border-2 border-input hover:border-primary bg-surface hover:bg-muted text-foreground"
                         }`}
                       >
-                        {plan.cta}
+                        {t(`plans.${plan.id}.cta`)}
                       </button>
                     )}
 
                     <p className="text-[11px] text-muted-foreground text-center select-none font-medium">
-                      {isContactSales
-                        ? "Custom trial & support available"
-                        : "14-day free trial included"}
+                      {isContactSales ? t("customTrial") : t("trialIncluded")}
                     </p>
                   </div>
                 </PricingCard>
@@ -650,7 +602,7 @@ export function Pricing() {
             onClick={() => setIsCompareOpen(true)}
             className="inline-flex items-center gap-3 px-8 py-3.5 rounded-full border-2 border-input bg-surface hover:bg-primary hover:text-primary-foreground hover:border-primary text-sm sm:text-base font-extrabold text-foreground shadow-sm transition-all duration-200 cursor-pointer select-none active:scale-[0.98] group"
           >
-            <span>Compare all features in detail</span>
+            <span>{t("compare")}</span>
             <ChevronDown className="w-4 h-4 text-muted-foreground group-hover:text-primary-foreground transition-colors" />
           </button>
         </div>
@@ -664,56 +616,57 @@ export function Pricing() {
                 <div className="flex items-start justify-between border-b border-border/80 pb-6 mb-6 shrink-0 gap-6">
                   <div>
                     <DialogTitle className="text-2xl sm:text-3xl lg:text-4xl font-black text-foreground tracking-tight">
-                      Detailed Feature Comparison
+                      {t("comparison.title")}
                     </DialogTitle>
                     <DialogDescription className="text-sm sm:text-base text-muted-foreground mt-2 font-medium">
-                      Compare Starter, Professional, and Business tiers side by
-                      side to pick the right plan for your team
+                      {t("comparison.description")}
                     </DialogDescription>
                   </div>
                   <button
                     type="button"
                     onClick={() => setIsCompareOpen(false)}
                     className="w-11 h-11 sm:w-12 sm:h-12 rounded-full border border-input hover:border-primary bg-surface hover:bg-muted flex items-center justify-center text-foreground hover:text-foreground transition-all duration-200 cursor-pointer shadow-xs select-none shrink-0"
-                    aria-label="Close"
+                    aria-label={t("comparison.close")}
                   >
                     <X className="w-5 h-5 sm:w-6 sm:h-6 stroke-[2.5]" />
                   </button>
                 </div>
 
                 {/* Scrollable table container */}
-                <div className="overflow-y-auto flex-1 rounded-2xl border border-border/90 bg-surface shadow-xs">
+                <div className="overflow-auto flex-1 rounded-2xl border border-border/90 bg-surface shadow-xs">
                   <table className="w-full border-collapse min-w-[700px]">
-                    <thead className="sticky top-0 bg-muted/95 backdrop-blur-md z-20 select-none border-b border-border shadow-xs">
+                    <thead className="sticky top-0 bg-muted/95 backdrop-blur-md z-20 select-none [&_th]:align-top [&_th]:whitespace-nowrap [&_th]:shadow-[inset_0_-1px_0_var(--color-border)]">
                       <tr>
                         <th className="w-[37%] px-6 sm:px-8 py-5 text-left text-xs sm:text-sm font-black text-muted-foreground uppercase tracking-wider">
-                          Feature
+                          {t("comparison.feature")}
                         </th>
-                        <th className="w-[21%] px-6 sm:px-8 py-5 text-left text-xs sm:text-sm font-black text-muted-foreground uppercase tracking-wider">
-                          Starter
+                        <th className="w-[21%] px-6 sm:px-8 py-5 text-left text-xs sm:text-sm font-black text-muted-foreground uppercase tracking-wider border-l border-border">
+                          {t("plans.starter.name")}
                         </th>
                         <th className="w-[21%] px-6 sm:px-8 py-5 text-left text-xs sm:text-sm font-black text-foreground uppercase tracking-wider bg-muted/80 border-x border-border">
-                          <div className="flex items-center gap-2">
-                            <span>Professional</span>
-                            <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-primary text-primary-foreground tracking-normal uppercase">
-                              Popular
+                          <div className="flex flex-col items-start gap-2">
+                            <span className="whitespace-nowrap">
+                              {t("plans.professional.name")}
+                            </span>
+                            <span className="shrink-0 whitespace-nowrap px-2.5 py-1 rounded-full text-[10px] leading-none font-black bg-primary text-primary-foreground tracking-normal uppercase">
+                              {t("mostPopular")}
                             </span>
                           </div>
                         </th>
                         <th className="w-[21%] px-6 sm:px-8 py-5 text-left text-xs sm:text-sm font-black text-muted-foreground uppercase tracking-wider">
-                          Business
+                          {t("plans.business.name")}
                         </th>
                       </tr>
                     </thead>
                     <tbody>
                       {COMPARISONS.map((group, gidx) => (
-                        <React.Fragment key={gidx}>
+                        <Fragment key={gidx}>
                           <tr className="bg-muted/60 select-none">
                             <td
                               colSpan={4}
-                              className="px-6 sm:px-8 py-3.5 sm:py-4 text-xs sm:text-sm font-black text-foreground uppercase tracking-wider border-b border-border"
+                              className="px-6 sm:px-8 py-3.5 sm:py-4 text-xs sm:text-sm font-black text-foreground uppercase tracking-wider border-y border-border"
                             >
-                              {group.group}
+                              {t(`comparison.groups.${gidx}.title`)}
                             </td>
                           </tr>
                           {group.rows.map((row, ridx) => (
@@ -723,15 +676,19 @@ export function Pricing() {
                             >
                               <td className="px-6 sm:px-8 py-4 sm:py-5 align-top">
                                 <span className="text-sm sm:text-base font-bold text-foreground block">
-                                  {row.name}
+                                  {t(
+                                    `comparison.groups.${gidx}.rows.${ridx}.name`,
+                                  )}
                                 </span>
                                 {row.desc && (
                                   <span className="text-xs sm:text-sm text-muted-foreground block mt-1 leading-snug">
-                                    {row.desc}
+                                    {t(
+                                      `comparison.groups.${gidx}.rows.${ridx}.desc`,
+                                    )}
                                   </span>
                                 )}
                               </td>
-                              <td className="px-6 sm:px-8 py-4 sm:py-5 text-sm sm:text-base text-foreground font-medium align-middle">
+                              <td className="px-6 sm:px-8 py-4 sm:py-5 text-sm sm:text-base text-foreground font-medium align-middle border-l border-border/80">
                                 {typeof row.starter === "boolean" ? (
                                   row.starter ? (
                                     <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-primary text-primary-foreground shadow-xs">
@@ -744,7 +701,9 @@ export function Pricing() {
                                   )
                                 ) : (
                                   <span className="text-foreground font-medium">
-                                    {row.starter}
+                                    {t(
+                                      `comparison.groups.${gidx}.rows.${ridx}.starter`,
+                                    )}
                                   </span>
                                 )}
                               </td>
@@ -761,7 +720,9 @@ export function Pricing() {
                                   )
                                 ) : (
                                   <span className="text-foreground font-black">
-                                    {row.professional}
+                                    {t(
+                                      `comparison.groups.${gidx}.rows.${ridx}.professional`,
+                                    )}
                                   </span>
                                 )}
                               </td>
@@ -778,13 +739,15 @@ export function Pricing() {
                                   )
                                 ) : (
                                   <span className="text-foreground font-medium">
-                                    {row.business}
+                                    {t(
+                                      `comparison.groups.${gidx}.rows.${ridx}.business`,
+                                    )}
                                   </span>
                                 )}
                               </td>
                             </tr>
                           ))}
-                        </React.Fragment>
+                        </Fragment>
                       ))}
                     </tbody>
                   </table>
@@ -794,17 +757,14 @@ export function Pricing() {
                 <div className="pt-4 sm:pt-6 mt-4 border-t border-border/80 flex flex-col sm:flex-row items-center justify-between gap-4 shrink-0">
                   <p className="text-xs sm:text-sm text-muted-foreground flex items-center gap-2">
                     <Lock className="w-4 h-4 text-muted-foreground shrink-0" />
-                    <span>
-                      All plans include a 14-day free trial. No credit card
-                      required.
-                    </span>
+                    <span>{t("comparison.footer")}</span>
                   </p>
                   <button
                     type="button"
                     onClick={() => setIsCompareOpen(false)}
                     className="w-full sm:w-auto px-6 py-2.5 rounded-full border border-input hover:bg-muted text-xs sm:text-sm font-bold text-foreground transition cursor-pointer"
                   >
-                    Close comparison
+                    {t("comparison.close")}
                   </button>
                 </div>
               </DialogContent>
@@ -814,11 +774,9 @@ export function Pricing() {
 
         {/* Footer Notes */}
         <div className="text-center mt-5 select-none">
-          <p className="text-[9px] text-muted-foreground flex items-center justify-center gap-1">
-            <Lock className="w-3 h-3" />
-            <span>
-              No credit card required. Trial accounts will not be auto-charged.
-            </span>
+          <p className="text-sm leading-relaxed text-muted-foreground flex items-start justify-center gap-2">
+            <Lock className="size-4 shrink-0 mt-0.5" aria-hidden="true" />
+            <span>{t("footerNote")}</span>
           </p>
         </div>
       </div>

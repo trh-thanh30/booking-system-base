@@ -1,10 +1,12 @@
 "use client";
 
-import { useTransition } from "react";
+import { useEffect, useTransition } from "react";
+import { useToast } from "@repo/hooks";
 import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
 import { ChevronDown, Check } from "lucide-react";
 import { usePathname, useRouter } from "@/src/i18n/navigation";
+import { LANGUAGE_SWITCH_TOAST_KEY } from "@/src/constants/locale-switch.constants";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -30,6 +32,23 @@ export function LanguageSwitcher({
   const pathname = usePathname();
   const router = useRouter();
   const [pending, startTransition] = useTransition();
+  const { toast } = useToast();
+
+  useEffect(() => {
+    if (sessionStorage.getItem(LANGUAGE_SWITCH_TOAST_KEY) !== locale) return;
+    // Let the locale layout's Toaster subscribe before publishing the toast.
+    const timeout = window.setTimeout(() => {
+      // Header and footer share this switcher; only one should announce the change.
+      if (sessionStorage.getItem(LANGUAGE_SWITCH_TOAST_KEY) !== locale) return;
+      sessionStorage.removeItem(LANGUAGE_SWITCH_TOAST_KEY);
+      toast.success(t("languageChanged"), {
+        classNames: {
+          title: "!text-sm !font-semibold !leading-relaxed",
+        },
+      });
+    }, 0);
+    return () => window.clearTimeout(timeout);
+  }, [locale, t, toast]);
 
   const currentLanguage =
     LANDING_LANGUAGES.find((lang) => lang.code === locale) ||
@@ -42,6 +61,7 @@ export function LanguageSwitcher({
       window.location.search,
       window.location.hash,
     );
+    sessionStorage.setItem(LANGUAGE_SWITCH_TOAST_KEY, nextLocale);
     startTransition(() =>
       router.replace(target, { locale: nextLocale, scroll: false }),
     );
@@ -58,7 +78,7 @@ export function LanguageSwitcher({
           className,
         )}
       >
-        <div className="flex items-center gap-2">
+        <div className="flex shrink-0 items-center gap-2">
           <span className="relative flex h-3.5 w-5 shrink-0 overflow-hidden rounded-xs shadow-xs ring-1 ring-foreground/10">
             <Image
               src={
@@ -72,7 +92,7 @@ export function LanguageSwitcher({
               className="h-full w-full object-cover"
             />
           </span>
-          <span className="font-bold text-foreground">
+          <span className="whitespace-nowrap font-bold text-foreground">
             {currentLanguage?.label}
           </span>
         </div>
