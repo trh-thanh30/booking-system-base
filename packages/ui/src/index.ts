@@ -8,6 +8,7 @@ export * from "./dialog";
 export * from "./dropdown-menu";
 export * from "./input";
 export * from "./command";
+export * from "./confirm-dialog";
 export * from "./popover";
 export * from "./phone-number-input";
 export * from "./timezone-select";

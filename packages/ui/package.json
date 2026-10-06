@@ -10,6 +10,7 @@
     "./button": "./src/button.tsx",
     "./card": "./src/card.tsx",
     "./command": "./src/command.tsx",
+    "./confirm-dialog": "./src/confirm-dialog.tsx",
     "./country-select": "./src/country-select.tsx",
     "./checkbox": "./src/checkbox.tsx",
     "./dialog": "./src/dialog.tsx",
