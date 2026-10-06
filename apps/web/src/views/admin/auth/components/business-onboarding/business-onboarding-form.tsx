@@ -218,7 +218,7 @@ export function BusinessOnboardingForm({
         noValidate
         onSubmit={form.handleSubmit(submit)}
       >
-        <div className="flex items-center gap-3 rounded-md border bg-muted p-3 mb-2">
+        <div className="flex items-center gap-3 rounded-md border bg-muted p-3 mb-5">
           <Avatar className="size-10">
             <AvatarImage
               src={
