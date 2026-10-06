@@ -115,16 +115,16 @@
     "sessionExpired": "Your setup session expired. Log in to continue business setup.",
     "detailsConflict": "Username, phone or booking URL is already in use. Check your information.",
     "completionFailed": "Unable to complete business setup. Your form has been kept; please try again.",
-    "draftRestored": "Your saved draft has been restored.",
-    "draftSaving": "Saving draft…",
-    "draftSaved": "Draft saved automatically.",
-    "draftSaveFailed": "The draft could not be saved. Keep this tab open and try again.",
-    "discardDraft": "Delete saved draft",
+    "draftRestored": "Your saved business information has been restored.",
+    "draftSaving": "Saving your business information…",
+    "draftSaved": "Your business information has been saved automatically.",
+    "draftSaveFailed": "Your business information could not be saved. Keep this tab open and try again.",
+    "discardDraft": "Delete saved information",
     "discardDraftDialog": {
-      "title": "Delete saved draft?",
-      "description": "The information currently on screen will remain, but it will no longer be restored after you leave unless you edit the form again.",
-      "cancel": "Keep draft",
-      "confirm": "Delete draft"
+      "title": "Delete saved business information?",
+      "description": "The information currently shown will remain until you leave this page, but it will not be restored the next time you return.",
+      "cancel": "Keep information",
+      "confirm": "Delete saved information"
     },
     "retry": "Try again",
     "backToLogin": "Back to login"

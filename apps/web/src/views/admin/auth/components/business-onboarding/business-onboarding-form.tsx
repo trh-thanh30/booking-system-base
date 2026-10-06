@@ -218,7 +218,7 @@ export function BusinessOnboardingForm({
         noValidate
         onSubmit={form.handleSubmit(submit)}
       >
-        <div className="flex items-center gap-3 rounded-md border bg-muted p-3">
+        <div className="flex items-center gap-3 rounded-md border bg-muted p-3 mb-2">
           <Avatar className="size-10">
             <AvatarImage
               src={
@@ -315,7 +315,7 @@ export function BusinessOnboardingForm({
             <Button
               type="button"
               variant="ghost"
-              className="min-h-11 shrink-0 px-2 text-xs text-destructive hover:bg-transparent hover:text-destructive/80"
+              className="min-h-11 shrink-0 px-2 text-xs hover:cursor-pointer hover:underline text-destructive hover:bg-transparent hover:text-destructive/80"
               onClick={() => setDiscardDialogOpen(true)}
             >
               {t("discardDraft")}

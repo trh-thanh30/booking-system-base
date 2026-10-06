@@ -115,16 +115,16 @@
     "sessionExpired": "Phiên thiết lập đã hết hạn. Đăng nhập để tiếp tục thông tin doanh nghiệp.",
     "detailsConflict": "Tên đăng nhập, điện thoại hoặc đường dẫn đã được sử dụng. Vui lòng kiểm tra lại.",
     "completionFailed": "Chưa hoàn tất được thiết lập. Thông tin trên form vẫn được giữ, hãy thử lại.",
-    "draftRestored": "Đã khôi phục bản nháp của bạn.",
-    "draftSaving": "Đang lưu bản nháp…",
-    "draftSaved": "Đã tự động lưu bản nháp.",
-    "draftSaveFailed": "Chưa thể lưu bản nháp. Hãy giữ tab này mở và thử lại.",
-    "discardDraft": "Xóa bản nháp đã lưu",
+    "draftRestored": "Đã khôi phục thông tin doanh nghiệp đã lưu.",
+    "draftSaving": "Đang lưu thông tin doanh nghiệp…",
+    "draftSaved": "Thông tin doanh nghiệp đã được tự động lưu.",
+    "draftSaveFailed": "Chưa thể lưu thông tin doanh nghiệp. Hãy giữ tab này mở và thử lại.",
+    "discardDraft": "Xóa thông tin đã lưu",
     "discardDraftDialog": {
-      "title": "Xóa bản nháp đã lưu?",
-      "description": "Thông tin đang hiển thị vẫn được giữ, nhưng sẽ không được khôi phục sau khi bạn rời trang nếu bạn không chỉnh sửa thêm.",
-      "cancel": "Giữ bản nháp",
-      "confirm": "Xóa bản nháp"
+      "title": "Xóa thông tin doanh nghiệp đã lưu?",
+      "description": "Thông tin đang hiển thị vẫn được giữ cho đến khi bạn rời trang, nhưng sẽ không được khôi phục trong lần truy cập tiếp theo.",
+      "cancel": "Giữ thông tin",
+      "confirm": "Xóa thông tin đã lưu"
     },
     "retry": "Thử lại",
     "backToLogin": "Quay lại đăng nhập"

@@ -491,6 +491,47 @@ Không viết business logic, React component implementation, constant lớn ho�
 - `src/components/common` không import ngược vào `src/views`.
 - Feature này không import component private của feature khác.
 
+## Form Draft Và Khôi Phục Dữ Liệu
+
+Form dài hoặc có nhiều bước phải tự động lưu draft để người dùng không mất công
+việc khi reload, đóng tab hoặc vô tình rời route. Không áp dụng persistence hàng
+loạt cho mọi form.
+
+### Quy Tắc Persistence
+
+- Form dài/nhiều bước hoặc cần nhiều công sức nhập liệu dùng draft có version,
+  TTL và scope theo danh tính hiện tại.
+- Draft client-side không được chứa password, OTP, access/refresh token, payment
+  credential hoặc secret. Form có các trường này không được persist toàn bộ.
+- Dùng `localStorage` khi product yêu cầu phục hồi sau khi đóng tab; dùng
+  `sessionStorage` chỉ khi dữ liệu phải kết thúc cùng tab.
+- Draft phải có schema riêng chấp nhận dữ liệu đang nhập dở. Không dùng schema
+  submit cuối cùng để restore vì validation nghiệp vụ đầy đủ có thể xóa nhầm
+  draft chưa hoàn thiện.
+- Autosave nên debounce khoảng 300–800 ms và flush khi `pagehide`. Không toast
+  sau mỗi lần save; dùng status nhỏ với `aria-live="polite"`.
+- Chỉ hiện cảnh báo rời trang khi save đang thất bại hoặc còn thay đổi chưa lưu.
+  Không chặn điều hướng khi draft đã được lưu an toàn.
+- Chỉ xóa draft khi submit thành công, người dùng chủ động xóa, draft hết hạn,
+  sai version hoặc hỏng cấu trúc. Lỗi API/session tạm thời không được tự động
+  xóa công việc người dùng đã nhập.
+- Nếu cần khôi phục trên nhiều thiết bị, dùng draft phía server. `localStorage`
+  chỉ đảm bảo trên cùng browser/profile và vẫn chịu rủi ro khi người dùng xóa
+  dữ liệu trình duyệt.
+- Chỉ trích xuất hook/storage abstraction dùng chung khi có ít nhất hai feature
+  có cùng policy thực tế; không tạo wrapper generic trước nhu cầu.
+
+### Phân Loại Form Hiện Tại
+
+| Form                               | Policy                                                           |
+| :--------------------------------- | :--------------------------------------------------------------- |
+| Business onboarding                | Persist `localStorage`, TTL 7 ngày, restore step và dữ liệu      |
+| Signup/login/forgot/reset password | Không persist vì chứa credential hoặc là form ngắn               |
+| Email/OTP verification             | Không persist mã xác minh; countdown có thể giữ theo session     |
+| Accept invitation                  | Không persist vì chứa password và invitation token               |
+| Create Business dialog             | Không persist; cân nhắc confirm khi đóng nếu form dirty          |
+| Invite User dialog                 | Không persist; form ngắn, có thể confirm nếu mất dữ liệu đáng kể |
+
 ## Test Kiểm Soát Native HTML
 
 Mỗi frontend có native HTML spec riêng, quét `src` và `app` của chính app đó.

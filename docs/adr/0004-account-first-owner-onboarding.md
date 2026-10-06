@@ -2,8 +2,9 @@
 
 ## Status
 
-Accepted, 2026-10-03. Supersedes the registration timing and single-endpoint
-restriction in ADR 0002; preserves its Auth → Tenant boundary.
+Accepted, 2026-10-03; amended 2026-10-07. Supersedes the registration timing
+and single-endpoint restriction in ADR 0002; preserves its Auth → Tenant
+boundary.
 
 ## Decision
 
@@ -63,6 +64,8 @@ the shared country-neutral address contract.
 
 Denied location permissions and unavailable geocoding do not block manual entry.
 No password, JWT or onboarding ticket is stored in URLs, localStorage or
-sessionStorage. The Business form draft may be stored in sessionStorage under a
-versioned key and is schema-validated before restoration; it remains independent
-from authentication credentials.
+sessionStorage. The Business form draft may be stored in localStorage under a
+versioned key so it survives closing the tab. It is scoped to the verified
+profile, expires after seven days and is validated with a draft-specific schema
+before restoration. It remains independent from authentication credentials and
+is removed after successful onboarding or explicit discard.
