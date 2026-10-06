@@ -1,19 +1,19 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
-import { useLocale, useTranslations } from "next-intl";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { useToast } from "@repo/hooks";
-import type { CompleteGoogleOwnerOnboardingInput } from "@repo/shared";
-import { Button } from "@repo/ui";
-import { GoogleIcon } from "@/src/components/common";
 import { useAuth } from "@/src/app/providers/admin";
+import { GoogleIcon } from "@/src/components/common";
+import { useGoogleLogin } from "@/src/hooks/use-google-login";
 import { Link, useRouter } from "@/src/i18n/navigation";
 import { getSafeReturnTo } from "@/src/lib/admin/auth-routing";
 import { authService } from "@/src/services/admin/auth.service";
+import { useToast } from "@repo/hooks";
+import type { CompleteGoogleOwnerOnboardingInput } from "@repo/shared";
+import { Button } from "@repo/ui";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { useLocale, useTranslations } from "next-intl";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { AuthLoadingState, AuthShell, GoogleBusinessForm } from "./components";
 import { GOOGLE_ONBOARDING_QUERY_KEY } from "./constants/google-onboarding.constants";
-import { useGoogleLogin } from "@/src/hooks/use-google-login";
 import { getGoogleOnboardingError } from "./utils/google-auth.utils";
 
 export function GoogleOnboardingView() {
@@ -89,7 +89,7 @@ export function GoogleOnboardingView() {
       title={t("google.onboardingTitle")}
       description={t("google.onboardingDescription")}
     >
-      <div className="space-y-4">
+      <div className="space-y-2">
         {isLoading || isAuthenticated || profile.isPending ? (
           <AuthLoadingState
             title={t("checkingSession")}
