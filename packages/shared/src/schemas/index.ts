@@ -1,6 +1,7 @@
 export * from "./asset.schema.ts";
 export * from "./auth.schema.ts";
 export * from "./category.schema.ts";
+export * from "./location.schema.ts";
 export * from "./notification.schema.ts";
 export * from "./pagination.schema.ts";
 export * from "./permission.schema.ts";
