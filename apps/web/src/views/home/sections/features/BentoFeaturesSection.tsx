@@ -69,7 +69,7 @@ export function BentoFeaturesSection() {
           {/* 2x2 Compact Square-ish Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
             {/* CARD 1: Avoid Appointment Overload */}
-            <div className="rounded-3xl border border-border bg-muted/70 p-8 sm:p-10 flex flex-col justify-between space-y-6 shadow-xs hover:border-primary/40 transition-all min-h-[340px]">
+            <div className="@container rounded-3xl border border-border bg-muted/70 p-5 sm:p-6 lg:p-10 flex flex-col justify-between space-y-6 shadow-xs hover:border-primary/40 transition-all min-h-[340px]">
               <div className="space-y-2">
                 <h3 className="text-xl sm:text-2xl font-extrabold text-foreground tracking-tight">
                   {t("benefits.overload.title")}
@@ -95,7 +95,7 @@ export function BentoFeaturesSection() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 @min-[260px]:grid-cols-2 gap-3">
                     <div className="space-y-1">
                       <span className="text-xs font-semibold text-muted-foreground">
                         {t("benefits.overload.before")}
@@ -120,7 +120,7 @@ export function BentoFeaturesSection() {
             </div>
 
             {/* CARD 2: Stand Out with a Custom Booking Link */}
-            <div className="rounded-3xl border border-border bg-muted/70 p-8 sm:p-10 flex flex-col justify-between space-y-6 shadow-xs hover:border-primary/40 transition-all min-h-[340px]">
+            <div className="@container rounded-3xl border border-border bg-muted/70 p-5 sm:p-6 lg:p-10 flex flex-col justify-between space-y-6 shadow-xs hover:border-primary/40 transition-all min-h-[340px]">
               <div className="space-y-2">
                 <h3 className="text-xl sm:text-2xl font-extrabold text-foreground tracking-tight">
                   {t("benefits.link.title")}
@@ -133,15 +133,17 @@ export function BentoFeaturesSection() {
               {/* Compact Mockup: Link Bubble & Service Card */}
               <div className="space-y-3">
                 <div className="flex justify-center">
-                  <div className="px-4 py-1 rounded-full border border-border bg-surface shadow-xs text-xs font-mono text-foreground font-semibold inline-flex items-center gap-1.5">
-                    <Link2 className="w-3.5 h-3.5 text-muted-foreground" />
-                    <span>bookingbase.com/{t("benefits.link.slug")}</span>
+                  <div className="max-w-full px-3 py-2.5 rounded-2xl border border-border bg-surface shadow-xs text-xs font-mono text-foreground font-semibold inline-flex items-center gap-2">
+                    <Link2 className="w-3.5 h-3.5 shrink-0 text-muted-foreground" />
+                    <span className="min-w-0 break-all">
+                      bookingbase.com/{t("benefits.link.slug")}
+                    </span>
                   </div>
                 </div>
 
                 <div className="rounded-2xl border border-border bg-surface p-4 sm:p-5 space-y-2.5 shadow-xs text-xs sm:text-sm">
                   <div className="flex items-center gap-2.5">
-                    <div className="w-8 h-8 rounded-full bg-muted text-foreground font-bold text-xs flex items-center justify-center">
+                    <div className="w-8 h-8 shrink-0 rounded-full bg-muted text-foreground font-bold text-xs flex items-center justify-center">
                       BP
                     </div>
                     <div>
@@ -154,7 +156,7 @@ export function BentoFeaturesSection() {
                     </div>
                   </div>
 
-                  <div className="flex gap-1.5 pt-1 text-xs">
+                  <div className="flex flex-wrap gap-1.5 pt-1 text-xs">
                     <span className="px-2.5 py-1 rounded-lg bg-muted text-foreground">
                       15m
                     </span>
@@ -169,7 +171,7 @@ export function BentoFeaturesSection() {
                     </span>
                   </div>
 
-                  <div className="flex items-center justify-between text-xs text-muted-foreground pt-1.5 border-t border-border">
+                  <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5 text-xs text-muted-foreground pt-1.5 border-t border-border">
                     <span className="inline-flex items-center gap-1.5">
                       <Video className="w-3.5 h-3.5" /> Zoom
                     </span>
@@ -180,7 +182,7 @@ export function BentoFeaturesSection() {
             </div>
 
             {/* CARD 3: Streamline Your Bookers' Experience */}
-            <div className="rounded-3xl border border-border bg-muted/70 p-8 sm:p-10 flex flex-col justify-between space-y-6 shadow-xs hover:border-primary/40 transition-all min-h-[340px]">
+            <div className="rounded-3xl border border-border bg-muted/70 p-5 sm:p-6 lg:p-10 flex flex-col justify-between space-y-6 shadow-xs hover:border-primary/40 transition-all min-h-[340px]">
               <div className="space-y-2">
                 <h3 className="text-xl sm:text-2xl font-extrabold text-foreground tracking-tight">
                   {t("benefits.experience.title")}
@@ -191,25 +193,25 @@ export function BentoFeaturesSection() {
               </div>
 
               {/* Compact Mockup: Calendar Overlay */}
-              <div className="rounded-2xl border border-border bg-surface p-4 sm:p-5 space-y-3 shadow-xs">
-                <div className="flex items-center justify-between pb-2 border-b border-border text-xs">
+              <div className="@container rounded-2xl border border-border bg-surface p-4 sm:p-5 space-y-3 shadow-xs">
+                <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 pb-2 border-b border-border text-xs">
                   <div className="flex items-center gap-2 font-semibold text-foreground">
-                    <div className="w-6 h-3.5 rounded-full bg-primary relative p-0.5">
+                    <div className="w-6 h-3.5 shrink-0 rounded-full bg-primary relative p-0.5">
                       <div className="w-2.5 h-2.5 rounded-full bg-primary-foreground ml-auto" />
                     </div>
                     <span>{t("benefits.experience.overlay")}</span>
                   </div>
-                  <span className="text-muted-foreground font-semibold">
+                  <span className="whitespace-nowrap text-muted-foreground font-semibold">
                     12h / 24h
                   </span>
                 </div>
 
-                <div className="grid grid-cols-4 gap-2 text-center text-xs">
+                <div className="grid grid-cols-2 @min-[300px]:grid-cols-4 gap-2 text-center text-xs [&>div]:min-w-0 [&>div]:flex [&>div]:flex-col [&>div>div]:flex-1 [&>div>div]:flex [&>div>div]:items-center [&>div>div]:justify-center">
                   <div className="space-y-1">
                     <span className="font-semibold text-muted-foreground">
                       {t("benefits.experience.wed")}
                     </span>
-                    <div className="p-1.5 rounded-lg bg-muted text-foreground font-medium truncate text-[11px]">
+                    <div className="p-2 rounded-lg bg-muted text-foreground font-medium leading-snug text-xs">
                       {t("benefits.experience.lunch")}
                     </div>
                   </div>
@@ -217,7 +219,7 @@ export function BentoFeaturesSection() {
                     <span className="font-semibold text-muted-foreground">
                       {t("benefits.experience.thu")}
                     </span>
-                    <div className="p-1.5 rounded-lg bg-primary text-primary-foreground font-medium truncate text-[11px]">
+                    <div className="p-2 rounded-lg bg-primary text-primary-foreground font-medium leading-snug text-xs">
                       {t("benefits.experience.coffee")}
                     </div>
                   </div>
@@ -225,7 +227,7 @@ export function BentoFeaturesSection() {
                     <span className="font-semibold text-muted-foreground">
                       {t("benefits.experience.fri")}
                     </span>
-                    <div className="p-1.5 rounded-lg border border-dashed border-input text-muted-foreground text-[11px]">
+                    <div className="p-2 rounded-lg border border-dashed border-input text-muted-foreground leading-snug text-xs">
                       {t("benefits.experience.open")}
                     </div>
                   </div>
@@ -233,7 +235,7 @@ export function BentoFeaturesSection() {
                     <span className="font-semibold text-muted-foreground">
                       {t("benefits.experience.sat")}
                     </span>
-                    <div className="p-1.5 rounded-lg bg-muted text-foreground font-medium truncate text-[11px]">
+                    <div className="p-2 rounded-lg bg-muted text-foreground font-medium leading-snug text-xs">
                       {t("benefits.experience.hiring")}
                     </div>
                   </div>
@@ -242,7 +244,7 @@ export function BentoFeaturesSection() {
             </div>
 
             {/* CARD 4: Reduce No-Shows with Automated Meeting Reminders */}
-            <div className="rounded-3xl border border-border bg-muted/70 p-8 sm:p-10 flex flex-col justify-between space-y-6 shadow-xs hover:border-primary/40 transition-all min-h-[340px]">
+            <div className="rounded-3xl border border-border bg-muted/70 p-5 sm:p-6 lg:p-10 flex flex-col justify-between space-y-6 shadow-xs hover:border-primary/40 transition-all min-h-[340px]">
               <div className="space-y-2">
                 <h3 className="text-xl sm:text-2xl font-extrabold text-foreground tracking-tight">
                   {t("benefits.reminders.title")}
@@ -254,20 +256,20 @@ export function BentoFeaturesSection() {
 
               {/* Compact Mockup: Notification Toast */}
               <div className="py-3 flex items-center justify-center">
-                <div className="w-full rounded-2xl border border-border bg-surface p-4 shadow-xs flex items-center gap-3.5">
+                <div className="w-full rounded-2xl border border-border bg-surface p-4 shadow-xs flex items-start gap-3">
                   <div className="w-10 h-10 rounded-xl bg-primary text-primary-foreground flex items-center justify-center font-bold text-xs shrink-0">
                     B
                   </div>
                   <div className="min-w-0 flex-1">
-                    <div className="flex items-center justify-between">
-                      <p className="text-xs sm:text-sm font-bold text-foreground truncate">
+                    <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-1">
+                      <p className="text-xs sm:text-sm font-bold text-foreground leading-snug">
                         {t("benefits.reminders.confirmed")}
                       </p>
-                      <span className="text-[11px] text-muted-foreground shrink-0">
+                      <span className="text-[11px] text-muted-foreground shrink-0 whitespace-nowrap">
                         {t("benefits.reminders.now")}
                       </span>
                     </div>
-                    <p className="text-xs text-muted-foreground truncate mt-0.5">
+                    <p className="text-xs text-muted-foreground leading-relaxed mt-1">
                       {t("benefits.reminders.notification")}
                     </p>
                   </div>

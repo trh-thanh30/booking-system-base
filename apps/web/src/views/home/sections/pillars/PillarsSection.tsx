@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { ArrowRight, Calendar, Check } from "lucide-react";
+import { ArrowRight, Calendar, Check, Link2 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import {
   LandingSection,
@@ -410,28 +410,28 @@ export function PillarsSection() {
                     )}
 
                     {card.id === "business" && (
-                      <div className="mx-auto w-full max-w-[420px] sm:max-w-[450px] rounded-t-3xl border-t-4 border-x-4 border-input bg-foreground p-2.5 pb-0 shadow-lg">
+                      <div className="@container mx-auto w-full max-w-[420px] sm:max-w-[450px] rounded-t-3xl border-t-4 border-x-4 border-input bg-foreground p-2.5 pb-0 shadow-lg">
                         <div className="rounded-t-2xl bg-surface border-t border-x border-border p-4 pb-8 text-left space-y-3">
-                          <div className="flex items-center justify-between border-b border-border pb-2.5">
-                            <div className="flex items-center gap-2">
-                              <div className="w-7 h-7 rounded-full bg-primary text-primary-foreground font-bold text-xs flex items-center justify-center">
+                          <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 border-b border-border pb-2.5">
+                            <div className="flex min-w-0 items-center gap-2">
+                              <div className="w-7 h-7 shrink-0 rounded-full bg-primary text-primary-foreground font-bold text-xs flex items-center justify-center">
                                 L
                               </div>
                               <span className="text-sm font-bold text-foreground">
                                 lumiere_beauty
                               </span>
                             </div>
-                            <span className="text-xs font-semibold text-muted-foreground">
+                            <span className="whitespace-nowrap text-xs font-semibold text-muted-foreground">
                               {t("demo.following")}
                             </span>
                           </div>
 
                           <div className="rounded-2xl border border-border bg-muted p-3 space-y-2.5">
-                            <div className="flex items-center justify-between text-xs">
+                            <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-1.5 text-xs">
                               <span className="font-bold text-foreground">
                                 {t("demo.hydration")}
                               </span>
-                              <span className="font-extrabold text-foreground text-sm">
+                              <span className="whitespace-nowrap font-extrabold text-foreground text-sm">
                                 {price(85.0)}
                               </span>
                             </div>
@@ -444,17 +444,20 @@ export function PillarsSection() {
                                 type="button"
                                 className="w-full py-2 rounded-xl bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer"
                               >
-                                <Calendar className="w-3.5 h-3.5" />
+                                <Calendar className="w-3.5 h-3.5 shrink-0" />
                                 <span>{t("demo.bookWebsite")}</span>
                               </button>
                             </div>
                           </div>
 
-                          <div className="p-2.5 rounded-xl bg-muted border border-border/80 flex items-center justify-between text-xs text-foreground">
-                            <span className="font-mono truncate">
-                              bookingbase.com/lumiere
-                            </span>
-                            <span className="font-semibold text-foreground shrink-0 ml-2">
+                          <div className="p-2.5 rounded-xl bg-muted border border-border/80 flex flex-col @min-[320px]:flex-row items-start @min-[320px]:items-center justify-between gap-2 text-xs text-foreground">
+                            <div className="flex min-w-0 items-center gap-2">
+                              <Link2 className="w-3.5 h-3.5 shrink-0 text-muted-foreground" />
+                              <span className="whitespace-nowrap text-[11px] font-bold text-foreground">
+                                bookingbase.com/lumiere
+                              </span>
+                            </div>
+                            <span className="self-center whitespace-nowrap text-xs font-bold text-foreground bg-surface px-2.5 py-1 rounded-lg shadow-xs shrink-0">
                               {t("demo.shareLink")}
                             </span>
                           </div>
@@ -498,8 +501,8 @@ export function PillarsSection() {
         {/* Horizontal Feature Card: Social Bio Booking (Square Style Banner) */}
         <div className="mt-12 lg:mt-16 rounded-3xl border border-input bg-surface shadow-xs overflow-hidden grid grid-cols-1 md:grid-cols-12 items-stretch">
           {/* Left Column: Interactive Social Bio Mockup with Popup */}
-          <div className="md:col-span-6 bg-muted/70 p-8 sm:p-12 flex items-center justify-center border-b md:border-b-0 md:border-r border-border/80 overflow-hidden relative">
-            <div className="w-full max-w-[360px] sm:max-w-[390px] rounded-3xl border-4 border-input bg-surface shadow-lg overflow-hidden text-left relative">
+          <div className="md:col-span-6 bg-muted/70 p-4 sm:p-8 lg:p-12 flex items-center justify-center border-b md:border-b-0 md:border-r border-border/80 overflow-hidden relative">
+            <div className="@container w-full max-w-[360px] sm:max-w-[390px] rounded-3xl border-4 border-input bg-surface shadow-lg overflow-hidden text-left relative">
               {/* Phone Header / Status Bar */}
               <div className="bg-surface px-5 pt-3 pb-2.5 border-b border-border flex items-center justify-between text-xs text-muted-foreground font-semibold">
                 <span>9:41</span>
@@ -510,14 +513,14 @@ export function PillarsSection() {
               {/* Instagram / Social Profile Header */}
               <div className="p-4 sm:p-5 space-y-3.5">
                 <div className="flex items-center gap-3.5">
-                  <div className="relative">
+                  <div className="relative shrink-0">
                     <div className="w-14 h-14 rounded-full border-2 border-primary p-0.5 flex items-center justify-center">
                       <div className="w-full h-full rounded-full bg-primary text-primary-foreground font-bold text-sm flex items-center justify-center">
                         LM
                       </div>
                     </div>
                   </div>
-                  <div className="space-y-0.5">
+                  <div className="min-w-0 space-y-0.5">
                     <div className="flex items-center gap-1.5">
                       <span className="text-sm font-bold text-foreground">
                         lumiere.studio
@@ -539,14 +542,14 @@ export function PillarsSection() {
                 </div>
 
                 {/* Bio Action Link Button */}
-                <div className="p-2.5 rounded-xl bg-muted border border-border flex items-center justify-between text-xs sm:text-sm">
-                  <div className="flex items-center gap-2 truncate">
-                    <span className="text-muted-foreground text-xs">🔗</span>
-                    <span className="font-semibold text-foreground truncate">
+                <div className="p-2.5 rounded-xl bg-muted border border-border flex flex-col @min-[320px]:flex-row items-start @min-[320px]:items-center justify-between gap-2.5 text-xs sm:text-sm">
+                  <div className="flex min-w-0 items-center gap-2">
+                    <Link2 className="w-3.5 h-3.5 shrink-0 text-muted-foreground" />
+                    <span className="whitespace-nowrap text-[11px] @min-[320px]:text-xs font-bold text-foreground">
                       bookingbase.com/lumiere
                     </span>
                   </div>
-                  <span className="text-xs font-bold text-foreground bg-surface px-2.5 py-1 rounded-lg shadow-xs shrink-0">
+                  <span className="self-center whitespace-nowrap text-xs font-bold text-foreground bg-surface px-2.5 py-1 rounded-lg shadow-xs shrink-0">
                     {t("demo.bookNow")}
                   </span>
                 </div>
@@ -555,19 +558,19 @@ export function PillarsSection() {
               {/* Sliding Bottom Sheet Booking Popup (In-App Booking Experience) */}
               <div className="rounded-t-3xl border-t-2 border-input bg-accent text-accent-foreground p-4 sm:p-5 space-y-3 shadow-lg">
                 <div className="w-10 h-1 rounded-full bg-input mx-auto" />
-                <div className="flex items-center justify-between text-xs">
+                <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 text-xs">
                   <span className="font-bold text-muted-foreground">
                     {t("demo.instantInApp")}
                   </span>
-                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-muted text-muted-foreground font-medium">
+                  <span className="whitespace-nowrap text-[10px] px-2 py-0.5 rounded-full bg-muted text-muted-foreground font-medium">
                     {t("demo.checkout")}
                   </span>
                 </div>
 
                 <div className="p-3 rounded-xl bg-surface border border-border space-y-1">
-                  <div className="flex justify-between items-center text-xs sm:text-sm font-bold">
+                  <div className="flex flex-wrap justify-between items-start gap-x-3 gap-y-1.5 text-xs sm:text-sm font-bold">
                     <span>{t("demo.balayage")}</span>
-                    <span>{price(140.0)}</span>
+                    <span className="whitespace-nowrap">{price(140.0)}</span>
                   </div>
                   <p className="text-xs text-muted-foreground">
                     {t("demo.tomorrow")}
@@ -625,10 +628,10 @@ export function PillarsSection() {
 
           <a
             href="#faq"
-            className="shrink-0 px-8 py-3.5 rounded-full border border-input bg-surface hover:bg-muted text-sm sm:text-base font-bold text-foreground transition-all inline-flex items-center gap-2.5 cursor-pointer shadow-xs"
+            className="shrink-0 whitespace-nowrap px-4 sm:px-8 py-3.5 rounded-full border border-input bg-surface hover:bg-muted text-sm sm:text-base font-bold text-foreground transition-all inline-flex items-center justify-center gap-2.5 cursor-pointer shadow-xs"
           >
             <span>{t("migration.cta")}</span>
-            <ArrowRight className="w-4 h-4 text-foreground" />
+            <ArrowRight className="w-4 h-4 shrink-0 text-foreground" />
           </a>
         </div>
       </LandingContainer>
