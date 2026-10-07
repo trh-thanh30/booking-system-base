@@ -17,6 +17,29 @@ const owner = {
   businesses: [{ id: "business-a", tenant_id: "tenant-a", is_default: true }],
   permissions: [],
 };
+test("verified business onboarding adopts its session without another login or profile request", async () => {
+  let logins = 0;
+  let profileRequests = 0;
+  const context = setup({
+    login: async () => {
+      logins++;
+      throw new Error("unexpected login");
+    },
+    getMe: async () => {
+      profileRequests++;
+      throw new Error("unexpected profile request");
+    },
+  });
+  const result = await context.session.establishSession(async () => ({
+    access_token: "onboarding-token",
+    user: owner,
+  }));
+  assert.deepEqual(result.user, owner);
+  assert.equal(context.token, "onboarding-token");
+  assert.equal(context.active, "business-a");
+  assert.equal(logins, 0);
+  assert.equal(profileRequests, 0);
+});
 function setup(overrides = {}) {
   let token;
   let active;

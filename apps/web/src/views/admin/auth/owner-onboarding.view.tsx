@@ -9,11 +9,13 @@ import { Button } from "@repo/ui";
 import { useRouter } from "@/src/i18n/navigation";
 import { authService } from "@/src/services/admin/auth.service";
 import { AuthShell, BusinessOnboardingForm } from "./components";
+import { useAuth } from "@/src/app/providers/admin";
 
 export function OwnerOnboardingView() {
   const locale = useLocale();
   const t = useTranslations("AuthJourney");
   const router = useRouter();
+  const { completeOwnerOnboarding, isLoading, isAuthenticated } = useAuth();
   const { toast } = useToast();
   const submitted = useRef(false);
   const clearDraftRef = useRef<() => void>(() => undefined);
@@ -21,15 +23,20 @@ export function OwnerOnboardingView() {
   const profile = useQuery({
     queryKey: ["owner-onboarding-profile"],
     queryFn: authService.getOwnerOnboardingProfile,
+    enabled: !isLoading && !isAuthenticated,
     retry: false,
     staleTime: 0,
     gcTime: 0,
     refetchOnWindowFocus: false,
   });
   const completion = useMutation({
-    mutationFn: authService.completeOwnerOnboarding,
+    mutationFn: completeOwnerOnboarding,
     retry: false,
   });
+  useEffect(() => {
+    if (!isLoading && isAuthenticated && !submitted.current)
+      router.replace("/admin/business-setup/entry");
+  }, [isLoading, isAuthenticated, router]);
   async function submit(input: CompleteOwnerBusinessInput) {
     if (submitted.current) return;
     submitted.current = true;
@@ -37,7 +44,7 @@ export function OwnerOnboardingView() {
       await completion.mutateAsync(input);
       clearDraftRef.current();
       toast.success(t("businessCreated"));
-      router.replace("/admin/login");
+      router.replace("/admin/business-setup/entry");
     } catch (failure) {
       submitted.current = false;
       const sessionExpired =

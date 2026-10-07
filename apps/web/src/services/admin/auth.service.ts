@@ -80,7 +80,9 @@ export const authService = {
     );
   },
   async completeOwnerOnboarding(input: CompleteOwnerBusinessInput) {
-    await publicAuthClient.post("/auth/admin/onboarding", input);
+    return unwrapApiData(
+      await publicAuthClient.post<AuthSession>("/auth/admin/onboarding", input),
+    );
   },
   getGoogleLoginUrl(locale: string, returnTo?: string) {
     return buildGoogleLoginUrl(apiConfig.baseUrl, locale, returnTo);

@@ -15,6 +15,8 @@ import {
   type VerifyAccountParams,
 } from './verify-account.usecase';
 import { LoginDto } from '../dto/login.dto';
+import { AuthTokenService } from '../services/auth-token.service';
+import { RefreshTokenSessionService } from '../services/refresh-token-session.service';
 
 @Injectable()
 export class OwnerBusinessOnboardingUseCase {
@@ -26,6 +28,8 @@ export class OwnerBusinessOnboardingUseCase {
     private readonly verifyAccount: VerifyAccountUseCase,
     private readonly bcrypt: BcryptService,
     private readonly workspace: CreateTenantWorkspaceUseCase,
+    private readonly tokens: AuthTokenService,
+    private readonly refreshSessions: RefreshTokenSessionService,
   ) {}
 
   async verify(input: VerifyAccountParams): Promise<string | null> {
@@ -100,12 +104,26 @@ export class OwnerBusinessOnboardingUseCase {
         phone: dto.owner.phone,
       },
     });
+    const tokens = this.tokens.generateTokenPair(
+      {
+        id: result.owner.id,
+        tenant_id: result.owner.tenant_id,
+        email: result.owner.email,
+        username: result.owner.username,
+        role: result.owner.role,
+        status: result.owner.status,
+      },
+      'admin',
+    );
+    await this.users.update(result.owner.id, {
+      refresh_token_hash: this.refreshSessions.hash(tokens.refresh_token),
+    });
     try {
       await this.sessions.delete(token);
     } catch {
       this.logger.warn('Owner onboarding completed; ticket cleanup failed');
     }
-    return result;
+    return { owner: result.owner, ...tokens };
   }
 
   private async pendingUser(token: string) {
