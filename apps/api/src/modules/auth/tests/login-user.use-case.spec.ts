@@ -15,6 +15,28 @@ function user(overrides: Record<string, unknown> = {}) {
 }
 
 describe('LoginUserUseCase', () => {
+  it('never issues Admin tokens to a verified Owner without a workspace', async () => {
+    const tokens = { generateTokenPair: jest.fn() };
+    await expect(
+      new LoginUserUseCase(
+        {
+          user: {
+            findFirst: jest
+              .fn()
+              .mockResolvedValue(user({ role: 'OWNER', tenant_id: null })),
+          },
+        } as never,
+        { comparePassword: jest.fn().mockResolvedValue(true) } as never,
+        tokens as never,
+        { createSession: jest.fn() } as never,
+      ).execute(
+        { usernameOrEmail: 'owner@example.com', password: 'password' },
+        ['OWNER', 'STAFF'],
+        'admin',
+      ),
+    ).rejects.toMatchObject({ code: 'OWNER_ONBOARDING_REQUIRED' });
+    expect(tokens.generateTokenPair).not.toHaveBeenCalled();
+  });
   const dto = {
     usernameOrEmail: 'user@example.com',
     password: 'password',

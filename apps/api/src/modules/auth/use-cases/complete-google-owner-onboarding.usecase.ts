@@ -1,4 +1,12 @@
-import { ConflictError } from '@/common/response';
+import {
+  BadRequestError,
+  ConflictError,
+  UnauthorizedError,
+} from '@/common/response';
+import {
+  businessProfileSchema,
+  completeOwnerBusinessSchema,
+} from '@repo/shared';
 import { PrismaService } from '@/database/prisma/prisma.service';
 import { CompleteGoogleOwnerOnboardingDto } from '@/modules/auth/dto/complete-google-owner-onboarding.dto';
 import { AuthTokenService } from '@/modules/auth/services/auth-token.service';
@@ -26,11 +34,36 @@ export class CompleteGoogleOwnerOnboardingUseCase {
 
   async execute(token: string, dto: CompleteGoogleOwnerOnboardingDto) {
     const session = await this.onboardingSessionService.get(token);
+    if (session.userId && !completeOwnerBusinessSchema.safeParse(dto).success) {
+      throw new BadRequestError('Complete business information and address');
+    }
+    const phone = dto.owner.phone?.trim() || undefined;
+    const profile = dto.business_profile
+      ? businessProfileSchema.safeParse(dto.business_profile)
+      : null;
+    if (profile && !profile.success)
+      throw new BadRequestError('Invalid business information');
+    if (session.userId) {
+      const pendingOwner = await this.usersService.findById(session.userId);
+      if (
+        !pendingOwner ||
+        pendingOwner.email !== session.email ||
+        pendingOwner.role !== 'OWNER' ||
+        pendingOwner.status !== 'ACTIVE' ||
+        !pendingOwner.is_verified ||
+        pendingOwner.tenant_id
+      )
+        throw new UnauthorizedError(
+          'Google onboarding session is invalid',
+          'GOOGLE_ONBOARDING_SESSION_INVALID',
+        );
+    }
     await this.assertIdentityIsUnique(
       session.email,
       session.providerAccountId,
       dto.owner.username,
-      dto.owner.phone,
+      phone,
+      session.userId,
     );
 
     const workspace = await this.createTenantWorkspaceUseCase.execute({
@@ -39,12 +72,17 @@ export class CompleteGoogleOwnerOnboardingUseCase {
         name: dto.name,
         timezone: dto.timezone,
         locale: dto.locale ?? session.locale,
+        businessCategoryId: dto.business_category_id,
         primaryDomain: dto.primary_domain,
         defaultBusinessName: dto.default_business_name,
         defaultBusinessSlug: dto.default_business_slug,
         settings: dto.settings,
+        ...(profile?.success
+          ? { defaultBusinessSettings: { onboarding: profile.data } }
+          : {}),
       },
       owner: {
+        ...(session.userId ? { existingUserId: session.userId } : {}),
         avatar_url: session.avatarUrl,
         email: session.email,
         full_name: session.fullName,
@@ -55,7 +93,7 @@ export class CompleteGoogleOwnerOnboardingUseCase {
         },
         isVerified: true,
         password: null,
-        phone: dto.owner.phone,
+        phone,
         username: dto.owner.username,
       },
     });
@@ -102,6 +140,7 @@ export class CompleteGoogleOwnerOnboardingUseCase {
     providerAccountId: string,
     username: string,
     phone?: string,
+    existingUserId?: string,
   ): Promise<void> {
     const [existingEmail, existingIdentity, existingUsername, existingPhone] =
       await Promise.all([
@@ -113,22 +152,26 @@ export class CompleteGoogleOwnerOnboardingUseCase {
               provider_account_id: providerAccountId,
             },
           },
-          select: { id: true },
+          select: { id: true, user_id: true },
         }),
         this.usersService.findByUsername(username),
         phone ? this.usersService.findByPhone(phone) : Promise.resolve(null),
       ]);
 
-    if (existingEmail || existingIdentity) {
+    if (
+      (existingEmail && existingEmail.id !== existingUserId) ||
+      (existingIdentity && existingIdentity.user_id !== existingUserId) ||
+      (existingUserId && !existingIdentity)
+    ) {
       throw new ConflictError(
         'Google account onboarding is already completed',
         'GOOGLE_ONBOARDING_ALREADY_COMPLETED',
       );
     }
-    if (existingUsername) {
+    if (existingUsername && existingUsername.id !== existingUserId) {
       throw new ConflictError('Username is already taken');
     }
-    if (existingPhone) {
+    if (existingPhone && existingPhone.id !== existingUserId) {
       throw new ConflictError('Phone number is already in use');
     }
   }

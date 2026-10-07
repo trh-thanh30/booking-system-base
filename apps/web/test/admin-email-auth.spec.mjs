@@ -6,10 +6,17 @@ import {
   verifyEmailSchema,
 } from "@repo/shared";
 import {
+  formatCountdown,
   getEmailAuthError,
   getSessionUrl,
   getUnverifiedEmailUrl,
 } from "../src/views/admin/auth/utils/email-auth.utils.ts";
+
+test("verification countdown formats a stable mm:ss value", () => {
+  assert.equal(formatCountdown(900), "15:00");
+  assert.equal(formatCountdown(61), "1:01");
+  assert.equal(formatCountdown(-1), "0:00");
+});
 
 test("OTP is exactly six digits and reset password must match and have eight characters", () => {
   for (const code of ["12345", "1234567", "12345a", ""]) {

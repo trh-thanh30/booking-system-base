@@ -86,6 +86,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm lint:platform-admin
       - run: pnpm typecheck:platform-admin
+      - run: pnpm test:platform-admin
       - run: pnpm build:platform-admin
 
   dependency-security:

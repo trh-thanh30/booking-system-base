@@ -11,6 +11,7 @@ const onboardingSession = {
 };
 
 const input = {
+  business_category_id: '2518359c-6d0d-4ad8-a7ce-10f00eb36074',
   slug: 'demo-spa',
   name: 'Demo Spa',
   default_business_name: 'Demo Spa Hồ Tây',
@@ -24,6 +25,50 @@ const input = {
 };
 
 describe('CompleteGoogleOwnerOnboardingUseCase', () => {
+  it('attaches a callback-persisted Google Owner instead of creating a second user', async () => {
+    const dependencies = makeDependencies();
+    dependencies.sessions.get.mockResolvedValue({
+      ...onboardingSession,
+      userId: 'owner-id',
+    });
+    dependencies.users.findById.mockResolvedValue({
+      id: 'owner-id',
+      email: onboardingSession.email,
+      role: 'OWNER',
+      status: 'ACTIVE',
+      tenant_id: null,
+      is_verified: true,
+    });
+    dependencies.users.findByEmail.mockResolvedValue({ id: 'owner-id' });
+    dependencies.prisma.userIdentity.findUnique.mockResolvedValue({
+      id: 'identity',
+      user_id: 'owner-id',
+    });
+    await createUseCase(dependencies).execute('ticket', {
+      ...input,
+      business_profile: {
+        address: {
+          countryCode: 'VN',
+          addressLine1: '1 Example',
+          addressLine2: '',
+          locality: 'Hanoi',
+          administrativeAreaLevel1: 'Hanoi',
+          administrativeAreaLevel2: '',
+          postalCode: '100000',
+          formattedAddress: '1 Example, Hanoi, Vietnam',
+          location: null,
+        },
+      },
+    });
+    expect(dependencies.workspace.execute).toHaveBeenCalledWith(
+      expect.objectContaining({
+        owner: expect.objectContaining({
+          existingUserId: 'owner-id',
+          password: null,
+        }),
+      }),
+    );
+  });
   it('provisions a verified Google Owner workspace and creates an admin session', async () => {
     const dependencies = makeDependencies();
 
@@ -45,6 +90,7 @@ describe('CompleteGoogleOwnerOnboardingUseCase', () => {
         name: 'Demo Spa',
         defaultBusinessName: 'Demo Spa Hồ Tây',
         defaultBusinessSlug: 'demo-spa-ho-tay',
+        businessCategoryId: input.business_category_id,
       }),
       owner: {
         avatar_url: 'https://example.com/avatar.png',
@@ -124,6 +170,7 @@ function makeDependencies() {
       },
     },
     users: {
+      findById: jest.fn().mockResolvedValue(null),
       findByEmail: jest.fn().mockResolvedValue(null),
       findByPhone: jest.fn().mockResolvedValue(null),
       findByUsername: jest.fn().mockResolvedValue(null),

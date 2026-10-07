@@ -23,6 +23,6 @@ import { Module } from '@nestjs/common';
     PrismaService,
     BcryptService,
   ],
-  exports: [UsersService],
+  exports: [UsersService, UsersRepository],
 })
 export class UsersModule {}

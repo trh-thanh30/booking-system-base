@@ -4,6 +4,10 @@
 
 Accepted
 
+Registration timing and endpoint restriction are superseded by
+[ADR 0004](0004-account-first-owner-onboarding.md). The Auth → Tenant boundary
+and no-separate-Onboarding-module decision remain applicable.
+
 ## Context
 
 The current phase has one public registration flow. A person registers as an

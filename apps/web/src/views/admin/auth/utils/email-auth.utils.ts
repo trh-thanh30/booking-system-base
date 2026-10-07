@@ -1,6 +1,13 @@
 import { HttpClientError } from "@repo/shared";
 import { getSafeReturnTo } from "@/src/lib/admin/auth-routing";
 
+export function formatCountdown(totalSeconds: number) {
+  const safeSeconds = Math.max(0, Math.floor(totalSeconds));
+  const minutes = Math.floor(safeSeconds / 60);
+  const seconds = safeSeconds % 60;
+  return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+}
+
 export function getEmailAuthError(error: unknown, phase: "request" | "otp") {
   const result = { key: "emailFlow.failed", expired: false, retryAfter: 0 };
   if (!(error instanceof HttpClientError)) return result;
@@ -52,5 +59,11 @@ export function getUnverifiedEmailUrl(error: unknown, returnTo?: string) {
     typeof details.sessionId === "string"
       ? details.sessionId
       : "";
-  return getSessionUrl("verify-email", sessionId, returnTo);
+  const url = getSessionUrl("verify-email", sessionId, returnTo);
+  return typeof details === "object" &&
+    details !== null &&
+    "requiresOnboarding" in details &&
+    details.requiresOnboarding === true
+    ? `${url}&onboarding=1`
+    : url;
 }

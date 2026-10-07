@@ -48,6 +48,11 @@ function createSubject(options?: {
     user;
   const transaction = {
     user: {
+      create: jest
+        .fn()
+        .mockResolvedValue(
+          owner({ tenant_id: null, password: null, is_verified: true }),
+        ),
       findUnique: jest.fn().mockResolvedValue(user),
       update: jest.fn().mockImplementation(({ data }) =>
         Promise.resolve({
@@ -113,6 +118,24 @@ function createSubject(options?: {
 }
 
 describe('LoginWithGoogleUseCase', () => {
+  it('resumes a persisted pending Google Owner without issuing Admin tokens', async () => {
+    const pending = owner({
+      tenant_id: null,
+      password: null,
+      is_verified: true,
+    });
+    const { subject, tokenService, onboardingSessionService } = createSubject({
+      existingIdentity: { id: 'identity-id', user: pending },
+      user: pending,
+    });
+    await expect(
+      subject.execute({ code: 'code', state: 'state', stateCookie: 'state' }),
+    ).resolves.toMatchObject({ status: 'onboarding_required' });
+    expect(tokenService.generateTokenPair).not.toHaveBeenCalled();
+    expect(onboardingSessionService.create).toHaveBeenCalledWith(
+      expect.objectContaining({ userId: pending.id }),
+    );
+  });
   it('links a verified Google identity to an existing Owner and creates an admin session', async () => {
     const { subject, stateService, googleOAuthProvider, transaction } =
       createSubject();
@@ -208,6 +231,7 @@ describe('LoginWithGoogleUseCase', () => {
       onboardingTtlSeconds: 900,
     });
     expect(onboardingSessionService.create).toHaveBeenCalledWith({
+      userId: 'owner-id',
       avatarUrl: 'https://example.com/avatar.png',
       email: 'owner@example.com',
       fullName: 'Business Owner',
@@ -218,11 +242,19 @@ describe('LoginWithGoogleUseCase', () => {
 
     expect(transaction.userIdentity.create).not.toHaveBeenCalled();
     expect(transaction.user.update).not.toHaveBeenCalled();
+    expect(transaction.user.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          password: null,
+          is_verified: true,
+          role: 'OWNER',
+        }),
+      }),
+    );
   });
 
   it.each([
     [owner({ role: user_role.STAFF }), 'GOOGLE_OWNER_REQUIRED'],
-    [owner({ tenant_id: null }), 'GOOGLE_OWNER_REQUIRED'],
     [owner({ status: user_status.INACTIVE }), 'GOOGLE_ACCOUNT_INACTIVE'],
   ])('rejects an ineligible account without linking it', async (user, code) => {
     const { subject, transaction } = createSubject({ user });

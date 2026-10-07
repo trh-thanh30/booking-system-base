@@ -56,6 +56,22 @@ import { useAuth, usePermission } from "@repo/hooks/auth";
 - Hook trong package này phải type-safe, SSR-safe nếu chạm tới `window`/`document`.
 - File `index.ts` chỉ dùng để export, không viết implementation.
 
+### Một Nơi Sở Hữu Implementation
+
+Hook chung phải được import trực tiếp từ nơi sở hữu, không đi qua file hook
+feature chỉ có re-export. Ví dụ Landing signup, Admin login và Google onboarding
+cùng dùng:
+
+```tsx
+import { useGoogleLogin } from "@/src/hooks/use-google-login";
+```
+
+Không tạo `views/admin/auth/hooks/use-google-login.ts` chỉ để re-export hook này.
+Khi chuyển hook sang `src/hooks` hoặc package, sửa consumer và xóa file cũ trong
+cùng thay đổi. Wrapper chỉ hợp lệ khi bổ sung behavior riêng của feature;
+không wrapper chỉ để đổi đường dẫn import. Component barrel vẫn dùng như quy tắc
+frontend, nhưng không áp dụng bằng cách tạo bản sao/re-export hook ở từng feature.
+
 ## Ví Dụ
 
 ### Debounce Search

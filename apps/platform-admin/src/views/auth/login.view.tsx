@@ -57,10 +57,12 @@ export function LoginView() {
           error={errors.usernameOrEmail?.message}
           htmlFor="usernameOrEmail"
           label={t("fields.usernameOrEmail")}
+          required
         >
           <div className="relative">
             <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
             <Input
+              aria-required="true"
               autoComplete="username"
               className="pl-9"
               id="usernameOrEmail"
@@ -72,10 +74,12 @@ export function LoginView() {
           error={errors.password?.message}
           htmlFor="password"
           label={t("fields.password")}
+          required
         >
           <div className="relative">
             <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
             <Input
+              aria-required="true"
               autoComplete="current-password"
               className="pl-9"
               id="password"

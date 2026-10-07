@@ -28,6 +28,7 @@ export function useEmailAuthFeedback() {
     setErrorKey(result.key);
     if (result.expired) setExpired(true);
     if (result.retryAfter) cooldown(result.retryAfter);
+    return result;
   }
 
   function clear() {

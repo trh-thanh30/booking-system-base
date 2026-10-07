@@ -129,7 +129,7 @@ import { Toaster } from "@repo/ui/sonner";
 Trong client component, dùng shared hook thay vì import Sonner trực tiếp cho code mới:
 
 ```tsx
-import { useToast } from "@repo/hooks/toast";
+import { useToast } from "@repo/hooks";
 
 const { toast } = useToast();
 toast.success("Đã lưu thay đổi");
@@ -142,7 +142,51 @@ Component và feature hook phải lấy `toast` qua `useToast`; chỉ shared wra
 Toaster primitive được import Sonner trực tiếp. Nhờ đó frontend dùng một API
 notification thống nhất và có thể thay provider tại shared package.
 
+### Quy tắc phản hồi form
+
+- Lỗi validation gắn với một field (sai định dạng, thiếu dữ liệu, mật khẩu không
+  khớp) hiển thị ngay dưới field bằng `FormField`; control phải có
+  `aria-invalid` và liên kết tới nội dung lỗi. Không dùng toast thay cho lỗi field.
+  Không render trực tiếp `ZodIssue.message` hoặc `Error.message`: schema dùng
+  chung không biết locale hiện tại và backend message có thể không phù hợp để
+  công khai. View phải map field/error code sang translation key rồi gọi `t(...)`.
+- Lỗi nghiệp vụ hoặc lỗi submit áp dụng cho toàn form (email đã tồn tại, thao tác
+  bị từ chối, lưu thất bại, lỗi mạng tạm thời) hiển thị bằng `toast.error` qua
+  `useToast`. Không tạo thêm banner đỏ bên trong form cho cùng lỗi đó.
+- Thành công sau một hành động submit dùng `toast.success`, trừ khi màn hình đã
+  chuyển sang một success state riêng có đầy đủ ngữ cảnh.
+- Banner/`StatePanel` chỉ dành cho trạng thái nội dung cần tồn tại lâu dài, ví dụ
+  không có quyền truy cập, tài nguyên không tồn tại hoặc một vùng dữ liệu không
+  thể tải. Không dùng banner như notification tạm thời. Session Auth hết hạn phải
+  dùng toast kèm recovery UI phù hợp (form yêu cầu mã mới, CTA đăng nhập lại),
+  không render thêm banner đỏ trong form.
+- Không lặp cùng một thông báo ở cả toast và banner. Khi cần vừa chỉ vị trí lỗi
+  vừa thông báo kết quả (ví dụ OTP sai), toast nêu lỗi nghiệp vụ còn field chỉ
+  hiển thị câu ngắn và visual invalid để hướng người dùng về đúng control.
+
 ## Component Rules
+
+- Các input trong luồng Auth/onboarding dùng `AuthInput` compose shared `Input`
+  với nền `bg-card`, không lấy nền trang `bg-background` làm nền field.
+  Trường email dùng `EmailInput` chung với icon mail bên trái; login dùng cùng
+  component với `type="text"` để vẫn nhận username. Disabled state giữ nguyên.
+  Login có CTA đăng ký rõ ràng dẫn đến `/signup-business`, giữ locale hiện tại.
+- Input/textarea nhập văn bản, email, số và mật khẩu phải có placeholder mô tả
+  hoặc example value theo locale. Không dùng placeholder thay cho label; không
+  ghi example vào `defaultValue` như dữ liệu người dùng. Hidden/checkbox/radio,
+  native time/date/color không có placeholder hiển thị: dùng label và hint/example
+  thích hợp; readonly field hiển thị giá trị thật. Không dùng mật khẩu thật làm ví dụ.
+- Trường bắt buộc phải truyền `required` cho `FormField`. `FormField` chịu trách
+  nhiệm hiển thị dấu `*` bằng semantic `text-destructive` và gắn
+  `aria-required` cho control. Prop này phải khớp schema/contract; trường tùy
+  chọn không được có dấu `*`. Không tự nối dấu `*` vào translation hoặc label
+  của từng màn hình.
+- `PasswordInput` dùng lock bên trái, eye toggle bên phải; eye không đổi nền/màu
+  khi hover nhưng vẫn giữ focus-visible, aria-label, disabled và vùng bấm 44px.
+- Nút Google dùng `GoogleIcon` chung với asset màu tại `public/icons/google.svg`.
+  Component dùng `Image` từ `next/image`, kích thước 20×20 và `alt=""` vì tên
+  hành động đã có trong button; không thay bằng native img để lách test runner.
+  Màu trong asset logo là ngoại lệ brand bên thứ ba, không phải token giao diện.
 
 - Shared primitive nằm ở `packages/ui` và dùng semantic token làm mặc định.
 - API public hiện tại của component phải được giữ ổn định khi chỉ đổi styling.
@@ -221,8 +265,19 @@ Modal feedback và bảng so sánh dùng shared Dialog cho focus trap/Escape, th
 overlay tự dựng. `cn` của UI khai báo custom font-size groups để `text-label`,
 `text-body`, `text-heading-*` không bị hiểu nhầm là màu và xóa semantic text color.
 
-`/signup-business` tiếp tục dùng Input/Label/Button và RegistrationField; lỗi có
-label association, aria-invalid, aria-describedby và role alert. Không đổi Auth flow.
+`/signup-business` và các màn Auth dùng `AuthenticationLayout` với header brand/vi-en,
+card hẹp căn giữa, nền semantic và Button/Input/FormField từ shared UI.
+Header được lấy từ `SiteHeader` dùng chung với Landing. Landing truyền navigation;
+Auth không truyền navigation nên chỉ hiện logo/ngôn ngữ, không nav/menu/CTA marketing.
+PasswordInput hỗ trợ hiện/ẩn mật khẩu bằng nút có aria-label. Không sao chép logo, trial claim,
+CAPTCHA hoặc nội dung điều khoản của website tham chiếu.
+
+Luồng account-first (ADR 0004): đăng ký email → xác minh → Business info → địa chỉ
+→ tạo doanh nghiệp. `BusinessOnboardingForm` dùng chung cho email/Google; không tạo
+hai wizard. Giờ hoạt động được cấu hình riêng sau onboarding, không tự tạo từ giá
+trị mặc định. Bản đồ Leaflet chỉ tải ở client tại bước địa chỉ, có attribution OSM,
+click/drag pin và định vị theo thao tác người dùng. Địa chỉ/tọa độ nhập tay vẫn dùng
+được khi bản đồ hoặc quyền định vị lỗi. Không có Nominatim autocomplete.
 
 Metadata có title/description/OG/Twitter/canonical/hreflang cho vi/en, signup
 noindex; public origin từ `NEXT_PUBLIC_WEB_URL`, Admin login từ `NEXT_PUBLIC_WEB_URL`.

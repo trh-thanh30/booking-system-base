@@ -11,3 +11,9 @@ storage
 prisma-data
 telegram-notification.preview.*
 .next-*/
+
+# TypeScript source-only package: prevent single-file tsc output from being staged.
+packages/shared/src/**/*.js
+packages/shared/src/**/*.js.map
+packages/shared/src/**/*.d.ts
+packages/shared/src/**/*.d.ts.map

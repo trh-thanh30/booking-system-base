@@ -1,301 +1,164 @@
 "use client";
 
-import { useMutation } from "@tanstack/react-query";
-import { useLocale, useTranslations } from "next-intl";
-import { ArrowLeft, Building2, CheckCircle2, ExternalLink } from "lucide-react";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { useToast } from "@repo/hooks";
-import { HttpClientError, type RegisterOwnerInput } from "@repo/shared";
-import { Button, Input } from "@repo/ui";
-import { Link } from "@/src/i18n/navigation";
-import { LandingContainer } from "@/src/components/common/landing-compositions";
-import { authService } from "@/src/services/auth.service";
-import { RegistrationField as Field } from "./components/registration-field";
 import {
-  getAdminVerificationUrl,
-  parseOwnerRegistration,
-} from "./utils/registration.utils";
+  EmailInput,
+  FormField,
+  GoogleIcon,
+  PasswordInput,
+} from "@/src/components/common";
+import { AuthenticationLayout } from "@/src/components/layout";
+import { useGoogleLogin } from "@/src/hooks/use-google-login";
+import { Link, useRouter } from "@/src/i18n/navigation";
+import { authService } from "@/src/services/auth.service";
+import { useToast } from "@repo/hooks";
+import {
+  HttpClientError,
+  registerOwnerAccountSchema,
+  type RegisterOwnerAccountInput,
+} from "@repo/shared";
+import { Button } from "@repo/ui";
+import { useMutation } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
+import { useForm } from "react-hook-form";
 
 export function SignupBusinessView() {
+  const t = useTranslations("AuthJourney");
+  const auth = useTranslations("Auth");
+  const router = useRouter();
   const { toast } = useToast();
-  const locale = useLocale();
-  const t = useTranslations("SignupBusiness");
-  const [submitError, setSubmitError] = useState<string | null>(null);
-  const [verificationUrl, setVerificationUrl] = useState<string | null>(null);
-  const {
-    formState: { errors },
-    handleSubmit,
-    register,
-    setError,
-  } = useForm<RegisterOwnerInput>({
-    defaultValues: {
-      default_business_name: "",
-      default_business_slug: "",
-      locale,
-      name: "",
-      owner: {
-        confirmPassword: "",
-        email: "",
-        full_name: "",
-        password: "",
-        phone: "",
-        username: "",
-      },
-      primary_domain: "",
-      settings: {},
-      slug: "",
-      timezone: "Asia/Ho_Chi_Minh",
-    },
+  const google = useGoogleLogin();
+  const form = useForm<RegisterOwnerAccountInput>({
+    defaultValues: { email: "", password: "", confirmPassword: "" },
   });
-  const signupMutation = useMutation({
+  const registration = useMutation({
+    mutationFn: authService.registerOwnerAccount,
     retry: false,
-    async mutationFn(input: RegisterOwnerInput) {
-      const baseUrl = window.location.origin;
-      // Validate configuration before creating an account to avoid a duplicate registration after a broken handoff.
-      getAdminVerificationUrl(baseUrl, locale, "");
-      const result = await authService.registerOwner(input);
-      return getAdminVerificationUrl(baseUrl, locale, result.sessionId);
-    },
-    onSuccess(url) {
-      setVerificationUrl(url);
-      toast.success(t("success"));
-      window.location.assign(url);
-    },
-    onError(error) {
-      setSubmitError(
+  });
+  const password = form.watch("password");
+  const busy =
+    registration.isPending ||
+    form.formState.isSubmitting ||
+    google.isRedirecting;
+  async function submit(input: RegisterOwnerAccountInput) {
+    if (registration.isPending || google.isRedirecting) return;
+    form.clearErrors();
+    const parsed = registerOwnerAccountSchema.safeParse(input);
+    if (!parsed.success) {
+      for (const issue of parsed.error.issues)
+        form.setError(issue.path[0] as keyof RegisterOwnerAccountInput, {
+          message: t("invalidField"),
+        });
+      return;
+    }
+    try {
+      const result = await registration.mutateAsync(parsed.data);
+      toast.success(t("verificationSent"));
+      form.reset();
+      router.replace(
+        `/admin/verify-email?${new URLSearchParams({ sessionId: result.sessionId, onboarding: "1" })}`,
+      );
+    } catch (failure) {
+      toast.error(
         t(
-          error instanceof HttpClientError && error.status === 429
-            ? "rateLimited"
-            : "failed",
+          failure instanceof HttpClientError && failure.status === 409
+            ? "accountExists"
+            : "registrationFailed",
         ),
       );
-    },
-  });
-
+    }
+  }
   return (
-    <main className="min-h-dvh bg-background text-foreground">
-      <LandingContainer className="flex min-h-dvh max-w-6xl flex-col py-6">
-        <div>
-          <Button asChild variant="ghost">
-            <Link href="/">
-              <ArrowLeft className="h-4 w-4" />
-              {t("back")}
-            </Link>
-          </Button>
+    <AuthenticationLayout
+      title={t("registerTitle")}
+      description={t("registerDescription")}
+    >
+      <form
+        className="space-y-5"
+        onSubmit={form.handleSubmit(submit)}
+        noValidate
+      >
+        <Button
+          variant="outline"
+          type="button"
+          className="min-h-11 w-full rounded-full"
+          disabled={busy}
+          onClick={google.startGoogleLogin}
+        >
+          <GoogleIcon />
+          {auth(google.isRedirecting ? "google.redirecting" : "google.login")}
+        </Button>
+        <div className="flex items-center gap-3 text-sm text-muted-foreground">
+          <span className="h-px flex-1 bg-border" />
+          {auth("google.or")}
+          <span className="h-px flex-1 bg-border" />
         </div>
-        <div className="grid flex-1 items-center gap-8 py-8 lg:grid-cols-[0.9fr_1.1fr]">
-          <section className="space-y-6">
-            <div className="flex h-12 w-12 items-center justify-center rounded-md bg-primary text-primary-foreground">
-              <Building2 className="h-5 w-5" />
-            </div>
-            <div>
-              <p className="text-sm font-medium uppercase text-muted-foreground">
-                {t("eyebrow")}
-              </p>
-              <h1 className="mt-3 max-w-xl text-4xl font-semibold tracking-normal sm:text-5xl">
-                {t("title")}
-              </h1>
-              <p className="mt-4 max-w-xl text-base leading-7 text-muted-foreground">
-                {t("description")}
-              </p>
-            </div>
-            <div className="grid gap-3 text-sm text-muted-foreground sm:grid-cols-3">
-              <div className="rounded-md border border-border bg-card p-4">
-                {t("tenantIsolated")}
-              </div>
-              <div className="rounded-md border border-border bg-card p-4">
-                {t("ownerReady")}
-              </div>
-              <div className="rounded-md border border-border bg-card p-4">
-                {t("verification")}
-              </div>
-            </div>
-          </section>
-          <section className="rounded-md border border-border bg-card p-5 shadow-sm sm:p-6">
-            {verificationUrl ? (
-              <div className="flex min-h-96 flex-col justify-center text-center">
-                <CheckCircle2 className="mx-auto h-10 w-10 text-success" />
-                <h2 className="mt-4 text-xl font-semibold">
-                  {t("checkEmail")}
-                </h2>
-                <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-muted-foreground">
-                  {t("successDescription")}
-                </p>
-                <Button asChild className="mx-auto mt-6">
-                  <a href={verificationUrl}>
-                    {t("verifyEmail")}
-                    <ExternalLink className="h-4 w-4" />
-                  </a>
-                </Button>
-              </div>
-            ) : (
-              <form
-                className="space-y-5"
-                onSubmit={handleSubmit((input) => {
-                  setSubmitError(null);
-                  const parsed = parseOwnerRegistration(input);
-
-                  if (!parsed.success) {
-                    const issue = parsed.error.issues[0];
-                    if (!issue) {
-                      return;
-                    }
-                    const [root, child] = issue?.path ?? [];
-                    if (root === "owner" && child) {
-                      setError(`owner.${String(child)}` as never, {
-                        message: t("invalidField"),
-                      });
-                    } else if (root) {
-                      setError(String(root) as keyof RegisterOwnerInput, {
-                        message: t("invalidField"),
-                      });
-                    }
-                    return;
-                  }
-
-                  signupMutation.mutate(parsed.data);
-                })}
-              >
-                {submitError ? (
-                  <p
-                    role="alert"
-                    className="rounded-md border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive"
-                  >
-                    {submitError}
-                  </p>
-                ) : null}
-                <fieldset
-                  className="space-y-5"
-                  disabled={signupMutation.isPending}
-                >
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <Field
-                      error={errors.name?.message}
-                      id="business-name"
-                      label={t("fields.name")}
-                    >
-                      <Input id="business-name" {...register("name")} />
-                    </Field>
-                    <Field
-                      error={errors.slug?.message}
-                      id="business-slug"
-                      label={t("fields.slug")}
-                    >
-                      <Input id="business-slug" {...register("slug")} />
-                    </Field>
-                  </div>
-                  <Field
-                    error={errors.primary_domain?.message}
-                    id="business-domain"
-                    label={t("fields.domain")}
-                  >
-                    <Input
-                      id="business-domain"
-                      placeholder="demo.localhost"
-                      {...register("primary_domain")}
-                    />
-                  </Field>
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <Field
-                      error={errors.default_business_name?.message}
-                      id="default-business-name"
-                      label={t("fields.defaultBusiness")}
-                    >
-                      <Input
-                        id="default-business-name"
-                        placeholder={t("sameName")}
-                        {...register("default_business_name")}
-                      />
-                    </Field>
-                    <Field
-                      error={errors.default_business_slug?.message}
-                      id="default-business-slug"
-                      label={t("fields.slug")}
-                    >
-                      <Input
-                        id="default-business-slug"
-                        placeholder={t("sameSlug")}
-                        {...register("default_business_slug")}
-                      />
-                    </Field>
-                  </div>
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <Field
-                      error={errors.owner?.full_name?.message}
-                      id="owner-name"
-                      label={t("fields.fullName")}
-                    >
-                      <Input id="owner-name" {...register("owner.full_name")} />
-                    </Field>
-                    <Field
-                      error={errors.owner?.username?.message}
-                      id="owner-username"
-                      label={t("fields.username")}
-                    >
-                      <Input
-                        id="owner-username"
-                        {...register("owner.username")}
-                      />
-                    </Field>
-                  </div>
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <Field
-                      error={errors.owner?.email?.message}
-                      id="owner-email"
-                      label={t("fields.email")}
-                    >
-                      <Input
-                        id="owner-email"
-                        type="email"
-                        {...register("owner.email")}
-                      />
-                    </Field>
-                    <Field
-                      error={errors.owner?.phone?.message}
-                      id="owner-phone"
-                      label={t("fields.phone")}
-                    >
-                      <Input id="owner-phone" {...register("owner.phone")} />
-                    </Field>
-                  </div>
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <Field
-                      error={errors.owner?.password?.message}
-                      id="owner-password"
-                      label={t("fields.password")}
-                    >
-                      <Input
-                        id="owner-password"
-                        type="password"
-                        {...register("owner.password")}
-                      />
-                    </Field>
-                    <Field
-                      error={errors.owner?.confirmPassword?.message}
-                      id="owner-confirm-password"
-                      label={t("fields.confirmPassword")}
-                    >
-                      <Input
-                        id="owner-confirm-password"
-                        type="password"
-                        {...register("owner.confirmPassword")}
-                      />
-                    </Field>
-                  </div>
-                  <Button
-                    className="w-full"
-                    disabled={signupMutation.isPending}
-                    type="submit"
-                  >
-                    {signupMutation.isPending ? t("submitting") : t("submit")}
-                  </Button>
-                </fieldset>
-              </form>
+        <fieldset disabled={busy} className="space-y-5">
+          <legend className="sr-only">{t("accountDetails")}</legend>
+          <FormField
+            htmlFor="owner-email"
+            label={auth("fields.email")}
+            error={form.formState.errors.email?.message}
+            required
+          >
+            <EmailInput
+              id="owner-email"
+              placeholder={t("placeholders.email")}
+              type="email"
+              autoComplete="email"
+              {...form.register("email")}
+            />
+          </FormField>
+          <FormField
+            htmlFor="owner-password"
+            label={auth("fields.password")}
+            error={form.formState.errors.password?.message}
+            description={t(
+              password.length >= 8 ? "passwordReady" : "passwordHint",
             )}
-          </section>
-        </div>
-      </LandingContainer>
-    </main>
+            descriptionClassName={
+              password.length >= 8 ? "text-success" : undefined
+            }
+            descriptionRole="status"
+            required
+          >
+            <PasswordInput
+              id="owner-password"
+              placeholder={t("placeholders.newPassword")}
+              autoComplete="new-password"
+              {...form.register("password")}
+            />
+          </FormField>
+          <FormField
+            htmlFor="owner-confirm-password"
+            label={t("confirmPassword")}
+            error={form.formState.errors.confirmPassword?.message}
+            required
+          >
+            <PasswordInput
+              id="owner-confirm-password"
+              placeholder={t("placeholders.confirmPassword")}
+              autoComplete="new-password"
+              {...form.register("confirmPassword")}
+            />
+          </FormField>
+          <Button
+            className="min-h-11 w-full rounded-full"
+            type="submit"
+            disabled={busy}
+          >
+            {t(registration.isPending ? "registering" : "continueEmail")}
+          </Button>
+        </fieldset>
+        <p className="pt-3 text-center text-sm text-muted-foreground">
+          {t("haveAccount")}{" "}
+          <Link
+            className="font-medium text-primary underline-offset-4 hover:underline"
+            href="/admin/login"
+          >
+            {auth("login.submit")}
+          </Link>
+        </p>
+      </form>
+    </AuthenticationLayout>
   );
 }

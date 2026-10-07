@@ -9,16 +9,21 @@ import {
   acceptInvitationSchema,
   type AcceptInvitationInput,
 } from "@repo/shared";
-import { Badge, Button, Input, Skeleton } from "@repo/ui";
-import { FormField } from "@/src/components/common/form-field";
-import { StatePanel } from "@/src/components/common/state-panel";
+import { Badge, Button, Skeleton } from "@repo/ui";
+import {
+  AuthInput as Input,
+  PasswordInput,
+  FormField,
+  StatePanel,
+} from "@/src/components/common";
 import { Link, useRouter } from "@/src/i18n/navigation";
 import { authService } from "@/src/services/admin/auth.service";
-import { AuthShell } from "./components/auth-shell";
+import { AuthShell } from "./components";
 
 export function AcceptInvitationView({ token }: { token: string }) {
   const { toast } = useToast();
   const t = useTranslations("Auth");
+  const placeholders = useTranslations("AuthJourney.placeholders");
   const router = useRouter();
   const invitationQuery = useQuery({
     queryFn: () => authService.getInvitation(token),
@@ -47,7 +52,7 @@ export function AcceptInvitationView({ token }: { token: string }) {
       const field = issue?.path[0] as keyof AcceptInvitationInput | undefined;
 
       if (field && issue) {
-        setError(field, { message: issue.message });
+        setError(field, { message: t("invitation.invalidField") });
       }
 
       return;
@@ -57,10 +62,8 @@ export function AcceptInvitationView({ token }: { token: string }) {
       await authService.acceptInvitation(parsed.data);
       toast.success(t("invitation.success"));
       router.replace("/admin/login");
-    } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : t("invitation.failed"),
-      );
+    } catch {
+      toast.error(t("invitation.failed"));
     }
   }
 
@@ -130,11 +133,13 @@ export function AcceptInvitationView({ token }: { token: string }) {
           error={errors.username?.message}
           htmlFor="username"
           label={t("fields.username")}
+          required
         >
           <Input
             autoComplete="username"
             disabled={disabled}
             id="username"
+            placeholder={placeholders("username")}
             {...register("username")}
           />
         </FormField>
@@ -146,6 +151,7 @@ export function AcceptInvitationView({ token }: { token: string }) {
           <Input
             disabled={disabled}
             id="full_name"
+            placeholder={placeholders("fullName")}
             {...register("full_name")}
           />
         </FormField>
@@ -153,11 +159,13 @@ export function AcceptInvitationView({ token }: { token: string }) {
           error={errors.password?.message}
           htmlFor="password"
           label={t("fields.password")}
+          required
         >
-          <Input
+          <PasswordInput
             autoComplete="new-password"
             disabled={disabled}
             id="password"
+            placeholder={placeholders("newPassword")}
             type="password"
             {...register("password")}
           />
@@ -166,11 +174,13 @@ export function AcceptInvitationView({ token }: { token: string }) {
           error={errors.confirmPassword?.message}
           htmlFor="confirmPassword"
           label={t("fields.confirmPassword")}
+          required
         >
-          <Input
+          <PasswordInput
             autoComplete="new-password"
             disabled={disabled}
             id="confirmPassword"
+            placeholder={placeholders("confirmPassword")}
             type="password"
             {...register("confirmPassword")}
           />

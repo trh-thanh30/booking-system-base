@@ -44,6 +44,7 @@ test("Google login navigates once to API with safe locale and returnTo", () => {
 
 test("Google onboarding validates shared contract, normalizes optional fields and never posts a password or editable Google email", () => {
   const input = {
+    business_category_id: "2518359c-6d0d-4ad8-a7ce-10f00eb36074",
     name: " Business ",
     slug: " business ",
     default_business_name: "",

@@ -34,7 +34,7 @@ type SonnerStyle = CSSProperties & {
 const defaultStyle: SonnerStyle = {
   "--error-bg": "var(--color-danger-surface)",
   "--error-border": "var(--color-danger-border)",
-  "--error-text": "var(--color-danger-surface-foreground)",
+  "--error-text": "var(--color-danger-500)",
   "--info-bg": "var(--color-info-surface)",
   "--info-border": "var(--color-info-border)",
   "--info-text": "var(--color-info-surface-foreground)",
@@ -87,6 +87,7 @@ export function Toaster({
           closeButton:
             "!border-border !bg-background !text-foreground hover:!bg-muted",
           description: "!text-current/75",
+          title: "!font-semibold",
           toast: "!font-sans !shadow-lg",
           ...toastOptions?.classNames,
         },

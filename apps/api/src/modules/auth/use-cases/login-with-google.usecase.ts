@@ -6,6 +6,7 @@ import { GoogleOnboardingSessionService } from '@/modules/auth/services/google-o
 import { GoogleOAuthStateService } from '@/modules/auth/services/google-oauth-state.service';
 import { RefreshTokenSessionService } from '@/modules/auth/services/refresh-token-session.service';
 import { Injectable } from '@nestjs/common';
+import { randomUUID } from 'node:crypto';
 import {
   identity_provider,
   Prisma,
@@ -71,8 +72,75 @@ export class LoginWithGoogleUseCase {
         where: { email: profile.email },
       }));
 
-    if (!user) {
+    if (!user || (user.role === user_role.OWNER && !user.tenant_id)) {
+      if (user && user.status !== user_status.ACTIVE) {
+        throw new UnauthorizedError(
+          'Owner account is inactive',
+          'GOOGLE_ACCOUNT_INACTIVE',
+        );
+      }
+      let pendingOwner: User;
+      try {
+        pendingOwner = await this.prismaService.$transaction(
+          async (transaction) => {
+            if (!user) {
+              return transaction.user.create({
+                data: {
+                  email: profile.email,
+                  username: `owner_${randomUUID()}`,
+                  password: null,
+                  full_name: profile.name,
+                  avatar_url: profile.picture,
+                  role: user_role.OWNER,
+                  status: user_status.ACTIVE,
+                  is_verified: true,
+                  identities: {
+                    create: {
+                      provider: identity_provider.GOOGLE,
+                      provider_account_id: profile.subject,
+                      provider_email: profile.email,
+                    },
+                  },
+                },
+              });
+            }
+            if (!existingIdentity) {
+              const linked = await transaction.userIdentity.findFirst({
+                where: { user_id: user.id, provider: identity_provider.GOOGLE },
+              });
+              if (linked)
+                throw new ConflictError(
+                  'Google identity conflict',
+                  'GOOGLE_IDENTITY_CONFLICT',
+                );
+              await transaction.userIdentity.create({
+                data: {
+                  user_id: user.id,
+                  provider: identity_provider.GOOGLE,
+                  provider_account_id: profile.subject,
+                  provider_email: profile.email,
+                },
+              });
+            }
+            return transaction.user.update({
+              where: { id: user.id },
+              data: { is_verified: true },
+            });
+          },
+        );
+      } catch (error) {
+        if (
+          error instanceof Prisma.PrismaClientKnownRequestError &&
+          error.code === 'P2002'
+        )
+          throw new ConflictError(
+            'Google identity conflict',
+            'GOOGLE_IDENTITY_CONFLICT',
+          );
+        throw error;
+      }
       const onboarding = await this.onboardingSessionService.create({
+        userId: pendingOwner.id,
         avatarUrl: profile.picture,
         email: profile.email,
         fullName: profile.name,
