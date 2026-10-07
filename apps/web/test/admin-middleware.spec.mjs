@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { NextRequest } from "next/server.js";
-import middleware from "../middleware.ts";
+import middleware, { handleMiddleware } from "../middleware.ts";
 
 test("dashboard middleware redirects a guest to localized login with original filters", () => {
   const response = middleware(
@@ -14,6 +14,18 @@ test("dashboard middleware redirects a guest to localized login with original fi
     location.searchParams.get("returnTo"),
     "/admin/bookings?status=pending",
   );
+});
+
+test("production base and Tenant workspace hosts reach client session bootstrap without an API-host marker", () => {
+  for (const hostname of ["app.bookingbase.com", "acme.app.bookingbase.com"]) {
+    const response = handleMiddleware(
+      new NextRequest(`https://${hostname}/en/admin/bookings?status=pending`, {
+        headers: { host: hostname },
+      }),
+      "https://app.bookingbase.com",
+    );
+    assert.equal(response.headers.get("location"), null);
+  }
 });
 
 test("verification and onboarding stay public without an Admin refresh marker", () => {

@@ -16,8 +16,17 @@ const browser = await puppeteer.launch({
 const origin = new URL(
   process.env.FRONTEND_SMOKE_URL || "http://localhost:3121",
 ).origin;
+const workspaceBaseOrigin = new URL(
+  process.env.ADMIN_WORKSPACE_SMOKE_URL || origin,
+).origin;
+const tenantOrigin = (() => {
+  const url = new URL(workspaceBaseOrigin);
+  if (url.hostname !== "localhost") url.hostname = `test.${url.hostname}`;
+  return url.origin;
+})();
 assert.ok(
-  ["localhost", "127.0.0.1"].includes(new URL(origin).hostname),
+  ["localhost", "127.0.0.1"].includes(new URL(origin).hostname) ||
+    new URL(origin).hostname.endsWith(".localhost"),
   "Browser smoke is local-only and mocks all API requests",
 );
 const profile = {
@@ -53,6 +62,20 @@ const profile = {
     },
   ],
 };
+
+async function submitAndWaitForNavigation(page) {
+  const navigation = page.waitForNavigation({
+    waitUntil: "networkidle0",
+    timeout: 10000,
+  });
+  try {
+    await page.$eval("form", (form) => form.requestSubmit());
+  } catch (error) {
+    if (!String(error).includes("context")) throw error;
+  }
+  await navigation;
+}
+
 try {
   const page = await browser.newPage();
   const requests = [],
@@ -66,7 +89,7 @@ try {
     }
     const path = new URL(req.url()).pathname.split("/api/v1")[1];
     const headers = {
-      "access-control-allow-origin": origin,
+      "access-control-allow-origin": req.headers().origin || origin,
       "access-control-allow-credentials": "true",
       "access-control-allow-headers":
         "content-type,authorization,x-auth-context,x-tenant-id,x-business-id",
@@ -110,7 +133,18 @@ try {
           : { access_token: "mock-token", user: profile };
     } else if (path === "/auth/me") data = profile;
     else if (path === "/businesses") data = profile.businesses;
-    else if (path === "/auth/admin/logout") {
+    else if (path === "/business-categories") {
+      data = [
+        {
+          id: "2518359c-6d0d-4ad8-a7ce-10f00eb36074",
+          slug: "spa",
+          name_en: "Spa",
+          name_vi: "Spa",
+        },
+      ];
+    } else if (path === "/auth/admin/onboarding/check-slug") {
+      data = { available: true };
+    } else if (path === "/auth/admin/logout") {
       await page.deleteCookie({ name: "admin_has_rt", url: origin, path: "/" });
       data = null;
     }
@@ -158,30 +192,26 @@ try {
   assert.equal(await page.$('link[rel="canonical"]'), null);
   await page.type('input[name="usernameOrEmail"]', "owner@example.com");
   await page.type('input[name="password"]', "Password123");
-  await page.click('button[type="submit"]');
-  await page
-    .waitForFunction(() => location.pathname === "/en/admin/bookings", {
-      timeout: 10000,
-    })
-    .catch(async (e) => {
-      console.log(
-        "LOGIN FAIL",
-        page.url(),
-        await page.$eval("body", (x) => x.innerText),
-        requests.map((x) => x.path),
-        errors,
-      );
-      throw e;
-    });
+  await submitAndWaitForNavigation(page).catch((e) => {
+    console.log(
+      "LOGIN FAIL",
+      page.url(),
+      requests.map((x) => x.path),
+      errors,
+    );
+    throw e;
+  });
+  assert.equal(page.url(), `${tenantOrigin}/en/admin/bookings?status=pending`);
   await page.waitForSelector("aside");
   assert.equal(
     requests.filter((x) => x.path === "/auth/admin/login").length,
     1,
   );
   assert.ok(requests.some((x) => x.path === "/auth/me"));
-  await page.goto(`${origin}/en/admin/dashboard`, {
+  await page.goto(`${tenantOrigin}/en/admin/dashboard`, {
     waitUntil: "networkidle0",
   });
+  assert.equal(page.url(), `${tenantOrigin}/en/admin/dashboard`);
   assert.ok(requests.some((x) => x.path === "/auth/admin/refresh"));
   await page.screenshot({ path: "/tmp/arch001-admin-desktop.png" });
   await page.setViewport({ width: 375, height: 812 });
@@ -215,21 +245,30 @@ try {
   );
   assert.equal(await page.$('input[type="password"]'), null);
   assert.ok(requests.some((x) => x.path === "/auth/admin/google/onboarding"));
-  for (const [name, value] of [
-    ["owner.username", "googleowner"],
-    ["name", "Google Workspace"],
-    ["slug", "google-workspace"],
-    ["default_business_name", "First Business"],
-    ["default_business_slug", "first-business"],
-  ]) {
-    await page.type(`input[name="${name}"]`, value);
-  }
+  await page.type('input[name="name"]', "Google Workspace");
+  await page.type('input[name="owner.username"]', "googleowner");
+  await page.click("#business-category");
+  await page.keyboard.press("ArrowDown");
+  await page.keyboard.press("Enter");
+  await page.waitForSelector(".lucide-check");
   await page.click('button[type="submit"]');
-  await page.waitForFunction(() => location.pathname === "/en/admin/dashboard");
+  await page.waitForSelector(
+    'input[name="business_profile.address.addressLine1"]',
+  );
+  await page.type(
+    'input[name="business_profile.address.addressLine1"]',
+    "1 Example Street",
+  );
+  await page.type('input[name="business_profile.address.locality"]', "Hanoi");
+  const coordinates = await page.$$('input[type="number"]');
+  await coordinates[0].type("21.0285");
+  await coordinates[1].type("105.8542");
+  await submitAndWaitForNavigation(page);
+  assert.equal(page.url(), `${tenantOrigin}/en/admin/dashboard`);
   await page.waitForSelector("aside");
   assert.deepEqual(errors, []);
   console.log(
-    "PASS browser: vi/en Landing without Admin bootstrap, locale switch, guest redirect, Admin noindex/no canonical, password login, profile/bootstrap, reload refresh, mobile layouts, verified Google onboarding identity",
+    "PASS browser: vi/en Landing without Admin bootstrap, locale switch, guest redirect, Tenant vanity host after login/onboarding, profile/bootstrap, reload refresh, mobile layouts, verified Google onboarding identity",
   );
 } finally {
   await browser.close();
