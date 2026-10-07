@@ -42,9 +42,12 @@ import { OwnerBusinessOnboardingUseCase } from './use-cases/owner-business-onboa
 import { CheckOwnerBusinessSlugUseCase } from './use-cases/check-owner-business-slug.usecase';
 import { RegisterOwnerAccountUseCase } from './use-cases/register-owner-account.usecase';
 import { ConfigModule } from '@nestjs/config';
+import { OwnerContactController } from './controllers/owner-contact.controller';
+import { CheckOwnerContactUseCase } from './use-cases/check-owner-contact.usecase';
 
 @Module({
   controllers: [
+    OwnerContactController,
     AuthController,
     AdminAuthController,
     PlatformAuthController,
@@ -52,6 +55,7 @@ import { ConfigModule } from '@nestjs/config';
     OwnerOnboardingController,
   ],
   providers: [
+    CheckOwnerContactUseCase,
     RegisterOwnerUseCase,
     RegisterOwnerAccountUseCase,
     OwnerBusinessOnboardingUseCase,

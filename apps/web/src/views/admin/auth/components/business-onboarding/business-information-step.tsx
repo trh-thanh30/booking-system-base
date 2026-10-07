@@ -30,6 +30,10 @@ export function BusinessInformationStep({
   businessSlug,
   businessNameStatus,
   onCheckBusinessName,
+  usernameStatus,
+  phoneStatus,
+  onCheckUsername,
+  onCheckPhone,
 }: {
   locale: string;
   disabled: boolean;
@@ -37,9 +41,25 @@ export function BusinessInformationStep({
   businessSlug: string;
   businessNameStatus: BusinessNameAvailabilityStatus;
   onCheckBusinessName: () => Promise<void>;
+  usernameStatus: BusinessNameAvailabilityStatus;
+  phoneStatus: BusinessNameAvailabilityStatus;
+  onCheckUsername: () => Promise<boolean>;
+  onCheckPhone: () => Promise<boolean>;
 }) {
   const t = useTranslations("AuthJourney");
   const form = useFormContext<CompleteOwnerBusinessInput>();
+  function contactError(
+    status: BusinessNameAvailabilityStatus,
+    field: "username" | "phone",
+  ) {
+    return status === "unavailable"
+      ? t(`availability.${field}Taken`)
+      : status === "error"
+        ? t("availability.failed")
+        : status === "invalid"
+          ? t("invalidField")
+          : undefined;
+  }
   const categories = useQuery({
     queryKey: ["business-categories", "active"],
     queryFn: businessCategoriesService.listActive,
@@ -117,11 +137,26 @@ export function BusinessInformationStep({
       >
         {t("bookingUrlPreview", { url: bookingHost })}
       </p>
-      <BusinessOnboardingField name="owner.username" label="username" />
+      <BusinessOnboardingField
+        name="owner.username"
+        label="username"
+        onBlur={() => void onCheckUsername()}
+        availabilityError={contactError(usernameStatus, "username")}
+        availabilityHint={
+          usernameStatus === "checking" ? t("availability.checking") : undefined
+        }
+      />
       <FormField
         htmlFor="owner-phone"
         label={t("phone")}
-        error={form.formState.errors.owner?.phone?.message}
+        error={
+          form.formState.errors.owner?.phone?.message ||
+          contactError(phoneStatus, "phone")
+        }
+        description={
+          phoneStatus === "checking" ? t("availability.checking") : undefined
+        }
+        descriptionRole="status"
       >
         <Controller
           control={form.control}
@@ -131,11 +166,20 @@ export function BusinessInformationStep({
               {...field}
               id="owner-phone"
               key={phoneCountry}
-              invalid={Boolean(form.formState.errors.owner?.phone)}
+              invalid={
+                Boolean(form.formState.errors.owner?.phone) ||
+                phoneStatus === "unavailable" ||
+                phoneStatus === "invalid" ||
+                phoneStatus === "error"
+              }
               placeholder={t("placeholders.phone")}
               defaultCountry={phoneCountry}
               value={field.value || undefined}
               onChange={field.onChange}
+              onBlur={() => {
+                field.onBlur();
+                void onCheckPhone();
+              }}
             />
           )}
         />

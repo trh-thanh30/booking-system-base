@@ -22,6 +22,7 @@ import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 import { FormProvider, useForm, type FieldPath } from "react-hook-form";
 import { useBusinessNameAvailability } from "../../hooks/use-business-name-availability";
+import { useOwnerContactAvailability } from "../../hooks/use-owner-contact-availability";
 import { useBusinessOnboardingDraft } from "../../hooks/use-business-onboarding-draft";
 import type { BusinessOnboardingStep } from "../../types/business-onboarding.types";
 import {
@@ -42,12 +43,14 @@ export function BusinessOnboardingForm({
   isPending,
   onSubmit,
   onDraftStateChange,
+  availabilityProvider = "email",
 }: {
   profile: OwnerOnboardingProfile;
   locale: string;
   isPending: boolean;
   onSubmit: (input: CompleteOwnerBusinessInput) => Promise<void>;
   onDraftStateChange?: (hasDraft: boolean, clearDraft: () => void) => void;
+  availabilityProvider?: "email" | "google";
 }) {
   const t = useTranslations("AuthJourney");
   const [step, setStep] = useState<BusinessOnboardingStep>(0);
@@ -93,6 +96,16 @@ export function BusinessOnboardingForm({
     status: businessNameStatus,
   } = useBusinessNameAvailability(form.watch("name"));
   const busy = isPending || form.formState.isSubmitting;
+  const usernameAvailability = useOwnerContactAvailability(
+    form,
+    "username",
+    availabilityProvider,
+  );
+  const phoneAvailability = useOwnerContactAvailability(
+    form,
+    "phone",
+    availabilityProvider,
+  );
 
   useEffect(() => {
     if (
@@ -172,6 +185,17 @@ export function BusinessOnboardingForm({
           { message: t("invalidField") },
           { shouldFocus: true },
         );
+      }
+      return;
+    }
+    const contacts = await Promise.all([
+      usernameAvailability.check(),
+      phoneAvailability.check(),
+    ]);
+    if (contacts.some((available) => !available)) {
+      if (step !== 0) {
+        draft.persistDraft(0);
+        setStep(0);
       }
       return;
     }
@@ -313,6 +337,10 @@ export function BusinessOnboardingForm({
               businessSlug={businessSlug}
               businessNameStatus={businessNameStatus}
               onCheckBusinessName={checkBusinessName}
+              usernameStatus={usernameAvailability.status}
+              phoneStatus={phoneAvailability.status}
+              onCheckUsername={usernameAvailability.check}
+              onCheckPhone={phoneAvailability.check}
             />
           ) : null}
           {step === 1 ? (

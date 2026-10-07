@@ -178,6 +178,12 @@
     "complete": "Create my business",
     "completing": "Creating business…",
     "businessCreated": "Business created. Let's set up your working hours.",
+    "availability": {
+      "usernameTaken": "This username is already in use.",
+      "phoneTaken": "This phone number is already in use.",
+      "checking": "Checking availability…",
+      "failed": "Could not check availability. Leave this field again to retry."
+    },
     "loading": "Loading your verified account…",
     "sessionExpired": "Your setup session expired. Log in to continue business setup.",
     "detailsConflict": "Username, phone or booking URL is already in use. Check your information.",
