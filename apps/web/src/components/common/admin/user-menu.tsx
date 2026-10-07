@@ -1,7 +1,7 @@
 "use client";
 
 import { LogOut, Settings, User } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import {
   Avatar,
   AvatarFallback,
@@ -16,9 +16,9 @@ import {
 import { cn } from "@repo/ui/lib/utils";
 import { useAuth } from "@/src/app/providers/admin";
 import { Link } from "@/src/i18n/navigation";
-import { useRouter } from "@/src/i18n/navigation";
 import { useState } from "react";
 import { useToast } from "@repo/hooks";
+import { buildAdminBaseUrl } from "@/src/lib/admin/admin-workspace-url";
 
 function getInitials(name: string) {
   return name
@@ -32,8 +32,8 @@ function getInitials(name: string) {
 
 export function UserMenu() {
   const { toast } = useToast();
+  const locale = useLocale();
   const t = useTranslations("DashboardConfig");
-  const router = useRouter();
   const { logout, user } = useAuth();
   const tAuth = useTranslations("Auth");
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -61,7 +61,9 @@ export function UserMenu() {
     } catch {
       toast.error(tAuth("logoutFailed"));
     } finally {
-      router.replace("/admin/login");
+      window.location.replace(
+        buildAdminBaseUrl({ locale, pathname: "/admin/login" }),
+      );
       setIsLoggingOut(false);
     }
   }

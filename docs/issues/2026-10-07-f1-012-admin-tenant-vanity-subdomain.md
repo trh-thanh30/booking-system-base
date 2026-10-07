@@ -12,7 +12,7 @@ Sau khi Owner đăng nhập hoặc hoàn tất onboarding, Business Admin sử d
 Tenant slug để người dùng dễ nhận biết workspace đang mở, ví dụ:
 
 ```text
-http://acme.localhost:3001/en/admin/dashboard
+http://localhost:3001/en/admin/dashboard
 https://acme.app.bookingbase.com/en/admin/dashboard
 ```
 
@@ -53,7 +53,10 @@ Còn thiếu:
 
 - Dùng URL `{tenantSlug}.{adminWorkspaceBaseDomain}/{locale}/admin/*` cho các trang
   Admin private sau khi đã biết Tenant từ session.
-- Development dùng `{tenantSlug}.localhost:3001`.
+- Development giữ Web tại `localhost:3001` và API tại `localhost:3000`; không thêm
+  Tenant slug để Google OAuth dùng được loopback callback tiêu chuẩn.
+- Staging/production dùng Tenant subdomain trên HTTPS để kiểm thử và vận hành đầy
+  đủ vanity hostname, cookie, CORS và canonical redirect.
 - Production dùng base domain cấu hình riêng, ví dụ
   `{tenantSlug}.app.bookingbase.com`.
 - Sau login thành công, chuyển full-page navigation sang Tenant hostname và giữ
@@ -144,7 +147,10 @@ Còn thiếu:
 - [ ] Sau password login thành công, Owner được đưa đến Tenant hostname đúng slug.
 - [ ] Sau Google login/onboarding thành công, Owner được đưa đến Tenant hostname đúng slug.
 - [ ] Redirect giữ đúng locale `vi`/`en` và safe local `returnTo`.
-- [ ] Development hoạt động với `{tenantSlug}.localhost:3001`.
+- [ ] Development hoạt động trên `localhost` với password và Google OAuth, không
+      tự thêm Tenant subdomain.
+- [ ] Staging/production sử dụng Tenant subdomain và reload trực tiếp vẫn khôi phục
+      session với cookie domain/SameSite phù hợp.
 - [ ] Production URL được dựng từ Admin workspace base domain cấu hình, không hardcode.
 - [ ] Reload trực tiếp một Admin private route trên Tenant hostname khôi phục session.
 - [ ] Truy cập Admin private route trên base host khi đã đăng nhập được canonical

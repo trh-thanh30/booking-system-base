@@ -8,16 +8,24 @@ import {
   setAccessToken,
   getSessionRevision,
 } from "./auth-token";
+import { isAdminWorkspaceHostname } from "./admin-workspace-url";
+import { siteConfig } from "@/src/config/site.config";
 
 export const ADMIN_SESSION_EXPIRED_EVENT = "booking:admin-session-expired";
 
-export function hasAdminRefreshCookie() {
-  return (
-    typeof document !== "undefined" &&
-    document.cookie
-      .split(";")
-      .some((cookie) => cookie.trim() === "admin_has_rt=1")
-  );
+export function hasAdminRefreshCookie(
+  adminWorkspaceUrl = siteConfig.adminWorkspaceUrl,
+) {
+  if (typeof document === "undefined") return false;
+  const hasMarker = document.cookie
+    .split(";")
+    .some((cookie) => cookie.trim() === "admin_has_rt=1");
+  if (hasMarker) return true;
+
+  // The marker is only a refresh hint and may be host-scoped to the API. On a
+  // configured production workspace base/Tenant host, try the real HttpOnly
+  // refresh cookie and let the API decide whether the session is valid.
+  return isAdminWorkspaceHostname(window.location.hostname, adminWorkspaceUrl);
 }
 
 function clearAdminSession() {

@@ -16,10 +16,11 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 
 // app
 import { AppModule } from '@/app.module';
-import { appConfig } from '@/config';
+import { appConfig, corsConfig } from '@/config';
 
 // common
 import { AllExceptionsFilter } from '@/common/filters/all-exceptions.filter';
+import { isCorsOriginAllowed } from '@/common/helpers/cors-origin.util';
 import { HttpLogInterceptor } from '@/common/interceptors/http-logger.interceptor';
 import { ResponseInterceptor } from '@/common/interceptors/response.interceptor';
 
@@ -43,6 +44,7 @@ async function bootstrap() {
 
     // Get app config
     const appCfg = app.get<ConfigType<typeof appConfig>>(appConfig.KEY);
+    const corsCfg = app.get<ConfigType<typeof corsConfig>>(corsConfig.KEY);
 
     // Set cookie parser
     app.use(cookieParser());
@@ -56,12 +58,16 @@ async function bootstrap() {
     });
 
     // Enable CORS
-    const origins =
-      process.env.CORS_ORIGINS?.split(',').map((o) =>
-        o.trim().replace(/\/$/, ''),
-      ) || '*';
     app.enableCors({
-      origin: origins,
+      origin: (origin, callback) =>
+        callback(
+          null,
+          isCorsOriginAllowed(
+            origin,
+            corsCfg.origins,
+            corsCfg.adminWorkspaceUrl,
+          ),
+        ),
       credentials: true,
       methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
       allowedHeaders: [
@@ -69,6 +75,8 @@ async function bootstrap() {
         'Accept',
         'Authorization',
         'X-Auth-Context',
+        'X-Tenant-Id',
+        'X-Business-Id',
         'X-Requested-With',
         'apollo-require-preflight',
       ],

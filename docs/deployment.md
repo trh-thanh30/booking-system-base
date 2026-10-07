@@ -79,12 +79,22 @@ pnpm prisma:migrate:prod
 ## CI/CD
 
 ARCH-001 hợp nhất Landing và Business Admin vào image `web`. Production build
-cần GitHub repository variables `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_WEB_URL`;
+cần GitHub repository variables `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_WEB_URL` và
+`NEXT_PUBLIC_ADMIN_WORKSPACE_URL`;
 Docker build args nhúng các biến này vào browser bundle. Thay env ở lúc start
 container không thay public URL đã build. Local Docker default dùng localhost.
 API dùng `WEB_URL` (origin, không `/admin`) cho OAuth redirect; Google authorized
 callback vẫn là URL API. Public health check kiểm tra Landing và
 `${DEPLOY_WEB_URL}/vi/admin/login` trên cùng service.
+
+Vanity Admin URL cần wildcard DNS và TLS cho host như
+`*.app.bookingbase.com`. API runtime phải đặt `ADMIN_WORKSPACE_URL` bằng base
+origin tương ứng và tiếp tục dùng authenticated Tenant/Business IDs; hostname
+không được dùng để resolve hoặc authorize Tenant. CORS tự cho phép đúng một Tenant
+slug dưới base host, nhưng vẫn từ chối nested/lookalike origins.
+Production nên giữ refresh cookie `SameSite=Lax; Secure` khi Admin và API cùng
+registrable domain. Development giữ Web/API trên `localhost`; kiểm thử tích hợp
+Google OAuth cùng Tenant subdomain được thực hiện trên staging HTTPS.
 
 Trước cutover từ release có Admin riêng, làm theo
 [ADR 0003](adr/0003-merge-web-business-admin.md): kiểm tra ingress/cookie/CORS,

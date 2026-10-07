@@ -6,14 +6,13 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useToast } from "@repo/hooks";
 import { HttpClientError, type CompleteOwnerBusinessInput } from "@repo/shared";
 import { Button } from "@repo/ui";
-import { useRouter } from "@/src/i18n/navigation";
+import { buildAdminBaseUrl } from "@/src/lib/admin/admin-workspace-url";
 import { authService } from "@/src/services/admin/auth.service";
 import { AuthShell, BusinessOnboardingForm } from "./components";
 
 export function OwnerOnboardingView() {
   const locale = useLocale();
   const t = useTranslations("AuthJourney");
-  const router = useRouter();
   const { toast } = useToast();
   const submitted = useRef(false);
   const clearDraftRef = useRef<() => void>(() => undefined);
@@ -37,7 +36,9 @@ export function OwnerOnboardingView() {
       await completion.mutateAsync(input);
       clearDraftRef.current();
       toast.success(t("businessCreated"));
-      router.replace("/admin/login");
+      window.location.replace(
+        buildAdminBaseUrl({ locale, pathname: "/admin/login" }),
+      );
     } catch (failure) {
       submitted.current = false;
       const sessionExpired =
@@ -104,7 +105,11 @@ export function OwnerOnboardingView() {
         <Button
           variant="ghost"
           className="w-full"
-          onClick={() => router.push("/admin/login")}
+          onClick={() =>
+            window.location.assign(
+              buildAdminBaseUrl({ locale, pathname: "/admin/login" }),
+            )
+          }
           type="button"
         >
           {t("backToLogin")}

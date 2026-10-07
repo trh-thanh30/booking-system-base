@@ -22,7 +22,7 @@ axios.defaults.adapter = async (config) => {
     statusText: "OK",
   };
 };
-const { apiClient, refreshAdminAccessToken } =
+const { apiClient, hasAdminRefreshCookie, refreshAdminAccessToken } =
   await import("../src/lib/admin/api-client.ts");
 const { authService } = await import("../src/services/admin/auth.service.ts");
 const { useAdminUiStore } = await import("../src/app/stores/admin/ui.store.ts");
@@ -75,6 +75,23 @@ function browser(t) {
     delete globalThis.document;
   });
 }
+
+test("production workspace hosts attempt refresh when the API-host marker is unreadable", (t) => {
+  globalThis.window = Object.assign(new EventTarget(), {
+    location: { hostname: "acme.app.bookingbase.com" },
+  });
+  globalThis.document = { cookie: "" };
+  t.after(() => {
+    delete globalThis.window;
+    delete globalThis.document;
+  });
+
+  assert.equal(hasAdminRefreshCookie("https://app.bookingbase.com"), true);
+  globalThis.window.location.hostname = "app.bookingbase.com";
+  assert.equal(hasAdminRefreshCookie("https://app.bookingbase.com"), true);
+  globalThis.window.location.hostname = "localhost";
+  assert.equal(hasAdminRefreshCookie("https://app.bookingbase.com"), false);
+});
 
 test("concurrent protected requests share the Admin refresh and send Tenant/Business headers", async (t) => {
   browser(t);

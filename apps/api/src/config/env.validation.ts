@@ -33,6 +33,7 @@ export const envSchema = z
       .default(900),
     WEB_URL: z.string().url().optional(),
     NEXT_PUBLIC_WEB_URL: z.string().url().optional(),
+    ADMIN_WORKSPACE_URL: z.string().url().optional(),
 
     // Database
     DB_HOST: z.string().default('localhost'),

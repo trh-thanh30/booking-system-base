@@ -280,7 +280,9 @@ click/drag pin và định vị theo thao tác người dùng. Địa chỉ/tọ
 được khi bản đồ hoặc quyền định vị lỗi. Không có Nominatim autocomplete.
 
 Metadata có title/description/OG/Twitter/canonical/hreflang cho vi/en, signup
-noindex; public origin từ `NEXT_PUBLIC_WEB_URL`, Admin login từ `NEXT_PUBLIC_WEB_URL`.
+noindex; public origin từ `NEXT_PUBLIC_WEB_URL`, Admin auth dùng base origin từ
+`NEXT_PUBLIC_ADMIN_WORKSPACE_URL`, còn private Admin routes canonicalize sang
+`{tenantSlug}.<admin-workspace-host>` sau khi Auth Profile đã được xác thực.
 Chưa khai báo OG image/social handle khi chưa có asset/tài khoản chính thức.
 
 ### Token guard và ngoại lệ

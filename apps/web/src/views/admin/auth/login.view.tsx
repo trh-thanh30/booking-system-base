@@ -10,13 +10,14 @@ import {
 import { useGoogleLogin } from "@/src/hooks/use-google-login";
 import { Link, useRouter } from "@/src/i18n/navigation";
 import { getSafeReturnTo } from "@/src/lib/admin/auth-routing";
+import { buildTenantAdminUrl } from "@/src/lib/admin/admin-workspace-url";
 import { authService } from "@/src/services/admin/auth.service";
 import { useToast } from "@repo/hooks";
 import { HttpClientError, loginSchema, type LoginInput } from "@repo/shared";
 import { Button } from "@repo/ui";
 import { useMutation } from "@tanstack/react-query";
 import { LogIn } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { AuthLoadingState, AuthShell } from "./components";
@@ -35,9 +36,10 @@ export function LoginView({
   oauthError?: string;
 }) {
   const t = useTranslations("Auth");
+  const locale = useLocale();
   const placeholders = useTranslations("AuthJourney.placeholders");
   const router = useRouter();
-  const { login, isLoading, isAuthenticated } = useAuth();
+  const { login, isLoading, isAuthenticated, user } = useAuth();
   const { toast } = useToast();
   const handledOAuthError = useRef<string | null>(null);
   const manualLoginRedirect = useRef(false);
@@ -55,10 +57,21 @@ export function LoginView({
   const loginMutation = useMutation({ mutationFn: login, retry: false });
   const destination = getSafeReturnTo(returnTo);
   useEffect(() => {
-    if (!manualLoginRedirect.current && !isLoading && isAuthenticated) {
-      router.replace(destination);
+    if (
+      !manualLoginRedirect.current &&
+      !isLoading &&
+      isAuthenticated &&
+      user?.tenant?.slug
+    ) {
+      window.location.replace(
+        buildTenantAdminUrl({
+          locale,
+          returnTo: destination,
+          tenantSlug: user.tenant.slug,
+        }),
+      );
     }
-  }, [destination, isAuthenticated, isLoading, router]);
+  }, [destination, isAuthenticated, isLoading, locale, user]);
   const {
     formState: { errors, isSubmitting },
     handleSubmit,
@@ -88,9 +101,16 @@ export function LoginView({
 
     try {
       manualLoginRedirect.current = true;
-      await loginMutation.mutateAsync(parsed.data);
+      const authenticatedUser = await loginMutation.mutateAsync(parsed.data);
       toast.success(t("login.success"));
-      router.replace(destination);
+      if (!authenticatedUser.tenant?.slug) throw new Error("TENANT_REQUIRED");
+      window.location.replace(
+        buildTenantAdminUrl({
+          locale,
+          returnTo: destination,
+          tenantSlug: authenticatedUser.tenant.slug,
+        }),
+      );
     } catch (error) {
       manualLoginRedirect.current = false;
       if (
