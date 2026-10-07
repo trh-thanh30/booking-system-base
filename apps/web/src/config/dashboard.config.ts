@@ -54,11 +54,14 @@ export function getDashboardConfig(t: Translate): DashboardConfig {
           },
           {
             title: t("items.chats"),
-            badge: "3",
+            badge: t("comingSoon"),
+            disabled: true,
             icon: MessageSquare,
           },
           {
             title: t("items.securedByAuth"),
+            badge: t("comingSoon"),
+            disabled: true,
             icon: ShieldCheck,
           },
         ],
@@ -68,10 +71,14 @@ export function getDashboardConfig(t: Translate): DashboardConfig {
         items: [
           {
             title: t("items.auth"),
+            badge: t("comingSoon"),
+            disabled: true,
             icon: ShieldCheck,
           },
           {
             title: t("items.errors"),
+            badge: t("comingSoon"),
+            disabled: true,
             icon: TriangleAlert,
           },
         ],
@@ -93,6 +100,8 @@ export function getDashboardConfig(t: Translate): DashboardConfig {
           },
           {
             title: t("items.helpCenter"),
+            badge: t("comingSoon"),
+            disabled: true,
             icon: CircleHelp,
           },
         ],

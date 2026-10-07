@@ -76,16 +76,16 @@ export function CommandMenu() {
 
   return (
     <Dialog onOpenChange={setOpen} open={open}>
-      <DialogContent className="p-0">
+      <DialogContent className="max-w-xl overflow-hidden p-0">
         <DialogTitle className="sr-only">{tCommon("searchPages")}</DialogTitle>
         <DialogDescription className="sr-only">
           {tCommon("searchPagesDescription")}
         </DialogDescription>
-        <CommandPrimitive className="overflow-hidden rounded-lg bg-background dark:bg-background">
-          <div className="flex items-center border-b border-border px-3 dark:border-border">
-            <Search className="mr-2 h-4 w-4 shrink-0 text-muted-foreground" />
+        <CommandPrimitive className="overflow-hidden rounded-lg bg-popover text-popover-foreground">
+          <div className="flex items-center border-b border-border px-4">
+            <Search className="mr-2 size-4 shrink-0 text-muted-foreground" />
             <CommandPrimitive.Input
-              className="h-12 w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+              className="h-14 w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground"
               placeholder={tCommon("searchPagesPlaceholder")}
             />
           </div>
@@ -98,13 +98,13 @@ export function CommandMenu() {
               return (
                 <CommandPrimitive.Item
                   asChild
-                  className="cursor-pointer rounded-md px-3 py-2 text-sm outline-none aria-selected:bg-muted dark:aria-selected:bg-muted"
+                  className="cursor-pointer rounded-md px-3 py-2.5 text-sm outline-none aria-selected:bg-accent aria-selected:text-accent-foreground"
                   key={item.href}
                   onSelect={() => setOpen(false)}
                   value={item.title}
                 >
                   <Link className="flex items-center gap-3" href={item.href}>
-                    <Icon className="h-4 w-4 text-muted-foreground" />
+                    <Icon className="size-4 text-muted-foreground" />
                     {item.title}
                   </Link>
                 </CommandPrimitive.Item>

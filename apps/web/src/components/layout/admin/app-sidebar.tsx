@@ -2,7 +2,16 @@
 
 import { ChevronRight, PanelLeft } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { Avatar, AvatarFallback, Badge, Button } from "@repo/ui";
+import {
+  Avatar,
+  AvatarFallback,
+  Badge,
+  Button,
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@repo/ui";
 import { cn } from "@repo/ui/lib/utils";
 import { useAdminUiStore } from "@/src/app/stores/admin/ui.store";
 import { useAuth } from "@/src/app/providers/admin";
@@ -22,73 +31,78 @@ function NavGroup({
   collapsed: boolean;
 }) {
   return (
-    <div className="space-y-1">
-      {!collapsed ? (
-        <p className="px-3 pb-1 pt-4 text-xs font-medium text-muted-foreground dark:text-muted-foreground animate-in fade-in duration-200">
-          {label}
-        </p>
-      ) : (
-        <div className="h-4" />
-      )}
-      {items.map((item) => {
-        const Icon = item.icon;
-        const active = item.href
-          ? pathname === item.href || pathname.startsWith(`${item.href}/`)
-          : false;
-        const className = cn(
-          "flex h-9 items-center rounded-md text-sm font-medium transition-all duration-200",
-          collapsed
-            ? "justify-center w-9 h-9 mx-auto px-0"
-            : "w-full gap-3 px-3",
-          active
-            ? "bg-muted text-foreground dark:bg-muted dark:text-muted-foreground"
-            : "text-muted-foreground hover:bg-muted hover:text-foreground dark:text-muted-foreground dark:hover:bg-muted dark:hover:text-muted-foreground",
-        );
-        const content = (
-          <>
-            <Icon className="h-4 w-4 shrink-0" />
-            {!collapsed && (
-              <>
-                <span className="min-w-0 flex-1 truncate text-left">
-                  {item.title}
-                </span>
-                {item.badge ? (
-                  <Badge variant="secondary">{item.badge}</Badge>
-                ) : null}
-                {!item.href && !item.badge ? (
-                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                ) : null}
-              </>
-            )}
-          </>
-        );
-
-        if (item.href) {
-          return (
-            <Link
-              aria-current={active ? "page" : undefined}
-              className={className}
-              href={item.href}
-              key={item.title}
-              title={collapsed ? item.title : undefined}
-            >
-              {content}
-            </Link>
+    <TooltipProvider delayDuration={100} skipDelayDuration={100}>
+      <div className="space-y-1">
+        {!collapsed ? (
+          <p className="animate-in fade-in px-3 pb-2 pt-5 text-caption font-semibold uppercase tracking-[0.12em] text-muted-foreground duration-normal">
+            {label}
+          </p>
+        ) : (
+          <div className="h-4" />
+        )}
+        {items.map((item) => {
+          const Icon = item.icon;
+          const active = item.href
+            ? pathname === item.href || pathname.startsWith(`${item.href}/`)
+            : false;
+          const className = cn(
+            "relative flex h-10 items-center rounded-lg text-sm font-medium transition-colors duration-normal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+            collapsed
+              ? "mx-auto size-10 justify-center px-0"
+              : "w-full gap-3 px-3",
+            active
+              ? "bg-accent text-accent-foreground"
+              : "text-muted-foreground hover:bg-muted-hover hover:text-foreground",
+            item.disabled &&
+              "cursor-not-allowed opacity-60 hover:bg-transparent hover:text-muted-foreground",
           );
-        }
+          const content = (
+            <>
+              <Icon className="size-4 shrink-0" />
+              {!collapsed && (
+                <>
+                  <span className="min-w-0 flex-1 truncate text-left">
+                    {item.title}
+                  </span>
+                  {item.badge ? (
+                    <Badge variant="secondary">{item.badge}</Badge>
+                  ) : null}
+                  {!item.href && !item.badge ? (
+                    <ChevronRight className="size-4 text-muted-foreground" />
+                  ) : null}
+                </>
+              )}
+            </>
+          );
 
-        return (
-          <button
-            className={className}
-            key={item.title}
-            type="button"
-            title={collapsed ? item.title : undefined}
-          >
-            {content}
-          </button>
-        );
-      })}
-    </div>
+          const navigationItem =
+            item.href && !item.disabled ? (
+              <Link
+                aria-current={active ? "page" : undefined}
+                className={className}
+                href={item.href}
+              >
+                {content}
+              </Link>
+            ) : (
+              <div aria-disabled="true" className={className}>
+                {content}
+              </div>
+            );
+
+          if (!collapsed) {
+            return <div key={item.title}>{navigationItem}</div>;
+          }
+
+          return (
+            <Tooltip key={item.title}>
+              <TooltipTrigger asChild>{navigationItem}</TooltipTrigger>
+              <TooltipContent side="right">{item.title}</TooltipContent>
+            </Tooltip>
+          );
+        })}
+      </div>
+    </TooltipProvider>
   );
 }
 
@@ -133,7 +147,7 @@ export function AppSidebar({
   return (
     <aside
       className={cn(
-        "flex h-full flex-col border-r border-border bg-background transition-all duration-300 ease-in-out dark:border-border dark:bg-background",
+        "flex h-full flex-col border-r border-border bg-surface transition-[width] duration-slow ease-[var(--ease-standard)]",
         collapsed ? "w-16" : "w-72",
       )}
     >
@@ -143,16 +157,16 @@ export function AppSidebar({
           collapsed && "justify-center px-0",
         )}
       >
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-background text-sm font-semibold text-foreground dark:bg-background dark:text-foreground">
-          <BrandLogo className="h-4 w-4" />
+        <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary text-sm font-semibold text-primary-foreground shadow-sm">
+          <BrandLogo className="size-4" />
         </div>
         {!collapsed && (
           <>
-            <div className="min-w-0 flex-1 animate-in fade-in duration-200">
-              <p className="truncate text-sm font-semibold text-foreground dark:text-muted-foreground">
+            <div className="animate-in fade-in min-w-0 flex-1 duration-normal">
+              <p className="truncate text-sm font-semibold text-foreground">
                 {dashboardConfig.brand.name}
               </p>
-              <p className="truncate text-xs text-muted-foreground dark:text-muted-foreground">
+              <p className="truncate text-xs text-muted-foreground">
                 {dashboardConfig.brand.description}
               </p>
             </div>
@@ -164,14 +178,17 @@ export function AppSidebar({
                 variant="ghost"
                 className="h-8 w-8"
               >
-                <PanelLeft className="h-4 w-4" />
+                <PanelLeft className="size-4" />
               </Button>
             ) : null}
           </>
         )}
       </div>
 
-      <nav className="flex-1 overflow-y-auto px-3 pb-3">
+      <nav
+        aria-label={dashboardConfig.brand.name}
+        className="flex-1 overflow-y-auto px-3 pb-3"
+      >
         {sidebarSections.map((section) => (
           <NavGroup
             items={section.items}
@@ -183,13 +200,13 @@ export function AppSidebar({
         ))}
       </nav>
 
-      <div className="border-t border-border p-4 dark:border-border">
+      <div className="border-t border-border p-3">
         <div
           className={cn(
-            "flex items-center rounded-md transition-all duration-200 hover:bg-muted dark:hover:bg-muted cursor-pointer",
+            "flex items-center rounded-lg bg-muted/60 transition-colors duration-normal",
             collapsed
-              ? "justify-center p-0 h-9 w-9 mx-auto"
-              : "gap-3 px-2 py-2",
+              ? "mx-auto size-10 justify-center p-0"
+              : "gap-3 px-2.5 py-2",
           )}
           title={collapsed ? `${user.name} (${user.email})` : undefined}
         >
@@ -198,15 +215,15 @@ export function AppSidebar({
           </Avatar>
           {!collapsed && (
             <>
-              <div className="min-w-0 flex-1 animate-in fade-in duration-200">
-                <p className="truncate text-sm font-medium text-foreground dark:text-muted-foreground">
+              <div className="animate-in fade-in min-w-0 flex-1 duration-normal">
+                <p className="truncate text-sm font-medium text-foreground">
                   {user.name}
                 </p>
-                <p className="truncate text-xs text-muted-foreground dark:text-muted-foreground">
+                <p className="truncate text-xs text-muted-foreground">
                   {user.email}
                 </p>
               </div>
-              <ChevronRight className="h-4 w-4 text-muted-foreground" />
+              <ChevronRight className="size-4 text-muted-foreground" />
             </>
           )}
         </div>

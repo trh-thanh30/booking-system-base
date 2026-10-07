@@ -1,14 +1,18 @@
 import { Card, CardContent, CardHeader, Skeleton } from "@repo/ui";
+import {
+  AdminPage,
+  AdminStatsGrid,
+} from "@/src/components/common/admin/admin-page";
 
 export default function DashboardLoading() {
   return (
-    <div className="space-y-6">
+    <AdminPage aria-busy="true" role="status">
       <div className="space-y-3">
         <Skeleton className="h-4 w-28" />
         <Skeleton className="h-8 w-64" />
         <Skeleton className="h-5 w-full max-w-xl" />
       </div>
-      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <AdminStatsGrid>
         {Array.from({ length: 4 }).map((_, index) => (
           <Card key={index}>
             <CardHeader>
@@ -20,7 +24,7 @@ export default function DashboardLoading() {
             </CardContent>
           </Card>
         ))}
-      </section>
+      </AdminStatsGrid>
       <Card>
         <CardHeader>
           <Skeleton className="h-5 w-40" />
@@ -32,6 +36,6 @@ export default function DashboardLoading() {
           ))}
         </CardContent>
       </Card>
-    </div>
+    </AdminPage>
   );
 }

@@ -11,8 +11,11 @@ import {
 } from "@repo/ui";
 import { useAuth } from "@/src/app/providers/admin";
 import { useAdminUiStore } from "@/src/app/stores/admin/ui.store";
+import { useTranslations } from "next-intl";
 
 export function BusinessSwitcher() {
+  const t = useTranslations("Common");
+  const tDashboard = useTranslations("DashboardConfig");
   const { user, selectBusiness } = useAuth();
   const businesses = user?.businesses ?? [];
   const activeBusinessId = useAdminUiStore((state) => state.activeBusinessId);
@@ -34,16 +37,17 @@ export function BusinessSwitcher() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
-          className="max-w-32 justify-start px-3 md:max-w-60"
+          aria-label={t("businessSwitcher")}
+          className="max-w-28 justify-start bg-background px-3 sm:max-w-44 md:max-w-56"
           variant="secondary"
         >
-          <Building2 className="h-4 w-4 shrink-0" />
+          <Building2 className="size-4 shrink-0 text-primary" />
           <span className="truncate">{activeBusiness.name}</span>
-          <ChevronDown className="ml-auto h-4 w-4 shrink-0 text-muted-foreground" />
+          <ChevronDown className="ml-auto size-4 shrink-0 text-muted-foreground" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-72">
-        <DropdownMenuLabel>Business</DropdownMenuLabel>
+        <DropdownMenuLabel>{tDashboard("items.businesses")}</DropdownMenuLabel>
         {businesses.map((business) => {
           const active = business.id === activeBusiness.id;
 
@@ -53,14 +57,19 @@ export function BusinessSwitcher() {
               key={business.id}
               onSelect={() => selectBusiness(business.id)}
             >
-              <Building2 className="h-4 w-4 text-muted-foreground" />
+              <Building2 className="size-4 text-muted-foreground" />
               <div className="min-w-0 flex-1">
                 <p className="truncate font-medium">{business.name}</p>
                 <p className="truncate text-xs text-muted-foreground">
                   {business.slug}
                 </p>
               </div>
-              {active ? <Check className="h-4 w-4" /> : null}
+              {active ? (
+                <>
+                  <span className="sr-only">{t("selected")}</span>
+                  <Check aria-hidden="true" className="size-4 text-primary" />
+                </>
+              ) : null}
             </DropdownMenuItem>
           );
         })}

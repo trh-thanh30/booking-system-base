@@ -15,7 +15,10 @@ import {
   Textarea,
 } from "@repo/ui";
 import { FormField } from "@/src/components/common/form-field";
-import { PageHeader } from "@/src/components/common/page-header";
+import {
+  AdminPage,
+  AdminPageHeader,
+} from "@/src/components/common/admin/admin-page";
 import {
   notificationSettings,
   securitySettings,
@@ -24,11 +27,11 @@ import {
 
 export function SettingsView() {
   return (
-    <div className="space-y-6">
-      <PageHeader
+    <AdminPage>
+      <AdminPageHeader
         actions={
           <Button>
-            <Save className="h-4 w-4" />
+            <Save className="size-4" />
             Save changes
           </Button>
         }
@@ -38,7 +41,7 @@ export function SettingsView() {
       />
 
       <Tabs defaultValue="general">
-        <TabsList className="w-full justify-start overflow-x-auto sm:w-auto">
+        <TabsList className="w-full justify-start overflow-x-auto bg-surface shadow-xs sm:w-auto">
           {settingsTabs.map((tab) => (
             <TabsTrigger key={tab.value} value={tab.value}>
               {tab.label}
@@ -50,7 +53,7 @@ export function SettingsView() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <SlidersHorizontal className="h-4 w-4" />
+                <SlidersHorizontal className="size-4 text-primary" />
                 Workspace profile
               </CardTitle>
               <CardDescription>
@@ -107,14 +110,12 @@ export function SettingsView() {
             <CardContent className="space-y-4">
               {notificationSettings.map((item) => (
                 <div
-                  className="flex items-center justify-between gap-4 rounded-md border border-border p-4 dark:border-border"
+                  className="flex items-center justify-between gap-4 rounded-lg border border-border bg-surface p-4"
                   key={item}
                 >
                   <div>
-                    <p className="font-medium text-foreground dark:text-muted-foreground">
-                      {item}
-                    </p>
-                    <p className="mt-1 text-sm text-muted-foreground dark:text-muted-foreground">
+                    <p className="font-medium text-foreground">{item}</p>
+                    <p className="mt-1 text-sm text-muted-foreground">
                       Send to configured operator channels.
                     </p>
                   </div>
@@ -129,7 +130,7 @@ export function SettingsView() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Shield className="h-4 w-4" />
+                <Shield className="size-4 text-primary" />
                 Access policy
               </CardTitle>
               <CardDescription>
@@ -140,14 +141,12 @@ export function SettingsView() {
             <CardContent className="space-y-4">
               {securitySettings.map((item) => (
                 <div
-                  className="flex items-center justify-between gap-4 rounded-md border border-border p-4 dark:border-border"
+                  className="flex items-center justify-between gap-4 rounded-lg border border-border bg-surface p-4"
                   key={item}
                 >
                   <div>
-                    <p className="font-medium text-foreground dark:text-muted-foreground">
-                      {item}
-                    </p>
-                    <p className="mt-1 text-sm text-muted-foreground dark:text-muted-foreground">
+                    <p className="font-medium text-foreground">{item}</p>
+                    <p className="mt-1 text-sm text-muted-foreground">
                       Prepared for future backend policy integration.
                     </p>
                   </div>
@@ -158,6 +157,6 @@ export function SettingsView() {
           </Card>
         </TabsContent>
       </Tabs>
-    </div>
+    </AdminPage>
   );
 }

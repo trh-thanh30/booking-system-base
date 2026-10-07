@@ -13,8 +13,6 @@ import {
 import {
   Badge,
   Button,
-  Card,
-  CardContent,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -29,8 +27,14 @@ import {
   TableRow,
 } from "@repo/ui";
 import { FormField } from "@/src/components/common/form-field";
-import { PageHeader } from "@/src/components/common/page-header";
-import { StatsCard } from "@/src/components/common/stats-card";
+import {
+  AdminPage,
+  AdminPageHeader,
+  AdminStatsGrid,
+} from "@/src/components/common/admin/admin-page";
+import { AdminStatsCard } from "@/src/components/common/admin/admin-stats-card";
+import { AdminTableContainer } from "@/src/components/common/admin/admin-table-container";
+import { StatePanel } from "@/src/components/common/state-panel";
 import { businessesService } from "@/src/services/admin/businesses.service";
 
 function formatDate(value: string) {
@@ -171,8 +175,8 @@ export function BusinessesView() {
   const defaultBusiness = businesses.find((business) => business.is_default);
 
   return (
-    <div className="space-y-6">
-      <PageHeader
+    <AdminPage>
+      <AdminPageHeader
         actions={
           <div className="flex flex-wrap gap-2">
             <Button
@@ -180,11 +184,11 @@ export function BusinessesView() {
               onClick={() => void businessesQuery.refetch()}
               variant="outline"
             >
-              <RefreshCw className="h-4 w-4" />
+              <RefreshCw className="size-4" />
               Refresh
             </Button>
             <Button onClick={() => setCreateOpen(true)}>
-              <Plus className="h-4 w-4" />
+              <Plus className="size-4" />
               Create business
             </Button>
           </div>
@@ -193,94 +197,113 @@ export function BusinessesView() {
         eyebrow="Tenant"
         title="Businesses"
       />
-      <section className="grid gap-4 md:grid-cols-3">
-        <StatsCard
+      <AdminStatsGrid className="xl:grid-cols-3">
+        <AdminStatsCard
           description="Operational units"
           icon={Store}
           title="Businesses"
           trend="Tenant scoped"
           value={String(businesses.length)}
         />
-        <StatsCard
+        <AdminStatsCard
           description="Ready for booking setup"
           icon={Building2}
           title="Active"
           trend={`${activeBusinesses}/${businesses.length || 0}`}
           value={String(activeBusinesses)}
         />
-        <StatsCard
+        <AdminStatsCard
           description="Initial business for this tenant"
           icon={Store}
           title="Default"
           trend={defaultBusiness?.slug ?? "-"}
           value={defaultBusiness?.name ?? "-"}
         />
-      </section>
-      <Card>
-        <CardContent className="p-0">
-          {businessesQuery.isLoading ? (
-            <div className="space-y-3 p-6">
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-10 w-full" />
-            </div>
-          ) : businesses.length === 0 ? (
-            <div className="flex min-h-72 flex-col items-center justify-center p-6 text-center">
-              <Store className="h-8 w-8 text-muted-foreground" />
-              <h2 className="mt-4 text-base font-semibold">
-                No businesses yet
-              </h2>
-              <p className="mt-2 max-w-md text-sm leading-6 text-muted-foreground dark:text-muted-foreground">
-                Create the first branch, brand, or location for this tenant.
-              </p>
-            </div>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Business</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Timezone</TableHead>
-                  <TableHead>Locale</TableHead>
-                  <TableHead>Created</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {businesses.map((business: BusinessContext) => (
-                  <TableRow key={business.id}>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <div>
-                          <div className="font-medium">{business.name}</div>
-                          <div className="text-xs text-muted-foreground">
-                            {business.slug}
-                          </div>
+      </AdminStatsGrid>
+      {businessesQuery.isLoading ? (
+        <AdminTableContainer>
+          <div className="space-y-3 p-6">
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
+          </div>
+        </AdminTableContainer>
+      ) : businessesQuery.isError || businesses.length === 0 ? (
+        <StatePanel
+          action={
+            businessesQuery.isError ? (
+              <Button
+                onClick={() => void businessesQuery.refetch()}
+                variant="outline"
+              >
+                Retry
+              </Button>
+            ) : (
+              <Button onClick={() => setCreateOpen(true)}>
+                <Plus className="size-4" />
+                Create business
+              </Button>
+            )
+          }
+          description={
+            businessesQuery.isError
+              ? "The businesses API could not be loaded. Check your connection and try again."
+              : "Create the first branch, brand, or location for this tenant."
+          }
+          icon={Store}
+          title={
+            businessesQuery.isError
+              ? "Unable to load businesses"
+              : "No businesses yet"
+          }
+        />
+      ) : (
+        <AdminTableContainer>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Business</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Timezone</TableHead>
+                <TableHead>Locale</TableHead>
+                <TableHead>Created</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {businesses.map((business: BusinessContext) => (
+                <TableRow key={business.id}>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <div>
+                        <div className="font-medium">{business.name}</div>
+                        <div className="text-xs text-muted-foreground">
+                          {business.slug}
                         </div>
-                        {business.is_default ? (
-                          <Badge variant="secondary">Default</Badge>
-                        ) : null}
                       </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge
-                        variant={
-                          business.status === "ACTIVE" ? "default" : "secondary"
-                        }
-                      >
-                        {business.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>{business.timezone}</TableCell>
-                    <TableCell>{business.locale}</TableCell>
-                    <TableCell>{formatDate(business.created_at)}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
-        </CardContent>
-      </Card>
+                      {business.is_default ? (
+                        <Badge variant="secondary">Default</Badge>
+                      ) : null}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <Badge
+                      variant={
+                        business.status === "ACTIVE" ? "default" : "secondary"
+                      }
+                    >
+                      {business.status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>{business.timezone}</TableCell>
+                  <TableCell>{business.locale}</TableCell>
+                  <TableCell>{formatDate(business.created_at)}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </AdminTableContainer>
+      )}
       <CreateBusinessDialog onOpenChange={setCreateOpen} open={createOpen} />
-    </div>
+    </AdminPage>
   );
 }
