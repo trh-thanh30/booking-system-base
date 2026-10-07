@@ -6,18 +6,22 @@ import { AppSidebar } from "@/src/components/layout/admin/app-sidebar";
 import { Header } from "@/src/components/layout/admin/header";
 import { useAuth } from "@/src/app/providers/admin";
 import { useAdminUiStore } from "@/src/app/stores/admin/ui.store";
-import { usePathname, useRouter } from "@/src/i18n/navigation";
+import { usePathname } from "@/src/i18n/navigation";
 import { getLoginUrl } from "@/src/lib/admin/auth-routing";
+import {
+  buildAdminBaseUrl,
+  buildTenantAdminUrl,
+} from "@/src/lib/admin/admin-workspace-url";
 import { cn } from "@repo/ui/lib/utils";
 import { Skeleton } from "@repo/ui";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { getDashboardConfig } from "@/src/config/dashboard.config";
 
 export function DashboardShell({ children }: { children: ReactNode }) {
   const collapsed = useAdminUiStore((state) => state.sidebarCollapsed);
-  const router = useRouter();
   const pathname = usePathname();
-  const { isAuthenticated, isLoading, can } = useAuth();
+  const locale = useLocale();
+  const { isAuthenticated, isLoading, can, user } = useAuth();
   const t = useTranslations("DashboardConfig");
   const tAuth = useTranslations("Auth");
   const route = getDashboardConfig(t)
@@ -28,14 +32,46 @@ export function DashboardShell({ children }: { children: ReactNode }) {
         (pathname === item.href || pathname.startsWith(`${item.href}/`)),
     );
   const hasPermission = !route?.permission || can(route.permission);
+  const returnTo =
+    typeof window === "undefined"
+      ? pathname
+      : pathname + window.location.search;
+  const workspaceUrl = user?.tenant?.slug
+    ? buildTenantAdminUrl({
+        locale,
+        returnTo,
+        tenantSlug: user.tenant.slug,
+      })
+    : null;
+  const isCanonicalRedirectPending = Boolean(
+    workspaceUrl &&
+    typeof window !== "undefined" &&
+    window.location.origin !== new URL(workspaceUrl).origin,
+  );
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      router.replace(getLoginUrl(pathname + window.location.search));
+      window.location.replace(
+        buildAdminBaseUrl({
+          locale,
+          pathname: getLoginUrl(pathname + window.location.search),
+        }),
+      );
+      return;
     }
-  }, [isAuthenticated, isLoading, pathname, router]);
+    if (!isLoading && workspaceUrl && isCanonicalRedirectPending) {
+      window.location.replace(workspaceUrl);
+    }
+  }, [
+    isAuthenticated,
+    isCanonicalRedirectPending,
+    isLoading,
+    locale,
+    pathname,
+    workspaceUrl,
+  ]);
 
-  if (isLoading || !isAuthenticated) {
+  if (isLoading || !isAuthenticated || isCanonicalRedirectPending) {
     return (
       <div
         role="status"
