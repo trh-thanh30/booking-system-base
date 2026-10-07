@@ -303,7 +303,7 @@ export function BusinessOnboardingForm({
             </Button>
           ) : null}
         </div>
-        <fieldset disabled={busy} className="space-y-4">
+        <fieldset disabled={busy} className="space-y-5">
           <legend className="sr-only">{t(STEP_TITLES[step])}</legend>
           {step === 0 ? (
             <BusinessInformationStep
@@ -323,14 +323,14 @@ export function BusinessOnboardingForm({
               <Button
                 type="button"
                 variant="outline"
-                className="min-h-11 rounded-full flex-1"
+                className="min-h-13 rounded-full flex-1 text-base font-semibold"
                 onClick={goBack}
               >
                 {t("back")}
               </Button>
             ) : null}
             <Button
-              className="min-h-11 rounded-full flex-1"
+              className="min-h-13 rounded-full flex-1 text-base font-semibold"
               disabled={
                 busy || (step === 0 && businessNameStatus !== "available")
               }

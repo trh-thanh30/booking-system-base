@@ -145,10 +145,10 @@ export function VerifyEmailView({
 
   return (
     <AuthShell description={t("verify.description")} title={t("verify.title")}>
-      <div className="space-y-4">
+      <div className="space-y-5">
         {sessionId && !feedback.expired ? (
           <form
-            className="space-y-4"
+            className="space-y-5"
             onSubmit={verifyForm.handleSubmit(verifyCode)}
           >
             <div className="space-y-2 rounded-md border bg-muted p-4 text-sm text-muted-foreground">
@@ -193,7 +193,7 @@ export function VerifyEmailView({
                         inputMode="numeric"
                         aria-invalid={invalid}
                         aria-describedby={invalid ? "code-error" : undefined}
-                        containerClassName="w-full justify-center"
+                        containerClassName="w-full min-w-0 justify-center"
                         disabled={pending || expiry.expired}
                         onChange={(value) => {
                           field.onChange(value);
@@ -202,9 +202,10 @@ export function VerifyEmailView({
                           }
                         }}
                       >
-                        <InputOTPGroup className="gap-1.5 sm:gap-2">
+                        <InputOTPGroup className="min-w-0 flex-1 gap-1 sm:gap-2">
                           {Array.from({ length: 6 }, (_, index) => (
                             <InputOTPSlot
+                              className="h-13 min-w-0 flex-1 text-xl font-semibold sm:h-13"
                               key={index}
                               index={index}
                               aria-invalid={invalid}
@@ -233,7 +234,7 @@ export function VerifyEmailView({
               </Button>
             </div>
             <Button
-              className="w-full"
+              className="w-full min-h-13 rounded-full text-base font-semibold"
               disabled={
                 pending ||
                 expiry.expired ||
@@ -248,7 +249,7 @@ export function VerifyEmailView({
           </form>
         ) : (
           <form
-            className="space-y-4"
+            className="space-y-5"
             onSubmit={requestForm.handleSubmit(requestCode)}
           >
             <FormField
@@ -271,7 +272,7 @@ export function VerifyEmailView({
               />
             </FormField>
             <Button
-              className="w-full"
+              className="w-full min-h-13 rounded-full text-base font-semibold"
               disabled={pending || feedback.remaining > 0}
               type="submit"
             >
@@ -279,7 +280,11 @@ export function VerifyEmailView({
             </Button>
           </form>
         )}
-        <Button asChild className="w-full" variant="ghost">
+        <Button
+          asChild
+          className="w-full min-h-13 rounded-full text-base font-semibold"
+          variant="ghost"
+        >
           <Link href={loginUrl}>{t("backToLogin")}</Link>
         </Button>
       </div>

@@ -108,7 +108,7 @@ export function GoogleOnboardingView() {
             ) : null}
             {profile.isError && !error?.terminal ? (
               <Button
-                className="w-full"
+                className="w-full min-h-13 rounded-full text-base font-semibold"
                 variant="outline"
                 disabled={profile.isFetching}
                 onClick={() => void profile.refetch()}
@@ -118,7 +118,7 @@ export function GoogleOnboardingView() {
             ) : null}
             {error?.terminal ? (
               <Button
-                className="w-full"
+                className="w-full min-h-13 rounded-full text-base font-semibold"
                 variant="outline"
                 disabled={google.isRedirecting}
                 onClick={google.startGoogleLogin}
@@ -129,7 +129,11 @@ export function GoogleOnboardingView() {
                   : t("google.restart")}
               </Button>
             ) : null}
-            <Button asChild variant="ghost" className="w-full">
+            <Button
+              asChild
+              variant="ghost"
+              className="w-full min-h-13 rounded-full text-base font-semibold"
+            >
               <Link href="/admin/login">{t("backToLogin")}</Link>
             </Button>
           </>

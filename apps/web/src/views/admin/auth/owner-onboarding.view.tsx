@@ -103,7 +103,7 @@ export function OwnerOnboardingView() {
         ) : null}
         <Button
           variant="ghost"
-          className="w-full"
+          className="w-full min-h-13 rounded-full text-base font-semibold"
           onClick={() => router.push("/admin/login")}
           type="button"
         >

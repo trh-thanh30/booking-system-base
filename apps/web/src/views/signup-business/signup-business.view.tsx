@@ -80,7 +80,7 @@ export function SignupBusinessView() {
         <Button
           variant="outline"
           type="button"
-          className="min-h-11 w-full rounded-full"
+          className="min-h-13 w-full rounded-full text-base font-semibold"
           disabled={busy}
           onClick={google.startGoogleLogin}
         >
@@ -142,7 +142,7 @@ export function SignupBusinessView() {
             />
           </FormField>
           <Button
-            className="min-h-11 w-full rounded-full"
+            className="min-h-13 w-full rounded-full text-base font-semibold"
             type="submit"
             disabled={busy}
           >

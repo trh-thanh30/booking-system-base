@@ -125,14 +125,16 @@ export function LoginView({
           description={t("checkingSessionDescription")}
         />
       ) : (
-        <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
+        <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
           <FormField
             error={errors.usernameOrEmail?.message}
             htmlFor="usernameOrEmail"
             label={t("fields.usernameOrEmail")}
+            className="text-base font-semibold"
             required
           >
             <EmailInput
+              className="h-13 min-h-13 text-base"
               type="text"
               aria-invalid={Boolean(errors.usernameOrEmail)}
               aria-describedby={
@@ -149,9 +151,11 @@ export function LoginView({
             error={errors.password?.message}
             htmlFor="password"
             label={t("fields.password")}
+            className="text-base font-semibold"
             required
           >
             <PasswordInput
+              className="h-13 min-h-13 text-base"
               aria-invalid={Boolean(errors.password)}
               aria-describedby={errors.password ? "password-error" : undefined}
               disabled={isSubmitting || google.isRedirecting}
@@ -162,7 +166,7 @@ export function LoginView({
               {...register("password")}
             />
           </FormField>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
             <Link
               className="text-sm font-medium text-muted-foreground underline-offset-4 hover:text-primary hover:underline"
               href="/admin/verify-email"
@@ -177,7 +181,7 @@ export function LoginView({
             </Link>
           </div>
           <Button
-            className="min-h-11 w-full rounded-full"
+            className="min-h-13 w-full rounded-full text-base font-semibold"
             disabled={
               isSubmitting || loginMutation.isPending || google.isRedirecting
             }
@@ -192,7 +196,7 @@ export function LoginView({
             <span className="h-px flex-1 bg-border" />
           </div>
           <Button
-            className="min-h-11 w-full rounded-full"
+            className="min-h-13 w-full rounded-full text-base font-semibold"
             variant="outline"
             type="button"
             disabled={
@@ -209,7 +213,7 @@ export function LoginView({
           <Button
             asChild
             variant="outline"
-            className="min-h-11 w-full rounded-full"
+            className="min-h-13 w-full rounded-full text-base font-semibold"
           >
             <Link href="/signup-business">{t("login.createAccount")}</Link>
           </Button>

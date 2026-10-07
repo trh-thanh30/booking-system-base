@@ -73,7 +73,7 @@ export function AcceptInvitationView({ token }: { token: string }) {
         description={t("invitation.description")}
         title={t("invitation.title")}
       >
-        <div className="space-y-4">
+        <div className="space-y-5">
           <Skeleton className="h-20 w-full" />
           <Skeleton className="h-10 w-full" />
           <Skeleton className="h-10 w-full" />
@@ -127,7 +127,7 @@ export function AcceptInvitationView({ token }: { token: string }) {
           </Badge>
         </div>
       </div>
-      <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
+      <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
         <input type="hidden" {...register("token")} />
         <FormField
           error={errors.username?.message}
@@ -186,7 +186,7 @@ export function AcceptInvitationView({ token }: { token: string }) {
           />
         </FormField>
         <Button
-          className="w-full"
+          className="w-full min-h-13 rounded-full text-base font-semibold"
           disabled={disabled || isSubmitting}
           type="submit"
         >
