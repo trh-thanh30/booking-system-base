@@ -8,8 +8,18 @@ export default getRequestConfig(async ({ requestLocale }) => {
     ? requested
     : routing.defaultLocale;
 
+  const [messages, landingPageHome] = await Promise.all([
+    import(`@/src/messages/${locale}.json`).then((module) => module.default),
+    import(`@/src/messages/landing-page-home/${locale}.json`).then(
+      (module) => module.default,
+    ),
+  ]);
+
   return {
     locale,
-    messages: (await import(`@/src/messages/${locale}.json`)).default,
+    messages: {
+      ...messages,
+      landing_page_home: landingPageHome,
+    },
   };
 });

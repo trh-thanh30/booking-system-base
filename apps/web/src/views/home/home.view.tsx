@@ -1,48 +1,22 @@
 "use client";
 
-import { useState } from "react";
-import { motion, useScroll, useSpring } from "framer-motion";
 import { useTranslations } from "next-intl";
+import { ScrollProgressBar } from "./components/ScrollProgressBar";
 
 import {
   Header,
   Hero,
-  Problem,
-  HowItWorks,
+  PillarsSection,
+  IndustrySolutionsSection,
   Features,
-  NoShowSection,
-  Templates,
-  Customization,
-  Channels,
-  Marketplace,
-  Industries,
-  EarlyAccess,
+  CustomizationSection,
   Pricing,
   FAQ,
-  FinalCTA,
+  Footer,
 } from "./sections";
 
 export function HomeView() {
   const t = useTranslations("Navigation");
-  // Shared state passed to child sections
-  const [activeTemplateIdx, setActiveTemplateIdx] = useState<number>(0);
-  const [customColor, setCustomColor] = useState<string>("brand-blue");
-  const [customRequireDeposit, setCustomRequireDeposit] =
-    useState<boolean>(true);
-  const [customSMS, setCustomSMS] = useState<boolean>(true);
-  const [customStaff, setCustomStaff] = useState<boolean>(true);
-  const [customBusinessName, setCustomBusinessName] =
-    useState<string>("Lumière");
-  const [customSelectedStaff, setCustomSelectedStaff] =
-    useState<string>("emily");
-
-  // Scroll progress bar
-  const { scrollYProgress } = useScroll();
-  const scaleX = useSpring(scrollYProgress, {
-    stiffness: 100,
-    damping: 30,
-    restDelta: 0.001,
-  });
 
   return (
     <div className="landing min-h-dvh bg-background text-foreground overflow-x-clip font-sans relative">
@@ -52,59 +26,31 @@ export function HomeView() {
       >
         {t("skip")}
       </a>
-      <motion.div
-        className="fixed top-0 left-0 right-0 h-[3px] bg-primary origin-[0%] z-[100]"
-        style={{ scaleX }}
-      />
+      <ScrollProgressBar />
 
       <Header />
       <main id="main-content" tabIndex={-1}>
+        {/* SECTION 1: HERO & INDUSTRY MARQUEE */}
         <Hero />
-        <Problem />
-        <HowItWorks />
+
+        {/* SECTION 2: 4 PILLARS & SOCIAL BIO (SQUARE APPOINTMENTS STYLE) */}
+        <PillarsSection />
+
+        {/* SECTION 3: INDUSTRY SOLUTIONS (EMBLA SLIDER FOR 5 TRADES) */}
+        <IndustrySolutionsSection />
+
+        {/* SECTION 4: DEEP-DIVE FEATURES (COMPREHENSIVE BENTO GRID & CAL STYLE) */}
         <Features />
-        <NoShowSection />
 
-        <Templates
-          activeTemplateIdx={activeTemplateIdx}
-          setActiveTemplateIdx={setActiveTemplateIdx}
-        />
+        {/* SECTION 5: ENDLESS CUSTOMISATION OPTIONS (LUNACAL STYLE) */}
+        <CustomizationSection />
 
-        <Customization
-          customColor={customColor}
-          setCustomColor={setCustomColor}
-          customRequireDeposit={customRequireDeposit}
-          setCustomRequireDeposit={setCustomRequireDeposit}
-          customSMS={customSMS}
-          setCustomSMS={setCustomSMS}
-          customStaff={customStaff}
-          setCustomStaff={setCustomStaff}
-          customBusinessName={customBusinessName}
-          setCustomBusinessName={setCustomBusinessName}
-          customSelectedStaff={customSelectedStaff}
-          setCustomSelectedStaff={setCustomSelectedStaff}
-        />
-
-        <Channels
-          customColor={customColor}
-          customBusinessName={customBusinessName}
-          setCustomBusinessName={setCustomBusinessName}
-        />
-
-        <Marketplace
-          activeTemplateIdx={activeTemplateIdx}
-          setActiveTemplateIdx={setActiveTemplateIdx}
-          customBusinessName={customBusinessName}
-        />
-
-        <Industries
-          activeTemplateIdx={activeTemplateIdx}
-          setActiveTemplateIdx={setActiveTemplateIdx}
-        />
-        <EarlyAccess />
+        {/* SECTION 6: TRANSPARENT PRICING */}
         <Pricing />
+
+        {/* SECTION 7: FAQ & FOOTER */}
         <FAQ />
-        <FinalCTA />
+        <Footer />
       </main>
     </div>
   );

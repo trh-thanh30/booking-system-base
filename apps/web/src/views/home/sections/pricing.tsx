@@ -6,18 +6,16 @@ import {
   DialogDescription,
 } from "@repo/ui";
 
-import { useState, useEffect } from "react";
+import { Fragment, useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, ChevronDown, Lock, X, Globe } from "lucide-react";
+import { Check, ChevronDown, Lock, X } from "lucide-react";
 import { useToast } from "@repo/hooks";
 import { RepeatReveal } from "@/src/components/motion/RepeatReveal";
 import { RepeatStaggerReveal } from "@/src/components/motion/RepeatStaggerReveal";
 import { RepeatStaggerItem } from "@/src/components/motion/RepeatStaggerItem";
-import { MotionButton } from "@/src/components/motion/MotionButton";
-import {
-  PricingCard,
-  SectionHeading,
-} from "@/src/components/common/landing-compositions";
+import { PricingCard } from "@/src/components/common/landing-compositions";
+import { useLocale, useTranslations } from "next-intl";
+import { getLocaleCurrency } from "../utils/demo-currency.utils";
 
 interface ComparisonRow {
   name: string;
@@ -266,9 +264,11 @@ const COMPARISONS: ComparisonGroup[] = [
 ];
 
 export function Pricing() {
+  const locale = useLocale();
+  const t = useTranslations("landing_page_home.pricing");
   const { toast } = useToast();
   const [billing, setBilling] = useState<"monthly" | "annual">("monthly");
-  const [currency, setCurrency] = useState<"USD" | "EUR" | "VND">("USD");
+  const currency = getLocaleCurrency(locale);
   const [isCompareOpen, setIsCompareOpen] = useState(false);
 
   useEffect(() => {
@@ -284,13 +284,11 @@ export function Pricing() {
 
   const handleCtaClick = (planName: string, isContactSales: boolean) => {
     if (isContactSales) {
-      toast.success(
-        "Opening contact form... Redirection to Sales Support scheduled.",
-      );
+      toast.success(t("toast.contact"));
       window.location.href =
         "mailto:sales@bookingbase.com?subject=BookingBase%20Business%20Plan%20Inquiry";
     } else {
-      toast.success(`Redirecting to ${planName} trial registration →`);
+      toast.success(t("toast.redirect", { plan: planName }));
       window.location.href = "/sign-up";
     }
   };
@@ -319,87 +317,101 @@ export function Pricing() {
     <RepeatReveal
       as="section"
       id="pricing"
-      className="scroll-mt-20 md:scroll-mt-24 py-10 md:py-12 lg:py-14 bg-background border-t border-border relative overflow-hidden"
+      className="scroll-mt-20 md:scroll-mt-24 py-24 lg:py-32 bg-surface relative overflow-hidden"
     >
-      <div className="mx-auto w-full max-w-landing px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="text-center max-w-3xl mx-auto mb-6 space-y-1.5">
-          <SectionHeading
-            eyebrow="Simple Pricing"
-            title="Choose a plan that grows with your service business"
-            description="Start with a 14-day trial. Upgrade, downgrade or cancel anytime — no long-term commitment."
-          />
+        <div className="text-center max-w-5xl mx-auto mb-14 sm:mb-16 space-y-4">
+          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-foreground leading-[1.14] text-balance">
+            {t("title")}
+            <br />
+            <span className="text-muted-foreground font-bold">
+              {t("titleHighlight")}
+            </span>
+          </h2>
+          <p className="mt-5 text-base sm:text-lg lg:text-xl text-muted-foreground leading-relaxed max-w-3xl mx-auto">
+            {t("description")}
+          </p>
         </div>
 
         {/* Toggle Row */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-5 select-none">
-          <div className="inline-flex items-center bg-surface border border-border rounded-full p-1 shadow-sm">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-10 select-none">
+          <div className="inline-flex items-center bg-surface border border-border rounded-full p-1.5 shadow-xs">
             <button
               type="button"
               onClick={() => setBilling("monthly")}
-              className={`px-5 py-1.5 rounded-full text-xs font-bold transition-all duration-200 cursor-pointer ${
+              className={`px-7 py-2.5 rounded-full text-sm sm:text-base font-bold transition-all duration-200 cursor-pointer ${
                 billing === "monthly"
-                  ? "bg-primary text-primary-foreground shadow-sm"
+                  ? "bg-primary text-primary-foreground shadow-xs"
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
-              Monthly
+              {t("monthly")}
             </button>
             <button
               type="button"
               onClick={() => setBilling("annual")}
-              className={`px-5 py-1.5 rounded-full text-xs font-bold transition-all duration-200 cursor-pointer flex items-center gap-1.5 ${
+              className={`px-7 py-2.5 rounded-full text-sm sm:text-base font-bold transition-all duration-200 cursor-pointer flex items-center gap-2 ${
                 billing === "annual"
-                  ? "bg-primary text-primary-foreground shadow-sm"
+                  ? "bg-primary text-primary-foreground shadow-xs"
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
-              <span>Annual</span>
+              <span>{t("annual")}</span>
               <span
-                className={`text-[9px] font-extrabold px-1.5 py-0.5 rounded ${
+                className={`text-xs font-extrabold px-2.5 py-0.5 rounded-full ${
                   billing === "annual"
-                    ? "bg-primary-400/30 text-primary-foreground"
+                    ? "bg-primary-hover text-primary-foreground"
                     : "bg-success-surface border border-success-border text-success-surface-foreground"
                 }`}
               >
-                Save 20%
+                {t("save20")}
               </span>
             </button>
-          </div>
-
-          <div className="inline-flex items-center bg-surface border border-border rounded-xl px-3 py-1 shadow-sm gap-1.5">
-            <Globe className="w-3.5 h-3.5 text-muted-foreground" />
-            <span className="text-xs text-muted-foreground font-bold">
-              Currency:
-            </span>
-            <select
-              value={currency}
-              onChange={(e) =>
-                setCurrency(e.target.value as "USD" | "EUR" | "VND")
-              }
-              className="text-xs font-extrabold text-foreground bg-transparent focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2 cursor-pointer py-0.5"
-            >
-              <option value="USD">USD ($)</option>
-              <option value="EUR">EUR (€)</option>
-              <option value="VND">VND (₫)</option>
-            </select>
           </div>
         </div>
 
         {/* Social Proof Line */}
-        <div className="text-center text-[11px] text-foreground select-none mb-5">
-          <span>
-            <strong>12,400+ businesses</strong> trust BookingBase
+        <div className="mb-10 flex flex-col items-center gap-2 text-center text-sm leading-relaxed text-muted-foreground select-none sm:flex-row sm:flex-wrap sm:justify-center sm:gap-0">
+          <span className="text-balance">
+            <span className="sm:hidden">{t("social.trustedMobile")} </span>
+            <strong className="text-foreground">
+              {t("social.businesses")}
+            </strong>
+            <span className="hidden sm:inline">
+              {" "}
+              {t("social.trustedDesktop")}
+            </span>
           </span>
-          <span className="mx-2 text-input">·</span>
-          <span className="text-warning-500 font-bold mr-1">★★★★★</span>
-          <span>
-            <strong>4.8 avg rating</strong> from 1,820 customer reviews
+          <span
+            className="mx-2 hidden text-muted-foreground sm:inline"
+            aria-hidden="true"
+          >
+            ·
+          </span>
+          <span className="flex flex-wrap items-center justify-center gap-x-1.5 gap-y-0.5">
+            <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
+              <span className="text-warning-500 font-bold" aria-hidden="true">
+                ★★★★★
+              </span>
+              <strong className="text-foreground">
+                <span className="sm:hidden">{t("social.ratingShort")}</span>
+                <span className="hidden sm:inline">
+                  {t("social.ratingLong")}
+                </span>
+              </strong>
+            </span>
+            <span className="whitespace-nowrap">
+              <span className="sm:hidden">· {t("social.reviews")}</span>
+              <span className="hidden sm:inline">
+                {t("social.reviewsLong")}
+              </span>
+            </span>
           </span>
         </div>
 
         {/* Pricing Cards Grid */}
-        <RepeatStaggerReveal className="grid gap-5 lg:grid-cols-3 items-stretch mb-6">
+        <RepeatStaggerReveal className="grid gap-6 lg:gap-8 lg:grid-cols-3 items-stretch mb-10">
           {PLANS.map((plan) => {
             const priceCfg = getPriceConfig(plan.id);
             const isContactSales = plan.id === "business";
@@ -407,9 +419,13 @@ export function Pricing() {
             let savingsText = "";
             if (billing === "annual") {
               if (currency === "VND") {
-                savingsText = `Save ${priceCfg.savings.toLocaleString("vi-VN")} ₫/year`;
+                savingsText = t("annualSavings", {
+                  amount: `${priceCfg.savings.toLocaleString("vi-VN")} ₫`,
+                });
               } else {
-                savingsText = `Save ${priceCfg.symbol}${priceCfg.savings}/year`;
+                savingsText = t("annualSavings", {
+                  amount: `${priceCfg.symbol}${priceCfg.savings}`,
+                });
               }
             }
 
@@ -417,36 +433,36 @@ export function Pricing() {
               <RepeatStaggerItem key={plan.id} className="h-full">
                 <PricingCard
                   featured={plan.popular}
-                  className={`h-full border rounded-2xl bg-surface p-5 flex flex-col justify-between transition-all duration-300 relative ${
+                  className={`h-full border-2 rounded-3xl bg-surface p-7 sm:p-9 flex flex-col justify-between transition-all duration-300 relative select-none ${
                     plan.popular
-                      ? "border-primary ring-4 ring-primary/10 shadow-xl z-10 scale-[1.01]"
-                      : "border-border shadow-sm hover:border-input hover:shadow-md"
+                      ? "border-primary shadow-2xl z-10"
+                      : "border-border shadow-xs hover:border-primary/40 hover:shadow-lg"
                   }`}
                 >
                   {plan.popular && (
-                    <span className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-primary text-primary-foreground text-[8px] font-extrabold tracking-wider px-3 py-0.5 uppercase rounded-full shadow-md flex items-center justify-center select-none">
-                      Most popular
+                    <span className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-primary text-primary-foreground text-[10px] font-extrabold tracking-wider px-4 py-1 uppercase rounded-full shadow-md flex items-center justify-center select-none">
+                      {t("mostPopular")}
                     </span>
                   )}
 
-                  <div className="space-y-4">
-                    <div className="space-y-1">
-                      <h3 className="text-lg font-extrabold text-foreground">
-                        {plan.name}
+                  <div className="space-y-6">
+                    <div className="space-y-1.5">
+                      <h3 className="text-2xl font-black text-foreground tracking-tight">
+                        {t(`plans.${plan.id}.name`)}
                       </h3>
-                      <p className="text-[11px] text-muted-foreground leading-relaxed min-h-[34px]">
-                        {plan.description}
+                      <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed min-h-[40px] lg:min-h-18 xl:min-h-[40px]">
+                        {t(`plans.${plan.id}.description`)}
                       </p>
                     </div>
 
-                    <div className="flex items-baseline gap-0.5 pt-3 border-t border-border select-none">
+                    <div className="flex flex-wrap items-baseline gap-x-1 gap-y-1 pt-4 lg:min-h-24 border-t border-border select-none">
                       {priceCfg.pos === "prefix" && (
-                        <span className="text-lg font-bold text-foreground">
+                        <span className="text-2xl font-bold text-foreground">
                           {priceCfg.symbol}
                         </span>
                       )}
 
-                      <div className="overflow-hidden min-h-[40px] flex items-baseline">
+                      <div className="min-w-0 max-w-full flex items-baseline">
                         <AnimatePresence mode="wait">
                           <motion.span
                             key={`${billing}-${currency}-${plan.id}`}
@@ -454,7 +470,11 @@ export function Pricing() {
                             animate={{ y: 0, opacity: 1 }}
                             exit={{ y: -6, opacity: 0 }}
                             transition={{ duration: 0.15, ease: "easeOut" }}
-                            className="text-3xl sm:text-4xl font-extrabold text-foreground tracking-tight inline-block"
+                            className={
+                              currency === "VND"
+                                ? "text-4xl sm:text-5xl lg:text-4xl xl:text-5xl font-black text-foreground tracking-tight inline-block whitespace-nowrap"
+                                : "text-4xl sm:text-5xl lg:text-6xl font-black text-foreground tracking-tight inline-block whitespace-nowrap"
+                            }
                           >
                             {priceCfg.value}
                           </motion.span>
@@ -462,55 +482,74 @@ export function Pricing() {
                       </div>
 
                       {priceCfg.pos === "suffix" && (
-                        <span className="text-base font-bold text-foreground ml-0.5">
+                        <span className="text-xl font-bold text-foreground ml-0.5">
                           {priceCfg.symbol}
                         </span>
                       )}
-                      <span className="text-xs text-muted-foreground font-bold ml-0.5">
-                        /month
+                      <span
+                        className={`text-sm text-muted-foreground font-semibold ${
+                          locale === "vi" ? "basis-full" : "ml-1"
+                        }`}
+                      >
+                        {t("perMonth")}
                       </span>
                     </div>
 
-                    <div className="text-[10px] select-none min-h-[16px]">
+                    <div className="text-xs select-none min-h-[20px]">
                       {billing === "annual" ? (
-                        <span className="text-success-surface-foreground font-bold bg-success-surface border border-success-border px-2 py-0.5 rounded-md">
+                        <span className="text-success-surface-foreground font-bold bg-success-surface border border-success-border px-2.5 py-1 rounded-md">
                           {savingsText}
                         </span>
                       ) : (
                         <span className="text-muted-foreground">
-                          Billed monthly · cancel anytime
+                          {t("billedMonthly")}
                         </span>
                       )}
                     </div>
 
-                    {/* EVERYTHING IN BADGE */}
-                    <div
-                      className={`text-[9px] font-bold text-success-surface-foreground bg-success-surface/80 border border-success-border py-0.5 px-2 rounded text-center select-none ${
-                        plan.everything_in
-                          ? ""
-                          : "opacity-0 pointer-events-none select-none"
-                      }`}
-                    >
-                      {plan.everything_in
-                        ? `✓ Everything in ${plan.everything_in}, plus:`
-                        : "Placeholder"}
+                    {/* Keep plan summaries aligned across the cards. */}
+                    <div className="min-h-18 lg:min-h-28 xl:min-h-18 flex items-start gap-2.5 rounded-2xl border border-border bg-muted/70 px-3.5 py-3 text-left select-none">
+                      <Check
+                        className="mt-0.5 size-4 shrink-0 text-primary"
+                        aria-hidden="true"
+                      />
+                      <div className="min-w-0 space-y-1">
+                        <p className="text-sm font-bold leading-snug text-foreground">
+                          {plan.everything_in
+                            ? t("everythingIn", {
+                                plan: t(
+                                  `plans.${plan.everything_in.toLowerCase()}.name`,
+                                ),
+                              })
+                            : t("starterSummary.title")}
+                        </p>
+                        <p className="text-xs leading-relaxed text-muted-foreground">
+                          {plan.everything_in
+                            ? t("everythingInExtra")
+                            : t("starterSummary.description")}
+                        </p>
+                      </div>
                     </div>
 
-                    {/* TWO-COLUMN GROUPED FEATURES LIST */}
-                    <div className="grid grid-cols-2 gap-x-4 gap-y-3 pt-2 border-t border-border/50 min-h-[115px]">
+                    {/* SINGLE-COLUMN GROUPED FEATURES LIST */}
+                    <div className="space-y-4 pt-5 border-t border-border">
                       {plan.features.map((grp, gidx) => (
-                        <div key={gidx} className="space-y-1">
-                          <h4 className="text-[9px] font-extrabold text-muted-foreground uppercase tracking-wider select-none">
-                            {grp.group}
+                        <div key={gidx} className="space-y-2">
+                          <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wider select-none">
+                            {t(`plans.${plan.id}.groups.${gidx}.title`)}
                           </h4>
-                          <ul className="space-y-1.5">
+                          <ul className="space-y-2.5">
                             {grp.items.map((feat, fidx) => (
                               <li
                                 key={fidx}
-                                className="flex items-start gap-1.5 text-[10px] text-foreground leading-tight"
+                                className="flex items-start gap-2.5 text-sm font-medium text-foreground leading-snug"
                               >
-                                <Check className="w-3.5 h-3.5 text-success-500 flex-shrink-0 mt-0.5" />
-                                <span>{feat}</span>
+                                <Check className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                                <span>
+                                  {t(
+                                    `plans.${plan.id}.groups.${gidx}.items.${fidx}`,
+                                  )}
+                                </span>
                               </li>
                             ))}
                           </ul>
@@ -519,29 +558,35 @@ export function Pricing() {
                     </div>
                   </div>
 
-                  <div className="pt-4 space-y-1.5">
+                  <div className="pt-6 space-y-2">
                     {isContactSales ? (
                       <button
                         type="button"
-                        onClick={() => handleCtaClick(plan.name, true)}
-                        className="w-full inline-flex h-9 items-center justify-center rounded-full border border-input hover:border-primary bg-surface hover:bg-accent/20 text-xs font-bold text-foreground hover:text-primary transition cursor-pointer select-none active:scale-[0.98]"
+                        onClick={() =>
+                          handleCtaClick(t(`plans.${plan.id}.name`), true)
+                        }
+                        className="w-full inline-flex h-13 sm:h-14 items-center justify-center rounded-full border-2 border-input hover:border-primary bg-surface hover:bg-muted text-sm sm:text-base font-bold text-foreground transition-all cursor-pointer select-none active:scale-[0.98] shadow-xs"
                       >
-                        <span>{plan.cta}</span>
+                        <span>{t(`plans.${plan.id}.cta`)}</span>
                       </button>
                     ) : (
-                      <MotionButton
-                        variant={plan.popular ? "primary" : "secondary"}
-                        className="w-full text-xs font-bold h-9 cursor-pointer select-none"
-                        onClick={() => handleCtaClick(plan.name, false)}
+                      <button
+                        type="button"
+                        onClick={() =>
+                          handleCtaClick(t(`plans.${plan.id}.name`), false)
+                        }
+                        className={`w-full inline-flex h-13 sm:h-14 items-center justify-center rounded-full text-sm sm:text-base font-bold transition-all cursor-pointer select-none active:scale-[0.98] shadow-xs ${
+                          plan.popular
+                            ? "bg-primary hover:bg-primary-hover text-primary-foreground shadow-md"
+                            : "border-2 border-input hover:border-primary bg-surface hover:bg-muted text-foreground"
+                        }`}
                       >
-                        {plan.cta}
-                      </MotionButton>
+                        {t(`plans.${plan.id}.cta`)}
+                      </button>
                     )}
 
-                    <p className="text-[9px] text-muted-foreground text-center select-none font-medium">
-                      {isContactSales
-                        ? "Custom trial & support available"
-                        : "14-day free trial included"}
+                    <p className="text-[11px] text-muted-foreground text-center select-none font-medium">
+                      {isContactSales ? t("customTrial") : t("trialIncluded")}
                     </p>
                   </div>
                 </PricingCard>
@@ -551,14 +596,14 @@ export function Pricing() {
         </RepeatStaggerReveal>
 
         {/* Compare Features Trigger Button */}
-        <div className="text-center mt-2 mb-1">
+        <div className="text-center mt-8 mb-4">
           <button
             type="button"
             onClick={() => setIsCompareOpen(true)}
-            className="inline-flex items-center gap-1.5 px-5 py-1.5 rounded-full border border-border bg-surface hover:bg-background hover:border-input text-xs font-bold text-foreground hover:text-primary shadow-sm transition-all duration-200 cursor-pointer select-none active:scale-[0.98]"
+            className="inline-flex items-center gap-3 px-8 py-3.5 rounded-full border-2 border-input bg-surface hover:bg-primary hover:text-primary-foreground hover:border-primary text-sm sm:text-base font-extrabold text-foreground shadow-sm transition-all duration-200 cursor-pointer select-none active:scale-[0.98] group"
           >
-            <span>Compare all features in detail</span>
-            <ChevronDown className="w-3 h-3" />
+            <span>{t("compare")}</span>
+            <ChevronDown className="w-4 h-4 text-muted-foreground group-hover:text-primary-foreground transition-colors" />
           </button>
         </div>
 
@@ -566,124 +611,161 @@ export function Pricing() {
         <AnimatePresence>
           {isCompareOpen && (
             <Dialog open={isCompareOpen} onOpenChange={setIsCompareOpen}>
-              <DialogContent className="w-[min(calc(100vw-2rem),56rem)] rounded-xl p-6 sm:p-8 max-h-[85dvh] flex flex-col">
+              <DialogContent className="w-[min(calc(100vw-2rem),76rem)] sm:w-[min(calc(100vw-3rem),84rem)] max-w-7xl max-h-[90dvh] h-[88vh] rounded-3xl p-6 sm:p-10 lg:p-12 flex flex-col bg-surface border border-border shadow-2xl overflow-hidden">
                 {/* Modal Header */}
-                <div className="flex items-center justify-between border-b border-border pb-4 mb-4 shrink-0">
+                <div className="flex items-start justify-between border-b border-border/80 pb-6 mb-6 shrink-0 gap-6">
                   <div>
-                    <DialogTitle className="text-heading-4 font-bold text-foreground">
-                      Detailed Feature Comparison
+                    <DialogTitle className="text-2xl sm:text-3xl lg:text-4xl font-black text-foreground tracking-tight">
+                      {t("comparison.title")}
                     </DialogTitle>
-                    <DialogDescription className="text-label text-muted-foreground mt-0.5">
-                      Compare Starter, Professional, and Business tiers side by
-                      side
+                    <DialogDescription className="text-sm sm:text-base text-muted-foreground mt-2 font-medium">
+                      {t("comparison.description")}
                     </DialogDescription>
                   </div>
                   <button
                     type="button"
                     onClick={() => setIsCompareOpen(false)}
-                    className="p-1.5 rounded-lg text-muted-foreground hover:bg-background hover:text-foreground transition cursor-pointer"
-                    aria-label="Close"
+                    className="w-11 h-11 sm:w-12 sm:h-12 rounded-full border border-input hover:border-primary bg-surface hover:bg-muted flex items-center justify-center text-foreground hover:text-foreground transition-all duration-200 cursor-pointer shadow-xs select-none shrink-0"
+                    aria-label={t("comparison.close")}
                   >
-                    <X className="w-4 h-4" />
+                    <X className="w-5 h-5 sm:w-6 sm:h-6 stroke-[2.5]" />
                   </button>
                 </div>
 
                 {/* Scrollable table container */}
-                <div className="overflow-y-auto flex-1 border border-border rounded-xl">
-                  <table className="w-full border-collapse min-w-[600px]">
-                    <thead className="sticky top-0 bg-background z-10 select-none shadow-sm">
+                <div className="overflow-auto flex-1 rounded-2xl border border-border/90 bg-surface shadow-xs">
+                  <table className="w-full border-collapse min-w-[700px]">
+                    <thead className="sticky top-0 bg-muted/95 backdrop-blur-md z-20 select-none [&_th]:align-top [&_th]:whitespace-nowrap [&_th]:shadow-[inset_0_-1px_0_var(--color-border)]">
                       <tr>
-                        <th className="px-4 py-3 text-left text-[10px] font-extrabold text-muted-foreground uppercase tracking-wider border-b border-border">
-                          Feature
+                        <th className="w-[37%] px-6 sm:px-8 py-5 text-left text-xs sm:text-sm font-black text-muted-foreground uppercase tracking-wider">
+                          {t("comparison.feature")}
                         </th>
-                        <th className="px-4 py-3 text-left text-[10px] font-extrabold text-muted-foreground uppercase tracking-wider border-b border-border">
-                          Starter
+                        <th className="w-[21%] px-6 sm:px-8 py-5 text-left text-xs sm:text-sm font-black text-muted-foreground uppercase tracking-wider border-l border-border">
+                          {t("plans.starter.name")}
                         </th>
-                        <th className="px-4 py-3 text-left text-[10px] font-extrabold text-primary uppercase tracking-wider border-b border-border bg-accent/20">
-                          Professional
+                        <th className="w-[21%] px-6 sm:px-8 py-5 text-left text-xs sm:text-sm font-black text-foreground uppercase tracking-wider bg-muted/80 border-x border-border">
+                          <div className="flex flex-col items-start gap-2">
+                            <span className="whitespace-nowrap">
+                              {t("plans.professional.name")}
+                            </span>
+                            <span className="shrink-0 whitespace-nowrap px-2.5 py-1 rounded-full text-[10px] leading-none font-black bg-primary text-primary-foreground tracking-normal uppercase">
+                              {t("mostPopular")}
+                            </span>
+                          </div>
                         </th>
-                        <th className="px-4 py-3 text-left text-[10px] font-extrabold text-muted-foreground uppercase tracking-wider border-b border-border">
-                          Business
+                        <th className="w-[21%] px-6 sm:px-8 py-5 text-left text-xs sm:text-sm font-black text-muted-foreground uppercase tracking-wider">
+                          {t("plans.business.name")}
                         </th>
                       </tr>
                     </thead>
                     <tbody>
                       {COMPARISONS.map((group, gidx) => (
-                        <React.Fragment key={gidx}>
-                          <tr className="bg-surface/50 select-none">
+                        <Fragment key={gidx}>
+                          <tr className="bg-muted/60 select-none">
                             <td
                               colSpan={4}
-                              className="px-4 py-2.5 text-[10px] font-extrabold text-muted-foreground uppercase tracking-wider border-b border-border"
+                              className="px-6 sm:px-8 py-3.5 sm:py-4 text-xs sm:text-sm font-black text-foreground uppercase tracking-wider border-y border-border"
                             >
-                              {group.group}
+                              {t(`comparison.groups.${gidx}.title`)}
                             </td>
                           </tr>
                           {group.rows.map((row, ridx) => (
                             <tr
                               key={ridx}
-                              className="hover:bg-background/25 transition"
+                              className="border-b border-border/70 hover:bg-muted/80 transition-colors"
                             >
-                              <td className="px-4 py-3 border-b border-border">
-                                <span className="text-xs font-bold text-foreground block">
-                                  {row.name}
+                              <td className="px-6 sm:px-8 py-4 sm:py-5 align-top">
+                                <span className="text-sm sm:text-base font-bold text-foreground block">
+                                  {t(
+                                    `comparison.groups.${gidx}.rows.${ridx}.name`,
+                                  )}
                                 </span>
                                 {row.desc && (
-                                  <span className="text-[10px] text-muted-foreground block mt-0.5">
-                                    {row.desc}
+                                  <span className="text-xs sm:text-sm text-muted-foreground block mt-1 leading-snug">
+                                    {t(
+                                      `comparison.groups.${gidx}.rows.${ridx}.desc`,
+                                    )}
                                   </span>
                                 )}
                               </td>
-                              <td className="px-4 py-3 text-xs text-foreground border-b border-border">
+                              <td className="px-6 sm:px-8 py-4 sm:py-5 text-sm sm:text-base text-foreground font-medium align-middle border-l border-border/80">
                                 {typeof row.starter === "boolean" ? (
                                   row.starter ? (
-                                    <span className="text-success-500 font-bold">
-                                      ✓
+                                    <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-primary text-primary-foreground shadow-xs">
+                                      <Check className="w-4 h-4 stroke-[3]" />
                                     </span>
                                   ) : (
-                                    <span className="text-muted-foreground opacity-40">
+                                    <span className="text-muted-foreground font-medium text-lg select-none">
                                       —
                                     </span>
                                   )
                                 ) : (
-                                  row.starter
+                                  <span className="text-foreground font-medium">
+                                    {t(
+                                      `comparison.groups.${gidx}.rows.${ridx}.starter`,
+                                    )}
+                                  </span>
                                 )}
                               </td>
-                              <td className="px-4 py-3 text-xs text-primary font-bold border-b border-border bg-accent/10">
+                              <td className="px-6 sm:px-8 py-4 sm:py-5 text-sm sm:text-base text-foreground font-bold bg-muted/40 border-x border-border/80 align-middle">
                                 {typeof row.professional === "boolean" ? (
                                   row.professional ? (
-                                    <span className="text-success-500 font-bold">
-                                      ✓
+                                    <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-primary text-primary-foreground shadow-xs">
+                                      <Check className="w-4 h-4 stroke-[3]" />
                                     </span>
                                   ) : (
-                                    <span className="text-muted-foreground opacity-40">
+                                    <span className="text-muted-foreground font-medium text-lg select-none">
                                       —
                                     </span>
                                   )
                                 ) : (
-                                  row.professional
+                                  <span className="text-foreground font-black">
+                                    {t(
+                                      `comparison.groups.${gidx}.rows.${ridx}.professional`,
+                                    )}
+                                  </span>
                                 )}
                               </td>
-                              <td className="px-4 py-3 text-xs text-foreground border-b border-border">
+                              <td className="px-6 sm:px-8 py-4 sm:py-5 text-sm sm:text-base text-foreground font-medium align-middle">
                                 {typeof row.business === "boolean" ? (
                                   row.business ? (
-                                    <span className="text-success-500 font-bold">
-                                      ✓
+                                    <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-primary text-primary-foreground shadow-xs">
+                                      <Check className="w-4 h-4 stroke-[3]" />
                                     </span>
                                   ) : (
-                                    <span className="text-muted-foreground opacity-40">
+                                    <span className="text-muted-foreground font-medium text-lg select-none">
                                       —
                                     </span>
                                   )
                                 ) : (
-                                  row.business
+                                  <span className="text-foreground font-medium">
+                                    {t(
+                                      `comparison.groups.${gidx}.rows.${ridx}.business`,
+                                    )}
+                                  </span>
                                 )}
                               </td>
                             </tr>
                           ))}
-                        </React.Fragment>
+                        </Fragment>
                       ))}
                     </tbody>
                   </table>
+                </div>
+
+                {/* Modal Footer */}
+                <div className="pt-4 sm:pt-6 mt-4 border-t border-border/80 flex flex-col sm:flex-row items-center justify-between gap-4 shrink-0">
+                  <p className="text-xs sm:text-sm text-muted-foreground flex items-center gap-2">
+                    <Lock className="w-4 h-4 text-muted-foreground shrink-0" />
+                    <span>{t("comparison.footer")}</span>
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setIsCompareOpen(false)}
+                    className="w-full sm:w-auto px-6 py-2.5 rounded-full border border-input hover:bg-muted text-xs sm:text-sm font-bold text-foreground transition cursor-pointer"
+                  >
+                    {t("comparison.close")}
+                  </button>
                 </div>
               </DialogContent>
             </Dialog>
@@ -692,11 +774,9 @@ export function Pricing() {
 
         {/* Footer Notes */}
         <div className="text-center mt-5 select-none">
-          <p className="text-[9px] text-muted-foreground flex items-center justify-center gap-1">
-            <Lock className="w-3 h-3" />
-            <span>
-              No credit card required. Trial accounts will not be auto-charged.
-            </span>
+          <p className="text-sm leading-relaxed text-muted-foreground flex items-start justify-center gap-2">
+            <Lock className="size-4 shrink-0 mt-0.5" aria-hidden="true" />
+            <span>{t("footerNote")}</span>
           </p>
         </div>
       </div>

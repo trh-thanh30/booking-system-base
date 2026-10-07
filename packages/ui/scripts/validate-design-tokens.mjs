@@ -60,11 +60,10 @@ for (const file of (
       const matches = [...line.matchAll(pattern)];
 
       for (const match of matches) {
-        // Narrow exception: a native color input's initial editable value.
+        const relPath = relative(reportRoot, file).replaceAll("\\", "/");
         if (
           webMode &&
-          relative(reportRoot, file) ===
-            "src/views/home/constants/color-input.constants.ts" &&
+          relPath === "src/views/home/constants/color-input.constants.ts" &&
           line === 'export const COLOR_INPUT_DEFAULT = "#006aff";' &&
           match[0] === "#006aff"
         )

@@ -114,6 +114,7 @@
   },
   "Navigation": {
     "language": "Chọn ngôn ngữ",
+    "languageChanged": "Đã chuyển sang Tiếng Việt.",
     "mainNavigation": "Điều hướng chính",
     "openMenu": "Mở menu",
     "closeMenu": "Đóng menu",

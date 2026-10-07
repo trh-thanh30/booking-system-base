@@ -1,0 +1,939 @@
+{
+  "navigation": {
+    "features": "Tính năng",
+    "industries": "Ngành nghề",
+    "pricing": "Bảng giá",
+    "resources": "Tài nguyên",
+    "onlineBooking": "Đặt lịch trực tuyến",
+    "staffScheduling": "Lịch làm việc nhân viên",
+    "calendarManagement": "Quản lý lịch",
+    "payments": "Thanh toán & đặt cọc",
+    "reminders": "Nhắc lịch tự động",
+    "reports": "Báo cáo & phân tích",
+    "description1": "Cho phép khách hàng đặt dịch vụ trực tuyến 24/7.",
+    "description2": "Quản lý thời gian rảnh và giờ làm việc của nhân viên.",
+    "description3": "Tránh trùng lịch bằng cơ chế kiểm tra thời gian thông minh.",
+    "description4": "Nhận tiền đặt cọc hoặc thanh toán đầy đủ khi đặt lịch.",
+    "description5": "Gửi nhắc lịch để giảm tình trạng khách không đến.",
+    "description6": "Theo dõi lịch hẹn, doanh thu và hiệu quả kinh doanh.",
+    "hair": "Tiệm tóc",
+    "nails": "Làm móng & mi",
+    "spas": "Chăm sóc & thư giãn",
+    "clinics": "Phòng khám & thẩm mỹ",
+    "barbers": "Tiệm tóc nam",
+    "allIndustries": "Tất cả ngành nghề",
+    "help": "Trung tâm trợ giúp",
+    "blog": "Bài viết",
+    "faq": "Câu hỏi thường gặp",
+    "login": "Đăng nhập",
+    "trial": "Dùng thử miễn phí"
+  },
+  "hero": {
+    "title": "Một hệ thống đặt lịch thông minh<br></br> cho <highlight>mọi mô hình kinh doanh</highlight>",
+    "description": "Quản lý lịch làm việc, cuộc hẹn, thanh toán, phân công nhân viên và quy trình tự động trên một nền tảng linh hoạt, hiệu suất cao.",
+    "startTrial": "Dùng thử miễn phí 14 ngày",
+    "liveDemo": "Xem bản demo",
+    "trust": {
+      "noCard": "Không cần thẻ tín dụng",
+      "quickSetup": "Thiết lập trong 5 phút",
+      "calendarSync": "Đồng bộ hai chiều nhiều lịch"
+    },
+    "reviews": "{count, number} đánh giá",
+    "minutes": "{count, number} phút",
+    "availableToday": "Còn lịch hôm nay",
+    "instantBooking": "Đặt lịch tức thì",
+    "templates": {
+      "coaching": {
+        "name": "Tư vấn lãnh đạo Minh Tâm",
+        "avatarText": "M",
+        "category": "Huấn luyện điều hành",
+        "tagline": "Lãnh đạo điều hành & tư vấn doanh nghiệp",
+        "services": {
+          "leadership": "Chiến lược lãnh đạo 1-1",
+          "scaling": "Khám phá chiến lược mở rộng"
+        },
+        "cta": "Đặt lịch tư vấn"
+      },
+      "beauty": {
+        "name": "An Nhiên Spa",
+        "avatarText": "A",
+        "category": "Spa & chăm sóc sức khỏe",
+        "tagline": "Thư giãn trị liệu & trẻ hóa làn da",
+        "services": {
+          "massage": "Massage đá nóng",
+          "facial": "Chăm sóc da làm sạch sâu"
+        },
+        "cta": "Đặt lịch hẹn"
+      },
+      "health": {
+        "name": "Nha khoa Tâm Đức",
+        "avatarText": "T",
+        "category": "Chăm sóc sức khỏe",
+        "tagline": "Nha khoa chuyên sâu • Không chờ đợi",
+        "services": {
+          "checkup": "Khám răng tổng quát",
+          "whitening": "Tẩy trắng răng bằng laser"
+        },
+        "cta": "Đặt lịch nha khoa"
+      },
+      "fitness": {
+        "name": "Phòng tập Sống Khỏe",
+        "avatarText": "S",
+        "category": "Thể hình & studio",
+        "tagline": "Lớp nhóm nhỏ & huấn luyện cá nhân",
+        "services": {
+          "vinyasa": "Lớp Vinyasa buổi sáng",
+          "pilates": "Pilates Reformer riêng"
+        },
+        "cta": "Đặt buổi tập"
+      },
+      "consulting": {
+        "name": "Tư vấn công nghệ Khai Minh",
+        "avatarText": "K",
+        "category": "Cố vấn công nghệ",
+        "tagline": "Kiến trúc hệ thống & phát triển kỹ năng trưởng nhóm kỹ thuật",
+        "services": {
+          "architecture": "Đánh giá kiến trúc hệ thống",
+          "interview": "Phỏng vấn thử & góp ý"
+        },
+        "cta": "Đặt lịch cố vấn"
+      },
+      "creative": {
+        "name": "Ảnh viện Ánh Dương",
+        "avatarText": "A",
+        "category": "Nhiếp ảnh & studio",
+        "tagline": "Ảnh chân dung & bộ ảnh thương hiệu",
+        "services": {
+          "portrait": "Chân dung thương hiệu cá nhân",
+          "lookbook": "Buổi lên ý tưởng bộ ảnh"
+        },
+        "cta": "Đặt lịch chụp ảnh"
+      }
+    }
+  },
+  "pillars": {
+    "title": "Nền tảng tất cả trong một<br></br><highlight>cho đặt lịch, thanh toán và hơn thế nữa.</highlight>",
+    "description": "Mọi công cụ bạn cần để vận hành doanh nghiệp dịch vụ, quản lý lịch hẹn và nhận thanh toán liền mạch.",
+    "seeFeatures": "Xem tính năng nổi bật",
+    "cards": {
+      "scheduling": {
+        "title": "Đơn giản hóa lịch hẹn",
+        "description": "Quản lý thời gian rảnh trên ứng dụng và cho phép khách đặt lịch hẹn hoặc lớp học trực tuyến.",
+        "features": {
+          "f0": "Ứng dụng iOS và Android để quản lý lịch hẹn mọi lúc",
+          "f1": "Trang đặt lịch miễn phí cho khách hàng",
+          "f2": "Tự động nhắc lịch qua email và SMS",
+          "f3": "Lịch hẹn định kỳ",
+          "f4": "Quản lý nhiều chi nhánh",
+          "f5": "Tích hợp Instagram và Google",
+          "f6": "Phí hủy lịch và không đến",
+          "f7": "Cho khách đặt nhiều dịch vụ với các nhân viên khác nhau",
+          "f8": "Đặt lịch lớp học"
+        }
+      },
+      "pos": {
+        "title": "Tối ưu điểm bán hàng",
+        "description": "Thanh toán tại quầy, lưu thẻ hoặc gửi hóa đơn với hệ thống POS linh hoạt.",
+        "features": {
+          "f0": "Thanh toán không tiếp xúc tại cửa hàng",
+          "f1": "Lưu thẻ thanh toán",
+          "f2": "Thanh toán trước khi đến",
+          "f3": "Không giới hạn sản phẩm và tìm kiếm",
+          "f4": "Nhập giao dịch thủ công",
+          "f5": "Hóa đơn chuyên nghiệp",
+          "f6": "Thẻ quà tặng điện tử và vật lý",
+          "f7": "Nhận thanh toán ngoại tuyến",
+          "f8": "Bảo mật dữ liệu tuân thủ PCI"
+        }
+      },
+      "people": {
+        "title": "Đặt con người lên trước",
+        "description": "Chăm sóc khách hàng và đội ngũ bằng hồ sơ khách hàng cùng công cụ quản lý nhân viên.",
+        "features": {
+          "f0": "Hồ sơ khách hàng kèm lịch sử hẹn",
+          "f1": "Ghi chú và công thức riêng cho từng khách",
+          "f2": "Phân quyền và cấp truy cập cho nhân viên",
+          "f3": "Theo dõi hoa hồng và tiền tip",
+          "f4": "Lịch và ca làm riêng cho từng nhân viên",
+          "f5": "Nhãn khách hàng thân thiết",
+          "f6": "Yêu cầu và phê duyệt ngày nghỉ",
+          "f7": "Tự động thu thập phản hồi và đánh giá"
+        }
+      },
+      "business": {
+        "title": "Vận hành doanh nghiệp",
+        "description": "Bán hàng trên mạng xã hội, đồng bộ tồn kho và quản lý vận hành mà không tăng việc hành chính.",
+        "features": {
+          "f0": "Đặt lịch trực tiếp từ hồ sơ mạng xã hội",
+          "f1": "Đồng bộ hai chiều với lịch Google và Apple",
+          "f2": "Tiện ích đặt lịch nhúng cho mọi website",
+          "f3": "Tự động thông báo danh sách chờ",
+          "f4": "Báo cáo doanh số, tiền tip và hiệu suất nhân viên",
+          "f5": "Xuất danh bạ khách hàng cho kế toán",
+          "f6": "Chiến dịch email và SMS tự động",
+          "f7": "Khách tự đổi lịch 24/7"
+        }
+      }
+    },
+    "demo": {
+      "november2026": "Tháng 11, 2026",
+      "day": "Ngày",
+      "week": "Tuần",
+      "weekdays": {
+        "d0": "CN",
+        "d1": "T2",
+        "d2": "T3",
+        "d3": "T4",
+        "d4": "T5",
+        "d5": "T6",
+        "d6": "T7"
+      },
+      "shortHair": "Cắt & tạo kiểu tóc ngắn • Ghế 2",
+      "facial": "Chăm sóc da làm sạch sâu • Thanh Mai",
+      "beard": "Tạo kiểu râu cổ điển",
+      "quickServices": "Dịch vụ",
+      "favorites": "Yêu thích",
+      "services": {
+        "hairCut": "Cắt tóc",
+        "facialCare": "Chăm sóc da",
+        "manicure": "Làm móng",
+        "blowdry": "Sấy tạo kiểu",
+        "hotStone": "Massage đá nóng",
+        "lookbook": "Chụp bộ ảnh"
+      },
+      "currentSale": "Đơn hiện tại (2)",
+      "hairCutStyle": "Cắt & tạo kiểu tóc",
+      "manicureSet": "Bộ làm móng",
+      "tax": "Thuế (8%)",
+      "charge": "Thanh toán {amount}",
+      "clientsStaff": "Khách hàng",
+      "totalClients": "Tổng cộng {count, number}",
+      "clientSince": "Khách từ năm 2024 • Ưu tiên: Thanh Mai",
+      "preferences": "Sở thích",
+      "allergy": "• Dị ứng mùi oải hương",
+      "cardEnding": "• Thẻ đã lưu kết thúc bằng ···· 4242",
+      "attendance": "• 0 lần vắng (tham dự 100%)",
+      "lifetimeSpend": "Tổng chi tiêu:",
+      "following": "Đang theo dõi",
+      "hydration": "Liệu trình cấp ẩm sáng da",
+      "hydrationDescription": "Chăm sóc phục hồi da trong 60 phút. Nhấn bên dưới để đặt khung giờ gần nhất hôm nay.",
+      "bookWebsite": "Đặt trên website",
+      "shareLink": "Chia sẻ liên kết",
+      "atelier": "Studio tóc & làm đẹp",
+      "socialBioLine1": "Chuyên gia balayage hiện đại và màu tóc tự nhiên.",
+      "socialBioLine2": "Đặt lịch ngay bên dưới",
+      "bookNow": "Đặt ngay",
+      "instantInApp": "ĐẶT LỊCH NGAY TRONG ỨNG DỤNG",
+      "checkout": "Thanh toán 30 giây",
+      "balayage": "Balayage & chăm sóc tóc",
+      "tomorrow": "Ngày mai • 10:30 (Thanh Mai)",
+      "confirm": "Xác nhận với 1 chạm →",
+      "names": {
+        "christina": "Ngọc Anh",
+        "derrick": "Minh Quân",
+        "cliff": "Hoàng Nam",
+        "lauren": "Lan N.",
+        "elisa": "Mai Anh",
+        "emi": "Thu Hà",
+        "cameron": "Minh Đức",
+        "natalia": "Bảo Ngọc"
+      }
+    },
+    "growth": {
+      "badge": "Tăng trưởng",
+      "title": "Biến người theo dõi thành lịch hẹn tức thì.",
+      "description": "Đặt liên kết đặt lịch ngay trên Instagram, TikTok, Facebook Bio và Google Maps. Khách đang xem hồ sơ có thể chốt lịch trong 30 giây mà không rời ứng dụng.",
+      "learnMore": "Tìm hiểu thêm về đặt lịch qua hồ sơ mạng xã hội"
+    },
+    "migration": {
+      "title": "Đang chuyển từ hệ thống khác?",
+      "description": "Chúng tôi hỗ trợ chuyển miễn phí hồ sơ khách hàng, menu dịch vụ và lịch làm việc trong vòng 24 giờ.",
+      "cta": "Trao đổi với chúng tôi"
+    }
+  },
+  "features": {
+    "title": "Một nền tảng cho <highlight>mọi lịch hẹn</highlight>",
+    "description": "Kết nối thời gian rảnh, liên kết đặt lịch, đồng bộ lịch và nhắc hẹn trong một quy trình.",
+    "getStarted": "Bắt đầu",
+    "bookDemo": "Đặt lịch demo",
+    "benefits": {
+      "overload": {
+        "title": "Tránh lịch hẹn quá tải",
+        "description": "Đặt giới hạn mỗi ngày và thêm thời gian đệm để chuẩn bị giữa các cuộc hẹn.",
+        "panelTitle": "Thời gian báo trước & khoảng đệm",
+        "minimumNotice": "Báo trước tối thiểu",
+        "hours": "24 giờ",
+        "before": "Đệm trước",
+        "after": "Đệm sau",
+        "minutes": "15 phút"
+      },
+      "link": {
+        "title": "Nổi bật với liên kết đặt lịch riêng",
+        "description": "Dùng liên kết ngắn, dễ nhớ thay cho URL phức tạp.",
+        "meeting": "Cuộc hẹn công việc",
+        "timezone": "Bắc Mỹ/California",
+        "author": "Nguyễn Bảo Phương",
+        "slug": "bao-phuong"
+      },
+      "experience": {
+        "title": "Đơn giản hóa trải nghiệm đặt lịch",
+        "description": "Cho khách xem chồng lịch cá nhân và đổi lịch dễ dàng.",
+        "overlay": "Hiển thị lịch của tôi",
+        "wed": "T4 06",
+        "thu": "T5 07",
+        "fri": "T6 08",
+        "sat": "T7 09",
+        "lunch": "Hẹn ăn trưa",
+        "coffee": "Cà phê 11:00",
+        "open": "Còn trống",
+        "hiring": "Phỏng vấn"
+      },
+      "reminders": {
+        "title": "Giảm vắng hẹn bằng lời nhắc tự động",
+        "description": "Gửi xác nhận tức thì và nhiều bước nhắc trước mỗi buổi hẹn.",
+        "confirmed": "Đã xác nhận lịch mới",
+        "now": "Vừa xong",
+        "notification": "Nguyễn Hoàng Nam đã đặt cuộc gọi tư vấn 30 phút."
+      }
+    },
+    "configurable": {
+      "title": "<line><highlight>Tính năng bạn cần.</highlight></line><line>Giao diện quản lý luôn <highlight>tập trung.</highlight></line>",
+      "description": "Bật hoặc tắt tính năng theo cách bạn làm việc, loại bỏ công cụ không cần thiết. Gói dịch vụ và giá không thay đổi.",
+      "categoriesLabel": "Nhóm tính năng"
+    },
+    "groups": {
+      "core": {
+        "line1": "Tính năng",
+        "line2": "cốt lõi"
+      },
+      "business": {
+        "line1": "Vận hành",
+        "line2": "kinh doanh"
+      },
+      "client": {
+        "line1": "Trải nghiệm",
+        "line2": "khách hàng"
+      }
+    },
+    "items": {
+      "payments": {
+        "title": "Nhận thanh toán",
+        "description": "Kiếm doanh thu từ lịch hẹn qua tích hợp Stripe."
+      },
+      "video": {
+        "title": "Video giới thiệu",
+        "description": "Chào đón khách bằng lời giới thiệu hoặc tour salon trước khi đặt lịch."
+      },
+      "socialProof": {
+        "title": "Đánh giá trực tiếp",
+        "description": "Hiển thị đánh giá đã xác minh ngay trên trang đặt lịch."
+      },
+      "faqWidgets": {
+        "title": "Tiện ích hỏi đáp",
+        "description": "Giải đáp trước về đặt cọc, chỗ đỗ xe và chuẩn bị dịch vụ."
+      },
+      "themes": {
+        "title": "Màu sắc thương hiệu",
+        "description": "Tùy chỉnh màu, chế độ tối và kiểu chữ theo thương hiệu."
+      },
+      "domain": {
+        "title": "Tên miền riêng",
+        "description": "Dùng URL thương hiệu riêng với SSL tự động."
+      },
+      "waivers": {
+        "title": "Phiếu thông tin & cam kết",
+        "description": "Thu thập bảng hỏi tư vấn và cam kết trước khi khách đến."
+      },
+      "packages": {
+        "title": "Gói & thẻ dịch vụ",
+        "description": "Bán gói nhiều buổi, thẻ trả trước và hội viên."
+      },
+      "embeds": {
+        "title": "Nhúng linh hoạt",
+        "description": "Nhúng lịch, nút đặt lịch nổi hoặc cửa sổ bật lên."
+      },
+      "documents": {
+        "title": "Chia sẻ tài liệu",
+        "description": "Tự động gửi hướng dẫn chăm sóc và chuẩn bị."
+      },
+      "languages": {
+        "title": "Đa ngôn ngữ",
+        "description": "Cung cấp quy trình đặt lịch bằng tiếng Việt và tiếng Anh."
+      },
+      "privacy": {
+        "title": "Ưu tiên riêng tư",
+        "description": "Xử lý dữ liệu khách hàng có trách nhiệm và bảo mật thanh toán."
+      },
+      "notifications": {
+        "title": "Thông báo tùy chỉnh",
+        "description": "Tạo lời nhắc SMS và Zalo theo giọng điệu thương hiệu."
+      },
+      "onlineBooking": {
+        "title": "Đặt lịch trực tuyến",
+        "description": "Cho khách chọn dịch vụ, nhân viên và khung giờ còn trống."
+      },
+      "availability": {
+        "title": "Thời gian rảnh thông minh",
+        "description": "Đặt giờ làm, thời gian báo trước và khoảng đệm."
+      },
+      "calendarSync": {
+        "title": "Đồng bộ lịch",
+        "description": "Giữ các lịch kết nối nhất quán và tránh trùng hẹn."
+      },
+      "recurring": {
+        "title": "Lịch hẹn định kỳ",
+        "description": "Tạo nhanh lịch tái hẹn và liệu trình nhiều buổi."
+      },
+      "deposits": {
+        "title": "Đặt cọc lịch hẹn",
+        "description": "Thu tiền cọc trước để bảo vệ khung giờ giá trị."
+      },
+      "team": {
+        "title": "Quản lý đội ngũ",
+        "description": "Sắp xếp lịch, phân công dịch vụ và quyền truy cập."
+      },
+      "locations": {
+        "title": "Nhiều chi nhánh",
+        "description": "Quản lý lịch hẹn và nhân sự ở mọi chi nhánh."
+      },
+      "reports": {
+        "title": "Báo cáo kinh doanh",
+        "description": "Theo dõi doanh thu, xu hướng đặt lịch và hiệu suất nhân viên."
+      },
+      "rescheduling": {
+        "title": "Khách tự đổi lịch",
+        "description": "Cho khách chuyển lịch trong phạm vi quy tắc của bạn."
+      },
+      "reminders": {
+        "title": "Nhắc lịch hẹn",
+        "description": "Gửi xác nhận và lời nhắc trước mỗi lần khách đến."
+      },
+      "profiles": {
+        "title": "Hồ sơ khách hàng",
+        "description": "Lưu lịch sử, sở thích và ghi chú dịch vụ cùng nhau."
+      }
+    },
+    "andMore": "…và còn nhiều hơn nữa!"
+  },
+  "industrySolutions": {
+    "title": "Quy trình phù hợp<br></br><highlight>với ngành nghề của bạn.</highlight>",
+    "description": "Dù bạn vận hành salon đông khách, phòng khám thẩm mỹ riêng hay spa chăm sóc sức khỏe, nền tảng luôn thích ứng với cách bạn đặt lịch.",
+    "previous": "Ngành trước",
+    "next": "Ngành tiếp theo",
+    "explore": "Khám phá thiết lập cho {industry}",
+    "industries": {
+      "hair": {
+        "label": "Tiệm tóc",
+        "badge": "TIỆM TÓC & NHUỘM MÀU",
+        "title": "Tự động phân bổ ghế, thời gian chờ xử lý và chia hoa hồng.",
+        "description": "Dành riêng cho tiệm tóc đông khách và chuyên viên nhuộm độc lập. Khách có thể đặt liệu trình nhiều bước, với khoảng chờ được tính sẵn để bạn phục vụ khách vãng lai trong lúc chờ màu lên.",
+        "highlights": {
+          "h0": {
+            "title": "Thời gian chờ xử lý",
+            "description": "Tự động mở khung giờ sấy hoặc tỉa nhanh trong lúc chờ màu balayage của khách lên."
+          },
+          "h1": {
+            "title": "Quản lý khu vực & ghế làm tóc",
+            "description": "Tránh đặt trùng bồn gội và ghế tạo kiểu bằng quy tắc phân bổ nguồn lực."
+          },
+          "h2": {
+            "title": "Giá & hoa hồng theo cấp độ thợ",
+            "description": "Tự động áp dụng mức giá và tỷ lệ hoa hồng riêng theo cấp độ thợ mới hoặc thợ chính."
+          }
+        }
+      },
+      "nails": {
+        "label": "Làm móng & mi",
+        "badge": "LÀM MÓNG, MI & CHÂN MÀY",
+        "title": "Menu trực quan, dịch vụ bổ sung và luân chuyển bàn nhanh chóng.",
+        "description": "Cho khách chọn độ dài móng, dáng móng, cấp độ vẽ gel và nối mi qua bộ mẫu trực quan trước khi ngồi vào ghế — tránh phát sinh bất ngờ khi thanh toán và chậm lịch.",
+        "highlights": {
+          "h0": {
+            "title": "Bộ mẫu trực quan & cấp độ trang trí",
+            "description": "Khách chọn trước độ phức tạp của mẫu móng cùng thời gian dự kiến chính xác."
+          },
+          "h1": {
+            "title": "Đặt dịch vụ kết hợp",
+            "description": "Cho khách đặt đồng thời làm móng tay và chân, hoặc mi và chân mày với hai kỹ thuật viên."
+          },
+          "h2": {
+            "title": "Tự động nhắc lịch dặm lại",
+            "description": "Tự động nhắc khách sau 2 và 3 tuần để dặm mi hoặc bảo dưỡng móng gel."
+          }
+        }
+      },
+      "spa": {
+        "label": "Chăm sóc & thư giãn",
+        "badge": "CHĂM SÓC, XOA BÓP & NGHỈ DƯỠNG",
+        "title": "Phân phòng, chọn kỹ thuật viên và thu thập thông tin sức khỏe.",
+        "description": "Tự động quản lý phòng trị liệu riêng, lượt sử dụng phòng xông hơi và phòng massage. Thu thập bảng hỏi và thông tin dị ứng trước khi khách đến.",
+        "highlights": {
+          "h0": {
+            "title": "Phân bổ phòng & khu trị liệu riêng",
+            "description": "Gắn lịch hẹn với phòng chuyên dụng như phòng hương liệu, tắm Vichy hoặc phòng xông hơi."
+          },
+          "h1": {
+            "title": "Biểu mẫu sức khỏe điện tử",
+            "description": "Khách khai báo dị ứng, mức lực massage mong muốn và chấn thương trước khi nhận dịch vụ."
+          },
+          "h2": {
+            "title": "Hội viên & lượt sử dụng gói linh hoạt",
+            "description": "Bán gói massage và gói chăm sóc sức khỏe hằng tháng, tự động trừ lượt khi thanh toán."
+          }
+        }
+      },
+      "clinics": {
+        "label": "Phòng khám & thẩm mỹ",
+        "badge": "THẨM MỸ Y KHOA & DA LIỄU",
+        "title": "Lên lịch chuyên viên, ký cam kết và lưu hồ sơ điều trị.",
+        "description": "Độ tin cậy cao cho cơ sở thẩm mỹ y khoa, phòng khám da và dịch vụ tiêm thẩm mỹ. Bảo mật ghi chú khách hàng, lên chuỗi lịch tái khám và bảo vệ tiền đặt cọc.",
+        "highlights": {
+          "h0": {
+            "title": "Liệu trình nhiều buổi",
+            "description": "Đặt chuỗi lịch lặp lại, ví dụ 4 buổi laser hoặc vi kim cách nhau 4 tuần, chỉ với một lần thao tác."
+          },
+          "h1": {
+            "title": "Cam kết điện tử & ảnh trước/sau",
+            "description": "Lưu cam kết đã ký và ảnh theo dõi tiến trình điều trị riêng tư ngay trong hồ sơ khách hàng."
+          },
+          "h2": {
+            "title": "Bảo vệ tiền cọc cho lịch giá trị cao",
+            "description": "Thu tiền cọc tư vấn không hoàn lại và tự động giữ hạn mức thẻ để hạn chế khung giờ bác sĩ bị bỏ trống."
+          }
+        }
+      },
+      "barber": {
+        "label": "Tiệm tóc nam",
+        "badge": "TIỆM TÓC NAM & THỢ ĐỘC LẬP",
+        "title": "Danh sách chờ trực tiếp, lịch fade 15 phút và thanh toán thuê ghế.",
+        "description": "Giữ ghế luôn có khách bằng cách kết hợp đặt lịch hẹn và xếp hàng trực tuyến theo thời gian thực. Thợ độc lập dễ dàng theo dõi khoản thanh toán và tiền tip của mình.",
+        "highlights": {
+          "h0": {
+            "title": "Đặt lịch kết hợp danh sách chờ",
+            "description": "Kết hợp đặt chỗ trực tuyến và hàng chờ khách vãng lai theo thời gian thực để ghế luôn được sử dụng."
+          },
+          "h1": {
+            "title": "Khung giờ nhanh 15/30 phút",
+            "description": "Lên lịch sát giờ cho cắt fade, tỉa râu và chỉnh viền với khăn nóng."
+          },
+          "h2": {
+            "title": "Tài khoản & thanh toán riêng cho thợ",
+            "description": "Mỗi thợ có tài khoản, lịch làm việc, theo dõi tiền tip và sổ thuê ghế hằng ngày riêng."
+          }
+        }
+      }
+    }
+  },
+  "customization": {
+    "title": "Tùy biến trang đặt lịch <highlight>theo cách của bạn</highlight>",
+    "description": "Đưa thương hiệu vào từng chi tiết với đánh giá, video, hỏi đáp và tên miền riêng.",
+    "previous": "Mục tùy biến trước",
+    "explore": "Kéo hoặc vuốt để khám phá",
+    "next": "Mục tùy biến tiếp theo",
+    "testimonials": {
+      "title": "Đánh giá khách hàng",
+      "rating": "Đánh giá 5,0 sao",
+      "verifiedClient": "Khách đã xác minh",
+      "role": "Giám đốc vận hành kinh doanh",
+      "quote": "Chuyển từ HubSpot sang Salesforce là bước ngoặt của chúng tôi. Với SmartRoute, thời gian phản hồi khách hàng tiềm năng giảm 80% và tỷ lệ chuyển đổi tăng 30% ngay trong tháng đầu.",
+      "synced": "Đã đồng bộ Google & Yelp",
+      "verified": "Đã xác minh 100%",
+      "author": "Nguyễn Minh Anh"
+    },
+    "faq": {
+      "title": "Hỏi đáp",
+      "heading": "Câu hỏi thường gặp",
+      "liveWidget": "Tiện ích trực tiếp",
+      "question1": "1. Giá dịch vụ được tính thế nào?",
+      "answer1": "Gói dịch vụ bắt đầu từ {minimum} mỗi người dùng và tối đa {maximum} cho tính năng nâng cao.",
+      "question2": "2. Mất bao lâu để triển khai?",
+      "answer2": "Hầu hết doanh nghiệp có thể mở quy trình đặt lịch trong dưới 15 phút mà không cần viết code.",
+      "footer": "Mục hỏi đáp có thể mở rộng trên trang thanh toán"
+    },
+    "files": {
+      "title": "Tài liệu",
+      "heading": "Tài liệu & biểu mẫu",
+      "autoSent": "Tự động gửi",
+      "documents": "Tài liệu",
+      "intake": "Khai báo & cam kết",
+      "delivery": "Gửi tự động qua email & SMS",
+      "total": "Tổng 1,4 MB"
+    },
+    "about": {
+      "title": "Giới thiệu",
+      "heading": "Về tôi",
+      "bio": "Xin chào! Tôi là Nguyễn Thanh Mai, chuyên gia được cấp phép với hơn 10 năm kinh nghiệm giúp khách hàng đạt mục tiêu. Dù bạn mới đặt lịch lần đầu hay đang xây dựng thói quen chăm sóc, tôi luôn đưa ra hướng dẫn phù hợp.",
+      "sessions": "Đã hoàn thành hơn 1.200 buổi",
+      "verified": "Chuyên gia đã xác minh"
+    },
+    "videos": {
+      "title": "Video",
+      "featured": "Lời chào nổi bật",
+      "tour": "Tham quan studio",
+      "description": "Gặp chuyên gia trước buổi hẹn",
+      "author": "Trần Ngọc Linh"
+    },
+    "domain": {
+      "title": "Tên miền riêng",
+      "colors": "Bộ màu thương hiệu",
+      "checkout": "Trang thanh toán theo thương hiệu",
+      "whiteLabel": "100% thương hiệu riêng, không huy hiệu bên thứ ba"
+    }
+  },
+  "faq": {
+    "title": "Bạn còn câu hỏi trước khi bắt đầu?",
+    "description": "Tìm câu trả lời nhanh về mẫu giao diện, trang đặt lịch, thanh toán, thời gian dùng thử và tính năng nền tảng.",
+    "groups": [
+      {
+        "title": "Sản phẩm & đặt lịch",
+        "items": {
+          "coding-skills": {
+            "question": "Tôi có cần biết code để tạo trang đặt lịch không?",
+            "answer": "Không. Bạn chọn mẫu giao diện, tùy chỉnh dịch vụ, thương hiệu và quy tắc đặt lịch rồi xuất bản mà không cần lập trình."
+          },
+          "reduce-no-shows": {
+            "question": "BookingBase giúp giảm khách vắng hẹn thế nào?",
+            "answer": "Tiền cọc, xác nhận đặt lịch và nhắc tự động qua SMS hoặc email giúp giảm lịch bị bỏ lỡ."
+          },
+          "download-app": {
+            "question": "Khách có cần tải app để đặt lịch không?",
+            "answer": "Không. Khách có thể đặt lịch trên trang công khai bằng trình duyệt ở mọi thiết bị."
+          },
+          "multi-location": {
+            "question": "Tôi có thể quản lý nhiều chi nhánh và ca làm không?",
+            "answer": "Có. Bạn quản lý chi nhánh, thời gian rảnh, phân công dịch vụ và ca làm trong trang quản lý."
+          },
+          "custom-domain": {
+            "question": "Tôi có thể dùng tên miền riêng không?",
+            "answer": "Có. Một số gói cho phép xuất bản trang đặt lịch dưới thương hiệu riêng của bạn."
+          }
+        }
+      },
+      {
+        "title": "Dùng thử & trải nghiệm sớm",
+        "items": {
+          "trial-card": {
+            "question": "Dùng thử 14 ngày có cần thẻ không?",
+            "answer": "Không. Bạn bắt đầu dùng thử mà không cần nhập thẻ và sẽ không bị tự động tính phí."
+          },
+          "after-trial": {
+            "question": "Điều gì xảy ra sau 14 ngày dùng thử?",
+            "answer": "Bạn chọn gói trả phí, liên hệ để được hỗ trợ thiết lập hoặc để gói dùng thử kết thúc mà không bị tính phí."
+          },
+          "feedback-rewards": {
+            "question": "Phản hồi nào có thể nhận thưởng trải nghiệm sớm?",
+            "answer": "Ý tưởng cải thiện quy trình, báo lỗi, yêu cầu tích hợp và ghi chú chi tiết về việc đặt lịch đều có thể được xem xét."
+          },
+          "rewards-guaranteed": {
+            "question": "Phần thưởng trải nghiệm sớm có được đảm bảo không?",
+            "answer": "Không. Phần thưởng được xem xét từng trường hợp và không được đảm bảo."
+          },
+          "submit-feedback": {
+            "question": "Tôi gửi phản hồi ở đâu?",
+            "answer": "Gửi email tới feedback@bookingbase.com hoặc dùng liên kết phản hồi trong mục trải nghiệm sớm."
+          }
+        }
+      }
+    ],
+    "cta": {
+      "title": "Bạn vẫn còn câu hỏi?",
+      "description": "Liên hệ đội ngũ hỗ trợ hoặc đặt lịch hướng dẫn 15 phút với chuyên gia sản phẩm.",
+      "contact": "Liên hệ hỗ trợ",
+      "demo": "Đặt lịch demo"
+    }
+  },
+  "footer": {
+    "description": "Nền tảng đặt lịch hiệu suất cao dành cho các doanh nghiệp dịch vụ hiện đại.",
+    "social": {
+      "linkedin": "LinkedIn",
+      "x": "X",
+      "youtube": "YouTube",
+      "github": "GitHub"
+    },
+    "columns": {
+      "product": {
+        "title": "Sản phẩm",
+        "features": "Tính năng",
+        "pricing": "Bảng giá",
+        "templates": "Mẫu giao diện",
+        "integrations": "Tích hợp",
+        "changelog": "Thay đổi sản phẩm"
+      },
+      "company": {
+        "title": "Công ty",
+        "about": "Giới thiệu",
+        "blog": "Bài viết",
+        "careers": "Tuyển dụng",
+        "pressKit": "Bộ nhận diện",
+        "contactSales": "Liên hệ kinh doanh"
+      },
+      "resources": {
+        "title": "Tài nguyên",
+        "help": "Trung tâm trợ giúp",
+        "docs": "Tài liệu",
+        "api": "Tài liệu API",
+        "community": "Cộng đồng",
+        "status": "Trạng thái hệ thống"
+      },
+      "legal": {
+        "title": "Pháp lý",
+        "privacy": "Chính sách riêng tư",
+        "terms": "Điều khoản dịch vụ",
+        "cookies": "Chính sách cookie",
+        "gdpr": "GDPR",
+        "dpa": "DPA"
+      }
+    },
+    "copyright": "© 2026 BookingBase Ltd. Bảo lưu mọi quyền."
+  },
+  "pricing": {
+    "title": "Chọn gói dịch vụ cùng doanh nghiệp phát triển",
+    "titleHighlight": "cho doanh nghiệp dịch vụ của bạn.",
+    "description": "Bắt đầu với 14 ngày dùng thử. Nâng cấp, hạ cấp hoặc hủy bất cứ lúc nào — không cam kết dài hạn.",
+    "monthly": "Theo tháng",
+    "annual": "Theo năm",
+    "save20": "Tiết kiệm 20%",
+    "currency": "Tiền tệ:",
+    "mostPopular": "Phổ biến nhất",
+    "perMonth": "/tháng",
+    "billedMonthly": "Tính theo tháng · hủy bất cứ lúc nào",
+    "annualSavings": "Tiết kiệm {amount}/năm",
+    "everythingIn": "Bao gồm gói {plan}",
+    "everythingInExtra": "Cùng các tính năng bổ sung bên dưới",
+    "starterSummary": {
+      "title": "Đủ công cụ để bắt đầu",
+      "description": "Đặt lịch, quản lý dịch vụ và khách hàng."
+    },
+    "customTrial": "Có hỗ trợ & dùng thử tùy chỉnh",
+    "trialIncluded": "Đã gồm 14 ngày dùng thử",
+    "compare": "So sánh chi tiết tất cả tính năng",
+    "footerNote": "Không cần thẻ tín dụng. Tài khoản dùng thử không tự động tính phí.",
+    "toast": {
+      "contact": "Đang mở biểu mẫu liên hệ…",
+      "redirect": "Đang chuyển tới đăng ký dùng thử gói {plan} →"
+    },
+    "social": {
+      "trustedMobile": "Được tin dùng bởi",
+      "businesses": "hơn 12.400 doanh nghiệp",
+      "trustedDesktop": "tin dùng BookingBase",
+      "ratingShort": "điểm 4,8",
+      "ratingLong": "điểm trung bình 4,8",
+      "reviews": "1.820 đánh giá",
+      "reviewsLong": "từ 1.820 đánh giá khách hàng"
+    },
+    "plans": {
+      "starter": {
+        "name": "Khởi đầu",
+        "description": "Dành cho cá nhân và nhóm nhỏ ra mắt trang đặt lịch đầu tiên.",
+        "cta": "Dùng thử miễn phí →",
+        "groups": [
+          {
+            "title": "Nền tảng cốt lõi",
+            "items": [
+              "1 chi nhánh",
+              "Tối đa 3 nhân viên",
+              "Dịch vụ không giới hạn",
+              "Trang đặt lịch theo thương hiệu"
+            ]
+          },
+          {
+            "title": "Giao tiếp",
+            "items": ["Thông báo email"]
+          },
+          {
+            "title": "Phân tích",
+            "items": ["Phân tích cơ bản"]
+          }
+        ]
+      },
+      "professional": {
+        "name": "Chuyên nghiệp",
+        "description": "Dành cho đội ngũ đang phát triển cần đặt cọc, nhắc lịch và CRM.",
+        "cta": "Dùng thử gói Chuyên nghiệp →",
+        "groups": [
+          {
+            "title": "Nền tảng cốt lõi",
+            "items": [
+              "2 chi nhánh",
+              "Tối đa 15 nhân viên",
+              "Hỗ trợ tên miền riêng"
+            ]
+          },
+          {
+            "title": "Thanh toán & đặt lịch",
+            "items": ["Thanh toán online & đặt cọc"]
+          },
+          {
+            "title": "Giao tiếp",
+            "items": ["Nhắc lịch SMS & email", "CRM & lịch sử khách hàng"]
+          },
+          {
+            "title": "Phân tích",
+            "items": ["Báo cáo doanh thu nâng cao"]
+          }
+        ]
+      },
+      "business": {
+        "name": "Doanh nghiệp",
+        "description": "Dành cho đội ngũ nhiều chi nhánh cần quyền kiểm soát và hỗ trợ nâng cao.",
+        "cta": "Liên hệ kinh doanh →",
+        "groups": [
+          {
+            "title": "Nền tảng cốt lõi",
+            "items": ["Không giới hạn chi nhánh", "Không giới hạn nhân viên"]
+          },
+          {
+            "title": "Tùy biến",
+            "items": [
+              "Bản địa hóa nâng cao",
+              "Truy cập API & webhook",
+              "Tùy chỉnh giao diện"
+            ]
+          },
+          {
+            "title": "Hỗ trợ doanh nghiệp",
+            "items": [
+              "Hỗ trợ ưu tiên 24/7",
+              "Quản lý riêng",
+              "SLA uptime 99,9%"
+            ]
+          }
+        ]
+      }
+    },
+    "comparison": {
+      "title": "So sánh chi tiết tính năng",
+      "description": "So sánh các gói Khởi đầu, Chuyên nghiệp và Doanh nghiệp để chọn gói phù hợp với đội ngũ",
+      "close": "Đóng so sánh",
+      "feature": "Tính năng",
+      "footer": "Mọi gói đều gồm 14 ngày dùng thử. Không cần thẻ tín dụng.",
+      "groups": [
+        {
+          "title": "Nền tảng cốt lõi",
+          "rows": [
+            {
+              "name": "Chi nhánh",
+              "desc": "Số địa điểm cung cấp dịch vụ",
+              "starter": "1",
+              "professional": "2 chi nhánh",
+              "business": "Không giới hạn"
+            },
+            {
+              "name": "Nhân viên",
+              "desc": "Số nhà cung cấp dịch vụ có thể thêm",
+              "starter": "Tối đa 3",
+              "professional": "Tối đa 15",
+              "business": "Không giới hạn"
+            },
+            {
+              "name": "Dịch vụ",
+              "desc": "Danh sách dịch vụ trên trang đặt lịch",
+              "starter": "Không giới hạn",
+              "professional": "Không giới hạn",
+              "business": "Không giới hạn"
+            },
+            {
+              "name": "Trang đặt lịch",
+              "desc": "Trải nghiệm dành cho khách",
+              "starter": "Mẫu theo thương hiệu",
+              "professional": "Tên miền riêng",
+              "business": "Tùy chỉnh hoàn toàn"
+            }
+          ]
+        },
+        {
+          "title": "Thanh toán & hoàn tất đặt lịch",
+          "rows": [
+            {
+              "name": "Thanh toán online",
+              "desc": "Nhận thanh toán thẻ khi đặt lịch",
+              "starter": "Có",
+              "professional": "Có",
+              "business": "Có"
+            },
+            {
+              "name": "Đặt cọc & trả trước",
+              "desc": "Thu một phần tiền trước",
+              "starter": "Không có",
+              "professional": "Có",
+              "business": "Có"
+            },
+            {
+              "name": "Tiền tip, bán thêm, gói dịch vụ",
+              "desc": "Quy trình thanh toán nâng cao",
+              "starter": "Không có",
+              "professional": "Không có",
+              "business": "Có"
+            }
+          ]
+        },
+        {
+          "title": "Giao tiếp",
+          "rows": [
+            {
+              "name": "Thông báo email",
+              "desc": "Xác nhận, nhắc lịch cho khách",
+              "starter": "Có",
+              "professional": "Có",
+              "business": "Có"
+            },
+            {
+              "name": "Nhắc lịch SMS",
+              "desc": "Giảm khách vắng hẹn bằng tin nhắn",
+              "starter": "Không có",
+              "professional": "Có",
+              "business": "Có"
+            },
+            {
+              "name": "CRM khách hàng",
+              "desc": "Ghi chú, lịch sử, hồ sơ liên hệ",
+              "starter": "Không có",
+              "professional": "Có",
+              "business": "Có"
+            },
+            {
+              "name": "Tự động marketing",
+              "desc": "Chiến dịch nhỏ giọt, tái tương tác",
+              "starter": "Không có",
+              "professional": "Không có",
+              "business": "Có"
+            }
+          ]
+        },
+        {
+          "title": "Phân tích & hỗ trợ",
+          "rows": [
+            {
+              "name": "Phân tích",
+              "desc": "Lịch đặt, doanh thu, chỉ số khách hàng",
+              "starter": "Cơ bản",
+              "professional": "Nâng cao",
+              "business": "Bảng thống kê riêng"
+            },
+            {
+              "name": "Báo cáo doanh thu",
+              "desc": "Phân tích tài chính sẵn sàng xuất",
+              "starter": "Không có",
+              "professional": "Có",
+              "business": "Có"
+            },
+            {
+              "name": "API & webhook",
+              "desc": "Xây dựng tích hợp riêng",
+              "starter": "Không có",
+              "professional": "Không có",
+              "business": "Có"
+            },
+            {
+              "name": "Mức hỗ trợ",
+              "desc": "Tốc độ phản hồi",
+              "starter": "Email · 48 giờ",
+              "professional": "Ưu tiên · 24 giờ",
+              "business": "Riêng · 4 giờ"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

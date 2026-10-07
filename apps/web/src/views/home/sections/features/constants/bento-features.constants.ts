@@ -1,0 +1,62 @@
+import {
+  Bell,
+  CalendarClock,
+  CalendarDays,
+  CalendarSync,
+  ChartNoAxesCombined,
+  Clock,
+  CreditCard,
+  FileCheck,
+  FileText,
+  Globe,
+  HelpCircle,
+  Languages,
+  Layout,
+  MapPin,
+  MessageSquare,
+  Package,
+  Palette,
+  Repeat,
+  ShieldCheck,
+  Star,
+  UserRound,
+  Users,
+  Video,
+  WalletCards,
+} from "lucide-react";
+
+export const FEATURE_GROUPS = [
+  { id: "core" },
+  { id: "business" },
+  { id: "client" },
+] as const;
+
+export const FEATURE_PREVIEW_LIMIT = 8;
+export const FEATURE_MOBILE_PREVIEW_LIMIT = 4;
+
+export const SQUIRCLE_FEATURES = [
+  { id: "payments", icon: CreditCard, group: "core" },
+  { id: "video", icon: Video, group: "client" },
+  { id: "socialProof", icon: Star, group: "client" },
+  { id: "faqWidgets", icon: HelpCircle, group: "client" },
+  { id: "themes", icon: Palette, group: "business" },
+  { id: "domain", icon: Globe, group: "business" },
+  { id: "waivers", icon: FileCheck, group: "business" },
+  { id: "packages", icon: Package, group: "core" },
+  { id: "embeds", icon: Layout, group: "core" },
+  { id: "documents", icon: FileText, group: "client" },
+  { id: "languages", icon: Languages, group: "client" },
+  { id: "privacy", icon: ShieldCheck, group: "business" },
+  { id: "notifications", icon: MessageSquare, group: "business" },
+  { id: "onlineBooking", icon: CalendarDays, group: "core" },
+  { id: "availability", icon: Clock, group: "core" },
+  { id: "calendarSync", icon: CalendarSync, group: "core" },
+  { id: "recurring", icon: Repeat, group: "core" },
+  { id: "deposits", icon: WalletCards, group: "core" },
+  { id: "team", icon: Users, group: "business" },
+  { id: "locations", icon: MapPin, group: "business" },
+  { id: "reports", icon: ChartNoAxesCombined, group: "business" },
+  { id: "rescheduling", icon: CalendarClock, group: "client" },
+  { id: "reminders", icon: Bell, group: "client" },
+  { id: "profiles", icon: UserRound, group: "client" },
+] as const;

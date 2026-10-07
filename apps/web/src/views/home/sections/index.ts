@@ -1,11 +1,14 @@
 export { Header } from "./header";
 export { Footer } from "./footer";
 export { Hero } from "./hero";
+export { PillarsSection } from "./pillars";
+export { IndustrySolutionsSection } from "./industry-solutions";
 export { ChallengesSection as Problem } from "./challenges/ChallengesSection";
 export { HowItWorksSection as HowItWorks } from "./how-it-works/HowItWorksSection";
 export { Features } from "./features";
 export { NoShowSection } from "./no-show/NoShowSection";
 export { Templates } from "./templates";
+export { CustomizationSection } from "./customization";
 export { Customization } from "../components/customization";
 export { Channels } from "../components/channels";
 export { Marketplace } from "./marketplace";

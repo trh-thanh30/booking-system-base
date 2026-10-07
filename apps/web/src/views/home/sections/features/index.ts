@@ -1,1 +1,1 @@
-export { FeaturesSection as Features } from "./FeaturesSection";
+export { BentoFeaturesSection as Features } from "./BentoFeaturesSection";
