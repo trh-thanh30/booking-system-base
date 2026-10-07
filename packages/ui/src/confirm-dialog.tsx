@@ -34,15 +34,16 @@ export function ConfirmDialog({
 }: ConfirmDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="max-h-[calc(100dvh-2rem)] overflow-y-auto">
         <DialogTitle className="text-base font-semibold">{title}</DialogTitle>
         <DialogDescription className="mt-2 text-sm font-medium text-muted-foreground">
           {description}
         </DialogDescription>
-        <div className="mt-5 flex justify-end gap-3">
+        <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:justify-end">
           <Button
             type="button"
             variant="outline"
+            className="h-auto min-h-11 min-w-0 w-full whitespace-normal sm:w-auto"
             onClick={() => onOpenChange(false)}
           >
             {cancelLabel}
@@ -50,6 +51,7 @@ export function ConfirmDialog({
           <Button
             type="button"
             variant={confirmVariant}
+            className="h-auto min-h-11 min-w-0 w-full whitespace-normal sm:w-auto"
             disabled={confirmDisabled}
             onClick={() => void onConfirm()}
           >
