@@ -17,8 +17,12 @@ export function createLandingMetadata(
         : "BookingBase — Online booking for service businesses";
   const description =
     lang === "vi"
-      ? "Tạo trang đặt lịch mang thương hiệu riêng. Quản lý dịch vụ, nhân viên và lịch hẹn trên BookingBase."
-      : "Create your branded booking page. Manage services, staff and appointments with BookingBase.";
+      ? signup
+        ? "Tạo tài khoản Owner, xác minh email rồi thiết lập thông tin và địa chỉ doanh nghiệp trên BookingBase."
+        : "Tạo trang đặt lịch mang thương hiệu riêng. Quản lý dịch vụ, nhân viên và lịch hẹn trên BookingBase."
+      : signup
+        ? "Create your Owner account, verify your email, then set up your business information and address on BookingBase."
+        : "Create your branded booking page. Manage services, staff and appointments with BookingBase.";
   const canonical = `/${lang}${path}`;
   return {
     metadataBase: new URL(siteConfig.webUrl),

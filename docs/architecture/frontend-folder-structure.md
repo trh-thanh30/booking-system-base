@@ -17,6 +17,17 @@ token từ `@repo/ui/styles.css`, không duy trì brand palette riêng trong t�
 
 - `app/[locale]/(marketing)`: Landing/signup, localized SEO metadata.
 - `app/[locale]/admin/(auth)`: public Owner auth/Google onboarding screens.
+- `AuthenticationLayout` trong `src/components/layout` dùng chung cho đăng ký và Auth.
+  Header dùng `src/components/layout/site-header.tsx`; Home chỉ compose navigation,
+  Auth dùng cùng header không navigation. Không tạo một logo/header riêng cho Auth.
+  `PasswordInput` và Leaflet `LocationPickerMap` ở `src/components/common`;
+  Business wizard cùng field compose vị trí nằm ở `src/views/admin/auth/components`.
+  Google redirect hook dùng chung ở `src/hooks`;
+  marketing không import Admin AuthProvider hoặc private API client để khởi tạo OAuth.
+- Form địa chỉ đa quốc gia lưu mã quốc gia ISO alpha-2 và contract trung lập gồm
+  `addressLine1/2`, `locality`, `administrativeAreaLevel1/2`, `postalCode`,
+  `formattedAddress`, `location`. Tên quốc gia và nhãn hành chính được dịch ở UI;
+  không lưu tên quốc gia đã dịch hoặc ép mọi quốc gia vào `ward/district/state`.
 - `app/[locale]/admin/(dashboard)`: protected dashboard shell/routes.
 - `app/[locale]/admin/layout.tsx`: một AuthProvider và private QueryClient dùng chung xuyên suốt Admin; marketing không bootstrap Admin.
 - `src/views/admin/<feature>`: các màn hình Admin, giữ role folders như rule dưới đây.
@@ -205,6 +216,11 @@ src/components/
 - `EmptyState`
 - `ConfirmDialog`
 
+Form dùng `FormField` chung. Trường bắt buộc phải truyền prop `required` để
+component hiển thị dấu `*` và khai báo `aria-required`; trạng thái này phải khớp
+schema/API contract. Không viết dấu `*` trực tiếp trong label/translation và
+không đánh dấu trường tùy chọn là bắt buộc.
+
 `layout/` dùng cho shell và navigation:
 
 - `DashboardShell`
@@ -266,6 +282,13 @@ Rule:
 - Hook chỉ dùng riêng một feature thì đặt trong `src/views/<feature>`.
 - Hook dùng API/server state nên gọi service/query function, không hardcode request ngay trong component UI.
 - Hook dùng chung giữa nhiều client nên đưa vào `packages/hooks`.
+- Consumer import trực tiếp hook từ nơi sở hữu implementation (`src/hooks` hoặc
+  public export của `@repo/hooks`). Không tạo file hook trong feature chỉ để
+  re-export hoặc gọi lại hook chung mà không bổ sung behavior.
+- Khi chuyển hook lên app/package, cập nhật toàn bộ consumer và xóa file ở vị trí
+  cũ; không giữ alias tương thích trong nội bộ repo. Chỉ tạo wrapper feature khi
+  có logic riêng thực sự (state, mapping, policy), đặt tên thể hiện vai trò đó.
+- Quy tắc barrel cho component không yêu cầu tạo bản re-export hook trong feature.
 
 ### `src/lib/`
 
@@ -400,6 +423,14 @@ export type BookingStatusFilter = "all" | BookingStatus;
 
 ## Barrel File Rule
 
+Component được dùng ngoài folder sở hữu phải được export qua `index.ts` của
+folder đó; consumer import từ folder, không import thẳng file component.
+Ví dụ: view lấy EmailInput từ `@/src/components/common`, AuthShell từ `./components`.
+Trong cùng folder, component dùng relative import trực tiếp tới sibling để tránh
+vòng lặp qua chính barrel của mình. Lazy/dynamic import có thể trỏ trực tiếp
+module cần tải để giữ ranh giới bundle. Không re-export Admin provider/private
+feature qua barrel của common/layout dùng bởi marketing.
+
 Chỉ tạo `index.ts` ở folder thật sự cần re-export module con.
 
 Không tạo `index.ts` chỉ để giữ folder trống.
@@ -434,14 +465,118 @@ Không viết business logic, React component implementation, constant lớn ho�
 
 ## Import Rule
 
+- Ảnh do app Next.js render dùng `Image` từ `next/image`, có `alt` và
+  `width`/`height` hoặc `fill` kèm `sizes`. SVG local vẫn dùng Image; không bật
+  `dangerouslyAllowSVG` chỉ để hiển thị logo. Remote image phải cấu hình nguồn
+  cụ thể, không mở wildcard rộng.
+- Điều hướng route nội bộ dùng `Link` từ helper `src/i18n/navigation` của app
+  (wrapper Next Link) để giữ locale; không tự thêm locale lần nữa. Nếu không
+  cần locale thì dùng `next/link`. Không thay OAuth redirect đầy trang thành
+  client-side Link.
+- Native `<a>` chỉ dùng khi cần hành vi trình duyệt: skip-link/anchor trong
+  cùng trang, URL ngoài, `mailto:`, `tel:`, download hoặc redirect khác origin.
+  Giữ `rel` phù hợp khi dùng `target="_blank"`.
+- Native `<img>` chỉ được giữ khi thư viện/framework-neutral primitive quản lý
+  ảnh (ví dụ Avatar, Leaflet) hoặc có ngoại lệ được giải thích. Không tắt rule
+  `@next/next/no-img-element` trong app chỉ để tránh dùng Next Image.
+- Các view/page/component Landing hiện có được loại khỏi đợt migration này;
+  không mở rộng việc sửa marketing khi task chỉ yêu cầu Admin/Auth. Ngoại lệ
+  về phạm vi này không phải quy tắc cho phép code mới dùng native tag tùy ý.
 - Trong app dùng alias `@/src/...`.
 - Import primitive từ `@repo/ui`.
 - Import shared type/schema/helper từ `@repo/shared`.
-- Notification trong component/hook frontend dùng `const { toast } = useToast()` từ `@repo/hooks`. Không import `toast` trực tiếp từ `sonner` trong Admin/Web; chỉ wrapper `packages/hooks` và Toaster primitive `packages/ui` phụ thuộc Sonner trực tiếp.
+- Notification trong component/hook frontend dùng `const { toast } = useToast()` từ `@repo/hooks`. Không import `toast` trực tiếp từ `sonner` trong Admin/Web; chỉ wrapper `packages/hooks` và Toaster primitive `packages/ui` phụ thuộc Sonner trực tiếp. Lỗi validation theo field nằm trong `FormField`; lỗi nghiệp vụ/toàn form dùng toast; banner chỉ dành cho trạng thái chặn trang hoặc cần hiển thị lâu dài. Không render đồng thời toast và banner cho cùng một thông báo.
 - View được import bởi `app/**/page.tsx`.
 - View có thể import `src/components/common`, `src/components/layout`, `src/hooks`, `src/services`, `src/utils`, `src/constants`.
 - `src/components/common` không import ngược vào `src/views`.
 - Feature này không import component private của feature khác.
+
+## Form Draft Và Khôi Phục Dữ Liệu
+
+Form dài hoặc có nhiều bước phải tự động lưu draft để người dùng không mất công
+việc khi reload, đóng tab hoặc vô tình rời route. Không áp dụng persistence hàng
+loạt cho mọi form.
+
+### Quy Tắc Persistence
+
+- Form dài/nhiều bước hoặc cần nhiều công sức nhập liệu dùng draft có version,
+  TTL và scope theo danh tính hiện tại.
+- Draft client-side không được chứa password, OTP, access/refresh token, payment
+  credential hoặc secret. Form có các trường này không được persist toàn bộ.
+- Dùng `localStorage` khi product yêu cầu phục hồi sau khi đóng tab; dùng
+  `sessionStorage` chỉ khi dữ liệu phải kết thúc cùng tab.
+- Draft phải có schema riêng chấp nhận dữ liệu đang nhập dở. Không dùng schema
+  submit cuối cùng để restore vì validation nghiệp vụ đầy đủ có thể xóa nhầm
+  draft chưa hoàn thiện.
+- Autosave nên debounce khoảng 300–800 ms và flush khi `pagehide`. Không toast
+  sau mỗi lần save; dùng status nhỏ với `aria-live="polite"`.
+- Chỉ hiện cảnh báo rời trang khi save đang thất bại hoặc còn thay đổi chưa lưu.
+  Không chặn điều hướng khi draft đã được lưu an toàn.
+- Chỉ xóa draft khi submit thành công, người dùng chủ động xóa, draft hết hạn,
+  sai version hoặc hỏng cấu trúc. Lỗi API/session tạm thời không được tự động
+  xóa công việc người dùng đã nhập.
+- Nếu cần khôi phục trên nhiều thiết bị, dùng draft phía server. `localStorage`
+  chỉ đảm bảo trên cùng browser/profile và vẫn chịu rủi ro khi người dùng xóa
+  dữ liệu trình duyệt.
+- Chỉ trích xuất hook/storage abstraction dùng chung khi có ít nhất hai feature
+  có cùng policy thực tế; không tạo wrapper generic trước nhu cầu.
+
+### Phân Loại Form Hiện Tại
+
+| Form                               | Policy                                                           |
+| :--------------------------------- | :--------------------------------------------------------------- |
+| Business onboarding                | Persist `localStorage`, TTL 7 ngày, restore step và dữ liệu      |
+| Signup/login/forgot/reset password | Không persist vì chứa credential hoặc là form ngắn               |
+| Email/OTP verification             | Không persist mã xác minh; countdown có thể giữ theo session     |
+| Accept invitation                  | Không persist vì chứa password và invitation token               |
+| Create Business dialog             | Không persist; cân nhắc confirm khi đóng nếu form dirty          |
+| Invite User dialog                 | Không persist; form ngắn, có thể confirm nếu mất dữ liệu đáng kể |
+
+## Test Kiểm Soát Native HTML
+
+Mỗi frontend có native HTML spec riêng, quét `src` và `app` của chính app đó.
+Web chạy `apps/web/test/native-html-policy.spec.mjs`; Platform chạy
+`apps/platform-admin/test/policies/native-html-policy.spec.mjs`. Chỉ logic phân
+tích TypeScript AST được chia sẻ tại `scripts/testing/native-html-policy.mjs`.
+Không import spec của app khác. CI chạy từng bộ test độc lập; lỗi nêu rõ file,
+dòng và tag cần sửa, không bắt nhầm comment/string.
+
+- `<img>` và `<a>` điều hướng nội bộ bị chặn mặc định.
+- Anchor có href tĩnh cho fragment, HTTP(S), `mailto:`, `tel:` hoặc download được
+  phép. Href động/spread cần ngoại lệ vì AST không xác định được đích runtime.
+- Ngoại lệ gắn trực tiếp lên element bằng `data-native-reason` có lý do tĩnh,
+  cụ thể (ít nhất 12 ký tự). Không dùng lý do chung chung để né Image/Link.
+  Ví dụ: `<a href={oauthUrl} data-native-reason="Full-page redirect to external OAuth provider">Continue</a>`.
+  Ngoại lệ không áp dụng cho element bên cạnh hay toàn bộ file. Nếu native img
+  được ESLint cảnh báo, chỉ suppress đúng dòng với cùng lý do integration.
+- Danh sách Landing được loại trừ nằm trong `isLandingExempt` tại
+  `scripts/testing/native-html-policy.mjs`: Home, signup marketing, marketing
+  routes, SiteHeader và landing compositions. Không loại trừ toàn bộ common/layout
+  hay Admin. Không mở rộng danh sách này để bỏ qua lỗi từ feature mới.
+
+Chạy guard riêng: `node --test apps/web/test/native-html-policy.spec.mjs`.
+
+### Client Test Runners
+
+Web và Platform Admin có `test/register.mjs` và `test/run.mjs` riêng; script
+package là `node --import ./test/register.mjs ./test/run.mjs`. Runner dùng chung
+helper discovery, tự chạy tất cả `*.spec.mjs` trong `test/` và folder con theo thứ
+tự ổn định. Thêm spec không cần cập nhật package.json; helper/fixture không dùng
+hậu tố `.spec.mjs` nếu không muốn được chạy. Loader dùng chung hỗ trợ TypeScript,
+TSX và Next, nhưng alias `@/` luôn trỏ đúng app đang test.
+
+Root scripts:
+
+- `pnpm test:web`: toàn bộ Web/Business Admin tests.
+- `pnpm test:admin`: alias của `test:web`, không có app Admin riêng.
+- `pnpm test:platform-admin`: toàn bộ Platform Admin tests.
+- `pnpm test:clients`: build shared một lần, chạy cả hai frontend song song.
+- `pnpm test` / `pnpm test:all`: toàn bộ workspace qua Turbo.
+
+Platform có spec local trong `test/policies/`; không đăng ký hoặc import spec của
+Web và không quét source của Web. Runner/loader và hàm AST dùng chung chỉ là hạ
+tầng tại `scripts/testing/`, không chứa bộ test của app. Web và Platform có
+`test/register.mjs`, `test/run.mjs`, alias root và danh sách spec độc lập.
 
 ## Khi Nào Đưa Code Lên Tầng Cao Hơn?
 

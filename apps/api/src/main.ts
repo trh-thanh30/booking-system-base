@@ -1,8 +1,8 @@
+import { loadEnv } from '@/load-env';
 import * as fs from 'fs';
 import * as path from 'path';
 import 'reflect-metadata';
 import './instrument';
-import { loadEnv } from '@/load-env';
 
 // Load environment variables and log which file was used
 const loadedEnvPath = loadEnv() ?? '(none found)';
@@ -106,7 +106,7 @@ async function bootstrap() {
       `🗄️  Database     : ${e.DB_HOST || 'localhost'}:${e.DB_PORT || '5432'}/${e.DB_NAME || '-'}`,
     );
     console.log(
-      `⚡ Redis         : ${e.REDIS_HOST || 'localhost'}:${e.REDIS_PORT || e.REDIS_DEV_PORT || '6379'}`,
+      `⚡ Redis        : ${e.REDIS_HOST || 'localhost'}:${e.REDIS_PORT || e.REDIS_DEV_PORT || '6379'}`,
     );
     console.log(
       `🔐 JWT Access   : expires in ${e.JWT_ACCESS_EXPIRES_IN || '-'}`,

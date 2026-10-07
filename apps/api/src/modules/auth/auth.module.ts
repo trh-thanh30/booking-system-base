@@ -36,6 +36,11 @@ import { PermissionModule } from '@/modules/permission/permission.module';
 import { UsersModule } from '@/modules/user/user.module';
 import { VerificationModule } from '@/modules/verification/verification.module';
 import { Module } from '@nestjs/common';
+import { OwnerOnboardingController } from './controllers/owner-onboarding.controller';
+import { OwnerOnboardingSessionService } from './services/owner-onboarding-session.service';
+import { OwnerBusinessOnboardingUseCase } from './use-cases/owner-business-onboarding.usecase';
+import { CheckOwnerBusinessSlugUseCase } from './use-cases/check-owner-business-slug.usecase';
+import { RegisterOwnerAccountUseCase } from './use-cases/register-owner-account.usecase';
 import { ConfigModule } from '@nestjs/config';
 
 @Module({
@@ -44,9 +49,14 @@ import { ConfigModule } from '@nestjs/config';
     AdminAuthController,
     PlatformAuthController,
     GoogleAuthController,
+    OwnerOnboardingController,
   ],
   providers: [
     RegisterOwnerUseCase,
+    RegisterOwnerAccountUseCase,
+    OwnerBusinessOnboardingUseCase,
+    CheckOwnerBusinessSlugUseCase,
+    OwnerOnboardingSessionService,
     LoginUserUseCase,
     StartGoogleLoginUseCase,
     LoginWithGoogleUseCase,

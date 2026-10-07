@@ -1,4 +1,5 @@
 import { PrismaModule } from '@/database/prisma/prisma.module';
+import { BusinessCategoryModule } from '@/modules/business-category/business-category.module';
 import {
   InternalTenantController,
   PlatformTenantController,
@@ -13,7 +14,7 @@ import { ResolveTenantUseCase } from '@/modules/tenant/use-cases/resolve-tenant.
 import { Module } from '@nestjs/common';
 
 @Module({
-  imports: [PrismaModule],
+  imports: [PrismaModule, BusinessCategoryModule],
   controllers: [
     TenantController,
     InternalTenantController,

@@ -1,5 +1,6 @@
 import { PrismaService } from '@/database/prisma/prisma.service';
 import { Injectable } from '@nestjs/common';
+import { ConflictError } from '@/common/response';
 import {
   business_status,
   tenant_domain_type,
@@ -87,8 +88,11 @@ export class TenantRepository {
       defaultBusinessName?: string;
       defaultBusinessSlug?: string;
       settings?: Record<string, unknown>;
+      defaultBusinessSettings?: Record<string, unknown>;
+      businessCategoryId?: string;
     };
     owner: {
+      existingUserId?: string;
       email: string;
       username: string;
       password: string | null;
@@ -132,8 +136,11 @@ export class TenantRepository {
               status: business_status.ACTIVE,
               timezone: input.tenant.timezone ?? 'Asia/Ho_Chi_Minh',
               locale: input.tenant.locale ?? 'vi',
-              settings: (input.tenant.settings ?? {}) as Prisma.InputJsonValue,
+              settings: (input.tenant.defaultBusinessSettings ??
+                input.tenant.settings ??
+                {}) as Prisma.InputJsonValue,
               is_default: true,
+              business_category_id: input.tenant.businessCategoryId,
             },
           },
         },
@@ -152,29 +159,56 @@ export class TenantRepository {
         throw new Error('Default business was not created');
       }
 
-      const owner = await tx.user.create({
-        data: {
-          tenant_id: tenant.id,
-          email: input.owner.email,
-          username: input.owner.username,
-          password: input.owner.password,
-          full_name: input.owner.full_name,
-          phone: input.owner.phone,
-          avatar_url: input.owner.avatar_url,
-          role: user_role.OWNER,
-          status: user_status.ACTIVE,
-          is_verified: input.owner.isVerified ?? false,
-          identities: input.owner.identity
-            ? {
-                create: {
-                  provider: input.owner.identity.provider,
-                  provider_account_id: input.owner.identity.providerAccountId,
-                  provider_email: input.owner.identity.providerEmail,
-                },
-              }
-            : undefined,
-        },
-      });
+      if (input.owner.existingUserId) {
+        const attached = await tx.user.updateMany({
+          where: {
+            id: input.owner.existingUserId,
+            tenant_id: null,
+            role: user_role.OWNER,
+            status: user_status.ACTIVE,
+            is_verified: true,
+          },
+          data: {
+            tenant_id: tenant.id,
+            username: input.owner.username,
+            full_name: input.owner.full_name,
+            phone: input.owner.phone,
+          },
+        });
+        if (attached.count !== 1)
+          throw new ConflictError(
+            'Owner onboarding is already completed',
+            'OWNER_ONBOARDING_ALREADY_COMPLETED',
+          );
+      }
+      const owner = input.owner.existingUserId
+        ? await tx.user.findUniqueOrThrow({
+            where: { id: input.owner.existingUserId },
+          })
+        : await tx.user.create({
+            data: {
+              tenant_id: tenant.id,
+              email: input.owner.email,
+              username: input.owner.username,
+              password: input.owner.password,
+              full_name: input.owner.full_name,
+              phone: input.owner.phone,
+              avatar_url: input.owner.avatar_url,
+              role: user_role.OWNER,
+              status: user_status.ACTIVE,
+              is_verified: input.owner.isVerified ?? false,
+              identities: input.owner.identity
+                ? {
+                    create: {
+                      provider: input.owner.identity.provider,
+                      provider_account_id:
+                        input.owner.identity.providerAccountId,
+                      provider_email: input.owner.identity.providerEmail,
+                    },
+                  }
+                : undefined,
+            },
+          });
 
       await tx.businessMembership.create({
         data: {

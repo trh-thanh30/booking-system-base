@@ -5,18 +5,18 @@ import { useMutation } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { useToast } from "@repo/hooks";
 import { emailRequestSchema, type EmailRequestInput } from "@repo/shared";
-import { Button, Input } from "@repo/ui";
-import { FormField } from "@/src/components/common/form-field";
+import { Button } from "@repo/ui";
+import { EmailInput, FormField } from "@/src/components/common";
 import { Link, useRouter } from "@/src/i18n/navigation";
 import { authService } from "@/src/services/admin/auth.service";
-import { AuthShell } from "./components/auth-shell";
-import { EmailAuthFeedback } from "./components/email-auth-feedback";
+import { AuthShell } from "./components";
 import { useEmailAuthFeedback } from "./hooks/use-email-auth-feedback";
 import { getSessionUrl } from "./utils/email-auth.utils";
 
 export function ForgotPasswordView() {
   const { toast } = useToast();
   const t = useTranslations("Auth");
+  const placeholders = useTranslations("AuthJourney.placeholders");
   const router = useRouter();
   const feedback = useEmailAuthFeedback();
   const request = useMutation({
@@ -43,24 +43,23 @@ export function ForgotPasswordView() {
       toast.success(t("forgot.success"));
       router.replace(getSessionUrl("reset-password", result.sessionId));
     } catch (error) {
-      feedback.fail(error, "request");
+      const result = feedback.fail(error, "request");
+      toast.error(t(result.key));
     }
   }
 
   return (
     <AuthShell description={t("forgot.description")} title={t("forgot.title")}>
       <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
-        <EmailAuthFeedback
-          errorKey={feedback.errorKey}
-          remaining={feedback.remaining}
-        />
         <FormField
           error={errors.email?.message}
           htmlFor="email"
           label={t("fields.email")}
+          required
         >
-          <Input
+          <EmailInput
             id="email"
+            placeholder={placeholders("email")}
             type="email"
             autoComplete="email"
             disabled={request.isPending}
@@ -74,7 +73,11 @@ export function ForgotPasswordView() {
           disabled={request.isPending || feedback.remaining > 0}
           type="submit"
         >
-          {request.isPending ? t("forgot.submitting") : t("forgot.submit")}
+          {request.isPending
+            ? t("forgot.submitting")
+            : feedback.remaining > 0
+              ? t("emailFlow.retryIn", { seconds: feedback.remaining })
+              : t("forgot.submit")}
         </Button>
         <Button asChild className="w-full" variant="ghost">
           <Link href="/admin/login">{t("backToLogin")}</Link>

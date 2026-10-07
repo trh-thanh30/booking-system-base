@@ -1,19 +1,19 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { useLocale, useTranslations } from "next-intl";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { useToast } from "@repo/hooks";
-import type { CompleteGoogleOwnerOnboardingInput } from "@repo/shared";
-import { Button } from "@repo/ui";
 import { useAuth } from "@/src/app/providers/admin";
+import { GoogleIcon } from "@/src/components/common";
+import { useGoogleLogin } from "@/src/hooks/use-google-login";
 import { Link, useRouter } from "@/src/i18n/navigation";
 import { getSafeReturnTo } from "@/src/lib/admin/auth-routing";
 import { authService } from "@/src/services/admin/auth.service";
-import { AuthShell } from "./components/auth-shell";
-import { GoogleBusinessForm } from "./components/google-business-form";
+import { useToast } from "@repo/hooks";
+import type { CompleteGoogleOwnerOnboardingInput } from "@repo/shared";
+import { Button } from "@repo/ui";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { useLocale, useTranslations } from "next-intl";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { AuthLoadingState, AuthShell, GoogleBusinessForm } from "./components";
 import { GOOGLE_ONBOARDING_QUERY_KEY } from "./constants/google-onboarding.constants";
-import { useGoogleLogin } from "./hooks/use-google-login";
 import { getGoogleOnboardingError } from "./utils/google-auth.utils";
 
 export function GoogleOnboardingView() {
@@ -24,6 +24,7 @@ export function GoogleOnboardingView() {
   const { isLoading, isAuthenticated, completeGoogleOnboarding } = useAuth();
   const google = useGoogleLogin();
   const attempt = useRef(false);
+  const clearDraftRef = useRef<() => void>(() => undefined);
   const [submitError, setSubmitError] = useState<ReturnType<
     typeof getGoogleOnboardingError
   > | null>(null);
@@ -52,45 +53,57 @@ export function GoogleOnboardingView() {
     setSubmitError(null);
     try {
       const result = await completion.mutateAsync(input);
+      clearDraftRef.current();
       toast.success(t("google.success"));
       router.replace(getSafeReturnTo(result.return_to), {
         locale: result.locale === "en" ? "en" : "vi",
       });
     } catch (error) {
       attempt.current = false;
-      setSubmitError(getGoogleOnboardingError(error));
+      const result = getGoogleOnboardingError(error);
+      setSubmitError(result);
+      toast.error(t(result.key));
     }
   }
 
-  const error =
-    submitError ??
-    (profile.isError ? getGoogleOnboardingError(profile.error) : null);
+  const profileError = profile.isError
+    ? getGoogleOnboardingError(profile.error)
+    : null;
+  const error = submitError ?? profileError;
+  const handleDraftStateChange = useCallback(
+    (hasDraft: boolean, clearDraft: () => void) => {
+      void hasDraft;
+      clearDraftRef.current = clearDraft;
+    },
+    [],
+  );
+  useEffect(() => {
+    if (!profile.isError) return;
+    const currentError = getGoogleOnboardingError(profile.error);
+    toast.error(t(currentError.key), {
+      id: "google-onboarding-profile-error",
+    });
+  }, [profile.error, profile.errorUpdatedAt, profile.isError, t, toast]);
   return (
     <AuthShell
       title={t("google.onboardingTitle")}
       description={t("google.onboardingDescription")}
     >
-      <div className="space-y-4">
+      <div className="space-y-2">
         {isLoading || isAuthenticated || profile.isPending ? (
-          <p role="status" className="text-muted-foreground">
-            {t("checkingSession")}
-          </p>
+          <AuthLoadingState
+            title={t("checkingSession")}
+            description={t("checkingSessionDescription")}
+          />
         ) : (
           <>
-            {error ? (
-              <p
-                role="alert"
-                className="rounded-md border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive"
-              >
-                {t(error.key)}
-              </p>
-            ) : null}
             {profile.data && !error?.terminal ? (
               <GoogleBusinessForm
                 profile={profile.data}
                 locale={locale}
                 isPending={completion.isPending}
                 onSubmit={submit}
+                onDraftStateChange={handleDraftStateChange}
               />
             ) : null}
             {profile.isError && !error?.terminal ? (
@@ -110,6 +123,7 @@ export function GoogleOnboardingView() {
                 disabled={google.isRedirecting}
                 onClick={google.startGoogleLogin}
               >
+                <GoogleIcon />
                 {google.isRedirecting
                   ? t("google.redirecting")
                   : t("google.restart")}

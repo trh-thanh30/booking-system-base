@@ -5,7 +5,7 @@ import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
 
 @Module({
-  imports: [HttpModule],
+  imports: [HttpModule.register({ timeout: 5000 })],
   controllers: [CommonController],
   providers: [CommonService, CommonUtils],
   exports: [CommonService],

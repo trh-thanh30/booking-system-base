@@ -9,6 +9,7 @@ import {
 } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
 import { Pool } from 'pg';
+import { seedBusinessCategories } from './seeds/business-categories.seed';
 
 let prisma: PrismaClient;
 
@@ -104,6 +105,14 @@ async function main() {
   const pool = new Pool({ connectionString });
   const adapter = new PrismaPg(pool);
   prisma = new PrismaClient({ adapter });
+
+  const businessCategories = await seedBusinessCategories(prisma);
+  const spaCategory = businessCategories.find(
+    (category) => category.slug === 'spa',
+  );
+  if (!spaCategory) {
+    throw new Error('The spa business category seed is missing');
+  }
 
   const hashedPassword = await bcrypt.hash('password123', 12);
 
@@ -204,6 +213,7 @@ async function main() {
       },
     },
     update: {
+      business_category_id: spaCategory.id,
       name: 'Demo Spa',
       status: business_status.ACTIVE,
       timezone: 'Asia/Ho_Chi_Minh',
@@ -215,6 +225,7 @@ async function main() {
     },
     create: {
       tenant_id: demoTenant.id,
+      business_category_id: spaCategory.id,
       slug: 'demo-spa',
       name: 'Demo Spa',
       status: business_status.ACTIVE,
@@ -340,6 +351,7 @@ async function main() {
   console.log('Base database seed completed successfully.');
   console.log(`Tenant: ${demoTenant.name} (${demoTenant.slug})`);
   console.log(`Business: ${demoBusiness.name} (${demoBusiness.slug})`);
+  console.log(`Business categories: ${businessCategories.length}`);
   console.log('Tenant domains: demo.localhost, demo-spa.localhost');
   console.log(`Super Admin: ${superAdminUser.email} (${superAdminUser.role})`);
   console.log(`Owner: ${ownerUser.email} (${ownerUser.role})`);

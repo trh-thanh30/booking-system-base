@@ -1,4 +1,9 @@
 import { z } from 'zod';
+export {
+  registerOwnerAccountSchema,
+  businessProfileSchema,
+  completeOwnerBusinessSchema,
+} from '../../../../packages/shared/src/schemas/owner-onboarding.schema';
 export { getSafeAdminReturnTo } from '../../../../packages/shared/src/utils/admin-navigation';
 
 const DEFAULT_RESPONSE_VERSION = 'v1';

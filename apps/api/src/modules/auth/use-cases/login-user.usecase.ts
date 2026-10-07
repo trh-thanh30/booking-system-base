@@ -58,7 +58,11 @@ export class LoginUserUseCase implements BaseUseCase<LoginDto, AuthResponse> {
 
     const isBusinessAdmin =
       user.role === user_role.OWNER || user.role === user_role.STAFF;
-    if (isBusinessAdmin && !user.tenant_id) {
+    const pendingOwner =
+      authContext === 'admin' &&
+      user.role === user_role.OWNER &&
+      !user.tenant_id;
+    if (isBusinessAdmin && !user.tenant_id && !pendingOwner) {
       throw new UnauthorizedError(this.errorMessages.INVALID_CREDENTIALS);
     }
 
@@ -90,11 +94,18 @@ export class LoginUserUseCase implements BaseUseCase<LoginDto, AuthResponse> {
         {
           requiresVerification: true,
           sessionId,
+          ...(pendingOwner ? { requiresOnboarding: true } : {}),
         },
       );
     }
 
     // Validate user can login
+    if (pendingOwner) {
+      throw new ValidationError(
+        'Complete your business information before logging in',
+        'OWNER_ONBOARDING_REQUIRED',
+      );
+    }
     this.validateUserCanLogin(user);
 
     // Generate tokens

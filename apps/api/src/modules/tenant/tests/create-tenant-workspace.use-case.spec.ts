@@ -11,7 +11,10 @@ describe('CreateTenantWorkspaceUseCase', () => {
     const repository = makeRepository();
 
     await expect(
-      new CreateTenantWorkspaceUseCase(repository as never).execute({
+      new CreateTenantWorkspaceUseCase(
+        repository as never,
+        makeBusinessCategories() as never,
+      ).execute({
         tenant: {
           slug: 'demo-spa',
           name: 'Demo Spa',
@@ -43,7 +46,10 @@ describe('CreateTenantWorkspaceUseCase', () => {
     });
 
     await expect(
-      new CreateTenantWorkspaceUseCase(repository as never).execute({
+      new CreateTenantWorkspaceUseCase(
+        repository as never,
+        makeBusinessCategories() as never,
+      ).execute({
         tenant: { slug: 'demo-spa', name: 'Demo Spa' },
         owner: {
           email: 'owner@example.com',
@@ -55,6 +61,10 @@ describe('CreateTenantWorkspaceUseCase', () => {
     expect(repository.createTenantWithOwner).not.toHaveBeenCalled();
   });
 });
+
+function makeBusinessCategories() {
+  return { findActiveById: jest.fn().mockResolvedValue({ id: 'category' }) };
+}
 
 function makeRepository(overrides: { findBySlug?: jest.Mock } = {}) {
   const createdAt = new Date('2026-09-30T00:00:00.000Z');

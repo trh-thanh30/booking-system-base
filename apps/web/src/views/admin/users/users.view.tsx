@@ -180,10 +180,11 @@ function InviteUserDialog({
               error={errors.email?.message}
               htmlFor="invite-email"
               label="Email"
+              required
             >
               <Input id="invite-email" type="email" {...register("email")} />
             </FormField>
-            <FormField htmlFor="invite-role" label="Role">
+            <FormField htmlFor="invite-role" label="Role" required>
               <select
                 className="flex h-10 w-full rounded-md border border-border bg-background px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring dark:border-border dark:bg-background dark:focus-visible:ring-ring"
                 id="invite-role"
