@@ -1,4 +1,4 @@
-export type BusinessOnboardingStep = 0 | 1 | 2;
+export type BusinessOnboardingStep = 0 | 1;
 
 export type BusinessOnboardingDraftSaveStatus =
   | "idle"

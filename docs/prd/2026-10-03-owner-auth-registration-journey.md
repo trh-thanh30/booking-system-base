@@ -7,7 +7,7 @@
 - Use the supplied SimplyBook screenshots as visual reference, not their logo,
   subscription claims, legal copy, marketplace opt-ins or CAPTCHA.
 - Persist an unverified OWNER account at initial email/password registration.
-- Verify email before collecting Business information, address and opening hours.
+- Verify email before collecting Business information and address.
 - Provision Tenant/default Business/membership atomically at final completion;
   attach the existing verified Owner, never create a second User.
 - Pending Owners must not receive Admin JWT/refresh tokens or dashboard access.
@@ -16,7 +16,8 @@
   stays read-only, OAuth-only accounts never receive a fake password.
 - Include OpenStreetMap + Leaflet, click/drag pin, explicit browser location,
   reverse geocoding from a selected pin and explicit address-to-map lookup.
-- Store address/location/weekly opening hours in default Business settings.
+- Store address/location in default Business settings. Configure opening hours
+  separately after onboarding.
 - Keep current owner registration endpoint compatible during cutover; new Web
   account-first registration uses dedicated Auth endpoints. No new module/model.
 
@@ -37,6 +38,6 @@ country-specific ward/district/state fields.
 
 Tests: pending account registration, verification-before-completion, session
 expiry, no pending Admin tokens, resume, transaction attach/replay, schema
-address/hours/location bounds, vi/en form rendering and Google compatibility.
+address/location bounds, vi/en form rendering and Google compatibility.
 Run API/Web/shared lint/typecheck/tests/build/token validation and browser QA
 where available. Keep real Google account and location permissions as HITL.

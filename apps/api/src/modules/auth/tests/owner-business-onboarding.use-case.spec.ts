@@ -30,12 +30,6 @@ const input = {
       formattedAddress: '1 Example, Hanoi, Vietnam',
       location: null,
     },
-    opening_hours: Array.from({ length: 7 }, (_, day) => ({
-      day,
-      enabled: day === 1,
-      opens: '09:00',
-      closes: '18:00',
-    })),
   },
 };
 function setup(user: unknown = owner) {
@@ -79,7 +73,15 @@ function setup(user: unknown = owner) {
 describe('OwnerBusinessOnboardingUseCase', () => {
   it('attaches the verified persisted Owner and stores business-only setup', async () => {
     const { useCase, workspace, sessions } = setup();
-    await useCase.execute('ticket', input);
+    await useCase.execute('ticket', {
+      ...input,
+      business_profile: {
+        ...input.business_profile,
+        opening_hours: [
+          { day: 1, enabled: true, opens: '09:00', closes: '18:00' },
+        ],
+      },
+    });
     expect(workspace.execute).toHaveBeenCalledWith(
       expect.objectContaining({
         owner: expect.objectContaining({ existingUserId: 'owner' }),
@@ -104,7 +106,7 @@ describe('OwnerBusinessOnboardingUseCase', () => {
     });
     expect(workspace.execute).not.toHaveBeenCalled();
   });
-  it('rejects invalid hours and coordinates at the server boundary', async () => {
+  it('rejects invalid coordinates at the server boundary', async () => {
     const { useCase, workspace } = setup();
     await expect(
       useCase.execute('ticket', {

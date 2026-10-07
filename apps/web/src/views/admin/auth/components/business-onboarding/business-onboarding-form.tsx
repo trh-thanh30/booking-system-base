@@ -31,14 +31,10 @@ import {
   getCountryFromTimezone,
 } from "../../utils/business-onboarding.utils";
 import { BusinessAddressStep } from "./business-address-step";
-import { BusinessHoursStep } from "./business-hours-step";
 import { BusinessInformationStep } from "./business-information-step";
 
-const STEP_TITLES = [
-  "businessInfo",
-  "businessAddress",
-  "businessHours",
-] as const;
+// Opening hours is temporarily configured after onboarding instead of as a step.
+const STEP_TITLES = ["businessInfo", "businessAddress"] as const;
 
 export function BusinessOnboardingForm({
   profile,
@@ -79,12 +75,6 @@ export function BusinessOnboardingForm({
           formattedAddress: "",
           location: null,
         },
-        opening_hours: Array.from({ length: 7 }, (_, day) => ({
-          day,
-          enabled: day !== 0 && day !== 6,
-          opens: "09:00",
-          closes: "18:00",
-        })),
       },
     },
   });
@@ -173,19 +163,10 @@ export function BusinessOnboardingForm({
               locale: true,
             })
             .safeParse(normalizedInput)
-        : step === 1
-          ? completeOwnerBusinessSchema.shape.business_profile.shape.address.safeParse(
-              normalizedInput.business_profile.address,
-            )
-          : completeOwnerBusinessSchema.safeParse(normalizedInput);
+        : completeOwnerBusinessSchema.safeParse(normalizedInput);
     if (!parsed.success) {
       for (const issue of parsed.error.issues) {
-        const path =
-          step === 1
-            ? ["business_profile", "address", ...issue.path]
-            : issue.path[0] === "slug"
-              ? ["name"]
-              : issue.path;
+        const path = issue.path[0] === "slug" ? ["name"] : issue.path;
         form.setError(
           path.join(".") as FieldPath<CompleteOwnerBusinessInput>,
           { message: t("invalidField") },
@@ -194,8 +175,8 @@ export function BusinessOnboardingForm({
       }
       return;
     }
-    if (step < 2) {
-      const nextStep = (step + 1) as BusinessOnboardingStep;
+    if (step === 0) {
+      const nextStep: BusinessOnboardingStep = 1;
       draft.persistDraft(nextStep);
       setStep(nextStep);
       return;
@@ -273,7 +254,7 @@ export function BusinessOnboardingForm({
           aria-valuemin={0}
           aria-valuemax={STEP_TITLES.length}
           aria-valuenow={step + 1}
-          className="grid grid-cols-3 gap-1"
+          className="grid grid-cols-2 gap-1"
         >
           <TooltipProvider delayDuration={100} skipDelayDuration={100}>
             <div className="contents">
@@ -337,7 +318,6 @@ export function BusinessOnboardingForm({
           {step === 1 ? (
             <BusinessAddressStep locale={locale} disabled={busy} />
           ) : null}
-          {step === 2 ? <BusinessHoursStep /> : null}
           <div className="flex gap-2 pt-3">
             {step > 0 ? (
               <Button
@@ -357,7 +337,7 @@ export function BusinessOnboardingForm({
               type="submit"
             >
               {t(
-                isPending ? "completing" : step === 2 ? "complete" : "continue",
+                isPending ? "completing" : step === 1 ? "complete" : "continue",
               )}
             </Button>
           </div>

@@ -58,12 +58,6 @@ describe('CompleteGoogleOwnerOnboardingUseCase', () => {
           formattedAddress: '1 Example, Hanoi, Vietnam',
           location: null,
         },
-        opening_hours: Array.from({ length: 7 }, (_, day) => ({
-          day,
-          enabled: day === 1,
-          opens: '09:00',
-          closes: '18:00',
-        })),
       },
     });
     expect(dependencies.workspace.execute).toHaveBeenCalledWith(

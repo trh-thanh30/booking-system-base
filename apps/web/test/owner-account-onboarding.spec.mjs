@@ -45,12 +45,6 @@ const input = {
       formattedAddress: "1 Example, Hanoi, Vietnam",
       location: null,
     },
-    opening_hours: Array.from({ length: 7 }, (_, day) => ({
-      day,
-      enabled: day === 1,
-      opens: "09:00",
-      closes: "18:00",
-    })),
   },
 };
 test("account-first registration normalizes email and rejects mismatched/short passwords", () => {
@@ -108,7 +102,19 @@ test("a restored step-one business name is checked for availability once", () =>
   );
 });
 
-test("business completion validates geographic bounds, timezone and unique daily intervals", () => {
+test("business onboarding completes after the address step", () => {
+  assert.doesNotMatch(businessOnboardingFormSource, /<BusinessHoursStep/);
+  assert.match(
+    businessOnboardingFormSource,
+    /const STEP_TITLES = \["businessInfo", "businessAddress"\] as const;/,
+  );
+  assert.match(
+    businessOnboardingFormSource,
+    /step === 1 \? "complete" : "continue"/,
+  );
+});
+
+test("business completion validates geographic bounds and timezone", () => {
   assert.equal(completeOwnerBusinessSchema.safeParse(input).success, true);
   assert.equal(
     completeOwnerBusinessSchema.parse({
@@ -156,21 +162,14 @@ test("business completion validates geographic bounds, timezone and unique daily
     }).success,
     false,
   );
-  for (const hours of [
-    profile.opening_hours.map(() => profile.opening_hours[1]),
-    profile.opening_hours.map((day) => ({ ...day, enabled: false })),
-    profile.opening_hours.map((day) => ({
-      ...day,
-      opens: "18:00",
-      closes: "09:00",
-    })),
-  ]) {
-    assert.equal(
-      completeOwnerBusinessSchema.safeParse({
-        ...input,
-        business_profile: { ...profile, opening_hours: hours },
-      }).success,
-      false,
-    );
-  }
+  const parsed = completeOwnerBusinessSchema.parse({
+    ...input,
+    business_profile: {
+      ...profile,
+      opening_hours: [
+        { day: 1, enabled: true, opens: "09:00", closes: "18:00" },
+      ],
+    },
+  });
+  assert.equal("opening_hours" in parsed.business_profile, false);
 });

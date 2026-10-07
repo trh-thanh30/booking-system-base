@@ -61,7 +61,8 @@ Bảo vệ dữ liệu doanh nghiệp, cho phép mỗi nhóm người dùng ch�
 ### Account-first onboarding (2026-10-03)
 
 Luồng Web mới: đăng ký Owner → xác minh email → thông tin Business → địa chỉ/
-OpenStreetMap pin → giờ hoạt động → tạo Tenant/default Business/membership.
+OpenStreetMap pin → tạo Tenant/default Business/membership. Giờ hoạt động được
+cấu hình riêng sau onboarding.
 Owner được lưu trước, tenant_id=null; không cấp Admin session khi chưa hoàn tất.
 Đăng nhập lại có thể tiếp tục onboarding bằng ticket HttpOnly 30 phút. Google
 Owner mới được lưu với password=null/is_verified=true trước Business setup.

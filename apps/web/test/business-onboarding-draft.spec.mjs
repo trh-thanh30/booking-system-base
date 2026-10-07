@@ -27,12 +27,6 @@ const incompleteValues = {
       formattedAddress: "",
       location: null,
     },
-    opening_hours: Array.from({ length: 7 }, (_, day) => ({
-      day,
-      enabled: day > 0 && day < 6,
-      opens: "09:00",
-      closes: "18:00",
-    })),
   },
 };
 
@@ -66,15 +60,19 @@ test("keeps a valid draft when the form is reopened and removes expired drafts",
   const now = Date.UTC(2026, 9, 7);
   const draft = createBusinessOnboardingDraft({
     profileEmail: "owner@example.com",
-    step: 2,
+    step: 1,
     values: incompleteValues,
     now,
   });
+  const legacyThreeStepDraft = { ...draft, step: 2 };
 
-  assert.equal(saveBusinessOnboardingDraft(storage, draft), true);
+  assert.equal(
+    saveBusinessOnboardingDraft(storage, legacyThreeStepDraft),
+    true,
+  );
   assert.equal(
     loadBusinessOnboardingDraft(storage, "owner@example.com", now)?.step,
-    2,
+    1,
   );
   assert.equal(
     loadBusinessOnboardingDraft(storage, "another@example.com", now),

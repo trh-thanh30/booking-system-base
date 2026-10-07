@@ -35,9 +35,7 @@ export class CompleteGoogleOwnerOnboardingUseCase {
   async execute(token: string, dto: CompleteGoogleOwnerOnboardingDto) {
     const session = await this.onboardingSessionService.get(token);
     if (session.userId && !completeOwnerBusinessSchema.safeParse(dto).success) {
-      throw new BadRequestError(
-        'Complete business information, address and opening hours',
-      );
+      throw new BadRequestError('Complete business information and address');
     }
     const phone = dto.owner.phone?.trim() || undefined;
     const profile = dto.business_profile

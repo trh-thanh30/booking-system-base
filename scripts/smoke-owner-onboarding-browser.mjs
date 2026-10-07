@@ -165,8 +165,8 @@ try {
   await input("slug", "demo-business");
   await input("owner.username", "demo-owner");
   await click("Continue");
-  await input("business_profile.address.city", "Hanoi");
-  await input("business_profile.address.street", "1 Example Street");
+  await input("business_profile.address.locality", "Hanoi");
+  await input("business_profile.address.addressLine1", "1 Example Street");
   await page.waitForSelector(".leaflet-container");
   assert.ok(
     (
@@ -178,23 +178,12 @@ try {
   );
   await page.click(".leaflet-container", { offset: { x: 160, y: 120 } });
   await page.waitForSelector(".business-map-pin");
-  await click("Continue");
-  await page.waitForSelector('[name="business_profile.opening_hours.1.opens"]');
-  await click("Back");
-  assert.equal(
-    await page.$eval(
-      '[name="business_profile.address.street"]',
-      (element) => element.value,
-    ),
-    "1 Example Street",
-  );
-  await click("Continue");
   await click("Create my business");
   await page.waitForSelector('[name="usernameOrEmail"]');
   const completed = calls.find(
     (call) => call.path === "/auth/admin/onboarding" && call.method === "POST",
   );
-  assert.equal(completed.data.business_profile.opening_hours.length, 7);
+  assert.equal("opening_hours" in completed.data.business_profile, false);
   assert.equal(
     typeof completed.data.business_profile.address.location.latitude,
     "number",

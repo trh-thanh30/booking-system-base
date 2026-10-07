@@ -18,10 +18,10 @@ export function createLandingMetadata(
   const description =
     lang === "vi"
       ? signup
-        ? "Tạo tài khoản Owner, xác minh email rồi thiết lập thông tin doanh nghiệp, địa chỉ và giờ hoạt động trên BookingBase."
+        ? "Tạo tài khoản Owner, xác minh email rồi thiết lập thông tin và địa chỉ doanh nghiệp trên BookingBase."
         : "Tạo trang đặt lịch mang thương hiệu riêng. Quản lý dịch vụ, nhân viên và lịch hẹn trên BookingBase."
       : signup
-        ? "Create your Owner account, verify your email, then set up your business information, address and opening hours on BookingBase."
+        ? "Create your Owner account, verify your email, then set up your business information and address on BookingBase."
         : "Create your branded booking page. Manage services, staff and appointments with BookingBase.";
   const canonical = `/${lang}${path}`;
   return {

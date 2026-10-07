@@ -34,23 +34,15 @@ const draftValuesSchema = z.object({
         })
         .nullable(),
     }),
-    opening_hours: z
-      .array(
-        z.object({
-          day: z.number().int(),
-          enabled: z.boolean(),
-          opens: z.string(),
-          closes: z.string(),
-        }),
-      )
-      .length(7),
   }),
 });
 
 const businessOnboardingDraftSchema = z.object({
   version: z.literal(BUSINESS_ONBOARDING_DRAFT_VERSION),
   profileEmail: z.string().trim().toLowerCase(),
-  step: z.union([z.literal(0), z.literal(1), z.literal(2)]),
+  step: z
+    .union([z.literal(0), z.literal(1), z.literal(2)])
+    .transform((step): BusinessOnboardingStep => (step === 2 ? 1 : step)),
   values: draftValuesSchema,
   updatedAt: z.number().int().nonnegative(),
   expiresAt: z.number().int().positive(),

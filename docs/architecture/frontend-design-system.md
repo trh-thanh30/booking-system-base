@@ -273,8 +273,9 @@ PasswordInput hỗ trợ hiện/ẩn mật khẩu bằng nút có aria-label. Kh
 CAPTCHA hoặc nội dung điều khoản của website tham chiếu.
 
 Luồng account-first (ADR 0004): đăng ký email → xác minh → Business info → địa chỉ
-→ giờ hoạt động. `BusinessOnboardingForm` dùng chung cho email/Google; không tạo hai
-wizard. Bản đồ Leaflet chỉ tải ở client tại bước địa chỉ, có attribution OSM,
+→ tạo doanh nghiệp. `BusinessOnboardingForm` dùng chung cho email/Google; không tạo
+hai wizard. Giờ hoạt động được cấu hình riêng sau onboarding, không tự tạo từ giá
+trị mặc định. Bản đồ Leaflet chỉ tải ở client tại bước địa chỉ, có attribution OSM,
 click/drag pin và định vị theo thao tác người dùng. Địa chỉ/tọa độ nhập tay vẫn dùng
 được khi bản đồ hoặc quyền định vị lỗi. Không có Nominatim autocomplete.
 

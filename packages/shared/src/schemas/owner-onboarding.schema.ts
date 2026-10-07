@@ -17,29 +17,6 @@ export type RegisterOwnerAccountInput = z.input<
 
 export const businessProfileSchema = z.object({
   address: globalAddressSchema,
-  opening_hours: z
-    .array(
-      z
-        .object({
-          day: z.number().int().min(0).max(6),
-          enabled: z.boolean(),
-          opens: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/),
-          closes: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/),
-        })
-        .refine((value) => !value.enabled || value.opens < value.closes, {
-          path: ["closes"],
-          message: "Closing time must follow opening time",
-        }),
-    )
-    .length(7)
-    .refine(
-      (days) => new Set(days.map((day) => day.day)).size === 7,
-      "Each weekday must occur once",
-    )
-    .refine(
-      (days) => days.some((day) => day.enabled),
-      "Choose at least one working day",
-    ),
 });
 export type BusinessOnboardingProfile = z.infer<typeof businessProfileSchema>;
 
