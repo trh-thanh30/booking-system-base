@@ -53,6 +53,7 @@ export function createAdminSession(options: SessionOptions) {
   let generation = 0;
   let currentUser: CurrentAuthUser | null = null;
   let bootstrapPromise: Promise<CurrentAuthUser | null> | undefined;
+  let bootstrapGeneration = 0;
 
   function clear() {
     generation++;
@@ -134,35 +135,47 @@ export function createAdminSession(options: SessionOptions) {
     }
   }
 
+  function bootstrap(): Promise<CurrentAuthUser | null> {
+    if (bootstrapPromise) {
+      // A remounted provider must not adopt an earlier, cancelled restoration.
+      // Wait for it to settle before requesting refresh again, since refresh is shared.
+      const requestedGeneration = generation;
+      return bootstrapGeneration === generation
+        ? bootstrapPromise
+        : bootstrapPromise.then(() =>
+            requestedGeneration === generation ? bootstrap() : null,
+          );
+    }
+    const requestGeneration = generation;
+    bootstrapGeneration = requestGeneration;
+    bootstrapPromise = (async () => {
+      try {
+        if (!options.getAccessToken()) {
+          options.clearCredentials();
+          if (!options.hasRefreshMarker()) {
+            clear();
+            return null;
+          }
+          if (!(await options.refresh())) {
+            if (requestGeneration === generation) clear();
+            return null;
+          }
+        }
+        const user = await options.getMe();
+        return requestGeneration === generation ? apply(user) : null;
+      } catch {
+        if (requestGeneration === generation) clear();
+        return null;
+      }
+    })().finally(() => {
+      bootstrapPromise = undefined;
+    });
+    return bootstrapPromise;
+  }
+
   return {
     clear,
-    bootstrap() {
-      if (bootstrapPromise) return bootstrapPromise;
-      const requestGeneration = generation;
-      bootstrapPromise = (async () => {
-        try {
-          if (!options.getAccessToken()) {
-            options.clearCredentials();
-            if (!options.hasRefreshMarker()) {
-              clear();
-              return null;
-            }
-            if (!(await options.refresh())) {
-              if (requestGeneration === generation) clear();
-              return null;
-            }
-          }
-          const user = await options.getMe();
-          return requestGeneration === generation ? apply(user) : null;
-        } catch {
-          if (requestGeneration === generation) clear();
-          return null;
-        }
-      })().finally(() => {
-        bootstrapPromise = undefined;
-      });
-      return bootstrapPromise;
-    },
+    bootstrap,
     async login(input: LoginInput) {
       return (await authenticate(() => options.login(input), false)).user;
     },

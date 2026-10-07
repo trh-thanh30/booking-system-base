@@ -105,6 +105,56 @@ test("reload restores one session with verified profile and default Business", a
   assert.equal(context.active, "business-a");
 });
 
+test("locale remount restores a fresh session after the previous bootstrap is cancelled", async () => {
+  let release;
+  const gate = new Promise((resolve) => {
+    release = resolve;
+  });
+  let requests = 0;
+  const context = setup({
+    getMe: async () => {
+      requests++;
+      if (requests === 1) await gate;
+      return owner;
+    },
+  });
+  const previous = context.session.bootstrap();
+  await new Promise((resolve) => setImmediate(resolve));
+  context.session.clear();
+  const restored = context.session.bootstrap();
+  release();
+  assert.equal(await previous, null);
+  assert.deepEqual(await restored, owner);
+  assert.equal(context.profile.id, owner.id);
+  assert.equal(requests, 2);
+});
+
+test("leaving Admin cancels a queued locale restoration before it can restart", async () => {
+  let release;
+  const gate = new Promise((resolve) => {
+    release = resolve;
+  });
+  let requests = 0;
+  const context = setup({
+    getMe: async () => {
+      requests++;
+      await gate;
+      return owner;
+    },
+  });
+  const previous = context.session.bootstrap();
+  await new Promise((resolve) => setImmediate(resolve));
+  context.session.clear();
+  const queued = context.session.bootstrap();
+  context.session.clear();
+  release();
+  assert.equal(await previous, null);
+  assert.equal(await queued, null);
+  assert.equal(requests, 1);
+  assert.equal(context.profile, null);
+  assert.equal(context.token, undefined);
+});
+
 test("leaving the Admin boundary clears local credentials and rejects a late profile without server logout", async () => {
   let resolveMe;
   let logouts = 0;
