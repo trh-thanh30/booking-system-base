@@ -55,6 +55,7 @@ import { JobsModule } from '@/modules/jobs/jobs.module';
 import { NotificationModule } from '@/modules/notification/notification.module';
 import { PermissionModule } from '@/modules/permission/permission.module';
 import { ServiceModule } from '@/modules/service/service.module';
+import { BusinessSettingsModule } from '@/modules/business-settings/business-settings.module';
 import { TenantModule } from '@/modules/tenant/tenant.module';
 import { UsersModule } from '@/modules/user/user.module';
 import { VerificationModule } from '@/modules/verification/verification.module';
@@ -146,6 +147,7 @@ const envPath = join(rootDir, envFile);
     CommonModule,
     TenantModule,
     ServiceModule,
+    BusinessSettingsModule,
     PermissionModule,
     NotificationModule,
     UsersModule,

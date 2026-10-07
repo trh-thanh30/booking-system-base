@@ -9,3 +9,4 @@ export * from "./service.schema.ts";
 export * from "./tenant.schema.ts";
 export * from "./owner-onboarding.schema.ts";
 export * from "./user.schema.ts";
+export * from "./business-settings.schema.ts";

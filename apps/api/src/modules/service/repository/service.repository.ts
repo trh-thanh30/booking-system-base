@@ -17,6 +17,21 @@ export type ListServicesParams = {
 export class ServiceRepository {
   constructor(private readonly prisma: PrismaService) {}
 
+  async hasActiveInBusiness(
+    tenantId: string,
+    businessId: string,
+  ): Promise<boolean> {
+    const service = await this.prisma.service.findFirst({
+      where: {
+        tenant_id: tenantId,
+        business_id: businessId,
+        status: service_status.ACTIVE,
+      },
+      select: { id: true },
+    });
+    return service !== null;
+  }
+
   async list(params: ListServicesParams) {
     const where = this.toListWhere(params);
     const skip = (params.page - 1) * params.limit;
