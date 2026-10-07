@@ -4,7 +4,7 @@ import { useAuth } from "@/src/app/providers/admin";
 import { GoogleIcon } from "@/src/components/common";
 import { useGoogleLogin } from "@/src/hooks/use-google-login";
 import { Link, useRouter } from "@/src/i18n/navigation";
-import { getSafeReturnTo } from "@/src/lib/admin/auth-routing";
+import { getPostAuthReturnTo } from "@/src/lib/admin/auth-routing";
 import { authService } from "@/src/services/admin/auth.service";
 import { useToast } from "@repo/hooks";
 import type { CompleteGoogleOwnerOnboardingInput } from "@repo/shared";
@@ -44,7 +44,7 @@ export function GoogleOnboardingView() {
 
   useEffect(() => {
     if (!isLoading && isAuthenticated && !attempt.current)
-      router.replace("/admin/dashboard");
+      router.replace("/admin/business-setup/entry");
   }, [isLoading, isAuthenticated, router]);
 
   async function submit(input: CompleteGoogleOwnerOnboardingInput) {
@@ -55,7 +55,7 @@ export function GoogleOnboardingView() {
       const result = await completion.mutateAsync(input);
       clearDraftRef.current();
       toast.success(t("google.success"));
-      router.replace(getSafeReturnTo(result.return_to), {
+      router.replace(getPostAuthReturnTo(result.return_to), {
         locale: result.locale === "en" ? "en" : "vi",
       });
     } catch (error) {

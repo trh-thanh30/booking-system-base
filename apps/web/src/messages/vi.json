@@ -1,4 +1,88 @@
 {
+  "BusinessSetup": {
+    "eyebrow": "Thiết lập nhanh",
+    "title": "Sẵn sàng đón khách",
+    "description": "Ba bước để bắt đầu nhận lịch hẹn. Bạn có thể hoàn tất sau.",
+    "dashboard": "Vào Dashboard",
+    "skip": "Bỏ qua thiết lập",
+    "start": "Bắt đầu thiết lập",
+    "resume": "Tiếp tục thiết lập",
+    "resumeTitle": "Hoàn tất thiết lập doanh nghiệp",
+    "progressLabel": "Các bước thiết lập doanh nghiệp",
+    "progress": "Đã hoàn tất {count}/{total} bước",
+    "stepCompleted": "Đã hoàn tất",
+    "loading": "Đang tải tiến độ thiết lập…",
+    "noBusiness": "Chọn doanh nghiệp để bắt đầu thiết lập.",
+    "chooseBusiness": "Chọn doanh nghiệp",
+    "retry": "Thử lại",
+    "saving": "Đang lưu…",
+    "saveContinue": "Lưu và tiếp tục",
+    "continue": "Tiếp tục",
+    "finish": "Hoàn tất thiết lập",
+    "saved": "Đã lưu thay đổi",
+    "skipped": "Bạn có thể tiếp tục thiết lập từ Dashboard hoặc Cài đặt.",
+    "completed": "Đã hoàn tất thiết lập doanh nghiệp",
+    "errors": {
+      "load": "Không thể tải tiến độ thiết lập. Vui lòng thử lại.",
+      "save": "Không thể lưu thay đổi. Vui lòng thử lại."
+    },
+    "steps": {
+      "WORKING_HOURS": "Giờ làm việc",
+      "FIRST_SERVICE": "Dịch vụ đầu tiên",
+      "BOOKING_TEMPLATE": "Mẫu trang đặt lịch"
+    },
+    "descriptions": {
+      "WORKING_HOURS": "Chọn ngày và giờ doanh nghiệp mở cửa đón khách.",
+      "FIRST_SERVICE": "Thêm các dịch vụ để khách có thể đặt lịch. Bạn có thể bổ sung hoặc chỉnh sửa sau.",
+      "BOOKING_TEMPLATE": "Chọn bố cục cho trang đặt lịch. Bạn có thể đổi lại sau."
+    },
+    "days": {
+      "0": "Chủ nhật",
+      "1": "Thứ hai",
+      "2": "Thứ ba",
+      "3": "Thứ tư",
+      "4": "Thứ năm",
+      "5": "Thứ sáu",
+      "6": "Thứ bảy"
+    },
+    "hours": {
+      "timezone": "Múi giờ doanh nghiệp: {timezone}",
+      "closed": "Nghỉ",
+      "opensAt": "Giờ mở cửa",
+      "closesAt": "Giờ đóng cửa",
+      "hour": "Giờ",
+      "minute": "Phút",
+      "invalidInterval": "Giờ đóng cửa phải sau giờ mở cửa.",
+      "openDayRequired": "Chọn ít nhất một ngày mở cửa."
+    },
+    "service": {
+      "name": "Tên dịch vụ",
+      "placeholder": "Ví dụ: Cắt tóc",
+      "duration": "Thời lượng (phút)",
+      "price": "Giá dịch vụ",
+      "currency": "Tiền tệ",
+      "freeHint": "Nhập 0 nếu dịch vụ miễn phí.",
+      "createContinue": "Lưu và tiếp tục",
+      "add": "Thêm dịch vụ",
+      "remove": "Xóa dịch vụ {number}",
+      "row": "Dịch vụ {number}",
+      "rowSaved": "Đã lưu",
+      "removed": "Đã xóa dịch vụ",
+      "existingTitle": "Doanh nghiệp đã có dịch vụ đang hoạt động",
+      "existingDescription": "Bạn có thể tiếp tục với dịch vụ hiện có mà không cần tạo thêm.",
+      "errors": {
+        "name": "Nhập tên dịch vụ từ 1 đến 160 ký tự.",
+        "duration_minutes": "Nhập thời lượng từ 1 đến 1440 phút.",
+        "price_amount": "Nhập số nguyên lớn hơn hoặc bằng 0.",
+        "currency": "Chọn loại tiền tệ hợp lệ."
+      }
+    },
+    "template": {
+      "previewHint": "Hình minh họa bố cục. Mẫu bạn chọn sẽ được lưu cho doanh nghiệp.",
+      "businessName": "Doanh nghiệp của bạn",
+      "book": "Đặt ngay"
+    }
+  },
   "AuthJourney": {
     "placeholders": {
       "email": "example@gmail.com",

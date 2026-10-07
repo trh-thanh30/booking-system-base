@@ -16,6 +16,7 @@ import {
 } from "@repo/ui";
 import { FormField } from "@/src/components/common/form-field";
 import { PageHeader } from "@/src/components/common/page-header";
+import { SetupResumeCard } from "@/src/views/admin/business-setup/components/setup-resume-card";
 import {
   notificationSettings,
   securitySettings,
@@ -36,6 +37,8 @@ export function SettingsView() {
         eyebrow="Configuration"
         title="Settings"
       />
+
+      <SetupResumeCard />
 
       <Tabs defaultValue="general">
         <TabsList className="w-full justify-start overflow-x-auto sm:w-auto">

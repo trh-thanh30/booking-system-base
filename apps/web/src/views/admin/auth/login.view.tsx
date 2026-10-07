@@ -9,7 +9,7 @@ import {
 } from "@/src/components/common";
 import { useGoogleLogin } from "@/src/hooks/use-google-login";
 import { Link, useRouter } from "@/src/i18n/navigation";
-import { getSafeReturnTo } from "@/src/lib/admin/auth-routing";
+import { getPostAuthReturnTo } from "@/src/lib/admin/auth-routing";
 import { authService } from "@/src/services/admin/auth.service";
 import { useToast } from "@repo/hooks";
 import { HttpClientError, loginSchema, type LoginInput } from "@repo/shared";
@@ -53,7 +53,7 @@ export function LoginView({
     );
   }, [oauthError, t, toast]);
   const loginMutation = useMutation({ mutationFn: login, retry: false });
-  const destination = getSafeReturnTo(returnTo);
+  const destination = getPostAuthReturnTo(returnTo);
   useEffect(() => {
     if (!manualLoginRedirect.current && !isLoading && isAuthenticated) {
       router.replace(destination);

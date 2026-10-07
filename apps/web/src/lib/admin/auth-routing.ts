@@ -24,6 +24,10 @@ export function getSafeReturnTo(value: string | null | undefined): string {
   return getSafeAdminReturnTo(value);
 }
 
+export function getPostAuthReturnTo(value: string | null | undefined): string {
+  return value ? getSafeReturnTo(value) : "/admin/business-setup/entry";
+}
+
 export function getLoginUrl(returnTo: string) {
   return `/admin/login?returnTo=${encodeURIComponent(getSafeReturnTo(returnTo))}`;
 }
@@ -43,7 +47,7 @@ export function buildGoogleLoginUrl(
   url.pathname = `${url.pathname.replace(/\/$/, "")}/auth/admin/google`;
   url.search = new URLSearchParams({
     locale: locale === "en" ? "en" : "vi",
-    returnTo: getSafeReturnTo(returnTo),
+    returnTo: getPostAuthReturnTo(returnTo),
   }).toString();
   url.hash = "";
   return url.href;

@@ -1,4 +1,88 @@
 {
+  "BusinessSetup": {
+    "eyebrow": "Quick setup",
+    "title": "Get your business ready",
+    "description": "Three steps to start taking bookings. You can finish later.",
+    "dashboard": "Go to Dashboard",
+    "skip": "Skip setup",
+    "start": "Start setup",
+    "resume": "Continue setup",
+    "resumeTitle": "Finish setting up your business",
+    "progressLabel": "Business setup steps",
+    "progress": "{count} of {total} steps completed",
+    "stepCompleted": "Completed",
+    "loading": "Loading your setup…",
+    "noBusiness": "Choose a business to begin setup.",
+    "chooseBusiness": "Choose business",
+    "retry": "Try again",
+    "saving": "Saving…",
+    "saveContinue": "Save and continue",
+    "continue": "Continue",
+    "finish": "Finish setup",
+    "saved": "Changes saved",
+    "skipped": "You can continue setup from Dashboard or Settings.",
+    "completed": "Your business setup is complete",
+    "errors": {
+      "load": "Could not load your setup. Please try again.",
+      "save": "Could not save your changes. Please try again."
+    },
+    "steps": {
+      "WORKING_HOURS": "Working hours",
+      "FIRST_SERVICE": "First service",
+      "BOOKING_TEMPLATE": "Booking template"
+    },
+    "descriptions": {
+      "WORKING_HOURS": "Set the days and times your business is open.",
+      "FIRST_SERVICE": "Add services that customers can book. You can add more or edit them later.",
+      "BOOKING_TEMPLATE": "Choose a layout for your booking page. You can change it later."
+    },
+    "days": {
+      "0": "Sunday",
+      "1": "Monday",
+      "2": "Tuesday",
+      "3": "Wednesday",
+      "4": "Thursday",
+      "5": "Friday",
+      "6": "Saturday"
+    },
+    "hours": {
+      "timezone": "Business timezone: {timezone}",
+      "closed": "Closed",
+      "opensAt": "Opening time",
+      "closesAt": "Closing time",
+      "hour": "Hour",
+      "minute": "Minute",
+      "invalidInterval": "Closing time must be after opening time.",
+      "openDayRequired": "Choose at least one open day."
+    },
+    "service": {
+      "name": "Service name",
+      "placeholder": "For example, a haircut",
+      "duration": "Duration (minutes)",
+      "price": "Price",
+      "currency": "Currency",
+      "freeHint": "Enter 0 for a free service.",
+      "createContinue": "Save and continue",
+      "add": "Add another service",
+      "remove": "Remove service {number}",
+      "row": "Service {number}",
+      "rowSaved": "Saved",
+      "removed": "Service removed",
+      "existingTitle": "Your business already has an active service",
+      "existingDescription": "Continue with your existing service. No need to create another one.",
+      "errors": {
+        "name": "Enter a service name (1–160 characters).",
+        "duration_minutes": "Enter a duration between 1 and 1440 minutes.",
+        "price_amount": "Enter a whole number of 0 or more.",
+        "currency": "Choose a valid currency."
+      }
+    },
+    "template": {
+      "previewHint": "Illustrative layout previews. Your choice will be saved for your business.",
+      "businessName": "Your business",
+      "book": "Book now"
+    }
+  },
   "AuthJourney": {
     "placeholders": {
       "email": "you@example.com",

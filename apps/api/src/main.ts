@@ -69,6 +69,8 @@ async function bootstrap() {
         'Accept',
         'Authorization',
         'X-Auth-Context',
+        'X-Tenant-Id',
+        'X-Business-Id',
         'X-Requested-With',
         'apollo-require-preflight',
       ],

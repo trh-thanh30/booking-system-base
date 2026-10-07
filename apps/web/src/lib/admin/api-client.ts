@@ -70,25 +70,36 @@ export const refreshAdminAccessToken = createSessionRefresh({
   requestAccessToken: requestAdminAccessToken,
 });
 
-export const apiClient = createApiClient({
-  baseURL: apiBaseUrl,
-  timeout: 15_000,
-  getHeaders: () => {
-    const tenantId = getTenantId();
-    const businessId = useAdminUiStore.getState().activeBusinessId;
+function createAdminClient(resolveBusinessId: () => string | null) {
+  return createApiClient({
+    baseURL: apiBaseUrl,
+    timeout: 15_000,
+    getHeaders: () => {
+      const tenantId = getTenantId();
+      const businessId = resolveBusinessId();
 
-    return {
-      "x-business-id": businessId ?? undefined,
-      "x-tenant-id": tenantId,
-    };
-  },
-  headers: {
-    "x-auth-context": "admin",
-  },
-  getAccessToken,
-  onUnauthorized: refreshAdminAccessToken,
-  onUnauthorizedRetryFailed: clearAdminSession,
-  shouldHandleUnauthorized: (config) =>
-    !isAdminSessionRequest(config.url) && Boolean(getAccessToken()),
-  withCredentials: true,
-});
+      return {
+        "x-business-id": businessId ?? undefined,
+        "x-tenant-id": tenantId,
+      };
+    },
+    headers: {
+      "x-auth-context": "admin",
+    },
+    getAccessToken,
+    onUnauthorized: refreshAdminAccessToken,
+    onUnauthorizedRetryFailed: clearAdminSession,
+    shouldHandleUnauthorized: (config) =>
+      !isAdminSessionRequest(config.url) && Boolean(getAccessToken()),
+    withCredentials: true,
+  });
+}
+
+export const apiClient = createAdminClient(
+  () => useAdminUiStore.getState().activeBusinessId,
+);
+
+/** Pin feature requests to their Business even if the user switches the active Business. */
+export function createBusinessApiClient(businessId: string) {
+  return createAdminClient(() => businessId);
+}

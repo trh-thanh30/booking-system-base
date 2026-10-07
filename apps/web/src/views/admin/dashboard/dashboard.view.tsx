@@ -22,6 +22,7 @@ import {
 } from "@/src/views/admin/dashboard/constants/dashboard.constants";
 import { DashboardOverviewChart } from "@/src/views/admin/dashboard/components/dashboard-overview-chart";
 import { RecentSales } from "@/src/views/admin/dashboard/components/recent-sales";
+import { SetupResumeCard } from "@/src/views/admin/business-setup/components/setup-resume-card";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -70,6 +71,8 @@ export function DashboardView() {
           {t("download")}
         </Button>
       </motion.div>
+
+      <SetupResumeCard />
 
       <motion.div variants={itemVariants}>
         <Tabs defaultValue="overview">
