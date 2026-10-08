@@ -196,7 +196,7 @@ Browser smoke cần xác nhận:
 
 - Resolve Tenant hoặc truy vấn dữ liệu dựa trên Admin hostname.
 - Thay đổi authorization, RBAC, Tenant/Business headers hoặc membership rules.
-- Public booking subdomain và custom domain management thuộc F10.
+- Public booking subdomain thuộc WP-02/WP-07; custom domain nằm ngoài Phase 1.
 - Ghi Admin vanity hostname vào `tenant_domains`.
 - Domain verification, custom domain, DNS automation hoặc cấp TLS certificate tự động.
 - Dùng Business slug trên hostname.
