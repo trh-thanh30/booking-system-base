@@ -290,6 +290,7 @@
   },
   "DashboardConfig": {
     "brandDescription": "Tenant workspace",
+    "comingSoon": "Sắp có",
     "sections": {
       "general": "Tổng quan",
       "pages": "Trang",
@@ -323,12 +324,18 @@
     "collapseSidebar": "Thu gọn thanh bên",
     "openNavigation": "Mở điều hướng",
     "openSettings": "Mở cài đặt",
+    "skipToContent": "Đi đến nội dung chính",
+    "topNavigation": "Điều hướng chính",
+    "businessSwitcher": "Chuyển cơ sở",
+    "selected": "Đang chọn",
     "language": "Ngôn ngữ",
     "vietnamese": "Tiếng Việt",
     "english": "English"
   },
   "Dashboard": {
     "title": "Bảng điều khiển",
+    "eyebrow": "Tổng quan không gian làm việc",
+    "description": "Theo dõi lịch đặt, doanh thu và hoạt động hằng ngày của doanh nghiệp tại một nơi.",
     "download": "Tải xuống",
     "tabs": {
       "overview": "Tổng quan",
@@ -402,6 +409,7 @@
     "checkingSessionDescription": "Vui lòng chờ trong giây lát. Bạn sẽ được chuyển tiếp tự động khi phiên đăng nhập sẵn sàng.",
     "logoutFailed": "Đã xóa phiên trên thiết bị này, nhưng chưa thể xác nhận đăng xuất với máy chủ. Vui lòng thử lại khi có kết nối.",
     "accessDenied": "Bạn không có quyền truy cập trang này.",
+    "accessDeniedDescription": "Hãy yêu cầu chủ không gian làm việc cấp quyền cần thiết hoặc quay lại trang phù hợp với vai trò của bạn.",
     "shell": {
       "workspace": "Không gian quản lý doanh nghiệp",
       "title": "Quản lý lịch hẹn, đội ngũ và cơ sở của bạn.",

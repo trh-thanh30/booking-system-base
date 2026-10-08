@@ -10,7 +10,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@repo/ui";
-import { PageHeader, StatCard } from "@/src/components/common";
+import {
+  PageHeader,
+  PlatformPage,
+  PlatformStatsGrid,
+  StatCard,
+} from "@/src/components/common";
 import { tenantsService } from "@/src/services/tenants.service";
 
 export function DashboardView() {
@@ -29,13 +34,13 @@ export function DashboardView() {
   ).length;
 
   return (
-    <div className="space-y-6">
+    <PlatformPage>
       <PageHeader
         description={t("description")}
         eyebrow="Platform"
         title={t("title")}
       />
-      <section className="grid gap-4 md:grid-cols-3">
+      <PlatformStatsGrid>
         <StatCard
           description={t("tenantDescription")}
           icon={Building2}
@@ -54,8 +59,8 @@ export function DashboardView() {
           title={t("systemCard")}
           value={tenantsQuery.isLoading ? "..." : `${activeTenants} active`}
         />
-      </section>
-      <Card>
+      </PlatformStatsGrid>
+      <Card className="shadow-xs">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <ShieldCheck className="h-4 w-4" />
@@ -66,12 +71,12 @@ export function DashboardView() {
             render tenant-scoped workflows.
           </CardDescription>
         </CardHeader>
-        <CardContent className="text-sm leading-6 text-slate-500 dark:text-slate-400">
+        <CardContent className="text-sm leading-6 text-muted-foreground">
           Tenant/business workflows stay in <code>apps/web /admin</code>. Global
           tenant lifecycle, platform users, audits, billing oversight, and
           system health belong here.
         </CardContent>
       </Card>
-    </div>
+    </PlatformPage>
   );
 }

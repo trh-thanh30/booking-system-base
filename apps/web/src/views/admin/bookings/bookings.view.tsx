@@ -1,18 +1,21 @@
 import { Download } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Button } from "@repo/ui";
-import { PageHeader } from "@/src/components/common/page-header";
+import {
+  AdminPage,
+  AdminPageHeader,
+} from "@/src/components/common/admin/admin-page";
 import { BookingsTable } from "@/src/views/admin/bookings/components/bookings-table";
 
 export function BookingsView() {
   const t = useTranslations("Bookings");
 
   return (
-    <div className="space-y-6">
-      <PageHeader
+    <AdminPage>
+      <AdminPageHeader
         actions={
           <Button variant="secondary">
-            <Download className="h-4 w-4" />
+            <Download className="size-4" />
             {t("export")}
           </Button>
         }
@@ -21,6 +24,6 @@ export function BookingsView() {
         title={t("title")}
       />
       <BookingsTable />
-    </div>
+    </AdminPage>
   );
 }

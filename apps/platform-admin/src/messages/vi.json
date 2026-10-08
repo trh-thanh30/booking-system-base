@@ -19,6 +19,7 @@
   },
   "Platform": {
     "brandDescription": "Super Admin",
+    "workspaceTitle": "Điều hành nền tảng",
     "sections": {
       "platform": "Nền tảng",
       "operations": "Vận hành"
@@ -54,8 +55,16 @@
     }
   },
   "Common": {
+    "backToDashboard": "Quay lại bảng điều khiển",
     "collapseSidebar": "Thu gọn thanh bên",
+    "notFoundDescription": "Trang Platform Admin bạn yêu cầu không tồn tại hoặc đã được di chuyển.",
+    "notFoundTitle": "Không tìm thấy trang",
     "openNavigation": "Mở điều hướng",
+    "pageErrorDescription": "Đã xảy ra lỗi khiến trang không thể tải. Vui lòng thử lại.",
+    "pageErrorTitle": "Không thể tải trang",
+    "retry": "Thử lại",
+    "skipToContent": "Chuyển đến nội dung chính",
+    "toggleTheme": "Chuyển giao diện sáng tối",
     "toggleSidebar": "Ẩn/hiện thanh bên"
   }
 }

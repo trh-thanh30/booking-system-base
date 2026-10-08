@@ -81,6 +81,9 @@ Production compose dùng các biến image sau:
 
 ARCH-001: `WEB_URL` / `NEXT_PUBLIC_WEB_URL` là origin chung của Landing + Admin,
 không chứa `/admin`. API Google redirects thêm `/{locale}/admin/*` trong code.
+`ADMIN_WORKSPACE_URL` / `NEXT_PUBLIC_ADMIN_WORKSPACE_URL` là base origin riêng để
+tạo vanity URL `{tenantSlug}.{host}/{locale}/admin/*`; hostname này chỉ nhận diện
+workspace, còn Tenant/Business context vẫn lấy từ authenticated profile và IDs.
 `ADMIN_URL`, `NEXT_PUBLIC_ADMIN_URL`, `ADMIN_PORT`, `ADMIN_IMAGE` không còn được
 dùng cho Business Admin; có thể bỏ khỏi env deploy sau cutover. Không đổi Google
 API callback hay nới cookie Domain/SameSite. Docker/CI phải truyền public URLs
@@ -90,16 +93,29 @@ Các app Next.js chỉ được expose biến ra browser nếu biến có prefix
 
 Biến FE dùng chung:
 
-- `NEXT_PUBLIC_API_URL`: API base URL, ví dụ `http://localhost:3000/api/v1`.
-- `NEXT_PUBLIC_ASSET_URL`: public asset base URL, ví dụ `http://localhost:3000/uploads/public/`.
+- `NEXT_PUBLIC_API_URL`: API base URL, ví dụ
+  `http://localhost:3000/api/v1`.
+- `NEXT_PUBLIC_ADMIN_WORKSPACE_URL`: Admin workspace base origin, ví dụ
+  `http://localhost:3001` hoặc `https://app.bookingbase.com`.
 
 Biến riêng theo app:
 
-| App                     | Biến public URL                  | Auth context |
-| :---------------------- | :------------------------------- | :----------- |
-| `apps/web`              | `NEXT_PUBLIC_WEB_URL`            | `client`     |
-| `apps/web` (`/admin/*`) | `NEXT_PUBLIC_WEB_URL`            | `admin`      |
-| `apps/platform-admin`   | `NEXT_PUBLIC_PLATFORM_ADMIN_URL` | `platform`   |
+| App                     | Biến public URL                   | Auth context |
+| :---------------------- | :-------------------------------- | :----------- |
+| `apps/web`              | `NEXT_PUBLIC_WEB_URL`             | `client`     |
+| `apps/web` (`/admin/*`) | `NEXT_PUBLIC_ADMIN_WORKSPACE_URL` | `admin`      |
+
+API dùng `ADMIN_WORKSPACE_URL` để cho phép base origin và đúng một Tenant label
+bên dưới base host trong CORS. Ví dụ `https://acme.app.bookingbase.com` được phép
+khi base là `https://app.bookingbase.com`; hostname lồng nhiều cấp hoặc lookalike
+không được phép. Khi base là `http://localhost:3001`, code không tạo hoặc cho
+phép Tenant subdomain. Production dùng `SameSite=Lax; Secure` khi Admin và API
+cùng site. Không cấu hình `CORS_ORIGINS=*` khi dùng credentials.
+
+Google OAuth development phải đăng ký chính xác callback
+`http://localhost:3000/api/v1/auth/admin/google/callback` trong Google Cloud
+Console. Luồng đầy đủ với Tenant subdomain phải được kiểm thử trên staging HTTPS.
+| `apps/platform-admin` | `NEXT_PUBLIC_PLATFORM_ADMIN_URL` | `platform` |
 
 `NEXT_PUBLIC_AUTH_CONTEXT` chỉ nên đặt trong app-local env file nếu cần debug/override. Trong code hiện tại auth context đang được set tường minh theo từng app để tránh trộn Business Admin với Platform Admin.
 

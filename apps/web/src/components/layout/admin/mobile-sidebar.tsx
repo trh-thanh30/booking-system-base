@@ -23,10 +23,10 @@ export function MobileSidebar() {
           size="icon"
           variant="ghost"
         >
-          <Menu className="h-5 w-5" />
+          <Menu className="size-5" />
         </Button>
       </SheetTrigger>
-      <SheetContent>
+      <SheetContent className="w-[min(20rem,calc(100vw-2rem))] p-0">
         <SheetTitle className="sr-only">{t("openNavigation")}</SheetTitle>
         <AppSidebar collapsedOverride={false} showCollapseButton={false} />
       </SheetContent>

@@ -48,20 +48,27 @@ lần lượt đặt trong `data/`, `hooks/` và `schemas/` khi cần.
 `src/views/example/example.view.tsx`
 
 ```tsx
-import { PageHeader } from "@/src/components/common/page-header";
+import {
+  AdminPage,
+  AdminPageHeader,
+} from "@/src/components/common/admin/admin-page";
 
 export function ExampleView() {
   return (
-    <div className="space-y-6">
-      <PageHeader
+    <AdminPage>
+      <AdminPageHeader
         description="Short description for the route."
         eyebrow="Section"
         title="Example"
       />
-    </div>
+    </AdminPage>
   );
 }
 ```
+
+Ví dụ này áp dụng cho Business Admin trong `apps/web`. Public/Marketing và
+Platform Admin dùng composition riêng của boundary tương ứng, nhưng vẫn compose
+primitive và semantic token từ `@repo/ui`.
 
 ## Constants
 

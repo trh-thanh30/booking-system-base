@@ -28,7 +28,7 @@ export function FormField({
       </Label>
       {children}
       {error ? (
-        <p className="text-xs leading-5 text-red-600 dark:text-red-400">
+        <p className="text-xs font-medium leading-5 text-destructive">
           {error}
         </p>
       ) : null}

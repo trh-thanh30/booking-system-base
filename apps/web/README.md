@@ -30,6 +30,14 @@ and shell. Shared primitives remain in `@repo/ui`; FormField, vi/en language
 selector, fonts, global CSS and one Toaster are reused. One theme provider defaults
 to Light; the existing Admin theme toggle controls the shared Web theme.
 
+Business Admin page composition lives in `src/components/common/admin`. Use
+`AdminPage` and `AdminPageHeader` for route hierarchy, `AdminStatsGrid` with
+`AdminStatsCard` for metrics, `AdminFilterToolbar` for list controls, and
+`AdminTableContainer` for responsive tables. The app canvas uses `background`,
+navigation uses `surface`, content uses `card`, overlays use `popover`, selected
+navigation uses `accent`, and primary is reserved for brand actions/status. Do
+not add an Admin-only palette or repeat semantic colors with `.dark` overrides.
+
 ## Run and validate
 
 ```bash
@@ -59,9 +67,17 @@ Legacy `*:admin` root scripts are compatibility aliases to Web, not a second app
 Do not run `dev:web` and `dev:admin` together: both now start the same port/service.
 If another `next dev` is running, use `NEXT_DIST_DIR=.next-arch001 pnpm build:web`
 and the same environment variable for start/smoke to avoid overwriting `.next`.
-Use `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_WEB_URL` at build time and `WEB_URL`
+Use `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_WEB_URL`,
+`NEXT_PUBLIC_ADMIN_WORKSPACE_URL` at build time and `WEB_URL`
 (origin only, no `/admin` prefix) for backend Google redirects. Google authorized
 callback remains the API `/api/v1/auth/admin/google/callback`.
 Production API/Web subdomains must retain existing cookie-compatible Domain,
 SameSite and CORS settings; do not broaden cookie Domain merely for this migration.
+Set API runtime `ADMIN_WORKSPACE_URL` to the same Admin base origin. Production
+also needs wildcard DNS/TLS for `{tenantSlug}.<admin-workspace-host>`.
+Local development stays on `http://localhost:3001`; the URL builder only adds a
+Tenant slug when the configured workspace base is not localhost. Register
+`http://localhost:3000/api/v1/auth/admin/google/callback` as the development
+Google OAuth redirect URI. Test the complete HTTPS Tenant-subdomain flow in
+staging before production cutover.
 See [cutover and rollback](../../docs/adr/0003-merge-web-business-admin.md).

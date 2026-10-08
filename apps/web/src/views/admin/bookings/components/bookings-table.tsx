@@ -27,6 +27,8 @@ import {
 } from "@repo/ui";
 import { FormField } from "@/src/components/common/form-field";
 import { StatePanel } from "@/src/components/common/state-panel";
+import { AdminFilterToolbar } from "@/src/components/common/admin/admin-filter-toolbar";
+import { AdminTableContainer } from "@/src/components/common/admin/admin-table-container";
 import { getBookingColumns } from "@/src/views/admin/bookings/columns/bookings.columns";
 import {
   bookings,
@@ -81,7 +83,7 @@ export function BookingsTable() {
               {t("newBooking")}
             </Button>
           </div>
-          <div className="grid gap-3 lg:grid-cols-[1fr_auto]">
+          <AdminFilterToolbar className="border-0 bg-transparent p-0 shadow-none">
             <div className="relative">
               <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
@@ -92,7 +94,7 @@ export function BookingsTable() {
                 value={query}
               />
             </div>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex max-w-full flex-wrap gap-2">
               {bookingStatusFilters.map((item) => (
                 <Button
                   aria-pressed={status === item}
@@ -105,51 +107,47 @@ export function BookingsTable() {
                 </Button>
               ))}
             </div>
-          </div>
+          </AdminFilterToolbar>
         </CardHeader>
         <CardContent>
           {table.getRowModel().rows.length > 0 ? (
-            <div className="overflow-hidden rounded-md border border-border dark:border-border">
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    {table.getHeaderGroups().map((headerGroup) => (
-                      <TableRow key={headerGroup.id}>
-                        {headerGroup.headers.map((header) => (
-                          <TableHead key={header.id}>
-                            {header.isPlaceholder
-                              ? null
-                              : flexRender(
-                                  header.column.columnDef.header,
-                                  header.getContext(),
-                                )}
-                          </TableHead>
-                        ))}
-                      </TableRow>
-                    ))}
-                  </TableHeader>
-                  <TableBody>
-                    {table.getRowModel().rows.map((row) => (
-                      <TableRow
-                        data-state={
-                          row.getIsSelected() ? "selected" : undefined
-                        }
-                        key={row.id}
-                      >
-                        {row.getVisibleCells().map((cell) => (
-                          <TableCell key={cell.id}>
-                            {flexRender(
-                              cell.column.columnDef.cell,
-                              cell.getContext(),
-                            )}
-                          </TableCell>
-                        ))}
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            </div>
+            <AdminTableContainer>
+              <Table>
+                <TableHeader>
+                  {table.getHeaderGroups().map((headerGroup) => (
+                    <TableRow key={headerGroup.id}>
+                      {headerGroup.headers.map((header) => (
+                        <TableHead key={header.id}>
+                          {header.isPlaceholder
+                            ? null
+                            : flexRender(
+                                header.column.columnDef.header,
+                                header.getContext(),
+                              )}
+                        </TableHead>
+                      ))}
+                    </TableRow>
+                  ))}
+                </TableHeader>
+                <TableBody>
+                  {table.getRowModel().rows.map((row) => (
+                    <TableRow
+                      data-state={row.getIsSelected() ? "selected" : undefined}
+                      key={row.id}
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell key={cell.id}>
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext(),
+                          )}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </AdminTableContainer>
           ) : (
             <StatePanel
               action={
@@ -196,7 +194,7 @@ export function BookingsTable() {
               <Input id="booking-owner" placeholder={t("teamMember")} />
             </FormField>
           </div>
-          <div className="flex justify-end border-t border-border pt-4 dark:border-border">
+          <div className="flex justify-end border-t border-border pt-4">
             <Button className="w-full md:w-auto" variant="secondary">
               <SlidersHorizontal className="h-4 w-4" />
               {t("saveDraft")}

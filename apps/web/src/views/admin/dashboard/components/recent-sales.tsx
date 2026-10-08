@@ -35,21 +35,24 @@ const sales = [
 
 export function RecentSales() {
   return (
-    <div className="space-y-8">
+    <div className="divide-y divide-border">
       {sales.map((sale) => (
-        <div className="flex items-center" key={sale.email}>
+        <div
+          className="flex items-center py-3 first:pt-0 last:pb-0"
+          key={sale.email}
+        >
           <Avatar className="h-9 w-9">
             <AvatarFallback>{sale.initials}</AvatarFallback>
           </Avatar>
           <div className="ml-4 min-w-0 flex-1 space-y-1">
-            <p className="truncate text-sm font-medium leading-none text-foreground dark:text-muted-foreground">
+            <p className="truncate text-sm font-medium leading-none text-foreground">
               {sale.name}
             </p>
-            <p className="truncate text-sm text-muted-foreground dark:text-muted-foreground">
+            <p className="truncate text-sm text-muted-foreground">
               {sale.email}
             </p>
           </div>
-          <div className="ml-4 text-sm font-medium tabular-nums text-foreground dark:text-muted-foreground">
+          <div className="ml-4 text-sm font-semibold tabular-nums text-foreground">
             {sale.amount}
           </div>
         </div>

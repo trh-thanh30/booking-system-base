@@ -134,6 +134,7 @@ HEALTH_ENDPOINTS_ENABLED=false
 
 # CORS
 CORS_ORIGINS=http://localhost:3000,http://localhost:4200
+ADMIN_WORKSPACE_URL=http://localhost:3001
 ```
 
 ## Project Structure
@@ -339,7 +340,16 @@ Configurable CORS origins for cross-origin requests:
 
 ```bash
 CORS_ORIGINS=http://localhost:3000,http://localhost:4200
+ADMIN_WORKSPACE_URL=http://localhost:3001
 ```
+
+`ADMIN_WORKSPACE_URL` is the canonical Business Admin base origin. Development
+uses `http://localhost:3001` without a Tenant subdomain. When staging or
+production configures a real workspace domain such as
+`https://app.bookingbase.com`, CORS also accepts exactly one Tenant slug below
+that hostname, such as `https://acme.app.bookingbase.com`. Tenant authorization
+still comes from the authenticated profile and Tenant/Business headers; the
+request hostname is not an authorization input.
 
 ### Development
 

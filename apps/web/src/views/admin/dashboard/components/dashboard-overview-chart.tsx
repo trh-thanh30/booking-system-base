@@ -53,9 +53,9 @@ export function DashboardOverviewChart() {
             className="text-muted-foreground"
           />
           <Bar
-            className="fill-foreground dark:fill-foreground"
+            className="fill-primary"
             dataKey="revenue"
-            radius={[5, 5, 0, 0]}
+            radius={[6, 6, 0, 0]}
           />
         </BarChart>
       </ResponsiveContainer>

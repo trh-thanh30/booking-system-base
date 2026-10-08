@@ -26,11 +26,17 @@ function publicHost(value: string | undefined, fallback: string) {
   }
 }
 
+const webUrl = publicOrigin(
+  process.env.NEXT_PUBLIC_WEB_URL,
+  "http://localhost:3001",
+);
+
 export const siteConfig = {
   name: "BookingBase",
-  webUrl: publicOrigin(
-    process.env.NEXT_PUBLIC_WEB_URL,
-    "http://localhost:3001",
+  webUrl,
+  adminWorkspaceUrl: publicOrigin(
+    process.env.NEXT_PUBLIC_ADMIN_WORKSPACE_URL,
+    webUrl,
   ),
   bookingDomain: publicHost(
     process.env.NEXT_PUBLIC_BOOKING_DOMAIN,

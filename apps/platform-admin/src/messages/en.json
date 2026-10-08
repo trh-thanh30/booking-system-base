@@ -19,6 +19,7 @@
   },
   "Platform": {
     "brandDescription": "Super Admin",
+    "workspaceTitle": "Platform Control",
     "sections": {
       "platform": "Platform",
       "operations": "Operations"
@@ -54,8 +55,16 @@
     }
   },
   "Common": {
+    "backToDashboard": "Back to dashboard",
     "collapseSidebar": "Collapse sidebar",
+    "notFoundDescription": "The requested Platform Admin page does not exist or has moved.",
+    "notFoundTitle": "Page not found",
     "openNavigation": "Open navigation",
+    "pageErrorDescription": "An unexpected error prevented this page from loading. Try again.",
+    "pageErrorTitle": "Unable to load this page",
+    "retry": "Try again",
+    "skipToContent": "Skip to main content",
+    "toggleTheme": "Toggle color theme",
     "toggleSidebar": "Toggle sidebar"
   }
 }

@@ -46,8 +46,14 @@ import {
   TableRow,
 } from "@repo/ui";
 import { FormField } from "@/src/components/common/form-field";
-import { PageHeader } from "@/src/components/common/page-header";
-import { StatsCard } from "@/src/components/common/stats-card";
+import {
+  AdminPage,
+  AdminPageHeader,
+  AdminStatsGrid,
+} from "@/src/components/common/admin/admin-page";
+import { AdminStatsCard } from "@/src/components/common/admin/admin-stats-card";
+import { AdminTableContainer } from "@/src/components/common/admin/admin-table-container";
+import { StatePanel } from "@/src/components/common/state-panel";
 import { useAuth } from "@/src/app/providers/admin";
 import { authService } from "@/src/services/admin/auth.service";
 import type { CreatedInvitation } from "@/src/services/admin/auth.service";
@@ -140,9 +146,9 @@ function InviteUserDialog({
         </DialogDescription>
         {createdInvitation ? (
           <div className="mt-4 space-y-4">
-            <div className="rounded-md border border-border p-3 dark:border-border">
+            <div className="rounded-md border border-border bg-muted/40 p-3">
               <p className="text-sm font-medium">{createdInvitation.email}</p>
-              <p className="mt-1 break-all text-xs leading-5 text-muted-foreground dark:text-muted-foreground">
+              <p className="mt-1 break-all text-xs leading-5 text-muted-foreground">
                 {createdInvitation.token}
               </p>
             </div>
@@ -186,7 +192,7 @@ function InviteUserDialog({
             </FormField>
             <FormField htmlFor="invite-role" label="Role" required>
               <select
-                className="flex h-10 w-full rounded-md border border-border bg-background px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring dark:border-border dark:bg-background dark:focus-visible:ring-ring"
+                className="flex h-10 w-full rounded-md border border-input bg-card px-3 py-2 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
                 id="invite-role"
                 {...register("role")}
               >
@@ -224,12 +230,12 @@ export function UsersView() {
   const canInvite = can(PERMISSIONS.STAFF.INVITE);
 
   return (
-    <div className="space-y-6">
-      <PageHeader
+    <AdminPage>
+      <AdminPageHeader
         actions={
           canInvite ? (
             <Button onClick={() => setInviteOpen(true)}>
-              <Plus className="h-4 w-4" />
+              <Plus className="size-4" />
               Invite user
             </Button>
           ) : null
@@ -239,8 +245,8 @@ export function UsersView() {
         title="Users"
       />
 
-      <section className="grid gap-4 md:grid-cols-3">
-        <StatsCard
+      <AdminStatsGrid className="xl:grid-cols-3">
+        <AdminStatsCard
           description="Can access this tenant"
           icon={Users}
           title="Total users"
@@ -248,7 +254,7 @@ export function UsersView() {
           trend="Live"
           value={String(users.length)}
         />
-        <StatsCard
+        <AdminStatsCard
           description="Currently enabled"
           icon={UserCheck}
           title="Active users"
@@ -256,7 +262,7 @@ export function UsersView() {
           trend={`${activeUsers}/${users.length || 0}`}
           value={String(activeUsers)}
         />
-        <StatsCard
+        <AdminStatsCard
           description="Admin role"
           icon={ShieldCheck}
           title="Privileged users"
@@ -264,7 +270,7 @@ export function UsersView() {
           trend="Guarded"
           value={String(privilegedUsers)}
         />
-      </section>
+      </AdminStatsGrid>
 
       <Card>
         <CardHeader className="gap-4">
@@ -283,101 +289,104 @@ export function UsersView() {
               <Skeleton className="h-12 w-full" />
             </div>
           ) : usersQuery.isError || users.length === 0 ? (
-            <div className="flex min-h-56 flex-col items-center justify-center rounded-md border border-dashed border-border p-6 text-center dark:border-border">
-              <div className="flex h-11 w-11 items-center justify-center rounded-md bg-muted text-muted-foreground dark:bg-muted dark:text-muted-foreground">
-                <Users className="h-5 w-5" />
-              </div>
-              <h2 className="mt-4 text-base font-semibold text-foreground dark:text-muted-foreground">
-                {usersQuery.isError ? "Unable to load users" : "No users found"}
-              </h2>
-              <p className="mt-2 max-w-md text-sm leading-6 text-muted-foreground dark:text-muted-foreground">
-                {usersQuery.isError
+            <StatePanel
+              action={
+                !usersQuery.isError && canInvite ? (
+                  <Button className="mt-4" onClick={() => setInviteOpen(true)}>
+                    <Plus className="size-4" />
+                    Invite user
+                  </Button>
+                ) : usersQuery.isError ? (
+                  <Button
+                    onClick={() => void usersQuery.refetch()}
+                    variant="outline"
+                  >
+                    Retry
+                  </Button>
+                ) : null
+              }
+              description={
+                usersQuery.isError
                   ? "The users API could not be loaded. Check your permission or try again."
-                  : "No users are visible for this tenant yet."}
-              </p>
-              {!usersQuery.isError && canInvite ? (
-                <Button className="mt-4" onClick={() => setInviteOpen(true)}>
-                  <Plus className="h-4 w-4" />
-                  Invite user
-                </Button>
-              ) : null}
-            </div>
+                  : "No users are visible for this tenant yet."
+              }
+              icon={Users}
+              title={
+                usersQuery.isError ? "Unable to load users" : "No users found"
+              }
+            />
           ) : (
-            <div className="overflow-hidden rounded-md border border-border dark:border-border">
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>User</TableHead>
-                      <TableHead>Role</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Created</TableHead>
-                      <TableHead aria-label="Actions" />
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {users.map((user) => (
-                      <TableRow key={user.id}>
-                        <TableCell>
-                          <div className="flex items-center gap-3">
-                            <Avatar>
-                              <AvatarFallback>
-                                {getInitials(user)}
-                              </AvatarFallback>
-                            </Avatar>
-                            <div>
-                              <p className="font-medium text-foreground dark:text-muted-foreground">
-                                {user.full_name ?? user.username}
-                              </p>
-                              <p className="mt-1 text-xs text-muted-foreground dark:text-muted-foreground">
-                                {user.email}
-                              </p>
-                            </div>
+            <AdminTableContainer>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>User</TableHead>
+                    <TableHead>Role</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Created</TableHead>
+                    <TableHead aria-label="Actions" />
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {users.map((user) => (
+                    <TableRow key={user.id}>
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          <Avatar>
+                            <AvatarFallback>{getInitials(user)}</AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <p className="font-medium text-foreground">
+                              {user.full_name ?? user.username}
+                            </p>
+                            <p className="mt-1 text-xs text-muted-foreground">
+                              {user.email}
+                            </p>
                           </div>
-                        </TableCell>
-                        <TableCell>{user.role}</TableCell>
-                        <TableCell>
-                          <Badge
-                            variant={
-                              user.status === "ACTIVE" ? "success" : "warning"
-                            }
-                          >
-                            {user.status}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>{formatDate(user.created_at)}</TableCell>
-                        <TableCell className="text-right">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button
-                                aria-label={`Open actions for ${user.email}`}
-                                size="icon"
-                                variant="ghost"
-                              >
-                                <MoreHorizontal className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem disabled>
-                                Edit profile
-                              </DropdownMenuItem>
-                              <DropdownMenuItem disabled>
-                                Manage permissions
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>{user.role}</TableCell>
+                      <TableCell>
+                        <Badge
+                          variant={
+                            user.status === "ACTIVE" ? "success" : "warning"
+                          }
+                        >
+                          {user.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>{formatDate(user.created_at)}</TableCell>
+                      <TableCell className="text-right">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              aria-label={`Open actions for ${user.email}`}
+                              size="icon"
+                              variant="ghost"
+                            >
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem disabled>
+                              Edit profile
+                            </DropdownMenuItem>
+                            <DropdownMenuItem disabled>
+                              Manage permissions
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </AdminTableContainer>
           )}
         </CardContent>
       </Card>
 
       <InviteUserDialog onOpenChange={setInviteOpen} open={inviteOpen} />
-    </div>
+    </AdminPage>
   );
 }

@@ -5,6 +5,7 @@ export {
 } from '@/config/bull.config';
 export { default as clientConfig } from '@/config/client.config';
 export { default as cookieConfig } from '@/config/cookie.config';
+export { default as corsConfig } from '@/config/cors.config';
 export { default as databaseConfig } from '@/config/database.config';
 export { default as emailConfig } from '@/config/email.config';
 export { default as googleOAuthConfig } from '@/config/google-oauth.config';

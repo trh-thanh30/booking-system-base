@@ -12,13 +12,15 @@ import { useAuth } from "@/src/app/providers/admin";
 import { useAdminUiStore } from "@/src/app/stores/admin/ui.store";
 import { getDashboardConfig } from "@/src/config/dashboard.config";
 import { LanguageSwitcher } from "@/src/components/common/language-switcher";
-import { Link } from "@/src/i18n/navigation";
+import { Link, usePathname } from "@/src/i18n/navigation";
+import { cn } from "@repo/ui/lib/utils";
 
 export function Header() {
   const t = useTranslations("DashboardConfig");
   const tCommon = useTranslations("Common");
   const dashboardConfig = getDashboardConfig(t);
   const { can } = useAuth();
+  const pathname = usePathname();
   const setCommandOpen = useAdminUiStore((state) => state.setCommandOpen);
   const toggleSidebar = useAdminUiStore((state) => state.toggleSidebar);
   const topNavigation = dashboardConfig.topNavigation.filter(
@@ -26,7 +28,7 @@ export function Header() {
   );
 
   return (
-    <header className="sticky top-0 z-40 flex min-h-16 flex-wrap items-center justify-between gap-3 border-b border-border bg-background/95 px-4 py-3 backdrop-blur lg:px-6">
+    <header className="sticky top-0 z-40 flex h-16 items-center justify-between gap-3 border-b border-border bg-surface/90 px-4 shadow-xs backdrop-blur-xl sm:px-6 lg:px-8">
       <div className="flex min-w-0 items-center gap-3">
         <MobileSidebar />
         <Button
@@ -36,51 +38,63 @@ export function Header() {
           size="icon"
           variant="ghost"
         >
-          <PanelLeft className="h-4 w-4" />
+          <PanelLeft className="size-4" />
         </Button>
-        <div className="hidden h-6 w-px bg-muted dark:bg-muted lg:block" />
-        <nav className="hidden items-center gap-6 lg:flex">
-          {topNavigation.map((item) => (
-            <Link
-              className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground first:text-foreground dark:text-muted-foreground dark:hover:text-muted-foreground dark:first:text-muted-foreground"
-              href={item.href}
-              key={item.href}
-            >
-              {item.title}
-            </Link>
-          ))}
+        <div className="hidden h-6 w-px bg-border lg:block" />
+        <nav
+          aria-label={tCommon("topNavigation")}
+          className="hidden items-center gap-1 lg:flex"
+        >
+          {topNavigation.map((item) => {
+            const active =
+              pathname === item.href || pathname.startsWith(`${item.href}/`);
+
+            return (
+              <Link
+                aria-current={active ? "page" : undefined}
+                className={cn(
+                  "rounded-md px-3 py-2 text-sm font-medium transition-colors duration-normal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                  active
+                    ? "bg-accent text-accent-foreground"
+                    : "text-muted-foreground hover:bg-muted-hover hover:text-foreground",
+                )}
+                href={item.href}
+                key={item.href}
+              >
+                {item.title}
+              </Link>
+            );
+          })}
         </nav>
       </div>
-      <div className="flex min-w-0 flex-wrap items-center justify-end gap-2">
+      <div className="flex min-w-0 items-center justify-end gap-1.5 sm:gap-2">
         <BusinessSwitcher />
         <Button
-          className="hidden w-64 justify-start text-muted-foreground md:inline-flex"
+          className="hidden w-52 justify-start bg-background text-muted-foreground xl:inline-flex xl:w-64"
           onClick={() => setCommandOpen(true)}
           variant="secondary"
         >
-          <Search className="h-4 w-4" />
+          <Search className="size-4" />
           {tCommon("search")}
-          <kbd className="ml-auto hidden rounded border border-border px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground dark:border-border md:inline-block">
+          <kbd className="ml-auto hidden rounded border border-border px-1.5 py-0.5 text-caption font-medium text-muted-foreground md:inline-block">
             Ctrl K
           </kbd>
         </Button>
         <Button
           aria-label={tCommon("searchPages")}
-          className="md:hidden"
+          className="xl:hidden"
           onClick={() => setCommandOpen(true)}
           size="icon"
           variant="ghost"
         >
-          <Search className="h-5 w-5" />
+          <Search className="size-5" />
         </Button>
         <LanguageSwitcher />
         <ThemeToggle />
-        <Button
-          aria-label={tCommon("openSettings")}
-          size="icon"
-          variant="ghost"
-        >
-          <Settings className="h-4 w-4" />
+        <Button asChild size="icon" variant="ghost">
+          <Link aria-label={tCommon("openSettings")} href="/admin/settings">
+            <Settings className="size-4" />
+          </Link>
         </Button>
         <UserMenu />
       </div>

@@ -6,7 +6,10 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useToast } from "@repo/hooks";
 import { HttpClientError, type CompleteOwnerBusinessInput } from "@repo/shared";
 import { Button } from "@repo/ui";
-import { useRouter } from "@/src/i18n/navigation";
+import {
+  buildAdminBaseUrl,
+  buildTenantAdminUrl,
+} from "@/src/lib/admin/admin-workspace-url";
 import { authService } from "@/src/services/admin/auth.service";
 import { AuthShell, BusinessOnboardingForm } from "./components";
 import { useAuth } from "@/src/app/providers/admin";
@@ -15,8 +18,8 @@ import { OnboardingLoadingSkeleton } from "./components/onboarding-loading-skele
 export function OwnerOnboardingView() {
   const locale = useLocale();
   const t = useTranslations("AuthJourney");
-  const router = useRouter();
-  const { completeOwnerOnboarding, isLoading, isAuthenticated } = useAuth();
+  const { completeOwnerOnboarding, isLoading, isAuthenticated, user } =
+    useAuth();
   const { toast } = useToast();
   const submitted = useRef(false);
   const clearDraftRef = useRef<() => void>(() => undefined);
@@ -35,17 +38,36 @@ export function OwnerOnboardingView() {
     retry: false,
   });
   useEffect(() => {
-    if (!isLoading && isAuthenticated && !submitted.current)
-      router.replace("/admin/business-setup/entry");
-  }, [isLoading, isAuthenticated, router]);
+    if (
+      !isLoading &&
+      isAuthenticated &&
+      !submitted.current &&
+      user?.tenant?.slug
+    ) {
+      window.location.replace(
+        buildTenantAdminUrl({
+          locale,
+          returnTo: "/admin/business-setup/entry",
+          tenantSlug: user.tenant.slug,
+        }),
+      );
+    }
+  }, [isLoading, isAuthenticated, locale, user]);
   async function submit(input: CompleteOwnerBusinessInput) {
     if (submitted.current) return;
     submitted.current = true;
     try {
-      await completion.mutateAsync(input);
+      const result = await completion.mutateAsync(input);
       clearDraftRef.current();
       toast.success(t("businessCreated"));
-      router.replace("/admin/business-setup/entry");
+      if (!result.user.tenant?.slug) throw new Error("TENANT_REQUIRED");
+      window.location.replace(
+        buildTenantAdminUrl({
+          locale,
+          returnTo: "/admin/business-setup/entry",
+          tenantSlug: result.user.tenant.slug,
+        }),
+      );
     } catch (failure) {
       submitted.current = false;
       const sessionExpired =
@@ -114,7 +136,11 @@ export function OwnerOnboardingView() {
         <Button
           variant="ghost"
           className="w-full min-h-13 rounded-full text-base font-semibold"
-          onClick={() => router.push("/admin/login")}
+          onClick={() =>
+            window.location.assign(
+              buildAdminBaseUrl({ locale, pathname: "/admin/login" }),
+            )
+          }
           type="button"
         >
           {t("backToLogin")}

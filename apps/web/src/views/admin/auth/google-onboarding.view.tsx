@@ -3,8 +3,9 @@
 import { useAuth } from "@/src/app/providers/admin";
 import { GoogleIcon } from "@/src/components/common";
 import { useGoogleLogin } from "@/src/hooks/use-google-login";
-import { Link, useRouter } from "@/src/i18n/navigation";
+import { Link } from "@/src/i18n/navigation";
 import { getPostAuthReturnTo } from "@/src/lib/admin/auth-routing";
+import { buildTenantAdminUrl } from "@/src/lib/admin/admin-workspace-url";
 import { authService } from "@/src/services/admin/auth.service";
 import { useToast } from "@repo/hooks";
 import type { CompleteGoogleOwnerOnboardingInput } from "@repo/shared";
@@ -20,9 +21,9 @@ import { OnboardingLoadingSkeleton } from "./components/onboarding-loading-skele
 export function GoogleOnboardingView() {
   const locale = useLocale();
   const t = useTranslations("Auth");
-  const router = useRouter();
   const { toast } = useToast();
-  const { isLoading, isAuthenticated, completeGoogleOnboarding } = useAuth();
+  const { isLoading, isAuthenticated, completeGoogleOnboarding, user } =
+    useAuth();
   const google = useGoogleLogin();
   const attempt = useRef(false);
   const clearDraftRef = useRef<() => void>(() => undefined);
@@ -44,9 +45,21 @@ export function GoogleOnboardingView() {
   });
 
   useEffect(() => {
-    if (!isLoading && isAuthenticated && !attempt.current)
-      router.replace("/admin/business-setup/entry");
-  }, [isLoading, isAuthenticated, router]);
+    if (
+      !isLoading &&
+      isAuthenticated &&
+      !attempt.current &&
+      user?.tenant?.slug
+    ) {
+      window.location.replace(
+        buildTenantAdminUrl({
+          locale,
+          returnTo: "/admin/business-setup/entry",
+          tenantSlug: user.tenant.slug,
+        }),
+      );
+    }
+  }, [isLoading, isAuthenticated, locale, user]);
 
   async function submit(input: CompleteGoogleOwnerOnboardingInput) {
     if (attempt.current || submitError?.terminal) return;
@@ -56,9 +69,14 @@ export function GoogleOnboardingView() {
       const result = await completion.mutateAsync(input);
       clearDraftRef.current();
       toast.success(t("google.success"));
-      router.replace(getPostAuthReturnTo(result.return_to), {
-        locale: result.locale === "en" ? "en" : "vi",
-      });
+      if (!result.user.tenant?.slug) throw new Error("TENANT_REQUIRED");
+      window.location.replace(
+        buildTenantAdminUrl({
+          locale: result.locale,
+          returnTo: getPostAuthReturnTo(result.return_to),
+          tenantSlug: result.user.tenant.slug,
+        }),
+      );
     } catch (error) {
       attempt.current = false;
       const result = getGoogleOnboardingError(error);

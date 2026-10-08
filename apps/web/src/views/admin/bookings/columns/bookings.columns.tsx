@@ -42,9 +42,7 @@ export function getBookingColumns(t: Translate): ColumnDef<BookingSummary>[] {
       accessorKey: "id",
       header: t("booking"),
       cell: ({ row }) => (
-        <span className="font-medium text-foreground dark:text-muted-foreground">
-          {row.original.id}
-        </span>
+        <span className="font-medium text-foreground">{row.original.id}</span>
       ),
     },
     {
@@ -52,10 +50,8 @@ export function getBookingColumns(t: Translate): ColumnDef<BookingSummary>[] {
       header: t("customer"),
       cell: ({ row }) => (
         <div>
-          <p className="font-medium text-foreground dark:text-muted-foreground">
-            {row.original.customer}
-          </p>
-          <p className="mt-1 text-xs text-muted-foreground dark:text-muted-foreground">
+          <p className="font-medium text-foreground">{row.original.customer}</p>
+          <p className="mt-1 text-xs text-muted-foreground">
             {row.original.location}
           </p>
         </div>
@@ -78,7 +74,7 @@ export function getBookingColumns(t: Translate): ColumnDef<BookingSummary>[] {
       accessorKey: "total",
       header: t("total"),
       cell: ({ row }) => (
-        <span className="font-medium tabular-nums text-foreground dark:text-muted-foreground">
+        <span className="font-medium tabular-nums text-foreground">
           {row.original.total}
         </span>
       ),
