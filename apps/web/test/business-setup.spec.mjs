@@ -1,12 +1,32 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
+  getSetupViewDestination,
   getSetupDestination,
   completeFirstService,
   setupQueryKey,
   getSetupEntryDestination,
 } from "../src/views/admin/business-setup/utils/business-setup.utils.ts";
 import { getPostAuthReturnTo } from "../src/lib/admin/auth-routing.ts";
+
+test("setup view keeps accepted data during refetch without trusting a new Business cache", () => {
+  const query = { isFetchedAfterMount: true, isFetching: true, isError: false };
+  const summary = { status: "IN_PROGRESS" };
+  assert.equal(
+    getSetupViewDestination("OWNER", summary, query, true),
+    "/admin/business-setup",
+  );
+  assert.equal(getSetupViewDestination("OWNER", summary, query, false), null);
+  assert.equal(
+    getSetupViewDestination(
+      "OWNER",
+      summary,
+      { ...query, isFetching: false, isError: true },
+      true,
+    ),
+    "/admin/business-setup",
+  );
+});
 
 test("entry waits for a successful fresh summary instead of redirecting from cached completion", () => {
   const cached = { status: "COMPLETED" };

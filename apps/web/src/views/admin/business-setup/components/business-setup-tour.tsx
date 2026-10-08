@@ -180,8 +180,9 @@ export function BusinessSetupTour({
           </p>
         </div>
         {step === "WORKING_HOURS" ? (
-          hours.isError || !hours.data ? (
+          !hours.data ? (
             <SetupLoadState
+              formOnly
               error={hours.isError}
               busy={hours.isFetching}
               onRetry={() => void hours.refetch()}
@@ -209,8 +210,10 @@ export function BusinessSetupTour({
           />
         ) : null}
         {step === "BOOKING_TEMPLATE" ? (
-          templates.isError || !templates.data ? (
+          !templates.data ? (
             <SetupLoadState
+              formOnly
+              step="BOOKING_TEMPLATE"
               error={templates.isError}
               busy={templates.isFetching}
               onRetry={() => void templates.refetch()}

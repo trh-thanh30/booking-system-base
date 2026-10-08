@@ -15,9 +15,9 @@ import { useToast } from "@repo/hooks";
 import { HttpClientError, loginSchema, type LoginInput } from "@repo/shared";
 import { Button } from "@repo/ui";
 import { useMutation } from "@tanstack/react-query";
-import { LogIn } from "lucide-react";
+import { LoaderCircle, LogIn } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { AuthLoadingState, AuthShell } from "./components";
 import {
@@ -41,6 +41,7 @@ export function LoginView({
   const { toast } = useToast();
   const handledOAuthError = useRef<string | null>(null);
   const manualLoginRedirect = useRef(false);
+  const [isRedirecting, setIsRedirecting] = useState(false);
   const google = useGoogleLogin(returnTo);
   useEffect(() => {
     if (!oauthError || handledOAuthError.current === oauthError) return;
@@ -70,9 +71,12 @@ export function LoginView({
       usernameOrEmail: "",
     },
   });
+  const loggingIn = isSubmitting || loginMutation.isPending || isRedirecting;
+  const busy = loggingIn || google.isRedirecting;
 
   async function onSubmit(input: LoginInput) {
-    if (google.isRedirecting || loginMutation.isPending) return;
+    if (google.isRedirecting || loginMutation.isPending || isRedirecting)
+      return;
     const parsed = loginSchema.safeParse(input);
 
     if (!parsed.success) {
@@ -89,6 +93,7 @@ export function LoginView({
     try {
       manualLoginRedirect.current = true;
       await loginMutation.mutateAsync(parsed.data);
+      setIsRedirecting(true);
       toast.success(t("login.success"));
       router.replace(destination);
     } catch (error) {
@@ -99,6 +104,7 @@ export function LoginView({
       ) {
         try {
           await authService.resumeOwnerOnboarding(parsed.data);
+          setIsRedirecting(true);
           toast.success(t("login.onboardingRequired"));
           router.replace("/admin/onboarding/business?provider=email");
         } catch (resumeError) {
@@ -108,6 +114,7 @@ export function LoginView({
       }
       const verificationUrl = getUnverifiedEmailUrl(error, destination);
       if (verificationUrl) {
+        setIsRedirecting(true);
         toast.info(t("login.verificationRequired"));
         router.replace(verificationUrl);
         return;
@@ -119,13 +126,17 @@ export function LoginView({
 
   return (
     <AuthShell description={t("login.description")} title={t("login.title")}>
-      {isLoading || isAuthenticated ? (
+      {(isLoading || isAuthenticated) && !manualLoginRedirect.current ? (
         <AuthLoadingState
           title={t("checkingSession")}
           description={t("checkingSessionDescription")}
         />
       ) : (
-        <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
+        <form
+          className="space-y-5"
+          onSubmit={handleSubmit(onSubmit)}
+          aria-busy={loggingIn}
+        >
           <FormField
             error={errors.usernameOrEmail?.message}
             htmlFor="usernameOrEmail"
@@ -140,7 +151,7 @@ export function LoginView({
               aria-describedby={
                 errors.usernameOrEmail ? "usernameOrEmail-error" : undefined
               }
-              disabled={isSubmitting || google.isRedirecting}
+              disabled={busy}
               autoComplete="username"
               id="usernameOrEmail"
               placeholder={placeholders("usernameOrEmail")}
@@ -158,7 +169,7 @@ export function LoginView({
               className="h-13 min-h-13 text-base"
               aria-invalid={Boolean(errors.password)}
               aria-describedby={errors.password ? "password-error" : undefined}
-              disabled={isSubmitting || google.isRedirecting}
+              disabled={busy}
               autoComplete="current-password"
               id="password"
               placeholder={placeholders("password")}
@@ -182,13 +193,18 @@ export function LoginView({
           </div>
           <Button
             className="min-h-13 w-full rounded-full text-base font-semibold"
-            disabled={
-              isSubmitting || loginMutation.isPending || google.isRedirecting
-            }
+            disabled={busy}
             type="submit"
           >
-            <LogIn className="h-4 w-4" />
-            {isSubmitting ? t("login.submitting") : t("login.submit")}
+            {loggingIn ? (
+              <LoaderCircle
+                aria-hidden="true"
+                className="size-4 animate-spin motion-reduce:animate-none"
+              />
+            ) : (
+              <LogIn aria-hidden="true" className="size-4" />
+            )}
+            {loggingIn ? t("login.submitting") : t("login.submit")}
           </Button>
           <div className="flex items-center gap-3 text-sm text-muted-foreground">
             <span className="h-px flex-1 bg-border" />
@@ -199,9 +215,7 @@ export function LoginView({
             className="min-h-13 w-full rounded-full text-base font-semibold"
             variant="outline"
             type="button"
-            disabled={
-              isSubmitting || loginMutation.isPending || google.isRedirecting
-            }
+            disabled={busy}
             onClick={google.startGoogleLogin}
           >
             <GoogleIcon />

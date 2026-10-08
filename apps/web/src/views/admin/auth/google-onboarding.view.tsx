@@ -15,6 +15,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { AuthLoadingState, AuthShell, GoogleBusinessForm } from "./components";
 import { GOOGLE_ONBOARDING_QUERY_KEY } from "./constants/google-onboarding.constants";
 import { getGoogleOnboardingError } from "./utils/google-auth.utils";
+import { OnboardingLoadingSkeleton } from "./components/onboarding-loading-skeleton";
 
 export function GoogleOnboardingView() {
   const locale = useLocale();
@@ -90,18 +91,20 @@ export function GoogleOnboardingView() {
       description={t("google.onboardingDescription")}
     >
       <div className="space-y-2">
-        {isLoading || isAuthenticated || profile.isPending ? (
+        {(isLoading || isAuthenticated) && !attempt.current ? (
           <AuthLoadingState
             title={t("checkingSession")}
             description={t("checkingSessionDescription")}
           />
+        ) : profile.isPending && !profile.data ? (
+          <OnboardingLoadingSkeleton label={t("checkingSession")} />
         ) : (
           <>
             {profile.data && !error?.terminal ? (
               <GoogleBusinessForm
                 profile={profile.data}
                 locale={locale}
-                isPending={completion.isPending}
+                isPending={completion.isPending || completion.isSuccess}
                 onSubmit={submit}
                 onDraftStateChange={handleDraftStateChange}
               />

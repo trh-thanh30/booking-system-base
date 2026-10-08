@@ -10,6 +10,7 @@ import { useRouter } from "@/src/i18n/navigation";
 import { authService } from "@/src/services/admin/auth.service";
 import { AuthShell, BusinessOnboardingForm } from "./components";
 import { useAuth } from "@/src/app/providers/admin";
+import { OnboardingLoadingSkeleton } from "./components/onboarding-loading-skeleton";
 
 export function OwnerOnboardingView() {
   const locale = useLocale();
@@ -88,12 +89,14 @@ export function OwnerOnboardingView() {
       description={t("businessDescription")}
     >
       <div className="space-y-5">
-        {profile.isPending ? <p role="status">{t("loading")}</p> : null}
+        {profile.isPending && !profile.data ? (
+          <OnboardingLoadingSkeleton label={t("loading")} />
+        ) : null}
         {profile.data && !terminal ? (
           <BusinessOnboardingForm
             profile={profile.data}
             locale={locale}
-            isPending={completion.isPending}
+            isPending={completion.isPending || completion.isSuccess}
             onSubmit={submit}
             onDraftStateChange={handleDraftStateChange}
           />

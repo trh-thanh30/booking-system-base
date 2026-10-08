@@ -1,5 +1,5 @@
 import type { LucideIcon } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@repo/ui";
+import { Card, CardContent, CardHeader, CardTitle, Skeleton } from "@repo/ui";
 
 type StatsCardProps = {
   title: string;
@@ -7,6 +7,7 @@ type StatsCardProps = {
   description: string;
   trend: string;
   icon: LucideIcon;
+  loading?: boolean;
 };
 
 export function StatsCard({
@@ -15,9 +16,10 @@ export function StatsCard({
   title,
   value,
   trend,
+  loading = false,
 }: StatsCardProps) {
   return (
-    <Card>
+    <Card aria-busy={loading}>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-6">
         <CardTitle className="text-sm font-medium text-muted-foreground dark:text-muted-foreground">
           {title}
@@ -26,16 +28,30 @@ export function StatsCard({
       </CardHeader>
       <CardContent className="px-6 pb-6 pt-0">
         <div className="text-2xl font-bold tracking-tight text-foreground dark:text-muted-foreground">
-          {value}
+          {loading ? (
+            <Skeleton
+              aria-hidden="true"
+              className="h-8 w-24 motion-reduce:animate-none"
+            />
+          ) : (
+            value
+          )}
         </div>
         <div className="flex items-center gap-2 mt-1">
           <p className="text-xs text-muted-foreground dark:text-muted-foreground">
             {description}
           </p>
-          {trend && (
-            <span className="inline-flex items-center rounded-full bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground dark:bg-muted dark:text-muted-foreground">
-              {trend}
-            </span>
+          {loading ? (
+            <Skeleton
+              aria-hidden="true"
+              className="h-4 w-16 motion-reduce:animate-none"
+            />
+          ) : (
+            trend && (
+              <span className="inline-flex items-center rounded-full bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground dark:bg-muted dark:text-muted-foreground">
+                {trend}
+              </span>
+            )
           )}
         </div>
       </CardContent>

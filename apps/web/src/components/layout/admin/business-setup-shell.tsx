@@ -6,6 +6,7 @@ import { useAuth } from "@/src/app/providers/admin";
 import { usePathname, useRouter } from "@/src/i18n/navigation";
 import { getLoginUrl } from "@/src/lib/admin/auth-routing";
 import { SiteHeader } from "../site-header";
+import { SetupLoadingSkeleton } from "@/src/views/admin/business-setup/components/setup-loading-skeleton";
 
 export function BusinessSetupShell({ children }: { children: ReactNode }) {
   const { isAuthenticated, isLoading } = useAuth();
@@ -33,13 +34,7 @@ export function BusinessSetupShell({ children }: { children: ReactNode }) {
         className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-12"
       >
         {isLoading || !isAuthenticated ? (
-          <p
-            role="status"
-            aria-busy="true"
-            className="text-center text-body text-muted-foreground"
-          >
-            {t("checkingSession")}
-          </p>
+          <SetupLoadingSkeleton label={t("checkingSession")} />
         ) : (
           children
         )}

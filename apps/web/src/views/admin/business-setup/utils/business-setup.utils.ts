@@ -41,6 +41,17 @@ export function getSetupEntryDestination(
   return getSetupDestination(role, summary);
 }
 
+export function getSetupViewDestination(
+  role: string,
+  summary: Pick<BusinessSetupSummary, "status"> | undefined,
+  query: Parameters<typeof getSetupEntryDestination>[2],
+  hasAcceptedSummary: boolean,
+) {
+  return hasAcceptedSummary && summary
+    ? getSetupDestination(role, summary)
+    : getSetupEntryDestination(role, summary, query);
+}
+
 export async function completeFirstService(
   api: {
     getSummary: () => Promise<BusinessSetupSummary>;

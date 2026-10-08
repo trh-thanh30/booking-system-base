@@ -8,6 +8,7 @@ import { useRouter } from "@/src/i18n/navigation";
 import { useAdminUiStore } from "@/src/app/stores/admin/ui.store";
 import { useBusinessSetup } from "../hooks/use-business-setup";
 import { getSetupDestination } from "../utils/business-setup.utils";
+import { SetupResumeSkeleton } from "./setup-resume-skeleton";
 
 export function SetupResumeCard() {
   const { user, query, queryKey, service, businessId } = useBusinessSetup();
@@ -27,10 +28,10 @@ export function SetupResumeCard() {
   if (
     user?.role !== "OWNER" ||
     !businessId ||
-    query.isPending ||
     query.data?.status === "COMPLETED"
   )
     return null;
+  if (query.isPending) return <SetupResumeSkeleton label={t("loading")} />;
   return (
     <Card>
       <CardContent className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">

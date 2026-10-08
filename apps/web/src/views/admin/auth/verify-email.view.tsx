@@ -19,9 +19,9 @@ import {
   REGEXP_ONLY_DIGITS,
 } from "@repo/ui";
 import { useMutation } from "@tanstack/react-query";
-import { Clock3 } from "lucide-react";
+import { Clock3, LoaderCircle } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { AuthShell } from "./components";
 import { useEmailAuthFeedback } from "./hooks/use-email-auth-feedback";
@@ -44,6 +44,7 @@ export function VerifyEmailView({
   const [sessionId, setSessionId] = useState(initialSessionId);
   const feedback = useEmailAuthFeedback();
   const expiry = useVerificationCountdown(sessionId);
+  const verifiedRemaining = useRef(expiry.remaining);
   const request = useMutation({
     mutationFn: authService.requestVerification,
     retry: false,
@@ -63,7 +64,8 @@ export function VerifyEmailView({
     defaultValues: { code: "", sessionId },
   });
   const loginUrl = returnTo ? getLoginUrl(returnTo) : "/admin/login";
-  const pending = request.isPending || verify.isPending || resend.isPending;
+  const verifying = verify.isPending || verify.isSuccess;
+  const pending = request.isPending || verifying || resend.isPending;
 
   async function requestCode(input: EmailRequestInput) {
     if (pending || feedback.remaining) return;
@@ -107,6 +109,7 @@ export function VerifyEmailView({
     feedback.clear();
     try {
       const result = await verify.mutateAsync(parsed.data);
+      verifiedRemaining.current = expiry.remaining;
       expiry.clear();
       toast.success(t("verify.success"));
       router.replace(
@@ -157,16 +160,20 @@ export function VerifyEmailView({
                 role="timer"
                 aria-live="off"
                 className={
-                  expiry.expired
+                  expiry.expired && !verify.isSuccess
                     ? "flex items-center gap-2 font-medium text-destructive"
                     : "flex items-center gap-2 font-medium text-foreground"
                 }
               >
                 <Clock3 aria-hidden="true" className="size-4" />
-                {expiry.expired
+                {expiry.expired && !verify.isSuccess
                   ? t("verify.codeExpired")
                   : t("verify.expiresIn", {
-                      time: formatCountdown(expiry.remaining),
+                      time: formatCountdown(
+                        verify.isSuccess
+                          ? verifiedRemaining.current
+                          : expiry.remaining,
+                      ),
                     })}
               </p>
             </div>
@@ -244,7 +251,13 @@ export function VerifyEmailView({
               }
               type="submit"
             >
-              {verify.isPending ? t("verify.submitting") : t("verify.submit")}
+              {verifying ? t("verify.submitting") : t("verify.submit")}
+              {verifying && (
+                <LoaderCircle
+                  aria-hidden="true"
+                  className="size-4 animate-spin motion-reduce:animate-none"
+                />
+              )}
             </Button>
           </form>
         ) : (
