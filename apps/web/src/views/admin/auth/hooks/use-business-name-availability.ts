@@ -17,7 +17,7 @@ export function useBusinessNameAvailability(slug: string) {
   }, [slug]);
 
   const check = useCallback(async () => {
-    if (slug === lastCheckedSlug.current && status !== "error") return;
+    if (slug === lastCheckedSlug.current) return;
     lastCheckedSlug.current = slug;
     if (!completeOwnerBusinessSchema.shape.slug.safeParse(slug).success) {
       setStatus("invalid");
@@ -35,7 +35,13 @@ export function useBusinessNameAvailability(slug: string) {
         setStatus("error");
       }
     }
-  }, [slug, status]);
+  }, [slug]);
+
+  useEffect(() => {
+    if (!slug) return;
+    const timer = window.setTimeout(() => void check(), 450);
+    return () => window.clearTimeout(timer);
+  }, [slug, check]);
 
   return { check, slug, status };
 }
