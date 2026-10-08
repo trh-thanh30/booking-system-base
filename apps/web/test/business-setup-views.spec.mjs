@@ -51,14 +51,51 @@ for (const locale of ["vi", "en"]) {
   });
   test(`${locale}: templates expose a keyboard radio group with the saved selection`, () => {
     const html = render(BookingTemplatePicker, {
+      catalog: {
+        templates: BOOKING_TEMPLATES,
+        selected_template_id: "nail-salon-v2",
+      },
+      busy: false,
+      onSave: async () => {},
+    });
+    assert.equal(
+      (html.match(/type="radio"/g) ?? []).length,
+      BOOKING_TEMPLATES.length,
+    );
+    assert.match(html, /id="template-nail-salon-v2"[^>]*checked=""/);
+    assert.doesNotMatch(html, /id="template-(classic|modern|minimal)"/);
+    for (const template of BOOKING_TEMPLATES)
+      assert.ok(html.includes(template.name[locale]));
+  });
+  test(`${locale}: nail template has a saved radio selection and a separate demo link`, () => {
+    const html = render(BookingTemplatePicker, {
+      catalog: {
+        templates: BOOKING_TEMPLATES,
+        selected_template_id: "nail-salon-v2",
+      },
+      busy: false,
+      onSave: async () => {},
+    });
+    assert.match(html, /id="template-nail-salon-v2"[^>]*checked=""/);
+    assert.match(html, /href="\/[^" ]*nail-salon-v2"/);
+    assert.match(html, /target="_blank"/);
+    assert.ok(html.includes(messages.BusinessSetup.template.openDemo));
+    assert.ok(
+      html.includes(
+        BOOKING_TEMPLATES.find((t) => t.id === "nail-salon-v2").description[
+          locale
+        ],
+      ),
+    );
+  });
+  test(`${locale}: a historical template is not displayed or submitted as an available choice`, () => {
+    const html = render(BookingTemplatePicker, {
       catalog: { templates: BOOKING_TEMPLATES, selected_template_id: "modern" },
       busy: false,
       onSave: async () => {},
     });
-    assert.equal((html.match(/type="radio"/g) ?? []).length, 3);
-    assert.match(html, /id="template-modern"[^>]*checked=""/);
-    for (const template of BOOKING_TEMPLATES)
-      assert.ok(html.includes(template.name[locale]));
+    assert.doesNotMatch(html, /id="template-modern"|checked=""/);
+    assert.match(html, /type="submit"[^>]*disabled=""/);
   });
   test(`${locale}: progress exposes exactly three steps and prevents jumping ahead`, () => {
     const html = render(SetupProgress, {

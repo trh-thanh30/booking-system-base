@@ -59,8 +59,9 @@ test("does not accept request-supplied scope or timezone", () => {
 test("every catalog template is selectable and has vi/en labels", () => {
   assert.deepEqual(
     BOOKING_TEMPLATES.map((template) => template.id),
-    BOOKING_TEMPLATE_IDS,
+    ["nail-salon-v2"],
   );
+  assert.ok(BOOKING_TEMPLATE_IDS.includes("nail-salon-v2"));
   for (const template of BOOKING_TEMPLATES) {
     assert.equal(
       selectBookingTemplateSchema.safeParse({ template_id: template.id })

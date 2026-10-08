@@ -5,6 +5,8 @@ import { useLocale, useTranslations } from "next-intl";
 import { Button, Label, cn } from "@repo/ui";
 import type { BookingTemplateCatalog, BookingTemplateId } from "@repo/shared";
 import { TemplatePreview } from "./template-preview";
+import { Link } from "@/src/i18n/navigation";
+import { ExternalLink } from "lucide-react";
 
 export function BookingTemplatePicker({
   catalog,
@@ -20,7 +22,11 @@ export function BookingTemplatePicker({
   const t = useTranslations("BusinessSetup");
   const locale = useLocale() === "en" ? "en" : "vi";
   const [selected, setSelected] = useState<BookingTemplateId | null>(
-    catalog.selected_template_id,
+    catalog.templates.some(
+      (template) => template.id === catalog.selected_template_id,
+    )
+      ? catalog.selected_template_id
+      : null,
   );
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -31,10 +37,16 @@ export function BookingTemplatePicker({
       <p className="text-body text-muted-foreground">
         {t("template.previewHint")}
       </p>
-      <fieldset disabled={busy} className="grid gap-4 md:grid-cols-3">
+      <fieldset
+        disabled={busy}
+        className="grid min-w-0 gap-4 sm:grid-cols-2 lg:grid-cols-3"
+      >
         <legend className="sr-only">{t("steps.BOOKING_TEMPLATE")}</legend>
         {catalog.templates.map((template) => (
-          <div key={template.id} className="relative">
+          <div
+            key={template.id}
+            className="group/template relative flex min-w-0 flex-col"
+          >
             <input
               id={`template-${template.id}`}
               type="radio"
@@ -49,11 +61,11 @@ export function BookingTemplatePicker({
             <Label
               htmlFor={`template-${template.id}`}
               className={cn(
-                "flex h-full cursor-pointer flex-col gap-3 rounded-xl border-2 border-border p-3 transition-colors hover:border-primary peer-focus-visible:ring-2 peer-focus-visible:ring-ring peer-focus-visible:ring-offset-2",
+                "flex flex-1 cursor-pointer flex-col gap-3 rounded-xl border-2 border-border p-3 transition-colors hover:border-primary peer-focus-visible:ring-2 peer-focus-visible:ring-ring peer-focus-visible:ring-offset-2",
                 selected === template.id && "border-primary bg-primary/5",
               )}
             >
-              <TemplatePreview id={template.id} />
+              <TemplatePreview />
               <span className="flex items-center justify-between gap-2 text-body font-semibold">
                 {template.name[locale]}
                 <span
@@ -71,6 +83,20 @@ export function BookingTemplatePicker({
                 {template.description[locale]}
               </span>
             </Label>
+            {template.id === "nail-salon-v2" ? (
+              <div className="pointer-events-none absolute inset-x-3.5 top-3.5 flex aspect-video items-center justify-center rounded-lg bg-foreground/45 opacity-0 transition-opacity duration-200 group-hover/template:opacity-100 group-focus-within/template:opacity-100 motion-reduce:transition-none [@media(hover:none)]:opacity-100">
+                <Link
+                  href="/nail-salon-v2"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={t("template.openDemo")}
+                  className="pointer-events-none inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-background px-4 text-label font-semibold text-foreground shadow-sm hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 group-hover/template:pointer-events-auto group-focus-within/template:pointer-events-auto [@media(hover:none)]:pointer-events-auto"
+                >
+                  {t("template.preview")}
+                  <ExternalLink className="size-4" aria-hidden="true" />
+                </Link>
+              </div>
+            ) : null}
           </div>
         ))}
       </fieldset>

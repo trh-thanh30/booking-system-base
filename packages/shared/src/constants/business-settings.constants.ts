@@ -1,28 +1,19 @@
+/** Only templates with an implemented preview belong in the selectable catalog. */
 export const BOOKING_TEMPLATES = [
   {
-    id: "classic",
-    name: { vi: "Cơ bản", en: "Classic" },
+    id: "nail-salon-v2",
+    name: { vi: "Tiệm nail", en: "Nail salon" },
     description: {
-      vi: "Danh sách dịch vụ rõ ràng, dễ chọn và đặt lịch.",
-      en: "A clear service list for simple appointment booking.",
-    },
-  },
-  {
-    id: "modern",
-    name: { vi: "Hiện đại", en: "Modern" },
-    description: {
-      vi: "Giới thiệu dịch vụ bằng các thẻ nội dung nổi bật.",
-      en: "Highlight services with a contemporary card layout.",
-    },
-  },
-  {
-    id: "minimal",
-    name: { vi: "Tối giản", en: "Minimal" },
-    description: {
-      vi: "Giao diện gọn gàng, tập trung vào thao tác đặt lịch.",
-      en: "A compact layout focused on booking an appointment.",
+      vi: "Mẫu tiệm nail với bộ sưu tập ảnh và phần giới thiệu dịch vụ. Bản demo chưa kết nối đặt lịch thật.",
+      en: "A nail salon layout with a gallery and service showcase. This demo does not create real bookings.",
     },
   },
 ] as const;
 
-export const BOOKING_TEMPLATE_IDS = ["classic", "modern", "minimal"] as const;
+// Keep historical IDs valid for existing saved settings and older API clients.
+export const BOOKING_TEMPLATE_IDS = [
+  "classic",
+  "modern",
+  "minimal",
+  "nail-salon-v2",
+] as const;

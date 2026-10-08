@@ -85,7 +85,13 @@
       }
     },
     "template": {
-      "previewHint": "Hình minh họa bố cục. Mẫu bạn chọn sẽ được lưu cho doanh nghiệp.",
+      "previewHint": "Xem trước giao diện và chọn mẫu cho doanh nghiệp của bạn.",
+      "openDemo": "Xem bản demo (mở tab mới)",
+      "preview": "Xem trước",
+      "demoBadge": "Bản demo",
+      "demoNotice": "Bạn đang xem mẫu demo tiệm nail. Nội dung là minh họa; thao tác đặt lịch không tạo lịch hẹn thật.",
+      "demoSubmitted": "Đã thử biểu mẫu demo — không có lịch hẹn thật được tạo.",
+      "demoBookingHint": "Biểu mẫu minh họa để xem trước giao diện đặt lịch. Không gửi xác nhận hay tạo lịch hẹn thật.",
       "businessName": "Doanh nghiệp của bạn",
       "book": "Đặt ngay"
     }

@@ -1,5 +1,5 @@
 import { BadRequestError, ForbiddenError } from '@/common/response';
-import { BOOKING_TEMPLATES, businessWorkingDaysSchema } from '@repo/shared';
+import { BOOKING_TEMPLATE_IDS, businessWorkingDaysSchema } from '@repo/shared';
 import type { BookingTemplateId } from '@repo/shared';
 import type { z } from 'zod';
 import type { BusinessSettingsRepository } from '../repository/business-settings.repository';
@@ -33,7 +33,7 @@ export function selectedTemplateId(
   settings: unknown,
 ): BookingTemplateId | null {
   const id = settingsObject(settings).booking_template_id;
-  return BOOKING_TEMPLATES.find((template) => template.id === id)?.id ?? null;
+  return BOOKING_TEMPLATE_IDS.find((templateId) => templateId === id) ?? null;
 }
 
 export function parseSettingsInput<T>(schema: z.ZodType<T>, input: unknown): T {

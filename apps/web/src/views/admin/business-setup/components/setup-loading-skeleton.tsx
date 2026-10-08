@@ -1,5 +1,6 @@
 import { Skeleton } from "@repo/ui";
 import type { BusinessSetupStep } from "@repo/shared";
+import { BOOKING_TEMPLATES } from "@repo/shared";
 
 export function SetupLoadingSkeleton({
   label,
@@ -45,14 +46,14 @@ export function SetupLoadingSkeleton({
         ) : null}
         <Skeleton className="h-4 w-60 max-w-full motion-reduce:animate-none" />
         {step === "BOOKING_TEMPLATE" ? (
-          <div className="grid gap-4 md:grid-cols-3">
-            {[0, 1, 2].map((template) => (
+          <div className="grid min-w-0 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {BOOKING_TEMPLATES.map((template) => (
               <div
-                key={template}
+                key={template.id}
                 data-template-placeholder
                 className="space-y-3 rounded-xl border-2 border-border p-3"
               >
-                <Skeleton className="aspect-[4/3] w-full motion-reduce:animate-none" />
+                <Skeleton className="aspect-video w-full motion-reduce:animate-none" />
                 <Skeleton className="h-5 w-28 motion-reduce:animate-none" />
                 <Skeleton className="h-4 w-full motion-reduce:animate-none" />
                 <Skeleton className="h-4 w-3/4 motion-reduce:animate-none" />

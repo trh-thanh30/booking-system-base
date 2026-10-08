@@ -85,7 +85,13 @@
       }
     },
     "template": {
-      "previewHint": "Illustrative layout previews. Your choice will be saved for your business.",
+      "previewHint": "Preview the layout and choose a template for your business.",
+      "openDemo": "View demo (opens a new tab)",
+      "preview": "Preview",
+      "demoBadge": "Demo",
+      "demoNotice": "You are viewing the nail salon demo. Content is illustrative; booking actions do not create real appointments.",
+      "demoSubmitted": "Demo form submitted — no real appointment was created.",
+      "demoBookingHint": "An illustrative form to preview the booking layout. No confirmation is sent and no real appointment is created.",
       "businessName": "Your business",
       "book": "Book now"
     }

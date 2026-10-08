@@ -23,7 +23,7 @@ test("loading stats do not announce a fabricated zero before the API responds", 
   assert.match(html, /aria-busy="true"/);
   assert.doesNotMatch(html, />0<|0\/0/);
 });
-test("template loading uses three cards instead of seven working-hours rows", () => {
+test("template loading shows the available nail template instead of placeholder layouts", () => {
   const html = renderToStaticMarkup(
     createElement(SetupLoadingSkeleton, {
       label: "Loading",
@@ -31,7 +31,7 @@ test("template loading uses three cards instead of seven working-hours rows", ()
       step: "BOOKING_TEMPLATE",
     }),
   );
-  assert.equal((html.match(/data-template-placeholder/g) ?? []).length, 3);
+  assert.equal((html.match(/data-template-placeholder/g) ?? []).length, 1);
   assert.doesNotMatch(html, /sm:grid-cols-\[1fr_2fr\]/);
   assert.match(html, /aria-busy="true"/);
 });

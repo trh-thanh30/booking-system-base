@@ -175,9 +175,7 @@ describe('Business quick setup use cases', () => {
     const list = new ListBookingTemplatesUseCase(h.repo);
     const catalog = await list.execute(tenantId, businessId);
     expect(catalog.templates.map((template) => template.id)).toEqual([
-      'classic',
-      'modern',
-      'minimal',
+      'nail-salon-v2',
     ]);
     expect(catalog.selected_template_id).toBeNull();
     await new SelectBookingTemplateUseCase(h.repo).execute(
@@ -198,6 +196,26 @@ describe('Business quick setup use cases', () => {
       }),
     ).rejects.toMatchObject({ statusCode: 400 });
     expect(h.repository.patchSettings).not.toHaveBeenCalled();
+  });
+
+  it('persists the nail template and returns it when resuming setup', async () => {
+    const h = harness();
+    await new SelectBookingTemplateUseCase(h.repo).execute(
+      tenantId,
+      businessId,
+      {
+        template_id: 'nail-salon-v2',
+      },
+    );
+    expect(
+      await new ListBookingTemplatesUseCase(h.repo).execute(
+        tenantId,
+        businessId,
+      ),
+    ).toMatchObject({ selected_template_id: 'nail-salon-v2' });
+    expect(await h.summary.execute(tenantId, businessId)).toMatchObject({
+      selected_template_id: 'nail-salon-v2',
+    });
   });
 
   it('skip preserves saved data; resume chooses the first incomplete step', async () => {
