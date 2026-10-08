@@ -9,8 +9,13 @@ import {
   CardTitle,
   Separator,
 } from "@repo/ui";
-import { PageHeader } from "@/src/components/common/page-header";
-import { StatsCard } from "@/src/components/common/stats-card";
+import {
+  AdminContentGrid,
+  AdminPage,
+  AdminPageHeader,
+  AdminStatsGrid,
+} from "@/src/components/common/admin/admin-page";
+import { AdminStatsCard } from "@/src/components/common/admin/admin-stats-card";
 import {
   connectivityNotes,
   services,
@@ -19,11 +24,11 @@ import {
 
 export function SystemView() {
   return (
-    <div className="space-y-6">
-      <PageHeader
+    <AdminPage>
+      <AdminPageHeader
         actions={
           <Button variant="secondary">
-            <RefreshCcw className="h-4 w-4" />
+            <RefreshCcw className="size-4" />
             Refresh
           </Button>
         }
@@ -32,14 +37,14 @@ export function SystemView() {
         title="System health"
       />
 
-      <section className="grid gap-4 md:grid-cols-3">
+      <AdminStatsGrid className="xl:grid-cols-3">
         {systemStats.map((item) => (
-          <StatsCard key={item.title} {...item} />
+          <AdminStatsCard key={item.title} {...item} />
         ))}
-      </section>
+      </AdminStatsGrid>
 
-      <section className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
-        <Card>
+      <AdminContentGrid>
+        <Card className="lg:col-span-7">
           <CardHeader>
             <CardTitle>Service checks</CardTitle>
             <CardDescription>
@@ -52,20 +57,20 @@ export function SystemView() {
               <div key={service.name}>
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <div className="flex items-start gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-md bg-muted text-muted-foreground dark:bg-muted dark:text-muted-foreground">
-                      <Server className="h-5 w-5" />
+                    <div className="flex size-10 items-center justify-center rounded-lg bg-accent text-accent-foreground">
+                      <Server className="size-5" />
                     </div>
                     <div>
-                      <p className="font-medium text-foreground dark:text-muted-foreground">
+                      <p className="font-medium text-foreground">
                         {service.name}
                       </p>
-                      <p className="mt-1 text-sm text-muted-foreground dark:text-muted-foreground">
+                      <p className="mt-1 text-sm text-muted-foreground">
                         {service.target}
                       </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className="text-sm tabular-nums text-muted-foreground dark:text-muted-foreground">
+                    <span className="text-sm tabular-nums text-muted-foreground">
                       {service.latency}
                     </span>
                     <Badge
@@ -85,7 +90,7 @@ export function SystemView() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="lg:col-span-5">
           <CardHeader>
             <CardTitle>Connectivity notes</CardTitle>
             <CardDescription>
@@ -95,18 +100,18 @@ export function SystemView() {
           <CardContent className="space-y-3">
             {connectivityNotes.map((item) => (
               <div
-                className="flex gap-3 rounded-md border border-border p-3 dark:border-border"
+                className="flex gap-3 rounded-lg border border-border bg-surface p-3"
                 key={item}
               >
-                <Wifi className="mt-0.5 h-4 w-4 text-success-600 dark:text-success-400" />
-                <p className="text-sm leading-6 text-muted-foreground dark:text-muted-foreground">
+                <Wifi className="mt-0.5 size-4 text-success" />
+                <p className="text-sm leading-6 text-muted-foreground">
                   {item}
                 </p>
               </div>
             ))}
           </CardContent>
         </Card>
-      </section>
-    </div>
+      </AdminContentGrid>
+    </AdminPage>
   );
 }

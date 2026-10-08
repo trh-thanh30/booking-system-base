@@ -5,7 +5,7 @@ import { Building2, Globe2, Plus, RefreshCw, Store } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
-import { toast } from "sonner";
+import { useToast } from "@repo/hooks";
 import {
   createTenantSchema,
   type CreateTenantInput,
@@ -14,8 +14,6 @@ import {
 import {
   Badge,
   Button,
-  Card,
-  CardContent,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -29,7 +27,16 @@ import {
   TableHeader,
   TableRow,
 } from "@repo/ui";
-import { FormField, PageHeader, StatCard } from "@/src/components/common";
+import {
+  DataTableContainer,
+  EmptyState,
+  FormField,
+  PageHeader,
+  PlatformPage,
+  PlatformStatsGrid,
+  StatePanel,
+  StatCard,
+} from "@/src/components/common";
 import { tenantsService } from "@/src/services/tenants.service";
 
 function formatDate(value: string) {
@@ -54,6 +61,7 @@ function CreateTenantDialog({
   onOpenChange: (open: boolean) => void;
   open: boolean;
 }) {
+  const { toast } = useToast();
   const queryClient = useQueryClient();
   const {
     formState: { errors },
@@ -235,7 +243,7 @@ export function TenantsView() {
   );
 
   return (
-    <div className="space-y-6">
+    <PlatformPage>
       <PageHeader
         actions={
           <div className="flex flex-wrap gap-2">
@@ -257,7 +265,7 @@ export function TenantsView() {
         eyebrow="Platform"
         title={t("title")}
       />
-      <section className="grid gap-4 md:grid-cols-3">
+      <PlatformStatsGrid>
         <StatCard
           description="Registered workspaces"
           icon={Building2}
@@ -276,66 +284,85 @@ export function TenantsView() {
           title="Businesses"
           value={String(totalBusinesses)}
         />
-      </section>
-      <Card>
-        <CardContent className="p-0">
-          {tenantsQuery.isLoading ? (
-            <div className="space-y-3 p-6">
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-10 w-full" />
-            </div>
-          ) : tenants.length === 0 ? (
-            <div className="flex min-h-72 flex-col items-center justify-center p-6 text-center">
-              <Building2 className="h-8 w-8 text-slate-500" />
-              <h2 className="mt-4 text-base font-semibold">No tenants yet</h2>
-              <p className="mt-2 max-w-md text-sm leading-6 text-slate-500 dark:text-slate-400">
-                Create the first business workspace or wait for public business
-                signup to add one.
-              </p>
-            </div>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Business</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Domain</TableHead>
-                  <TableHead>Businesses</TableHead>
-                  <TableHead>Users</TableHead>
-                  <TableHead>Created</TableHead>
+      </PlatformStatsGrid>
+      {tenantsQuery.isLoading ? (
+        <DataTableContainer>
+          <div className="space-y-3 p-6">
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
+          </div>
+        </DataTableContainer>
+      ) : tenantsQuery.isError ? (
+        <StatePanel
+          action={
+            <Button
+              onClick={() => void tenantsQuery.refetch()}
+              variant="outline"
+            >
+              <RefreshCw className="size-4" />
+              Retry
+            </Button>
+          }
+          description="The tenant directory could not be loaded. Check the connection and try again."
+          icon={Building2}
+          title="Unable to load tenants"
+          tone="danger"
+        />
+      ) : tenants.length === 0 ? (
+        <EmptyState
+          action={
+            <Button onClick={() => setCreateOpen(true)}>
+              <Plus className="size-4" />
+              Create tenant
+            </Button>
+          }
+          description="Create the first business workspace or wait for public business signup to add one."
+          icon={Building2}
+          title="No tenants yet"
+        />
+      ) : (
+        <DataTableContainer>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Business</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Domain</TableHead>
+                <TableHead>Businesses</TableHead>
+                <TableHead>Users</TableHead>
+                <TableHead>Created</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {tenants.map((tenant) => (
+                <TableRow key={tenant.id}>
+                  <TableCell>
+                    <div className="font-medium">{tenant.name}</div>
+                    <div className="text-xs text-muted-foreground">
+                      {tenant.slug}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <Badge
+                      variant={
+                        tenant.status === "ACTIVE" ? "default" : "secondary"
+                      }
+                    >
+                      {tenant.status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>{primaryDomain(tenant)}</TableCell>
+                  <TableCell>{tenant.businesses_count}</TableCell>
+                  <TableCell>{tenant.users_count}</TableCell>
+                  <TableCell>{formatDate(tenant.created_at)}</TableCell>
                 </TableRow>
-              </TableHeader>
-              <TableBody>
-                {tenants.map((tenant) => (
-                  <TableRow key={tenant.id}>
-                    <TableCell>
-                      <div className="font-medium">{tenant.name}</div>
-                      <div className="text-xs text-slate-500">
-                        {tenant.slug}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge
-                        variant={
-                          tenant.status === "ACTIVE" ? "default" : "secondary"
-                        }
-                      >
-                        {tenant.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>{primaryDomain(tenant)}</TableCell>
-                    <TableCell>{tenant.businesses_count}</TableCell>
-                    <TableCell>{tenant.users_count}</TableCell>
-                    <TableCell>{formatDate(tenant.created_at)}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
-        </CardContent>
-      </Card>
+              ))}
+            </TableBody>
+          </Table>
+        </DataTableContainer>
+      )}
       <CreateTenantDialog onOpenChange={setCreateOpen} open={createOpen} />
-    </div>
+    </PlatformPage>
   );
 }

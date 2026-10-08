@@ -1,7 +1,7 @@
 "use client";
 
 import { Menu } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useState } from "react";
 import {
   Button,
   Sheet,
@@ -9,13 +9,15 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@repo/ui";
-import { AppSidebar } from "@/src/components/layout/admin/app-sidebar";
+import { PlatformSidebar } from "./platform-sidebar";
+import { useTranslations } from "next-intl";
 
-export function MobileSidebar() {
+export function PlatformMobileSidebar() {
   const t = useTranslations("Common");
+  const [open, setOpen] = useState(false);
 
   return (
-    <Sheet>
+    <Sheet onOpenChange={setOpen} open={open}>
       <SheetTrigger asChild>
         <Button
           aria-label={t("openNavigation")}
@@ -28,7 +30,11 @@ export function MobileSidebar() {
       </SheetTrigger>
       <SheetContent className="w-[min(20rem,calc(100vw-2rem))] p-0">
         <SheetTitle className="sr-only">{t("openNavigation")}</SheetTitle>
-        <AppSidebar collapsedOverride={false} showCollapseButton={false} />
+        <PlatformSidebar
+          collapsed={false}
+          onNavigate={() => setOpen(false)}
+          showCollapseButton={false}
+        />
       </SheetContent>
     </Sheet>
   );

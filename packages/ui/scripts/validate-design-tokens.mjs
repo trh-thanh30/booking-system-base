@@ -5,9 +5,15 @@ import { fileURLToPath } from "node:url";
 
 const packageRoot = fileURLToPath(new URL("..", import.meta.url));
 const webMode = process.argv.includes("--web");
-const reportRoot = webMode ? join(packageRoot, "../../apps/web") : packageRoot;
-const sourceRoots = webMode
-  ? [join(reportRoot, "src"), join(reportRoot, "app")]
+const platformAdminMode = process.argv.includes("--platform-admin");
+const appRoot = webMode
+  ? join(packageRoot, "../../apps/web")
+  : platformAdminMode
+    ? join(packageRoot, "../../apps/platform-admin")
+    : null;
+const reportRoot = appRoot ?? packageRoot;
+const sourceRoots = appRoot
+  ? [join(appRoot, "src"), join(appRoot, "app")]
   : [join(packageRoot, "src")];
 const sourceExtensions = new Set([".ts", ".tsx", ".css"]);
 const forbiddenPatterns = [

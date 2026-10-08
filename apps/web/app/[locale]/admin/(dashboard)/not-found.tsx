@@ -3,20 +3,23 @@ import { useTranslations } from "next-intl";
 import { Button } from "@repo/ui";
 import { StatePanel } from "@/src/components/common/state-panel";
 import { Link } from "@/src/i18n/navigation";
+import { AdminPage } from "@/src/components/common/admin/admin-page";
 
 export default function DashboardNotFound() {
   const t = useTranslations("RouteStates");
 
   return (
-    <StatePanel
-      action={
-        <Button asChild>
-          <Link href="/admin/dashboard">{t("backToDashboard")}</Link>
-        </Button>
-      }
-      description={t("notFoundDescription")}
-      icon={SearchX}
-      title={t("notFoundTitle")}
-    />
+    <AdminPage>
+      <StatePanel
+        action={
+          <Button asChild>
+            <Link href="/admin/dashboard">{t("backToDashboard")}</Link>
+          </Button>
+        }
+        description={t("notFoundDescription")}
+        icon={SearchX}
+        title={t("notFoundTitle")}
+      />
+    </AdminPage>
   );
 }

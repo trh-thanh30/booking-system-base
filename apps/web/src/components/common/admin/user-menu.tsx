@@ -64,14 +64,17 @@ export function UserMenu() {
       window.location.replace(
         buildAdminBaseUrl({ locale, pathname: "/admin/login" }),
       );
-      setIsLoggingOut(false);
     }
   }
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button className="h-10 gap-2 px-2" variant="ghost">
+        <Button
+          aria-label={t("items.profile")}
+          className="h-10 gap-2 px-1.5 sm:px-2"
+          variant="ghost"
+        >
           <Avatar className="h-8 w-8">
             <AvatarFallback>{initials}</AvatarFallback>
           </Avatar>
@@ -80,8 +83,15 @@ export function UserMenu() {
           </span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent>
-        <DropdownMenuLabel>{email}</DropdownMenuLabel>
+      <DropdownMenuContent align="end" className="w-64">
+        <DropdownMenuLabel className="space-y-1">
+          <p className="truncate text-sm font-semibold text-foreground">
+            {displayName}
+          </p>
+          <p className="truncate text-xs font-normal text-muted-foreground">
+            {email}
+          </p>
+        </DropdownMenuLabel>
         <DropdownMenuSeparator />
         {menuItems.map((item) => {
           const Icon = item.icon;
@@ -90,12 +100,12 @@ export function UserMenu() {
               asChild
               className={cn(
                 "flex cursor-pointer items-center gap-2 rounded-sm px-2 py-2 text-sm outline-none transition-colors",
-                "text-foreground hover:bg-muted dark:text-muted-foreground dark:hover:bg-muted",
+                "text-foreground hover:bg-muted",
               )}
               key={item.label}
             >
               <Link href={item.href} className="flex w-full items-center gap-2">
-                <Icon className="h-4 w-4 shrink-0" />
+                <Icon className="size-4 shrink-0" />
                 <span>{item.label}</span>
               </Link>
             </DropdownMenuItem>
@@ -109,7 +119,7 @@ export function UserMenu() {
             void handleLogout();
           }}
         >
-          <LogOut className="h-4 w-4 shrink-0" />
+          <LogOut className="size-4 shrink-0" />
           <span>{t("items.signOut")}</span>
         </DropdownMenuItem>
       </DropdownMenuContent>

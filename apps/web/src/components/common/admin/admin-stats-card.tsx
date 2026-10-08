@@ -1,21 +1,23 @@
 import type { LucideIcon } from "lucide-react";
 import { Card, CardContent } from "@repo/ui";
 
-type StatCardProps = {
+type AdminStatsCardProps = {
   description: string;
   icon: LucideIcon;
   title: string;
+  trend?: string;
   value: string;
 };
 
-export function StatCard({
+export function AdminStatsCard({
   description,
   icon: Icon,
   title,
+  trend,
   value,
-}: StatCardProps) {
+}: AdminStatsCardProps) {
   return (
-    <Card className="group min-w-0 overflow-hidden shadow-xs transition-[border-color,box-shadow] duration-normal hover:border-primary/40 hover:shadow-md">
+    <Card className="group min-w-0 overflow-hidden shadow-xs transition-[border-color,box-shadow] duration-normal hover:border-primary-200 hover:shadow-md dark:hover:border-primary-800">
       <CardContent className="p-5">
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
@@ -30,9 +32,16 @@ export function StatCard({
             <Icon aria-hidden="true" className="size-4" />
           </div>
         </div>
-        <p className="mt-4 truncate border-t border-border pt-3 text-xs text-muted-foreground">
-          {description}
-        </p>
+        <div className="mt-4 flex min-w-0 items-center gap-2 border-t border-border pt-3">
+          <p className="min-w-0 flex-1 truncate text-xs text-muted-foreground">
+            {description}
+          </p>
+          {trend ? (
+            <span className="shrink-0 rounded-full bg-muted px-2 py-1 text-caption font-semibold text-muted-foreground">
+              {trend}
+            </span>
+          ) : null}
+        </div>
       </CardContent>
     </Card>
   );

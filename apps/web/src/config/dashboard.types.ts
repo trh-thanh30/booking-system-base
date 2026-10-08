@@ -11,6 +11,7 @@ export interface NavigationItem {
   href?: string;
   icon: ComponentType<{ className?: string }>;
   badge?: string;
+  disabled?: boolean;
   permission?: string;
 }
 

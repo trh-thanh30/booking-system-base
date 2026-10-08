@@ -219,6 +219,23 @@ Chạy kiểm tra token của shared UI bằng:
 pnpm --filter @repo/ui validate:tokens
 ```
 
+### Business Admin Dashboard — DS-003
+
+Protected Business Admin routes under `/{locale}/admin/*` compose shared
+primitives through `apps/web/src/components/common/admin`:
+
+- `AdminPage` and `AdminPageHeader` define route spacing and heading hierarchy.
+- `AdminStatsGrid` and `AdminStatsCard` define responsive operational metrics.
+- `AdminFilterToolbar` groups search/filter actions without feature logic.
+- `AdminTableContainer` owns table boundary and horizontal overflow.
+
+Use `background` for the app canvas, `surface` for navigation/header regions,
+`card` for content containers, `popover` for overlays, `accent` for selected
+navigation and `primary` for brand actions. Semantic tokens already switch with
+the theme; do not add equivalent `.dark` classes. Admin navigation must expose a
+skip link, visible keyboard focus, real active routes and an explicit disabled
+state for destinations that are not implemented.
+
 ## Landing Page — DS-002
 
 Web dùng Blue Brand Theme từ shared tokens; không định nghĩa lại palette trong

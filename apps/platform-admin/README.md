@@ -26,3 +26,18 @@ Backend dependency:
 
 Until the API supports that context, the app builds and renders but platform
 login is not expected to succeed against the current auth module.
+
+# Platform Admin
+
+Platform Admin is the isolated super-admin application for tenant lifecycle and
+platform operations. It uses the shared semantic tokens from `@repo/ui` and
+must not define an app-specific color palette.
+
+Reusable administration compositions live in `src/components/common`:
+
+- `PlatformPage`, `PageHeader`, `PageActions`, and `PlatformStatsGrid` define
+  page hierarchy and responsive spacing.
+- `FilterToolbar` and `DataTableContainer` define list and table surfaces.
+- `EmptyState` and `StatePanel` define empty and blocking feedback states.
+
+Run `pnpm --filter @repo/platform-admin validate:tokens` after styling changes.
