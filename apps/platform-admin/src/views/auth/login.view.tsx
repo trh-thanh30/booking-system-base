@@ -3,7 +3,7 @@
 import { Lock, LogIn, Mail } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
-import { toast } from "sonner";
+import { useToast } from "@repo/hooks";
 import { loginSchema, type LoginInput } from "@repo/shared";
 import { Button, Input } from "@repo/ui";
 import { FormField } from "@/src/components/common";
@@ -12,6 +12,7 @@ import { useRouter } from "@/src/i18n/navigation";
 import { AuthShell } from "./components/auth-shell";
 
 export function LoginView() {
+  const { toast } = useToast();
   const t = useTranslations("Auth");
   const router = useRouter();
   const { login } = useAuth();
@@ -60,7 +61,7 @@ export function LoginView() {
           required
         >
           <div className="relative">
-            <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <Mail className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               aria-required="true"
               autoComplete="username"
@@ -77,7 +78,7 @@ export function LoginView() {
           required
         >
           <div className="relative">
-            <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <Lock className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               aria-required="true"
               autoComplete="current-password"
@@ -89,7 +90,7 @@ export function LoginView() {
           </div>
         </FormField>
         <Button className="w-full" disabled={isSubmitting} type="submit">
-          <LogIn className="h-4 w-4" />
+          <LogIn className="size-4" />
           {isSubmitting ? t("login.submitting") : t("login.submit")}
         </Button>
       </form>

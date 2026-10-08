@@ -2,7 +2,15 @@
 
 import { LogOut, PanelLeft } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { Avatar, AvatarFallback, Button } from "@repo/ui";
+import {
+  Avatar,
+  AvatarFallback,
+  Button,
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@repo/ui";
 import { cn } from "@repo/ui/lib/utils";
 import { getPlatformConfig } from "@/src/config/platform.config";
 import { Link, usePathname, useRouter } from "@/src/i18n/navigation";
@@ -10,10 +18,14 @@ import { useAuth } from "@/src/app/providers";
 
 export function PlatformSidebar({
   collapsed,
+  onNavigate,
   onToggle,
+  showCollapseButton = true,
 }: {
   collapsed: boolean;
-  onToggle: () => void;
+  onNavigate?: () => void;
+  onToggle?: () => void;
+  showCollapseButton?: boolean;
 }) {
   const t = useTranslations("Platform");
   const tCommon = useTranslations("Common");
@@ -29,114 +41,136 @@ export function PlatformSidebar({
   }
 
   return (
-    <aside
-      className={cn(
-        "flex h-full flex-col border-r border-slate-200 bg-white transition-all duration-300 ease-in-out dark:border-slate-800 dark:bg-slate-950",
-        collapsed ? "w-16" : "w-72",
-      )}
-    >
-      <div
+    <TooltipProvider delayDuration={100} skipDelayDuration={100}>
+      <aside
         className={cn(
-          "flex h-16 items-center gap-3 px-5",
-          collapsed && "justify-center px-0",
+          "flex h-full flex-col border-r border-border bg-surface transition-[width] duration-slow ease-[var(--ease-standard)]",
+          collapsed ? "w-16" : "w-72",
         )}
       >
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-slate-950 text-white dark:bg-slate-50 dark:text-slate-950">
-          <BrandLogo className="h-4 w-4" />
-        </div>
-        {!collapsed ? (
-          <>
-            <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-semibold text-slate-950 dark:text-slate-50">
-                {config.brand.name}
-              </p>
-              <p className="truncate text-xs text-slate-500 dark:text-slate-400">
-                {config.brand.description}
-              </p>
-            </div>
-            <Button
-              aria-label={tCommon("collapseSidebar")}
-              className="h-8 w-8"
-              onClick={onToggle}
-              size="icon"
-              variant="ghost"
-            >
-              <PanelLeft className="h-4 w-4" />
-            </Button>
-          </>
-        ) : null}
-      </div>
-      <nav className="flex-1 overflow-y-auto px-3 pb-3">
-        {config.sidebarSections.map((section) => (
-          <div className="space-y-1" key={section.label}>
-            {!collapsed ? (
-              <p className="px-3 pb-1 pt-4 text-xs font-medium text-slate-500 dark:text-slate-500">
-                {section.label}
-              </p>
-            ) : (
-              <div className="h-4" />
-            )}
-            {section.items.map((item) => {
-              const Icon = item.icon;
-              const active =
-                pathname === item.href || pathname.startsWith(`${item.href}/`);
-
-              return (
-                <Link
-                  aria-current={active ? "page" : undefined}
-                  className={cn(
-                    "flex h-9 items-center rounded-md text-sm font-medium transition-colors",
-                    collapsed
-                      ? "mx-auto h-9 w-9 justify-center px-0"
-                      : "w-full gap-3 px-3",
-                    active
-                      ? "bg-slate-200 text-slate-950 dark:bg-slate-800 dark:text-slate-50"
-                      : "text-slate-600 hover:bg-slate-100 hover:text-slate-950 dark:text-slate-400 dark:hover:bg-slate-900 dark:hover:text-slate-50",
-                  )}
-                  href={item.href}
-                  key={item.href}
-                  title={collapsed ? item.title : undefined}
-                >
-                  <Icon className="h-4 w-4 shrink-0" />
-                  {!collapsed ? <span>{item.title}</span> : null}
-                </Link>
-              );
-            })}
-          </div>
-        ))}
-      </nav>
-      <div className="border-t border-slate-200 p-4 dark:border-slate-800">
         <div
           className={cn(
-            "flex items-center gap-3",
-            collapsed && "justify-center",
+            "flex h-16 items-center gap-3 px-5",
+            collapsed && "justify-center px-0",
           )}
         >
-          <Avatar className="h-9 w-9">
-            <AvatarFallback>SA</AvatarFallback>
-          </Avatar>
+          <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-sm">
+            <BrandLogo className="size-4" />
+          </div>
           {!collapsed ? (
             <>
               <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium text-slate-950 dark:text-slate-50">
-                  {user?.full_name ?? user?.username ?? "Super Admin"}
+                <p className="truncate text-sm font-semibold text-foreground">
+                  {config.brand.name}
                 </p>
-                <p className="truncate text-xs text-slate-500 dark:text-slate-400">
-                  {user?.email ?? "platform@example.com"}
+                <p className="truncate text-xs text-muted-foreground">
+                  {config.brand.description}
                 </p>
               </div>
-              <Button
-                aria-label={t("items.signOut")}
-                onClick={() => void handleLogout()}
-                size="icon"
-                variant="ghost"
-              >
-                <LogOut className="h-4 w-4" />
-              </Button>
+              {showCollapseButton ? (
+                <Button
+                  aria-label={tCommon("collapseSidebar")}
+                  className="size-8"
+                  onClick={onToggle}
+                  size="icon"
+                  variant="ghost"
+                >
+                  <PanelLeft className="size-4" />
+                </Button>
+              ) : null}
             </>
           ) : null}
         </div>
-      </div>
-    </aside>
+        <nav
+          aria-label={config.brand.name}
+          className="flex-1 overflow-y-auto px-3 pb-3"
+        >
+          {config.sidebarSections.map((section) => (
+            <div className="space-y-1" key={section.label}>
+              {!collapsed ? (
+                <p className="px-3 pb-2 pt-5 text-caption font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+                  {section.label}
+                </p>
+              ) : (
+                <div className="h-4" />
+              )}
+              {section.items.map((item) => {
+                const Icon = item.icon;
+                const active =
+                  pathname === item.href ||
+                  pathname.startsWith(`${item.href}/`);
+
+                const navigationItem = (
+                  <Link
+                    aria-current={active ? "page" : undefined}
+                    className={cn(
+                      "flex h-10 items-center rounded-lg text-sm font-medium transition-colors duration-normal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                      collapsed
+                        ? "mx-auto size-10 justify-center px-0"
+                        : "w-full gap-3 px-3",
+                      active
+                        ? "bg-accent text-accent-foreground"
+                        : "text-muted-foreground hover:bg-muted-hover hover:text-foreground",
+                    )}
+                    href={item.href}
+                    key={item.href}
+                    onClick={onNavigate}
+                  >
+                    <Icon className="size-4 shrink-0" />
+                    {!collapsed ? (
+                      <span className="truncate">{item.title}</span>
+                    ) : null}
+                  </Link>
+                );
+
+                if (!collapsed) return navigationItem;
+
+                return (
+                  <Tooltip key={item.href}>
+                    <TooltipTrigger asChild>{navigationItem}</TooltipTrigger>
+                    <TooltipContent side="right">{item.title}</TooltipContent>
+                  </Tooltip>
+                );
+              })}
+            </div>
+          ))}
+        </nav>
+        <div className="border-t border-border p-3">
+          <div
+            className={cn(
+              "flex items-center gap-3",
+              collapsed && "justify-center",
+            )}
+          >
+            <Avatar className="h-9 w-9">
+              <AvatarFallback>SA</AvatarFallback>
+            </Avatar>
+            {!collapsed ? (
+              <>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-medium text-foreground">
+                    {user?.full_name ?? user?.username ?? "Super Admin"}
+                  </p>
+                  <p className="truncate text-xs text-muted-foreground">
+                    {user?.email ?? "platform@example.com"}
+                  </p>
+                </div>
+                <Button
+                  aria-label={t("items.signOut")}
+                  onClick={() => {
+                    onNavigate?.();
+                    void handleLogout();
+                  }}
+                  size="icon"
+                  variant="ghost"
+                >
+                  <LogOut className="size-4" />
+                </Button>
+              </>
+            ) : null}
+          </div>
+        </div>
+      </aside>
+    </TooltipProvider>
   );
 }
