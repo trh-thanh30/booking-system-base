@@ -36,7 +36,7 @@ export function FormField({
   const controlIndex = childNodes.findIndex((child) => isValidElement(child));
 
   return (
-    <div className="grid gap-2">
+    <div className="grid min-w-0 grid-cols-1 gap-2">
       <Label className={className} htmlFor={htmlFor}>
         {label}
         {required ? (

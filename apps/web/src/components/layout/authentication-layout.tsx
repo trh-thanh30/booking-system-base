@@ -35,8 +35,8 @@ export function AuthenticationLayout({
             {description}
           </p>
         </div>
-        <div className="rounded-lg border border-border bg-card p-5 text-card-foreground shadow-md sm:p-7 [&_label]:text-base [&_label]:font-semibold [&_input:not([type=hidden]):not([data-input-otp])]:h-13 [&_input:not([type=hidden]):not([data-input-otp])]:min-h-13 [&_input:not([type=hidden]):not([data-input-otp])]:text-base [&_[role=combobox]]:min-h-13 [&_[role=combobox]]:text-base [&_p[id$=-description]]:text-sm [&_p[role=alert]]:text-sm">
-          {children}
+        <div className="rounded-lg border border-border bg-card p-5 text-card-foreground shadow-md sm:p-7 [&_label]:text-base [&_label]:font-semibold [&_.phone-number-input]:h-13! [&_input:not([type=hidden]):not([data-input-otp]):not(.PhoneInputInput)]:h-13 [&_input:not([type=hidden]):not([data-input-otp]):not(.PhoneInputInput)]:min-h-13 [&_input:not([type=hidden]):not([data-input-otp])]:text-base [&_[role=combobox]]:min-h-13 [&_[role=combobox]]:text-base [&_p[id$=-description]]:text-sm [&_p[role=alert]]:text-sm">
+          <div data-auth-form>{children}</div>
         </div>
         <p className="mt-7 text-center text-sm leading-6 text-muted-foreground">
           {t("footer")}

@@ -19,6 +19,8 @@ import {
   type PhoneCountry,
 } from "@repo/ui";
 import { useTranslations } from "next-intl";
+import { LoaderCircle } from "lucide-react";
+import { animate } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { FormProvider, useForm, type FieldPath } from "react-hook-form";
 import { useBusinessNameAvailability } from "../../hooks/use-business-name-availability";
@@ -94,8 +96,10 @@ export function BusinessOnboardingForm({
     check: checkBusinessName,
     slug: businessSlug,
     status: businessNameStatus,
-  } = useBusinessNameAvailability(form.watch("name"));
+  } = useBusinessNameAvailability(form.watch("slug"));
   const busy = isPending || form.formState.isSubmitting;
+  const creatingBusiness =
+    isPending || (step === 1 && form.formState.isSubmitting);
   const usernameAvailability = useOwnerContactAvailability(
     form,
     "username",
@@ -116,7 +120,11 @@ export function BusinessOnboardingForm({
     ) {
       return;
     }
-    const restoredSlug = createBusinessSlug(form.getValues("name"));
+    const restoredSlug =
+      form.getValues("slug") || createBusinessSlug(form.getValues("name"));
+    if (restoredSlug && !form.getValues("slug")) {
+      form.setValue("slug", restoredSlug, { shouldDirty: false });
+    }
     if (!restoredSlug) {
       checkedRestoredBusinessName.current = true;
       return;
@@ -134,10 +142,39 @@ export function BusinessOnboardingForm({
   ]);
 
   useEffect(() => {
-    if (previousStep.current !== null && previousStep.current !== step) {
-      heading.current?.focus();
-    }
+    const changed =
+      previousStep.current !== null && previousStep.current !== step;
     previousStep.current = step;
+    if (changed) {
+      const title = heading.current;
+      title?.focus({ preventScroll: true });
+      const bounds = title?.getBoundingClientRect();
+      if (bounds && (bounds.top < 96 || bounds.bottom > window.innerHeight)) {
+        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+          title?.scrollIntoView({ behavior: "instant", block: "start" });
+          return;
+        }
+        const animation = animate(
+          window.scrollY,
+          window.scrollY + bounds.top - 96,
+          {
+            duration: 0.8,
+            ease: "easeInOut",
+            onUpdate: (top) => window.scrollTo({ top, behavior: "instant" }),
+          },
+        );
+        const stop = () => {
+          animation.stop();
+          window.removeEventListener("wheel", stop);
+          window.removeEventListener("touchstart", stop);
+          window.removeEventListener("keydown", stop);
+        };
+        window.addEventListener("wheel", stop, { passive: true });
+        window.addEventListener("touchstart", stop, { passive: true });
+        window.addEventListener("keydown", stop);
+        return stop;
+      }
+    }
   }, [step]);
 
   useEffect(() => {
@@ -162,7 +199,7 @@ export function BusinessOnboardingForm({
     form.clearErrors();
     const normalizedInput = {
       ...input,
-      slug: createBusinessSlug(input.name),
+      slug: input.slug.trim(),
     };
     const parsed =
       step === 0
@@ -179,7 +216,7 @@ export function BusinessOnboardingForm({
         : completeOwnerBusinessSchema.safeParse(normalizedInput);
     if (!parsed.success) {
       for (const issue of parsed.error.issues) {
-        const path = issue.path[0] === "slug" ? ["name"] : issue.path;
+        const path = issue.path;
         form.setError(
           path.join(".") as FieldPath<CompleteOwnerBusinessInput>,
           {
@@ -270,7 +307,7 @@ export function BusinessOnboardingForm({
           <h2
             ref={heading}
             tabIndex={-1}
-            className="rounded-sm text-base font-semibold focus-visible:outline-2 focus-visible:outline-ring"
+            className="scroll-mt-24 rounded-sm text-base font-semibold focus-visible:outline-2 focus-visible:outline-ring"
           >
             {t(STEP_TITLES[step])}
           </h2>
@@ -302,7 +339,7 @@ export function BusinessOnboardingForm({
             </div>
           </TooltipProvider>
         </div>
-        <div className="flex min-h-5 items-center justify-between ">
+        <div className="flex min-h-5 flex-col items-start gap-1 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
           <p
             aria-live="polite"
             role="status"
@@ -333,26 +370,31 @@ export function BusinessOnboardingForm({
             </Button>
           ) : null}
         </div>
-        <fieldset disabled={busy} className="space-y-5">
+        <fieldset disabled={busy} className="min-w-0 space-y-5">
           <legend className="sr-only">{t(STEP_TITLES[step])}</legend>
-          {step === 0 ? (
-            <BusinessInformationStep
-              locale={locale}
-              disabled={busy}
-              phoneCountry={phoneCountry}
-              businessSlug={businessSlug}
-              businessNameStatus={businessNameStatus}
-              onCheckBusinessName={checkBusinessName}
-              usernameStatus={usernameAvailability.status}
-              phoneStatus={phoneAvailability.status}
-              onCheckUsername={usernameAvailability.check}
-              onCheckPhone={phoneAvailability.check}
-            />
-          ) : null}
-          {step === 1 ? (
-            <BusinessAddressStep locale={locale} disabled={busy} />
-          ) : null}
-          <div className="flex gap-2 pt-3">
+          <div
+            key={step}
+            data-onboarding-step={step}
+            className="space-y-5 animate-panel-in motion-reduce:animate-none [&_input:disabled]:bg-card [&_input:disabled]:text-foreground"
+          >
+            {step === 0 ? (
+              <BusinessInformationStep
+                locale={locale}
+                disabled={busy}
+                phoneCountry={phoneCountry}
+                businessNameStatus={businessNameStatus}
+                onCheckBusinessName={checkBusinessName}
+                usernameStatus={usernameAvailability.status}
+                phoneStatus={phoneAvailability.status}
+                onCheckUsername={usernameAvailability.check}
+                onCheckPhone={phoneAvailability.check}
+              />
+            ) : null}
+            {step === 1 ? (
+              <BusinessAddressStep locale={locale} disabled={busy} />
+            ) : null}
+          </div>
+          <div className="flex flex-col gap-2 pt-3 sm:flex-row">
             {step > 0 ? (
               <Button
                 type="button"
@@ -369,9 +411,22 @@ export function BusinessOnboardingForm({
                 busy || (step === 0 && businessNameStatus !== "available")
               }
               type="submit"
+              aria-busy={busy}
             >
+              {busy && (
+                <LoaderCircle
+                  aria-hidden="true"
+                  className="size-4 animate-spin motion-reduce:animate-none"
+                />
+              )}
               {t(
-                isPending ? "completing" : step === 1 ? "complete" : "continue",
+                creatingBusiness
+                  ? "completing"
+                  : busy
+                    ? "availability.checking"
+                    : step === 1
+                      ? "complete"
+                      : "continue",
               )}
             </Button>
           </div>

@@ -9,6 +9,7 @@ import { useFormContext, type FieldPath } from "react-hook-form";
 export function BusinessOnboardingField({
   name,
   label,
+  labelText,
   type = "text",
   required = true,
   availabilityError,
@@ -17,6 +18,7 @@ export function BusinessOnboardingField({
 }: {
   name: FieldPath<CompleteOwnerBusinessInput>;
   label: string;
+  labelText?: string;
   type?: HTMLInputTypeAttribute;
   required?: boolean;
   availabilityError?: string;
@@ -34,7 +36,7 @@ export function BusinessOnboardingField({
   return (
     <FormField
       htmlFor={id}
-      label={t(label)}
+      label={labelText ?? t(label)}
       error={error?.message || availabilityError}
       description={availabilityHint}
       descriptionRole="status"
