@@ -129,6 +129,7 @@
     "accountExists": "This email is already registered. Log in or request email verification to continue.",
     "registrationFailed": "Could not create your account. Please try again.",
     "invalidField": "Please check this field.",
+    "invalidPhone": "Enter a valid phone number for the selected country.",
     "businessTitle": "Set up your business",
     "businessDescription": "Complete these details to create your booking workspace.",
     "businessInfo": "Business information",

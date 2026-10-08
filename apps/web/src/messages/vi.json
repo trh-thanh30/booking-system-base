@@ -129,6 +129,7 @@
     "accountExists": "Email này đã được đăng ký. Đăng nhập hoặc yêu cầu xác minh email để tiếp tục.",
     "registrationFailed": "Chưa thể tạo tài khoản. Vui lòng thử lại.",
     "invalidField": "Vui lòng kiểm tra thông tin này.",
+    "invalidPhone": "Nhập số điện thoại hợp lệ theo quốc gia đã chọn.",
     "businessTitle": "Thiết lập doanh nghiệp",
     "businessDescription": "Hoàn tất thông tin để tạo không gian đặt lịch của bạn.",
     "businessInfo": "Thông tin doanh nghiệp",

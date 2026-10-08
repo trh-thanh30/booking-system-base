@@ -35,13 +35,14 @@ export class CheckOwnerContactUseCase {
       )
         throw new UnauthorizedError('Owner onboarding is not available');
     }
-    const value = input.value.trim();
+    const rawValue = input.value.trim();
     const parsed =
       completeOwnerBusinessSchema.shape.owner.shape[input.field].safeParse(
-        value,
+        rawValue,
       );
-    if (!parsed.success || !value)
+    if (!parsed.success || !parsed.data)
       throw new BadRequestError('Invalid contact field');
+    const value = parsed.data;
     const existing =
       input.field === 'username'
         ? await this.users.findByUsername(value)

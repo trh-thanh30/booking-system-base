@@ -82,6 +82,17 @@ function setup(user: unknown = owner) {
   };
 }
 describe('OwnerBusinessOnboardingUseCase', () => {
+  it('rejects invalid international phones before checking uniqueness or creating a workspace', async () => {
+    const { useCase, users, workspace } = setup();
+    await expect(
+      useCase.execute('ticket', {
+        ...input,
+        owner: { ...input.owner, phone: '+8412212121211212121212' },
+      }),
+    ).rejects.toThrow('Invalid business information');
+    expect(users.findByPhone).not.toHaveBeenCalled();
+    expect(workspace.execute).not.toHaveBeenCalled();
+  });
   it('establishes an Admin session for the newly provisioned verified Owner', async () => {
     const { useCase, users, tokens } = setup();
     const result = await useCase.execute('ticket', input);

@@ -182,7 +182,13 @@ export function BusinessOnboardingForm({
         const path = issue.path[0] === "slug" ? ["name"] : issue.path;
         form.setError(
           path.join(".") as FieldPath<CompleteOwnerBusinessInput>,
-          { message: t("invalidField") },
+          {
+            message: t(
+              path.join(".") === "owner.phone"
+                ? "invalidPhone"
+                : "invalidField",
+            ),
+          },
           { shouldFocus: true },
         );
       }

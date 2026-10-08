@@ -57,7 +57,7 @@ export function BusinessInformationStep({
       : status === "error"
         ? t("availability.failed")
         : status === "invalid"
-          ? t("invalidField")
+          ? t(field === "phone" ? "invalidPhone" : "invalidField")
           : undefined;
   }
   const categories = useQuery({
@@ -175,7 +175,10 @@ export function BusinessInformationStep({
               placeholder={t("placeholders.phone")}
               defaultCountry={phoneCountry}
               value={field.value || undefined}
-              onChange={field.onChange}
+              onChange={(value: string | undefined) => {
+                field.onChange(value);
+                form.clearErrors("owner.phone");
+              }}
               onBlur={() => {
                 field.onBlur();
                 void onCheckPhone();
