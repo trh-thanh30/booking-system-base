@@ -1,4 +1,11 @@
 {
+  "Map": {
+    "loading": "Đang tải bản đồ…",
+    "loadingTiles": "Đang tải bản đồ…",
+    "unavailable": "Không thể tải bản đồ. Bạn vẫn có thể nhập địa chỉ và tọa độ.",
+    "attribution": "Nguồn dữ liệu bản đồ",
+    "countryData": "Dữ liệu quốc gia"
+  },
   "BusinessSetup": {
     "eyebrow": "Thiết lập nhanh",
     "title": "Sẵn sàng đón khách",
@@ -180,6 +187,8 @@
     "longitude": "Kinh độ",
     "clearLocation": "Xóa vị trí",
     "invalidLocation": "Vui lòng kiểm tra tọa độ vị trí.",
+    "invalidLatitude": "Vĩ độ phải là số từ −90 đến 90.",
+    "invalidLongitude": "Kinh độ phải là số từ −180 đến 180.",
     "back": "Quay lại",
     "continue": "Tiếp tục",
     "complete": "Tạo doanh nghiệp",

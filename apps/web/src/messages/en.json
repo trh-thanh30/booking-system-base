@@ -1,4 +1,11 @@
 {
+  "Map": {
+    "loading": "Loading map…",
+    "loadingTiles": "Loading map…",
+    "unavailable": "Could not load the map. You can still enter your address and coordinates.",
+    "attribution": "Map data sources",
+    "countryData": "Country data"
+  },
   "BusinessSetup": {
     "eyebrow": "Quick setup",
     "title": "Get your business ready",
@@ -180,6 +187,8 @@
     "longitude": "Longitude",
     "clearLocation": "Clear location",
     "invalidLocation": "Check the location coordinates.",
+    "invalidLatitude": "Latitude must be a number between −90 and 90.",
+    "invalidLongitude": "Longitude must be a number between −180 and 180.",
     "back": "Back",
     "continue": "Continue",
     "complete": "Create my business",

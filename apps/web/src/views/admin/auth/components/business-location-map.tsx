@@ -8,13 +8,7 @@ import type {
   GeocodingAddress,
   LocationCoordinates,
 } from "@repo/shared";
-import {
-  Button,
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@repo/ui";
+import { Button } from "@repo/ui";
 import { LoaderCircle, LocateFixed, MapPin, X } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
@@ -42,11 +36,35 @@ export function BusinessLocationMap({
   const changeAddress = useRef(onAddressChange);
   changeAddress.current = onAddressChange;
   const [error, setError] = useState("");
+  const [coordinateErrors, setCoordinateErrors] = useState({
+    latitude: false,
+    longitude: false,
+  });
+  useEffect(() => {
+    setCoordinateErrors((current) => ({
+      latitude:
+        current.latitude &&
+        value !== null &&
+        (!Number.isFinite(value.latitude) || Math.abs(value.latitude) > 90),
+      longitude:
+        current.longitude &&
+        value !== null &&
+        (!Number.isFinite(value.longitude) || Math.abs(value.longitude) > 180),
+    }));
+  }, [value]);
   const [locating, setLocating] = useState(false);
   const [geocoding, setGeocoding] = useState<"forward" | "reverse" | null>(
     null,
   );
   const geocodingRequest = useRef(0);
+  const currentCountry = useRef(address.countryCode);
+  currentCountry.current = address.countryCode;
+  useEffect(() => {
+    // Discard lookups for the previous country so they cannot restore an old pin.
+    geocodingRequest.current += 1;
+    setGeocoding(null);
+    setLocating(false);
+  }, [address.countryCode]);
   const mounted = useRef(true);
   useEffect(() => {
     mounted.current = true;
@@ -113,10 +131,17 @@ export function BusinessLocationMap({
       return;
     }
     setLocating(true);
+    const locationRequest = geocodingRequest.current;
+    const requestedCountry = address.countryCode;
     setError("");
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        if (!mounted.current) return;
+        if (
+          !mounted.current ||
+          currentCountry.current !== requestedCountry ||
+          geocodingRequest.current !== locationRequest
+        )
+          return;
         setLocating(false);
         selectLocation({
           latitude: position.coords.latitude,
@@ -124,7 +149,11 @@ export function BusinessLocationMap({
         });
       },
       () => {
-        if (mounted.current) {
+        if (
+          mounted.current &&
+          currentCountry.current === requestedCountry &&
+          geocodingRequest.current === locationRequest
+        ) {
           setLocating(false);
           setError("locationDenied");
         }
@@ -172,6 +201,7 @@ export function BusinessLocationMap({
       </div>
       <div className="relative">
         <LocationPickerMap
+          countryCode={address.countryCode}
           value={value}
           disabled={disabled}
           ariaLabel={t("mapLabel")}
@@ -193,24 +223,35 @@ export function BusinessLocationMap({
           {t(error)}
         </p>
       ) : null}
-      <div
-        className={
-          value
-            ? "grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_2.75rem] items-end gap-3"
-            : "grid grid-cols-2 gap-3"
-        }
-      >
+      <div className="grid grid-cols-1 items-start gap-3 sm:grid-cols-2">
         {(["latitude", "longitude"] as const).map((coordinate) => (
-          <label key={coordinate} className="space-y-2 text-sm">
-            {t(coordinate)}
+          <div key={coordinate} className="min-w-0 space-y-2 text-sm">
+            <label htmlFor={`location-${coordinate}`}>{t(coordinate)}</label>
             <Input
+              id={`location-${coordinate}`}
               type="number"
               placeholder={t(`placeholders.${coordinate}`)}
               step="any"
               min={coordinate === "latitude" ? -90 : -180}
               max={coordinate === "latitude" ? 90 : 180}
               disabled={disabled}
+              aria-invalid={coordinateErrors[coordinate]}
+              aria-describedby={
+                coordinateErrors[coordinate]
+                  ? `location-${coordinate}-error`
+                  : undefined
+              }
+              className={
+                coordinateErrors[coordinate] ? "border-destructive" : undefined
+              }
               value={value?.[coordinate] ?? ""}
+              onBlur={(event) => {
+                const invalid = !event.currentTarget.validity.valid;
+                setCoordinateErrors((current) => ({
+                  ...current,
+                  [coordinate]: invalid,
+                }));
+              }}
               onChange={(event) => {
                 const number = Number(event.target.value);
                 if (event.target.value === "") {
@@ -225,29 +266,45 @@ export function BusinessLocationMap({
                   });
               }}
             />
-          </label>
+            {coordinateErrors[coordinate] ? (
+              <p
+                id={`location-${coordinate}-error`}
+                role="alert"
+                className="text-sm text-destructive"
+              >
+                {t(
+                  coordinate === "latitude"
+                    ? "invalidLatitude"
+                    : "invalidLongitude",
+                )}
+              </p>
+            ) : null}
+          </div>
         ))}
-        {value ? (
-          <TooltipProvider delayDuration={100}>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="size-11 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
-                  disabled={disabled}
-                  aria-label={t("clearLocation")}
-                  onClick={() => onChange(null)}
-                >
-                  <X aria-hidden="true" className="size-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>{t("clearLocation")}</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        ) : null}
       </div>
+      {value ? (
+        <div className="flex justify-end">
+          <Button
+            type="button"
+            variant="outline"
+            className="min-h-11 w-full gap-2 text-body sm:w-auto"
+            disabled={disabled}
+            onClick={() => {
+              geocodingRequest.current += 1;
+              setGeocoding(null);
+              setLocating(false);
+              setCoordinateErrors({ latitude: false, longitude: false });
+              onChange(null);
+              requestAnimationFrame(() =>
+                document.getElementById("location-latitude")?.focus(),
+              );
+            }}
+          >
+            <X aria-hidden="true" className="size-4" />
+            {t("clearLocation")}
+          </Button>
+        </div>
+      ) : null}
     </div>
   );
 }

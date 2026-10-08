@@ -78,10 +78,23 @@ export function BusinessAddressStep({
               locale={locale}
               value={field.value}
               onChange={(value) => {
-                field.onChange(value);
-                form.setValue("business_profile.address.formattedAddress", "", {
-                  shouldDirty: true,
-                });
+                if (value === field.value) return;
+                form.setValue(
+                  "business_profile.address",
+                  {
+                    countryCode: value,
+                    addressLine1: "",
+                    addressLine2: "",
+                    locality: "",
+                    administrativeAreaLevel1: "",
+                    administrativeAreaLevel2: "",
+                    postalCode: "",
+                    formattedAddress: "",
+                    location: null,
+                  },
+                  { shouldDirty: true },
+                );
+                form.clearErrors("business_profile.address");
               }}
               disabled={disabled}
               aria-invalid={Boolean(
