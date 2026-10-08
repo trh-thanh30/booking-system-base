@@ -29,6 +29,16 @@
     "saved": "Đã lưu thay đổi",
     "skipped": "Bạn có thể tiếp tục thiết lập từ Dashboard hoặc Cài đặt.",
     "completed": "Đã hoàn tất thiết lập doanh nghiệp",
+    "completion": {
+      "title": "Thiết lập đã hoàn tất!",
+      "description": "Giờ làm việc, dịch vụ và mẫu giao diện đã được lưu.",
+      "businessFallback": "Doanh nghiệp của bạn",
+      "selectedTemplate": "Mẫu đã chọn: {name}",
+      "demoNotice": "Giao diện hiện là bản demo, chưa phải website nhận lịch hẹn thật.",
+      "viewDemo": "Xem giao diện demo (mở tab mới)",
+      "viewDemoLabel": "Xem giao diện demo",
+      "dashboard": "Vào Dashboard"
+    },
     "errors": {
       "load": "Không thể tải tiến độ thiết lập. Vui lòng thử lại.",
       "save": "Không thể lưu thay đổi. Vui lòng thử lại."

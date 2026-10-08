@@ -29,6 +29,16 @@
     "saved": "Changes saved",
     "skipped": "You can continue setup from Dashboard or Settings.",
     "completed": "Your business setup is complete",
+    "completion": {
+      "title": "Your setup is complete!",
+      "description": "Your working hours, services and template selection have been saved.",
+      "businessFallback": "Your business",
+      "selectedTemplate": "Selected template: {name}",
+      "demoNotice": "The layout is currently a demo, not a website that accepts real appointments.",
+      "viewDemo": "View the demo layout (opens a new tab)",
+      "viewDemoLabel": "View demo layout",
+      "dashboard": "Go to Dashboard"
+    },
     "errors": {
       "load": "Could not load your setup. Please try again.",
       "save": "Could not save your changes. Please try again."

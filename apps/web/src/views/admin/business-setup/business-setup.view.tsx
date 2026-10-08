@@ -5,6 +5,7 @@ import { useRouter } from "@/src/i18n/navigation";
 import { useBusinessSetup } from "./hooks/use-business-setup";
 import { SetupLoadState } from "./components/setup-load-state";
 import { BusinessSetupTour } from "./components/business-setup-tour";
+import { BusinessSetupCompleteView } from "./business-setup-complete.view";
 import {
   getSetupEntryDestination,
   getSetupViewDestination,
@@ -29,7 +30,11 @@ export function BusinessSetupView() {
         readyBusinessId === businessId && Boolean(businessId),
       )
     : null;
-  const finished = destination === "/admin/dashboard";
+  const completed =
+    user?.role === "OWNER" &&
+    destination === "/admin/dashboard" &&
+    query.data?.status === "COMPLETED";
+  const finished = destination === "/admin/dashboard" && !completed;
   useEffect(() => {
     if (!isLoading && user && (user.role !== "OWNER" || finished))
       router.replace("/admin/dashboard");
@@ -45,6 +50,18 @@ export function BusinessSetupView() {
         onRetry={() => void query.refetch()}
       />
     );
+  if (completed) {
+    return (
+      <BusinessSetupCompleteView
+        key={businessId}
+        businessName={
+          user.businesses.find((business) => business.id === businessId)
+            ?.name ?? ""
+        }
+        templateId={query.data.selected_template_id}
+      />
+    );
+  }
   return (
     <BusinessSetupTour
       key={businessId}

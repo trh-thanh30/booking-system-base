@@ -9,6 +9,7 @@ import { WorkingHoursForm } from "../src/views/admin/business-setup/components/w
 import { FirstServiceForm } from "../src/views/admin/business-setup/components/first-service-form.tsx";
 import { BookingTemplatePicker } from "../src/views/admin/business-setup/components/booking-template-picker.tsx";
 import { SetupProgress } from "../src/views/admin/business-setup/components/setup-progress.tsx";
+import { BusinessSetupCompleteView } from "../src/views/admin/business-setup/business-setup-complete.view.tsx";
 
 for (const locale of ["vi", "en"]) {
   const messages = JSON.parse(
@@ -25,6 +26,24 @@ for (const locale of ["vi", "en"]) {
         createElement(component, props),
       ),
     );
+  test(`${locale}: completion offers Dashboard while identifying the website as a demo`, () => {
+    const html = render(BusinessSetupCompleteView, {
+      businessName: "My Studio",
+      templateId: "nail-salon-v2",
+    });
+    assert.ok(html.includes("My Studio"));
+    assert.ok(html.includes(messages.BusinessSetup.completion.demoNotice));
+    assert.doesNotMatch(html, /href="\/[^" ]*admin\/settings"/);
+    assert.match(html, /href="\/[^" ]*admin\/dashboard"/);
+    assert.match(html, /href="\/[^" ]*nail-salon-v2"/);
+  });
+  test(`${locale}: a historical template does not show the nail demo on completion`, () => {
+    const html = render(BusinessSetupCompleteView, {
+      businessName: "Old Studio",
+      templateId: "modern",
+    });
+    assert.doesNotMatch(html, /nail-salon-v2|ver1.webp/);
+  });
   test(`${locale}: working hours exposes seven labeled days and the Business timezone`, () => {
     const html = render(WorkingHoursForm, {
       initialDays: null,

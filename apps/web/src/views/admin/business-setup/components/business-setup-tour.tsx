@@ -113,8 +113,7 @@ export function BusinessSetupTour({
               : "saved",
         ),
       );
-      if (next.status === "SKIPPED" || next.status === "COMPLETED")
-        router.replace("/admin/dashboard");
+      if (next.status === "SKIPPED") router.replace("/admin/dashboard");
     },
     onError: () => toast.error(t("errors.save")),
   });
