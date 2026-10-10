@@ -38,7 +38,7 @@ export function BusinessSwitcher() {
       <DropdownMenuTrigger asChild>
         <Button
           aria-label={t("businessSwitcher")}
-          className="max-w-28 justify-start bg-background px-3 sm:max-w-44 md:max-w-56"
+          className="w-40 justify-start bg-background px-3 sm:w-56 lg:w-64 xl:w-80"
           variant="secondary"
         >
           <Building2 className="size-4 shrink-0 text-primary" />

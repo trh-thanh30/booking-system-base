@@ -1,12 +1,8 @@
 "use client";
 
-import { useEffect, useTransition } from "react";
-import { useToast } from "@repo/hooks";
 import Image from "next/image";
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import { ChevronDown, Check } from "lucide-react";
-import { usePathname, useRouter } from "@/src/i18n/navigation";
-import { LANGUAGE_SWITCH_TOAST_KEY } from "@/src/constants/locale-switch.constants";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -14,11 +10,8 @@ import {
   DropdownMenuItem,
   cn,
 } from "@repo/ui";
-import {
-  LANDING_LANGUAGES,
-  getLocaleSwitchTarget,
-  isLandingLocale,
-} from "@/src/utils/locale-switch.utils";
+import { LANDING_LANGUAGES } from "@/src/utils/locale-switch.utils";
+import { useLocaleSwitcher } from "@/src/hooks/use-locale-switcher";
 
 export function LanguageSwitcher({
   className,
@@ -27,45 +20,9 @@ export function LanguageSwitcher({
   className?: string;
   variant?: "default" | "landing";
 } = {}) {
-  const locale = useLocale();
   const t = useTranslations("Navigation");
-  const pathname = usePathname();
-  const router = useRouter();
-  const [pending, startTransition] = useTransition();
-  const { toast } = useToast();
-
-  useEffect(() => {
-    if (sessionStorage.getItem(LANGUAGE_SWITCH_TOAST_KEY) !== locale) return;
-    // Let the locale layout's Toaster subscribe before publishing the toast.
-    const timeout = window.setTimeout(() => {
-      // Header and footer share this switcher; only one should announce the change.
-      if (sessionStorage.getItem(LANGUAGE_SWITCH_TOAST_KEY) !== locale) return;
-      sessionStorage.removeItem(LANGUAGE_SWITCH_TOAST_KEY);
-      toast.success(t("languageChanged"), {
-        classNames: {
-          title: "!text-sm !font-semibold !leading-relaxed",
-        },
-      });
-    }, 0);
-    return () => window.clearTimeout(timeout);
-  }, [locale, t, toast]);
-
-  const currentLanguage =
-    LANDING_LANGUAGES.find((lang) => lang.code === locale) ||
-    LANDING_LANGUAGES[0];
-
-  const handleSelect = (nextLocale: string) => {
-    if (!isLandingLocale(nextLocale) || nextLocale === locale) return;
-    const target = getLocaleSwitchTarget(
-      pathname,
-      window.location.search,
-      window.location.hash,
-    );
-    sessionStorage.setItem(LANGUAGE_SWITCH_TOAST_KEY, nextLocale);
-    startTransition(() =>
-      router.replace(target, { locale: nextLocale, scroll: false }),
-    );
-  };
+  const { currentLanguage, locale, pending, selectLanguage } =
+    useLocaleSwitcher();
 
   return (
     <DropdownMenu modal={false}>
@@ -112,7 +69,7 @@ export function LanguageSwitcher({
           return (
             <DropdownMenuItem
               key={code}
-              onClick={() => handleSelect(code)}
+              onClick={() => selectLanguage(code)}
               className={cn(
                 "flex items-center justify-between gap-3 px-4 py-2.5 rounded-full font-bold text-sm cursor-pointer transition-colors outline-none",
                 isSelected

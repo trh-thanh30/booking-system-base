@@ -9,6 +9,7 @@ import {
   Settings,
   ShieldCheck,
   Store,
+  Tags,
   TriangleAlert,
   User,
   Users,
@@ -39,6 +40,12 @@ export function getDashboardConfig(t: Translate): DashboardConfig {
             href: "/admin/bookings",
             icon: CalendarCheck,
             permission: PERMISSIONS.BOOKING.READ,
+          },
+          {
+            title: t("items.categories"),
+            href: "/admin/categories",
+            icon: Tags,
+            permission: PERMISSIONS.CATEGORY.READ,
           },
           {
             title: t("items.users"),

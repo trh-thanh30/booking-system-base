@@ -1,14 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import {
-  Copy,
-  MoreHorizontal,
-  Plus,
-  ShieldCheck,
-  UserCheck,
-  Users,
-} from "lucide-react";
+import { Copy, Plus, ShieldCheck, UserCheck, Users } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useToast } from "@repo/hooks";
@@ -16,12 +9,8 @@ import {
   createInvitationSchema,
   PERMISSIONS,
   type CreateInvitationInput,
-  type UserSummary,
 } from "@repo/shared";
 import {
-  Avatar,
-  AvatarFallback,
-  Badge,
   Button,
   Card,
   CardContent,
@@ -32,18 +21,8 @@ import {
   DialogContent,
   DialogDescription,
   DialogTitle,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
   Input,
   Skeleton,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
 } from "@repo/ui";
 import { FormField } from "@/src/components/common/form-field";
 import {
@@ -52,33 +31,13 @@ import {
   AdminStatsGrid,
 } from "@/src/components/common/admin/admin-page";
 import { AdminStatsCard } from "@/src/components/common/admin/admin-stats-card";
-import { AdminTableContainer } from "@/src/components/common/admin/admin-table-container";
+import { AdminDataTable } from "@/src/components/common/admin/admin-data-table";
 import { StatePanel } from "@/src/components/common/state-panel";
 import { useAuth } from "@/src/app/providers/admin";
 import { authService } from "@/src/services/admin/auth.service";
 import type { CreatedInvitation } from "@/src/services/admin/auth.service";
 import { usersService } from "@/src/services/admin/users.service";
-
-function getInitials(user: UserSummary) {
-  const name = user.full_name ?? user.username;
-
-  return (
-    name
-      .split(" ")
-      .filter(Boolean)
-      .map((part) => part[0])
-      .join("")
-      .slice(0, 2)
-      .toUpperCase() || user.email.slice(0, 2).toUpperCase()
-  );
-}
-
-function formatDate(value: string) {
-  return new Intl.DateTimeFormat("vi-VN", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(new Date(value));
-}
+import { getUserColumns } from "./columns/users.columns";
 
 function InviteUserDialog({
   onOpenChange,
@@ -228,6 +187,7 @@ export function UsersView() {
   const activeUsers = users.filter((user) => user.status === "ACTIVE").length;
   const privilegedUsers = users.filter((user) => user.role === "OWNER").length;
   const canInvite = can(PERMISSIONS.STAFF.INVITE);
+  const columns = getUserColumns();
 
   return (
     <AdminPage>
@@ -313,72 +273,12 @@ export function UsersView() {
               }
             />
           ) : (
-            <AdminTableContainer>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>User</TableHead>
-                    <TableHead>Role</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Created</TableHead>
-                    <TableHead aria-label="Actions" />
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {users.map((user) => (
-                    <TableRow key={user.id}>
-                      <TableCell>
-                        <div className="flex items-center gap-3">
-                          <Avatar>
-                            <AvatarFallback>{getInitials(user)}</AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <p className="font-medium text-foreground">
-                              {user.full_name ?? user.username}
-                            </p>
-                            <p className="mt-1 text-xs text-muted-foreground">
-                              {user.email}
-                            </p>
-                          </div>
-                        </div>
-                      </TableCell>
-                      <TableCell>{user.role}</TableCell>
-                      <TableCell>
-                        <Badge
-                          variant={
-                            user.status === "ACTIVE" ? "success" : "warning"
-                          }
-                        >
-                          {user.status}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>{formatDate(user.created_at)}</TableCell>
-                      <TableCell className="text-right">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              aria-label={`Open actions for ${user.email}`}
-                              size="icon"
-                              variant="ghost"
-                            >
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem disabled>
-                              Edit profile
-                            </DropdownMenuItem>
-                            <DropdownMenuItem disabled>
-                              Manage permissions
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </AdminTableContainer>
+            <AdminDataTable
+              ariaLabel="Tenant users"
+              columns={columns}
+              data={users}
+              getRowId={(user) => user.id}
+            />
           )}
         </CardContent>
       </Card>

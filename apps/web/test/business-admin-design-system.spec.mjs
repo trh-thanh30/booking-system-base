@@ -4,6 +4,7 @@ import { test } from "node:test";
 import { Activity } from "lucide-react";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
+import { NextIntlClientProvider } from "next-intl";
 import {
   AdminPage,
   AdminPageHeader,
@@ -11,6 +12,13 @@ import {
 } from "../src/components/common/admin/admin-page.tsx";
 import { AdminStatsCard } from "../src/components/common/admin/admin-stats-card.tsx";
 import { AdminTableContainer } from "../src/components/common/admin/admin-table-container.tsx";
+import { AdminDataTable } from "../src/components/common/admin/admin-data-table.tsx";
+import { AdminTableActions } from "../src/components/common/admin/admin-table-actions.tsx";
+import {
+  AdminFormActions,
+  AdminFormPage,
+  AdminFormSection,
+} from "../src/components/common/admin/admin-form-page.tsx";
 import { StatePanel } from "../src/components/common/state-panel.tsx";
 import { getDashboardConfig } from "../src/config/dashboard.config.ts";
 
@@ -59,6 +67,65 @@ test("Business Admin data compositions use semantic surfaces and mobile-safe ove
   assert.doesNotMatch(state, /Create item/);
 });
 
+test("Business Admin data tables share TanStack rendering and accessible action menus", () => {
+  const table = render(AdminDataTable, {
+    ariaLabel: "Services",
+    columns: [{ accessorKey: "name", header: "Name" }],
+    data: [{ id: "service-1", name: "Haircut" }],
+    getRowId: (row) => row.id,
+  });
+  const actions = render(AdminTableActions, {
+    children: createElement("span", null, "Edit"),
+    label: "Open actions for Haircut",
+  });
+  const actionSource = readFileSync(
+    new URL(
+      "../src/components/common/admin/admin-table-actions.tsx",
+      import.meta.url,
+    ),
+    "utf8",
+  );
+
+  assert.match(table, /aria-label="Services"/);
+  assert.match(table, /aria-sort="none"/);
+  assert.match(table, /Haircut/);
+  assert.match(table, /overflow-x-auto/);
+  assert.match(actions, /aria-label="Open actions for Haircut"/);
+  assert.match(actions, /size-11/);
+  assert.match(actionSource, /min-h-11/);
+});
+
+test("Business Admin route forms provide reusable navigation, sections and actions", () => {
+  const page = renderToStaticMarkup(
+    createElement(
+      NextIntlClientProvider,
+      { locale: "en", messages: {} },
+      createElement(
+        AdminFormPage,
+        {
+          backHref: "/admin/categories",
+          backLabel: "Back",
+          description: "Create a category",
+          title: "New category",
+        },
+        "Form",
+      ),
+    ),
+  );
+  const section = render(AdminFormSection, {
+    description: "Core information",
+    title: "Details",
+    children: "Fields",
+  });
+  const actions = render(AdminFormActions, { children: "Actions" });
+
+  assert.match(page, /href="\/en\/admin\/categories"/);
+  assert.match(page, /<h1/);
+  assert.match(section, /bg-card/);
+  assert.match(section, /<h2/);
+  assert.match(actions, /border-border/);
+});
+
 test("unfinished sidebar destinations are visibly disabled instead of fake buttons", () => {
   const config = getDashboardConfig((key) => key);
   const items = config.sidebarSections.flatMap((section) => section.items);
@@ -85,10 +152,22 @@ test("Business Admin shell exposes skip navigation and uses semantic surfaces", 
     new URL("../src/components/layout/admin/header.tsx", import.meta.url),
     "utf8",
   );
+  const userMenu = readFileSync(
+    new URL("../src/components/common/admin/user-menu.tsx", import.meta.url),
+    "utf8",
+  );
 
   assert.match(shell, /href="#admin-main-content"/);
   assert.match(shell, /id="admin-main-content"/);
   assert.match(sidebar, /bg-surface/);
   assert.match(header, /bg-surface\/90/);
-  assert.match(header, /aria-current=/);
+  assert.doesNotMatch(header, /<nav/);
+  assert.ok(
+    header.indexOf('className="hidden min-w-0 max-w-lg flex-1') <
+      header.indexOf("<BusinessSwitcher"),
+    "desktop search should occupy the former top-navigation area",
+  );
+  assert.doesNotMatch(header, /<LanguageSwitcher|<ThemeToggle/);
+  assert.match(userMenu, /DropdownMenuSub/);
+  assert.match(userMenu, /tCommon\("darkMode"\)/);
 });

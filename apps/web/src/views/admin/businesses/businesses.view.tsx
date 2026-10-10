@@ -5,13 +5,8 @@ import { Building2, Plus, RefreshCw, Store } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useToast } from "@repo/hooks";
+import { createBusinessSchema, type CreateBusinessInput } from "@repo/shared";
 import {
-  createBusinessSchema,
-  type BusinessContext,
-  type CreateBusinessInput,
-} from "@repo/shared";
-import {
-  Badge,
   Button,
   Dialog,
   DialogContent,
@@ -19,14 +14,11 @@ import {
   DialogTitle,
   Input,
   Skeleton,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
 } from "@repo/ui";
+import { useAuth } from "@/src/app/providers/admin";
+import { useAdminUiStore } from "@/src/app/stores/admin/ui.store";
 import { FormField } from "@/src/components/common/form-field";
+import { AdminDataTable } from "@/src/components/common/admin/admin-data-table";
 import {
   AdminPage,
   AdminPageHeader,
@@ -36,13 +28,7 @@ import { AdminStatsCard } from "@/src/components/common/admin/admin-stats-card";
 import { AdminTableContainer } from "@/src/components/common/admin/admin-table-container";
 import { StatePanel } from "@/src/components/common/state-panel";
 import { businessesService } from "@/src/services/admin/businesses.service";
-
-function formatDate(value: string) {
-  return new Intl.DateTimeFormat("vi-VN", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(new Date(value));
-}
+import { getBusinessColumns } from "./columns/businesses.columns";
 
 function CreateBusinessDialog({
   onOpenChange,
@@ -161,6 +147,8 @@ function CreateBusinessDialog({
 
 export function BusinessesView() {
   const [createOpen, setCreateOpen] = useState(false);
+  const { selectBusiness } = useAuth();
+  const activeBusinessId = useAdminUiStore((state) => state.activeBusinessId);
   const businessesQuery = useQuery({
     queryFn: businessesService.listBusinesses,
     queryKey: ["businesses"],
@@ -173,6 +161,10 @@ export function BusinessesView() {
     (business) => business.status === "ACTIVE",
   ).length;
   const defaultBusiness = businesses.find((business) => business.is_default);
+  const columns = getBusinessColumns({
+    activeBusinessId,
+    onSelectBusiness: selectBusiness,
+  });
 
   return (
     <AdminPage>
@@ -258,50 +250,12 @@ export function BusinessesView() {
           }
         />
       ) : (
-        <AdminTableContainer>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Business</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Timezone</TableHead>
-                <TableHead>Locale</TableHead>
-                <TableHead>Created</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {businesses.map((business: BusinessContext) => (
-                <TableRow key={business.id}>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <div>
-                        <div className="font-medium">{business.name}</div>
-                        <div className="text-xs text-muted-foreground">
-                          {business.slug}
-                        </div>
-                      </div>
-                      {business.is_default ? (
-                        <Badge variant="secondary">Default</Badge>
-                      ) : null}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge
-                      variant={
-                        business.status === "ACTIVE" ? "default" : "secondary"
-                      }
-                    >
-                      {business.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>{business.timezone}</TableCell>
-                  <TableCell>{business.locale}</TableCell>
-                  <TableCell>{formatDate(business.created_at)}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </AdminTableContainer>
+        <AdminDataTable
+          ariaLabel="Businesses"
+          columns={columns}
+          data={businesses}
+          getRowId={(business) => business.id}
+        />
       )}
       <CreateBusinessDialog onOpenChange={setCreateOpen} open={createOpen} />
     </AdminPage>

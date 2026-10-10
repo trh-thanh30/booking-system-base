@@ -1,14 +1,10 @@
 import type { ColumnDef } from "@tanstack/react-table";
-import { MoreHorizontal } from "lucide-react";
-import {
-  Button,
-  Checkbox,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@repo/ui";
+import { Checkbox } from "@repo/ui";
 import type { BookingSummary } from "@repo/shared";
+import {
+  AdminTableActionItem,
+  AdminTableActions,
+} from "@/src/components/common/admin/admin-table-actions";
 import { BookingStatusBadge } from "@/src/views/admin/bookings/components/booking-status-badge";
 
 type Translate = (
@@ -82,23 +78,13 @@ export function getBookingColumns(t: Translate): ColumnDef<BookingSummary>[] {
     {
       id: "actions",
       cell: ({ row }) => (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              aria-label={t("openActions", { id: row.original.id })}
-              size="icon"
-              variant="ghost"
-            >
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem>{t("viewBooking")}</DropdownMenuItem>
-            <DropdownMenuItem>{t("assignOwner")}</DropdownMenuItem>
-            <DropdownMenuItem>{t("sendConfirmation")}</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <AdminTableActions label={t("openActions", { id: row.original.id })}>
+          <AdminTableActionItem>{t("viewBooking")}</AdminTableActionItem>
+          <AdminTableActionItem>{t("assignOwner")}</AdminTableActionItem>
+          <AdminTableActionItem>{t("sendConfirmation")}</AdminTableActionItem>
+        </AdminTableActions>
       ),
+      header: () => <span className="sr-only">Actions</span>,
       enableSorting: false,
     },
   ];

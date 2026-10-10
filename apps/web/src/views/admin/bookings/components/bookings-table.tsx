@@ -1,12 +1,5 @@
 "use client";
 
-import {
-  flexRender,
-  getCoreRowModel,
-  getSortedRowModel,
-  useReactTable,
-  type SortingState,
-} from "@tanstack/react-table";
 import { CalendarPlus, Filter, Search, SlidersHorizontal } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
@@ -18,17 +11,11 @@ import {
   CardHeader,
   CardTitle,
   Input,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
 } from "@repo/ui";
 import { FormField } from "@/src/components/common/form-field";
 import { StatePanel } from "@/src/components/common/state-panel";
 import { AdminFilterToolbar } from "@/src/components/common/admin/admin-filter-toolbar";
-import { AdminTableContainer } from "@/src/components/common/admin/admin-table-container";
+import { AdminDataTable } from "@/src/components/common/admin/admin-data-table";
 import { getBookingColumns } from "@/src/views/admin/bookings/columns/bookings.columns";
 import {
   bookings,
@@ -40,7 +27,6 @@ import { getBookingStatusFilterLabel } from "@/src/views/admin/bookings/utils/bo
 export function BookingsTable() {
   const t = useTranslations("Bookings");
   const [query, setQuery] = useState("");
-  const [sorting, setSorting] = useState<SortingState>([]);
   const [status, setStatus] = useState<BookingStatusFilter>("all");
 
   const filteredBookings = useMemo(() => {
@@ -58,16 +44,7 @@ export function BookingsTable() {
     });
   }, [query, status]);
 
-  const table = useReactTable({
-    columns: getBookingColumns(t),
-    data: filteredBookings,
-    getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    onSortingChange: setSorting,
-    state: {
-      sorting,
-    },
-  });
+  const columns = getBookingColumns(t);
 
   return (
     <div className="space-y-4">
@@ -110,44 +87,13 @@ export function BookingsTable() {
           </AdminFilterToolbar>
         </CardHeader>
         <CardContent>
-          {table.getRowModel().rows.length > 0 ? (
-            <AdminTableContainer>
-              <Table>
-                <TableHeader>
-                  {table.getHeaderGroups().map((headerGroup) => (
-                    <TableRow key={headerGroup.id}>
-                      {headerGroup.headers.map((header) => (
-                        <TableHead key={header.id}>
-                          {header.isPlaceholder
-                            ? null
-                            : flexRender(
-                                header.column.columnDef.header,
-                                header.getContext(),
-                              )}
-                        </TableHead>
-                      ))}
-                    </TableRow>
-                  ))}
-                </TableHeader>
-                <TableBody>
-                  {table.getRowModel().rows.map((row) => (
-                    <TableRow
-                      data-state={row.getIsSelected() ? "selected" : undefined}
-                      key={row.id}
-                    >
-                      {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id}>
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext(),
-                          )}
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </AdminTableContainer>
+          {filteredBookings.length > 0 ? (
+            <AdminDataTable
+              ariaLabel={t("queueTitle")}
+              columns={columns}
+              data={filteredBookings}
+              getRowId={(booking) => booking.id}
+            />
           ) : (
             <StatePanel
               action={

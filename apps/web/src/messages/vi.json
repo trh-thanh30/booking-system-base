@@ -179,6 +179,7 @@
       "bookings": "Đặt lịch",
       "users": "Người dùng",
       "businesses": "Cơ sở",
+      "categories": "Danh mục dịch vụ",
       "chats": "Trò chuyện",
       "securedByAuth": "Bảo vệ bởi Auth",
       "auth": "Xác thực",
@@ -208,7 +209,133 @@
     "selected": "Đang chọn",
     "language": "Ngôn ngữ",
     "vietnamese": "Tiếng Việt",
-    "english": "English"
+    "english": "English",
+    "darkMode": "Chế độ tối"
+  },
+  "CategoryManagement": {
+    "eyebrow": "Danh mục dịch vụ",
+    "title": "Quản lý danh mục dịch vụ",
+    "description": "Sắp xếp dịch vụ thành các nhóm rõ ràng cho nhân viên và khách hàng.",
+    "actions": {
+      "new": "Thêm danh mục",
+      "create": "Tạo danh mục",
+      "save": "Lưu thay đổi",
+      "saving": "Đang lưu…",
+      "cancel": "Hủy",
+      "archive": "Lưu trữ danh mục",
+      "archiving": "Đang lưu trữ…",
+      "retry": "Thử lại",
+      "moveUp": "Đưa {name} lên",
+      "moveDown": "Đưa {name} xuống",
+      "editNamed": "Sửa {name}",
+      "archiveNamed": "Lưu trữ {name}",
+      "backToList": "Quay lại danh mục"
+    },
+    "stats": {
+      "total": "Danh mục hiện tại",
+      "totalDescription": "Bao gồm danh mục hoạt động và tạm ngừng",
+      "active": "Đang hoạt động",
+      "activeDescription": "Có thể sử dụng trong danh mục dịch vụ",
+      "services": "Dịch vụ đã gán",
+      "servicesDescription": "Số dịch vụ thuộc các danh mục hiện tại"
+    },
+    "filters": {
+      "search": "Tìm danh mục",
+      "searchPlaceholder": "Tìm theo tên hoặc slug…",
+      "status": "Lọc theo trạng thái",
+      "current": "Danh mục hiện tại"
+    },
+    "status": {
+      "active": "Hoạt động",
+      "inactive": "Tạm ngừng",
+      "archived": "Đã lưu trữ"
+    },
+    "table": {
+      "name": "Danh mục",
+      "status": "Trạng thái",
+      "services": "Dịch vụ",
+      "order": "Thứ tự",
+      "actions": "Thao tác",
+      "label": "Danh mục dịch vụ",
+      "openActions": "Mở thao tác cho {name}",
+      "childOf": "Danh mục con của {parent}",
+      "children": "{count, plural, =0 {Chưa có danh mục con} other {# danh mục con}}"
+    },
+    "form": {
+      "createTitle": "Tạo danh mục dịch vụ",
+      "createDescription": "Thêm nhóm để phân loại dịch vụ trong cơ sở hiện tại.",
+      "editTitle": "Chỉnh sửa danh mục dịch vụ",
+      "editDescription": "Cập nhật cách danh mục hiển thị trong danh sách dịch vụ.",
+      "name": "Tên danh mục",
+      "namePlaceholder": "Ví dụ: Dịch vụ tóc",
+      "slug": "Slug (không bắt buộc)",
+      "slugPlaceholder": "dich-vu-toc",
+      "slugHint": "Để trống để hệ thống tự tạo từ tên danh mục.",
+      "description": "Mô tả (không bắt buộc)",
+      "descriptionPlaceholder": "Mô tả các dịch vụ thuộc danh mục này.",
+      "status": "Trạng thái",
+      "invalidField": "Vui lòng kiểm tra trường này.",
+      "detailsTitle": "Thông tin danh mục",
+      "detailsDescription": "Thiết lập tên, đường dẫn và trạng thái hiển thị trong catalog.",
+      "hierarchyTitle": "Phân cấp danh mục",
+      "hierarchyDescription": "Danh mục được tổ chức tối đa hai cấp.",
+      "parent": "Danh mục cha (không bắt buộc)",
+      "noParent": "Không có danh mục cha — danh mục cấp cao nhất",
+      "parentHint": "Chọn một danh mục cấp cao nhất để tạo danh mục con.",
+      "parentLockedHint": "Danh mục này đang có danh mục con nên phải giữ ở cấp cao nhất.",
+      "assetsTitle": "Hình ảnh danh mục",
+      "assetsDescription": "Thêm hình ảnh giúp nhận biết danh mục. Ảnh đầu tiên sẽ được dùng làm ảnh bìa.",
+      "assets": {
+        "label": "Hình ảnh (không bắt buộc)",
+        "hint": "Tối đa {count} ảnh công khai. JPG, PNG, WebP hoặc GIF; tối đa 10 MB mỗi ảnh.",
+        "upload": "Thêm hình ảnh",
+        "emptyTitle": "Thêm hình ảnh danh mục",
+        "emptyDescription": "Chọn một hoặc nhiều ảnh từ thiết bị của bạn.",
+        "cover": "Ảnh bìa",
+        "tooMany": "Bạn chỉ có thể thêm tối đa {count} ảnh.",
+        "imageOnly": "Chỉ có thể thêm tệp hình ảnh.",
+        "tooLarge": "Mỗi ảnh phải có dung lượng không quá 10 MB.",
+        "moveLeft": "Chuyển {name} sang trái",
+        "moveRight": "Chuyển {name} sang phải",
+        "remove": "Xóa {name}"
+      }
+    },
+    "archive": {
+      "title": "Lưu trữ danh mục này?",
+      "description": "{name} sẽ bị ẩn khỏi danh mục hiện tại. Bạn cần chuyển hoặc lưu trữ hết dịch vụ trước."
+    },
+    "states": {
+      "emptyTitle": "Không tìm thấy danh mục",
+      "emptyDescription": "Hãy tạo danh mục dịch vụ hoặc điều chỉnh bộ lọc hiện tại.",
+      "errorTitle": "Không thể tải danh mục",
+      "errorDescription": "Kiểm tra kết nối rồi thử lại.",
+      "formLoading": "Đang tải biểu mẫu danh mục",
+      "formErrorTitle": "Không thể tải biểu mẫu danh mục",
+      "formErrorDescription": "Danh mục có thể không thuộc cơ sở này hoặc kết nối đã bị gián đoạn.",
+      "notFoundTitle": "Danh mục không khả dụng",
+      "notFoundDescription": "Danh mục không tồn tại hoặc đã được lưu trữ."
+    },
+    "permission": {
+      "title": "Cần quyền truy cập danh mục",
+      "description": "Bạn không có quyền xem danh mục dịch vụ của cơ sở này.",
+      "formTitle": "Cần quyền quản lý danh mục",
+      "formDescription": "Bạn không có quyền tạo hoặc chỉnh sửa danh mục của cơ sở này."
+    },
+    "errors": {
+      "hasServices": "Hãy chuyển hoặc lưu trữ toàn bộ dịch vụ trước khi lưu trữ danh mục.",
+      "duplicate": "Tên hoặc slug của danh mục này đã được sử dụng.",
+      "forbidden": "Bạn không có quyền thực hiện thao tác này.",
+      "generic": "Không thể cập nhật danh mục. Vui lòng thử lại.",
+      "hasChildren": "Hãy lưu trữ toàn bộ danh mục con trước khi lưu trữ danh mục này.",
+      "invalidAsset": "Một hoặc nhiều hình ảnh không khả dụng hoặc không thuộc workspace này.",
+      "notFound": "Không tìm thấy danh mục trong cơ sở hiện tại."
+    },
+    "toasts": {
+      "created": "Đã tạo danh mục thành công.",
+      "updated": "Đã cập nhật danh mục thành công.",
+      "archived": "Đã lưu trữ danh mục thành công.",
+      "reordered": "Đã cập nhật thứ tự danh mục."
+    }
   },
   "Dashboard": {
     "title": "Bảng điều khiển",

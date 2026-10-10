@@ -1,12 +1,14 @@
 "use client";
 
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
+import { ChevronRight } from "lucide-react";
 import type { ComponentPropsWithoutRef } from "react";
 import { cn } from "@/lib/utils";
 
 export const DropdownMenu = DropdownMenuPrimitive.Root;
 export const DropdownMenuTrigger = DropdownMenuPrimitive.Trigger;
 export const DropdownMenuGroup = DropdownMenuPrimitive.Group;
+export const DropdownMenuSub = DropdownMenuPrimitive.Sub;
 
 export function DropdownMenuItem({
   className,
@@ -44,6 +46,44 @@ export function DropdownMenuSeparator({
       className={cn("-mx-1 my-1 h-px bg-border", className)}
       {...props}
     />
+  );
+}
+
+export function DropdownMenuSubTrigger({
+  children,
+  className,
+  ...props
+}: ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.SubTrigger>) {
+  return (
+    <DropdownMenuPrimitive.SubTrigger
+      className={cn(
+        "relative flex cursor-pointer select-none items-center rounded px-2 py-1.5 text-sm outline-none transition-colors focus:bg-muted data-[state=open]:bg-muted",
+        className,
+      )}
+      {...props}
+    >
+      {children}
+      <ChevronRight aria-hidden="true" className="ml-auto size-4" />
+    </DropdownMenuPrimitive.SubTrigger>
+  );
+}
+
+export function DropdownMenuSubContent({
+  className,
+  sideOffset = 8,
+  ...props
+}: ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.SubContent>) {
+  return (
+    <DropdownMenuPrimitive.Portal>
+      <DropdownMenuPrimitive.SubContent
+        className={cn(
+          "z-50 min-w-44 overflow-hidden rounded-md border border-border bg-popover p-1 text-popover-foreground shadow-md duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
+          className,
+        )}
+        sideOffset={sideOffset}
+        {...props}
+      />
+    </DropdownMenuPrimitive.Portal>
   );
 }
 

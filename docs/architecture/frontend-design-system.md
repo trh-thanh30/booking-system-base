@@ -228,6 +228,17 @@ primitives through `apps/web/src/components/common/admin`:
 - `AdminStatsGrid` and `AdminStatsCard` define responsive operational metrics.
 - `AdminFilterToolbar` groups search/filter actions without feature logic.
 - `AdminTableContainer` owns table boundary and horizontal overflow.
+- `AdminDataTable<TData>` owns TanStack row rendering, sorting state, semantic
+  table markup and accessible sortable headers. Feature columns stay in
+  `src/views/<feature>/columns`.
+- `AdminTableActions` is the standard row-action trigger: a 44px ellipsis
+  button with an accessible label and a shared `DropdownMenu`. Do not place a
+  row of edit/delete icon buttons directly in the action cell.
+
+Keep loading, error and empty states at view level because they depend on the
+feature query and available recovery actions. A hierarchical or manually
+ordered table may disable sorting per column when sorting would break its
+parent-child or explicit ordering semantics.
 
 Use `background` for the app canvas, `surface` for navigation/header regions,
 `card` for content containers, `popover` for overlays, `accent` for selected
@@ -235,6 +246,26 @@ navigation and `primary` for brand actions. Semantic tokens already switch with
 the theme; do not add equivalent `.dark` classes. Admin navigation must expose a
 skip link, visible keyboard focus, real active routes and an explicit disabled
 state for destinations that are not implemented.
+
+### Route-based Admin Forms
+
+Form tạo hoặc chỉnh sửa một resource chính phải là route riêng, không mở trong
+`Dialog`. Route riêng tạo deep-link, giữ đúng browser history và có đủ không gian
+cho validation, asset, relation cũng như các section có thể mở rộng về sau.
+
+- List page dẫn tới `/<resource>/new` và `/<resource>/[id]/edit` bằng localized
+  `Link`; không dùng state `open/editingItem` để điều khiển form CRUD chính.
+- Dùng `AdminFormPage` cho back navigation và heading `h1`, `AdminFormSection`
+  cho từng nhóm field, `AdminFormActions` cho vùng Cancel/Submit.
+- Chỉ có một primary submit action. Cancel là secondary action và quay lại list.
+- Submit phải có pending state, khóa thao tác lặp và phản hồi bằng shared toast.
+- Field lỗi hiển thị gần control qua `FormField`; lỗi nghiệp vụ dùng toast.
+- Loading, not-found, permission và load-error phải có state riêng. Edit route
+  không phụ thuộc dữ liệu đã cache từ list page.
+- Dialog chỉ dùng cho xác nhận, tác vụ ngắn hoặc nội dung phụ trợ; destructive
+  confirmation vẫn dùng `ConfirmDialog`.
+- Form và action bar phải dùng semantic token, hoạt động ở light/dark mode,
+  không gây horizontal scroll ở 375px và giữ touch target tối thiểu 44px.
 
 ## Landing Page — DS-002
 

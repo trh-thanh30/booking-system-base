@@ -179,6 +179,7 @@
       "bookings": "Bookings",
       "users": "Users",
       "businesses": "Businesses",
+      "categories": "Service categories",
       "chats": "Chats",
       "securedByAuth": "Secured by Auth",
       "auth": "Auth",
@@ -208,7 +209,133 @@
     "selected": "Selected",
     "language": "Language",
     "vietnamese": "Tiếng Việt",
-    "english": "English"
+    "english": "English",
+    "darkMode": "Dark mode"
+  },
+  "CategoryManagement": {
+    "eyebrow": "Service catalog",
+    "title": "Service categories",
+    "description": "Organize services into clear groups for staff and customers.",
+    "actions": {
+      "new": "New category",
+      "create": "Create category",
+      "save": "Save changes",
+      "saving": "Saving…",
+      "cancel": "Cancel",
+      "archive": "Archive category",
+      "archiving": "Archiving…",
+      "retry": "Try again",
+      "moveUp": "Move {name} up",
+      "moveDown": "Move {name} down",
+      "editNamed": "Edit {name}",
+      "archiveNamed": "Archive {name}",
+      "backToList": "Back to categories"
+    },
+    "stats": {
+      "total": "Current categories",
+      "totalDescription": "Active and inactive categories",
+      "active": "Active categories",
+      "activeDescription": "Available for catalog setup",
+      "services": "Assigned services",
+      "servicesDescription": "Services in current categories"
+    },
+    "filters": {
+      "search": "Search categories",
+      "searchPlaceholder": "Search by name or slug…",
+      "status": "Filter by status",
+      "current": "Current categories"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "archived": "Archived"
+    },
+    "table": {
+      "name": "Category",
+      "status": "Status",
+      "services": "Services",
+      "order": "Order",
+      "actions": "Actions",
+      "label": "Service categories",
+      "openActions": "Open actions for {name}",
+      "childOf": "Child of {parent}",
+      "children": "{count, plural, =0 {No child categories} =1 {1 child category} other {# child categories}}"
+    },
+    "form": {
+      "createTitle": "Create service category",
+      "createDescription": "Add a group that can be assigned to services in this business.",
+      "editTitle": "Edit service category",
+      "editDescription": "Update how this category appears in the service catalog.",
+      "name": "Category name",
+      "namePlaceholder": "e.g. Hair services",
+      "slug": "Slug (optional)",
+      "slugPlaceholder": "hair-services",
+      "slugHint": "Leave blank to generate it from the category name.",
+      "description": "Description (optional)",
+      "descriptionPlaceholder": "Describe the services in this category.",
+      "status": "Status",
+      "invalidField": "Check this field.",
+      "detailsTitle": "Category details",
+      "detailsDescription": "Define the name, URL and catalog visibility.",
+      "hierarchyTitle": "Category hierarchy",
+      "hierarchyDescription": "Keep categories at a maximum of two levels.",
+      "parent": "Parent category (optional)",
+      "noParent": "No parent — top-level category",
+      "parentHint": "Choose a top-level category to make this a child category.",
+      "parentLockedHint": "This category already has children, so it must remain top-level.",
+      "assetsTitle": "Category images",
+      "assetsDescription": "Add images that help identify this category. The first image is used as the cover.",
+      "assets": {
+        "label": "Images (optional)",
+        "hint": "Up to {count} public images. JPG, PNG, WebP or GIF; maximum 10 MB each.",
+        "upload": "Add images",
+        "emptyTitle": "Add category images",
+        "emptyDescription": "Select one or more images from your device.",
+        "cover": "Cover",
+        "tooMany": "You can add up to {count} images.",
+        "imageOnly": "Only image files can be added.",
+        "tooLarge": "Each image must be 10 MB or smaller.",
+        "moveLeft": "Move {name} left",
+        "moveRight": "Move {name} right",
+        "remove": "Remove {name}"
+      }
+    },
+    "archive": {
+      "title": "Archive this category?",
+      "description": "{name} will be hidden from the current catalog. Categories with services must be emptied first."
+    },
+    "states": {
+      "emptyTitle": "No categories found",
+      "emptyDescription": "Create a service category or adjust the current filters.",
+      "errorTitle": "Categories could not be loaded",
+      "errorDescription": "Check your connection and try again.",
+      "formLoading": "Loading category form",
+      "formErrorTitle": "The category form could not be loaded",
+      "formErrorDescription": "The category may not exist in this business, or the connection was interrupted.",
+      "notFoundTitle": "Category is unavailable",
+      "notFoundDescription": "This category does not exist or has already been archived."
+    },
+    "permission": {
+      "title": "Category access required",
+      "description": "You do not have permission to view service categories for this business.",
+      "formTitle": "Category management permission required",
+      "formDescription": "You do not have permission to create or edit categories for this business."
+    },
+    "errors": {
+      "hasServices": "Move or archive every service in this category before archiving it.",
+      "duplicate": "This category name or slug is already in use.",
+      "forbidden": "You do not have permission to perform this action.",
+      "generic": "The category could not be updated. Please try again.",
+      "hasChildren": "Archive every child category before archiving this category.",
+      "invalidAsset": "One or more images are unavailable or do not belong to this workspace.",
+      "notFound": "This category could not be found in the current business."
+    },
+    "toasts": {
+      "created": "Category created successfully.",
+      "updated": "Category updated successfully.",
+      "archived": "Category archived successfully.",
+      "reordered": "Category order updated."
+    }
   },
   "Dashboard": {
     "title": "Dashboard",
