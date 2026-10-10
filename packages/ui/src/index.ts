@@ -15,6 +15,7 @@ export * from "./timezone-select";
 export * from "./otp-input";
 export * from "./label";
 export * from "./lib/utils";
+export * from "./rich-text-editor";
 export * from "./separator";
 export * from "./select";
 export * from "./sheet";
