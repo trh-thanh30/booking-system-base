@@ -1,5 +1,5 @@
 import { PrismaModule } from '@/database/prisma/prisma.module';
-import { CategoryRepository } from '@/modules/category/repository/category.repository';
+import { CategoryModule } from '@/modules/category/category.module';
 import { ServiceRepository } from '@/modules/service/repository/service.repository';
 import { ServiceController } from '@/modules/service/service.controller';
 import { ArchiveServiceUseCase } from '@/modules/service/use-cases/archive-service.use-case';
@@ -12,11 +12,10 @@ import { ServiceInputNormalizer } from '@/modules/service/utils/service-input.ut
 import { Module } from '@nestjs/common';
 
 @Module({
-  imports: [PrismaModule],
+  imports: [PrismaModule, CategoryModule],
   controllers: [ServiceController],
   providers: [
     ServiceRepository,
-    CategoryRepository,
     ServiceInputNormalizer,
     ServiceCategoryValidator,
     ListServicesUseCase,

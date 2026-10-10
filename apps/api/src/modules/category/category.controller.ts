@@ -11,9 +11,11 @@ import { ArchiveCategoryUseCase } from '@/modules/category/use-cases/archive-cat
 import { CreateCategoryUseCase } from '@/modules/category/use-cases/create-category.use-case';
 import { GetCategoryUseCase } from '@/modules/category/use-cases/get-category.use-case';
 import { ListCategoriesUseCase } from '@/modules/category/use-cases/list-categories.use-case';
+import { ReorderCategoriesUseCase } from '@/modules/category/use-cases/reorder-categories.use-case';
 import { UpdateCategoryUseCase } from '@/modules/category/use-cases/update-category.use-case';
 import { CreateCategoryDto } from '@/modules/category/dto/create-category.dto';
 import { ListCategoriesDto } from '@/modules/category/dto/list-categories.dto';
+import { ReorderCategoriesDto } from '@/modules/category/dto/reorder-categories.dto';
 import { UpdateCategoryDto } from '@/modules/category/dto/update-category.dto';
 import { PERMISSIONS } from '@/modules/permission/constants/permission.constants';
 import type { BusinessContext } from '@repo/shared';
@@ -38,6 +40,7 @@ export class CategoryController {
     private readonly createCategoryUseCase: CreateCategoryUseCase,
     private readonly updateCategoryUseCase: UpdateCategoryUseCase,
     private readonly archiveCategoryUseCase: ArchiveCategoryUseCase,
+    private readonly reorderCategoriesUseCase: ReorderCategoriesUseCase,
   ) {}
 
   @Get()
@@ -60,6 +63,17 @@ export class CategoryController {
     @Body() dto: CreateCategoryDto,
   ) {
     return this.createCategoryUseCase.execute(tenant.id, business.id, dto);
+  }
+
+  @Post('reorder')
+  @Permissions([PERMISSIONS.CATEGORY.UPDATE])
+  @ApiSuccess('Categories reordered successfully')
+  reorder(
+    @Tenant() tenant: TenantContext,
+    @Business() business: BusinessContext,
+    @Body() dto: ReorderCategoriesDto,
+  ) {
+    return this.reorderCategoriesUseCase.execute(tenant.id, business.id, dto);
   }
 
   @Get(':id')

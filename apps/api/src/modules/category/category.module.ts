@@ -1,37 +1,44 @@
 import { PrismaModule } from '@/database/prisma/prisma.module';
+import { AssetsModule } from '@/modules/assets/assets.module';
 import { CategoryController } from '@/modules/category/category.controller';
 import { CategoryRepository } from '@/modules/category/repository/category.repository';
 import { ArchiveCategoryUseCase } from '@/modules/category/use-cases/archive-category.use-case';
 import { CreateCategoryUseCase } from '@/modules/category/use-cases/create-category.use-case';
 import { GetCategoryUseCase } from '@/modules/category/use-cases/get-category.use-case';
 import { ListCategoriesUseCase } from '@/modules/category/use-cases/list-categories.use-case';
+import { ReorderCategoriesUseCase } from '@/modules/category/use-cases/reorder-categories.use-case';
 import { UpdateCategoryUseCase } from '@/modules/category/use-cases/update-category.use-case';
 import { CategoryInputNormalizer } from '@/modules/category/utils/category-input.util';
+import { CategoryAssetValidator } from '@/modules/category/utils/category-asset.util';
 import { CategoryParentValidator } from '@/modules/category/utils/category-parent.util';
 import { Module } from '@nestjs/common';
 
 @Module({
-  imports: [PrismaModule],
+  imports: [PrismaModule, AssetsModule],
   controllers: [CategoryController],
   providers: [
     CategoryRepository,
     CategoryInputNormalizer,
+    CategoryAssetValidator,
     CategoryParentValidator,
     ListCategoriesUseCase,
     GetCategoryUseCase,
     CreateCategoryUseCase,
     UpdateCategoryUseCase,
     ArchiveCategoryUseCase,
+    ReorderCategoriesUseCase,
   ],
   exports: [
     CategoryRepository,
     CategoryInputNormalizer,
+    CategoryAssetValidator,
     CategoryParentValidator,
     ListCategoriesUseCase,
     GetCategoryUseCase,
     CreateCategoryUseCase,
     UpdateCategoryUseCase,
     ArchiveCategoryUseCase,
+    ReorderCategoriesUseCase,
   ],
 })
 export class CategoryModule {}

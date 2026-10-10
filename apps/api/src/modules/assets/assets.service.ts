@@ -35,6 +35,7 @@ export class AssetsService {
 
     const asset = await this.prisma.asset.create({
       data: {
+        tenant_id: user?.tenant_id ?? null,
         original_name: uploadResult.originalName,
         filename: uploadResult.filename,
         mime_type: uploadResult.mimeType,

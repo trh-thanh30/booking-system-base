@@ -4,8 +4,8 @@ import type { IStorageService } from '@/modules/assets/services/storage.interfac
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import type { ConfigType } from '@nestjs/config';
 import { asset_access_type, asset_type } from '@prisma/client';
+import { randomUUID } from 'node:crypto';
 import * as path from 'path';
-import { v4 as uuidv4 } from 'uuid';
 
 export interface UploadResult {
   originalName: string;
@@ -54,7 +54,7 @@ export class UploadAssetService {
       ? `${year}/${month}/${folder}`
       : `${year}/${month}`;
     const fileExt = path.extname(file.originalname);
-    const uniqueName = `${Date.now()}_${uuidv4()}${fileExt}`;
+    const uniqueName = `${Date.now()}_${randomUUID()}${fileExt}`;
 
     // 2. Save to Storage
     const { path: relativePath, size } = await this.storage.save(

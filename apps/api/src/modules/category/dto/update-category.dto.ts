@@ -1,6 +1,8 @@
 import { category_status } from '@prisma/client';
 import type { UpdateCategoryInput } from '@repo/shared';
 import {
+  ArrayMaxSize,
+  IsArray,
   IsEnum,
   IsInt,
   IsObject,
@@ -12,6 +14,7 @@ import {
   Min,
   ValidateIf,
 } from 'class-validator';
+import { MAX_CATEGORY_ASSETS } from '@repo/shared';
 
 export class UpdateCategoryDto implements UpdateCategoryInput {
   @IsOptional()
@@ -48,4 +51,10 @@ export class UpdateCategoryDto implements UpdateCategoryInput {
   @IsOptional()
   @IsObject()
   metadata?: Record<string, unknown>;
+
+  @IsOptional()
+  @IsArray()
+  @ArrayMaxSize(MAX_CATEGORY_ASSETS)
+  @IsUUID('4', { each: true })
+  asset_ids?: string[];
 }

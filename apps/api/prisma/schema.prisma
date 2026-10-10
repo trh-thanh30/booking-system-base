@@ -90,12 +90,14 @@ model AssetLink {
   asset_id    String   @db.Uuid
   entity_id   String   @db.Uuid
   entity_type String
+  sort_order  Int      @default(0)
   created_at  DateTime @default(now())
 
   asset Asset @relation(fields: [asset_id], references: [id], onDelete: Cascade)
 
   @@unique([asset_id, entity_id, entity_type])
   @@index([entity_id, entity_type])
+  @@index([entity_id, entity_type, sort_order])
   @@map("asset_link")
 }
 

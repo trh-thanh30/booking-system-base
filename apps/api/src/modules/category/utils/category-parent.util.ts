@@ -42,8 +42,28 @@ export class CategoryParentValidator {
       throw new BadRequestError('Parent category is archived');
     }
 
+    if (parent.parent_id !== null) {
+      throw new BadRequestError(
+        'Category hierarchy supports only two levels',
+        'CATEGORY_HIERARCHY_DEPTH_EXCEEDED',
+      );
+    }
+
     if (!input.currentCategoryId) {
       return;
+    }
+
+    const childCount = await this.categoryRepository.countChildren(
+      input.tenantId,
+      input.businessId,
+      input.currentCategoryId,
+    );
+
+    if (childCount > 0) {
+      throw new BadRequestError(
+        'A category with children cannot become a child',
+        'CATEGORY_PARENT_HAS_CHILDREN',
+      );
     }
 
     const parentChain = await this.categoryRepository.findParentChain(

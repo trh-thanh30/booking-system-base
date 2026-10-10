@@ -3,6 +3,7 @@ import { UpdateCategoryDto } from '@/modules/category/dto/update-category.dto';
 import { CategoryRepository } from '@/modules/category/repository/category.repository';
 import { toCategorySummary } from '@/modules/category/types/category.types';
 import { CategoryInputNormalizer } from '@/modules/category/utils/category-input.util';
+import { CategoryAssetValidator } from '@/modules/category/utils/category-asset.util';
 import { CategoryParentValidator } from '@/modules/category/utils/category-parent.util';
 import { Injectable } from '@nestjs/common';
 import { type Prisma } from '@prisma/client';
@@ -13,6 +14,7 @@ export class UpdateCategoryUseCase {
     private readonly categoryRepository: CategoryRepository,
     private readonly categoryInputNormalizer: CategoryInputNormalizer,
     private readonly categoryParentValidator: CategoryParentValidator,
+    private readonly categoryAssetValidator: CategoryAssetValidator,
   ) {}
 
   async execute(
@@ -61,6 +63,10 @@ export class UpdateCategoryUseCase {
       });
     }
 
+    if (dto.asset_ids !== undefined) {
+      await this.categoryAssetValidator.validate(tenantId, dto.asset_ids);
+    }
+
     const data: Prisma.CategoryUncheckedUpdateInput = {
       ...(dto.name !== undefined
         ? { name: this.categoryInputNormalizer.normalizeName(dto.name) }
@@ -77,12 +83,21 @@ export class UpdateCategoryUseCase {
         : {}),
     };
 
-    const category = await this.categoryRepository.update(
-      tenantId,
-      businessId,
-      categoryId,
-      data,
-    );
+    const category =
+      dto.asset_ids === undefined
+        ? await this.categoryRepository.update(
+            tenantId,
+            businessId,
+            categoryId,
+            data,
+          )
+        : await this.categoryRepository.update(
+            tenantId,
+            businessId,
+            categoryId,
+            data,
+            dto.asset_ids,
+          );
 
     return toCategorySummary(category);
   }
