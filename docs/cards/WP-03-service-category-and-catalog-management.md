@@ -2,7 +2,7 @@
 
 | Thuộc tính | Giá trị                                               |
 | ---------- | ----------------------------------------------------- |
-| Trạng thái | Backend partially complete                            |
+| Trạng thái | Category management complete; Service catalog ongoing |
 | Giai đoạn  | Tuần 3–4                                              |
 | Ưu tiên    | Critical                                              |
 | Bề mặt     | API, Business Admin, public booking, Shared contracts |
@@ -144,29 +144,30 @@ Backend CRUD cơ bản đã có nhưng Business Admin chưa có màn hình thậ
 
 - [x] Shared validation cho Category và Service CRUD.
 - [x] Permission keys và Business-scoped API foundation.
-- [ ] Chốt archive semantics và Category reorder contract.
+- [x] Chốt archive semantics và Category reorder contract.
 - [ ] Chốt Excel columns, atomicity và duplicate policy.
 
 ### Implementation
 
-| Task ID  | Layer | Task                                                | Trạng thái |
-| -------- | ----- | --------------------------------------------------- | ---------- |
-| WP03-001 | BE    | Category CRUD use cases/repository/tests            | Done       |
-| WP03-002 | BE    | Service CRUD use cases/repository/tests             | Done       |
-| WP03-003 | BE    | Archive/history-safe delete và public catalog query | Todo       |
-| WP03-004 | Asset | Service image ownership và ordering                 | Todo       |
-| WP03-005 | FE    | Category management UI                              | Todo       |
-| WP03-006 | FE    | Service list/create/edit/detail UI                  | Todo       |
-| WP03-007 | BE/FE | Excel preview/import/export                         | Todo       |
-| WP03-008 | Test  | Permission, isolation và active-only contract       | Todo       |
+| Task ID  | Layer | Task                                                 | Trạng thái |
+| -------- | ----- | ---------------------------------------------------- | ---------- |
+| WP03-001 | BE    | Category CRUD use cases/repository/tests             | Done       |
+| WP03-002 | BE    | Service CRUD use cases/repository/tests              | Done       |
+| WP03-003 | BE/FE | Category management: count, reorder, archive và UI   | Done       |
+| WP03-004 | BE    | History-safe Service archive và public catalog query | Todo       |
+| WP03-005 | Asset | Service image ownership và ordering                  | Todo       |
+| WP03-006 | FE    | Service list/create/edit/detail UI                   | Todo       |
+| WP03-007 | BE/FE | Excel preview/import/export                          | Todo       |
+| WP03-008 | Test  | Permission, isolation và active-only contract        | Todo       |
 
 ### Review & Testing
 
-- [ ] Owner tạo, sửa, archive Category/Service bằng dữ liệu thật.
+- [x] Owner tạo, sửa, sắp xếp và archive Category bằng dữ liệu thật.
+- [ ] Owner tạo, sửa và archive Service bằng dữ liệu thật.
 - [ ] Public catalog không trả inactive records.
 - [ ] Cross-Tenant và cross-Business ID bị từ chối.
 - [ ] Import lỗi hiển thị đúng row/column và không ghi ngoài policy.
-- [ ] UI có loading, empty, error, forbidden và responsive states.
+- [x] Category UI có loading, empty, error, forbidden và responsive states.
 
 ## Acceptance Criteria
 
