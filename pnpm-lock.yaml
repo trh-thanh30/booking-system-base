@@ -618,6 +618,9 @@ importers:
       axios:
         specifier: ^1.11.0
         version: 1.16.1
+      libphonenumber-js:
+        specifier: 1.13.14
+        version: 1.13.14
       zod:
         specifier: ^4.1.5
         version: 4.4.3

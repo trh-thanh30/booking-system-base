@@ -1,4 +1,43 @@
 @theme {
+  /* Template utility tokens; overrides stay scoped to .nail-salon-v2. */
+
+  --color-brand-50: var(--color-nail-50);
+  --color-brand-100: var(--color-nail-100);
+  --color-brand-200: var(--color-nail-200);
+  --color-brand-300: var(--color-nail-300);
+  --color-brand-400: var(--color-nail-400);
+  --color-brand-500: var(--color-nail-500);
+  --color-brand-600: var(--color-nail-600);
+  --color-brand-700: var(--color-nail-700);
+  --color-brand-800: color-mix(
+    in srgb,
+    var(--color-nail-700),
+    var(--color-nail-900)
+  );
+  --color-brand-900: var(--color-nail-900);
+
+  @keyframes shimmer {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
+  --animate-shimmer: shimmer 2.5s infinite;
+
+  --color-nail-cream: #efe3d3;
+  /* Default nail salon template palette. */
+  --color-nail-50: #faf8f9;
+  --color-nail-100: #f2ebe5;
+  --color-nail-200: #eae2ea;
+  --color-nail-300: #d6c7d7;
+  --color-nail-400: #b59eb6;
+  --color-nail-500: #6a526e;
+  --color-nail-600: #57415a;
+  --color-nail-700: #463248;
+  --color-nail-900: #2e2131;
+
   --color-primary-50: #eff6ff;
   --color-primary-100: #dbeafe;
   --color-primary-200: #bfdbfe;

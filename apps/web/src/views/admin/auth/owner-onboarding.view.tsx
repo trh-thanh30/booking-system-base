@@ -6,13 +6,20 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useToast } from "@repo/hooks";
 import { HttpClientError, type CompleteOwnerBusinessInput } from "@repo/shared";
 import { Button } from "@repo/ui";
-import { buildAdminBaseUrl } from "@/src/lib/admin/admin-workspace-url";
+import {
+  buildAdminBaseUrl,
+  buildTenantAdminUrl,
+} from "@/src/lib/admin/admin-workspace-url";
 import { authService } from "@/src/services/admin/auth.service";
 import { AuthShell, BusinessOnboardingForm } from "./components";
+import { useAuth } from "@/src/app/providers/admin";
+import { OnboardingLoadingSkeleton } from "./components/onboarding-loading-skeleton";
 
 export function OwnerOnboardingView() {
   const locale = useLocale();
   const t = useTranslations("AuthJourney");
+  const { completeOwnerOnboarding, isLoading, isAuthenticated, user } =
+    useAuth();
   const { toast } = useToast();
   const submitted = useRef(false);
   const clearDraftRef = useRef<() => void>(() => undefined);
@@ -20,24 +27,46 @@ export function OwnerOnboardingView() {
   const profile = useQuery({
     queryKey: ["owner-onboarding-profile"],
     queryFn: authService.getOwnerOnboardingProfile,
+    enabled: !isLoading && !isAuthenticated,
     retry: false,
     staleTime: 0,
     gcTime: 0,
     refetchOnWindowFocus: false,
   });
   const completion = useMutation({
-    mutationFn: authService.completeOwnerOnboarding,
+    mutationFn: completeOwnerOnboarding,
     retry: false,
   });
+  useEffect(() => {
+    if (
+      !isLoading &&
+      isAuthenticated &&
+      !submitted.current &&
+      user?.tenant?.slug
+    ) {
+      window.location.replace(
+        buildTenantAdminUrl({
+          locale,
+          returnTo: "/admin/business-setup/entry",
+          tenantSlug: user.tenant.slug,
+        }),
+      );
+    }
+  }, [isLoading, isAuthenticated, locale, user]);
   async function submit(input: CompleteOwnerBusinessInput) {
     if (submitted.current) return;
     submitted.current = true;
     try {
-      await completion.mutateAsync(input);
+      const result = await completion.mutateAsync(input);
       clearDraftRef.current();
       toast.success(t("businessCreated"));
+      if (!result.user.tenant?.slug) throw new Error("TENANT_REQUIRED");
       window.location.replace(
-        buildAdminBaseUrl({ locale, pathname: "/admin/login" }),
+        buildTenantAdminUrl({
+          locale,
+          returnTo: "/admin/business-setup/entry",
+          tenantSlug: result.user.tenant.slug,
+        }),
       );
     } catch (failure) {
       submitted.current = false;
@@ -82,12 +111,14 @@ export function OwnerOnboardingView() {
       description={t("businessDescription")}
     >
       <div className="space-y-5">
-        {profile.isPending ? <p role="status">{t("loading")}</p> : null}
+        {profile.isPending && !profile.data ? (
+          <OnboardingLoadingSkeleton label={t("loading")} />
+        ) : null}
         {profile.data && !terminal ? (
           <BusinessOnboardingForm
             profile={profile.data}
             locale={locale}
-            isPending={completion.isPending}
+            isPending={completion.isPending || completion.isSuccess}
             onSubmit={submit}
             onDraftStateChange={handleDraftStateChange}
           />
@@ -104,7 +135,7 @@ export function OwnerOnboardingView() {
         ) : null}
         <Button
           variant="ghost"
-          className="w-full"
+          className="w-full min-h-13 rounded-full text-base font-semibold"
           onClick={() =>
             window.location.assign(
               buildAdminBaseUrl({ locale, pathname: "/admin/login" }),

@@ -4,10 +4,8 @@ import { authService } from "@/src/services/admin/auth.service";
 import { completeOwnerBusinessSchema } from "@repo/shared";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { BusinessNameAvailabilityStatus } from "../types/business-onboarding.types";
-import { createBusinessSlug } from "../utils/business-onboarding.utils";
 
-export function useBusinessNameAvailability(name: string) {
-  const slug = createBusinessSlug(name);
+export function useBusinessNameAvailability(slug: string) {
   const [status, setStatus] = useState<BusinessNameAvailabilityStatus>("idle");
   const lastCheckedSlug = useRef("");
   const availabilityRequest = useRef(0);
@@ -19,11 +17,9 @@ export function useBusinessNameAvailability(name: string) {
   }, [slug]);
 
   const check = useCallback(async () => {
-    if (slug === lastCheckedSlug.current && status !== "error") return;
+    if (slug === lastCheckedSlug.current) return;
     lastCheckedSlug.current = slug;
-    const validName =
-      completeOwnerBusinessSchema.shape.name.safeParse(name).success;
-    if (!validName || slug.length < 2) {
+    if (!completeOwnerBusinessSchema.shape.slug.safeParse(slug).success) {
       setStatus("invalid");
       return;
     }
@@ -39,7 +35,13 @@ export function useBusinessNameAvailability(name: string) {
         setStatus("error");
       }
     }
-  }, [name, slug, status]);
+  }, [slug]);
+
+  useEffect(() => {
+    if (!slug) return;
+    const timer = window.setTimeout(() => void check(), 450);
+    return () => window.clearTimeout(timer);
+  }, [slug, check]);
 
   return { check, slug, status };
 }

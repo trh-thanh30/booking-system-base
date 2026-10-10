@@ -4,7 +4,7 @@ import { useAuth } from "@/src/app/providers/admin";
 import { GoogleIcon } from "@/src/components/common";
 import { useGoogleLogin } from "@/src/hooks/use-google-login";
 import { Link } from "@/src/i18n/navigation";
-import { getSafeReturnTo } from "@/src/lib/admin/auth-routing";
+import { getPostAuthReturnTo } from "@/src/lib/admin/auth-routing";
 import { buildTenantAdminUrl } from "@/src/lib/admin/admin-workspace-url";
 import { authService } from "@/src/services/admin/auth.service";
 import { useToast } from "@repo/hooks";
@@ -16,6 +16,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { AuthLoadingState, AuthShell, GoogleBusinessForm } from "./components";
 import { GOOGLE_ONBOARDING_QUERY_KEY } from "./constants/google-onboarding.constants";
 import { getGoogleOnboardingError } from "./utils/google-auth.utils";
+import { OnboardingLoadingSkeleton } from "./components/onboarding-loading-skeleton";
 
 export function GoogleOnboardingView() {
   const locale = useLocale();
@@ -53,7 +54,7 @@ export function GoogleOnboardingView() {
       window.location.replace(
         buildTenantAdminUrl({
           locale,
-          returnTo: "/admin/dashboard",
+          returnTo: "/admin/business-setup/entry",
           tenantSlug: user.tenant.slug,
         }),
       );
@@ -72,7 +73,7 @@ export function GoogleOnboardingView() {
       window.location.replace(
         buildTenantAdminUrl({
           locale: result.locale,
-          returnTo: getSafeReturnTo(result.return_to),
+          returnTo: getPostAuthReturnTo(result.return_to),
           tenantSlug: result.user.tenant.slug,
         }),
       );
@@ -108,25 +109,27 @@ export function GoogleOnboardingView() {
       description={t("google.onboardingDescription")}
     >
       <div className="space-y-2">
-        {isLoading || isAuthenticated || profile.isPending ? (
+        {(isLoading || isAuthenticated) && !attempt.current ? (
           <AuthLoadingState
             title={t("checkingSession")}
             description={t("checkingSessionDescription")}
           />
+        ) : profile.isPending && !profile.data ? (
+          <OnboardingLoadingSkeleton label={t("checkingSession")} />
         ) : (
           <>
             {profile.data && !error?.terminal ? (
               <GoogleBusinessForm
                 profile={profile.data}
                 locale={locale}
-                isPending={completion.isPending}
+                isPending={completion.isPending || completion.isSuccess}
                 onSubmit={submit}
                 onDraftStateChange={handleDraftStateChange}
               />
             ) : null}
             {profile.isError && !error?.terminal ? (
               <Button
-                className="w-full"
+                className="w-full min-h-13 rounded-full text-base font-semibold"
                 variant="outline"
                 disabled={profile.isFetching}
                 onClick={() => void profile.refetch()}
@@ -136,7 +139,7 @@ export function GoogleOnboardingView() {
             ) : null}
             {error?.terminal ? (
               <Button
-                className="w-full"
+                className="w-full min-h-13 rounded-full text-base font-semibold"
                 variant="outline"
                 disabled={google.isRedirecting}
                 onClick={google.startGoogleLogin}
@@ -147,7 +150,11 @@ export function GoogleOnboardingView() {
                   : t("google.restart")}
               </Button>
             ) : null}
-            <Button asChild variant="ghost" className="w-full">
+            <Button
+              asChild
+              variant="ghost"
+              className="w-full min-h-13 rounded-full text-base font-semibold"
+            >
               <Link href="/admin/login">{t("backToLogin")}</Link>
             </Button>
           </>

@@ -18,38 +18,55 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { Check, CircleX, LoaderCircle } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { useRef } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import type { BusinessNameAvailabilityStatus } from "../../types/business-onboarding.types";
-import { createBookingHost } from "../../utils/business-onboarding.utils";
+import { createBusinessSlug } from "../../utils/business-onboarding.utils";
 import { BusinessOnboardingField } from "./business-onboarding-field";
 
 export function BusinessInformationStep({
   locale,
   disabled,
   phoneCountry,
-  businessSlug,
   businessNameStatus,
   onCheckBusinessName,
+  usernameStatus,
+  phoneStatus,
+  onCheckUsername,
+  onCheckPhone,
 }: {
   locale: string;
   disabled: boolean;
   phoneCountry: PhoneCountry;
-  businessSlug: string;
   businessNameStatus: BusinessNameAvailabilityStatus;
   onCheckBusinessName: () => Promise<void>;
+  usernameStatus: BusinessNameAvailabilityStatus;
+  phoneStatus: BusinessNameAvailabilityStatus;
+  onCheckUsername: () => Promise<boolean>;
+  onCheckPhone: () => Promise<boolean>;
 }) {
   const t = useTranslations("AuthJourney");
   const form = useFormContext<CompleteOwnerBusinessInput>();
+  const slugEdited = useRef(false);
+  const lastSuggestedSlug = useRef("");
+  function contactError(
+    status: BusinessNameAvailabilityStatus,
+    field: "username" | "phone",
+  ) {
+    return status === "unavailable"
+      ? t(`availability.${field}Taken`)
+      : status === "error"
+        ? t("availability.failed")
+        : status === "invalid"
+          ? t(field === "phone" ? "invalidPhone" : "invalidField")
+          : undefined;
+  }
   const categories = useQuery({
     queryKey: ["business-categories", "active"],
     queryFn: businessCategoriesService.listActive,
     staleTime: 5 * 60 * 1000,
   });
-  const bookingHost = createBookingHost(
-    businessSlug || t("bookingUrlFallback"),
-    siteConfig.bookingDomain,
-  );
-  const fieldError = form.getFieldState("name", form.formState).error?.message;
+  const fieldError = form.getFieldState("slug", form.formState).error?.message;
   const statusError =
     businessNameStatus === "unavailable" || businessNameStatus === "invalid"
       ? t(
@@ -84,44 +101,107 @@ export function BusinessInformationStep({
       <FormField
         htmlFor="name"
         label={t("businessName")}
+        error={form.formState.errors.name?.message}
+        required
+      >
+        <Input
+          id="name"
+          type="text"
+          placeholder={t("placeholders.businessName")}
+          {...form.register("name", {
+            onChange: (event) => {
+              if (
+                !slugEdited.current &&
+                form.getValues("slug") === lastSuggestedSlug.current
+              ) {
+                const suggested = createBusinessSlug(event.target.value);
+                lastSuggestedSlug.current = suggested;
+                form.setValue("slug", suggested, {
+                  shouldDirty: false,
+                });
+              }
+            },
+          })}
+        />
+      </FormField>
+      <FormField
+        htmlFor="business-slug"
+        label={t("companyLogin")}
         error={fieldError || statusError}
-        description={statusMessage}
+        description={statusMessage || t("companyLoginHint")}
         descriptionRole="status"
         descriptionClassName={
           businessNameStatus === "error" ? "text-destructive" : undefined
         }
         required
       >
-        <div className="relative">
-          <Input
-            id="name"
-            type="text"
-            placeholder={t("placeholders.businessName")}
-            className={hasStatusError ? "border-destructive pr-10" : "pr-10"}
-            aria-invalid={hasStatusError}
-            aria-required="true"
-            {...form.register("name", {
-              onBlur: () => void onCheckBusinessName(),
-            })}
-          />
-          {statusIcon ? (
-            <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
-              {statusIcon}
-            </span>
-          ) : null}
+        <div
+          className={`flex min-w-0 flex-wrap items-center overflow-hidden rounded-lg border bg-card focus-within:ring-2 focus-within:ring-ring sm:flex-nowrap ${hasStatusError ? "border-destructive" : "border-input"}`}
+        >
+          <span
+            aria-hidden="true"
+            className="shrink-0 px-2 text-xs text-muted-foreground sm:px-3 sm:text-sm"
+          >
+            https://
+          </span>
+          <div className="relative min-w-0 flex-1">
+            <Input
+              id="business-slug"
+              type="text"
+              placeholder={t("companyLoginPlaceholder")}
+              className="min-w-0 rounded-none border-0 pr-8 shadow-none focus-visible:ring-0"
+              maxLength={80}
+              autoCapitalize="none"
+              autoCorrect="off"
+              spellCheck={false}
+              aria-invalid={hasStatusError}
+              aria-required="true"
+              aria-describedby="business-slug-description"
+              {...form.register("slug", {
+                onChange: () => {
+                  slugEdited.current = true;
+                },
+                onBlur: () => void onCheckBusinessName(),
+              })}
+            />
+            {statusIcon ? (
+              <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
+                {statusIcon}
+              </span>
+            ) : null}
+          </div>
+          <span
+            aria-hidden="true"
+            className="w-full shrink-0 border-t border-border bg-muted px-3 py-2 text-sm text-muted-foreground sm:w-auto sm:self-stretch sm:content-center sm:border-t-0"
+          >
+            .{siteConfig.bookingDomain}
+          </span>
         </div>
       </FormField>
-      <p
-        aria-live="polite"
-        className="-mt-2 break-all text-xs text-muted-foreground"
-      >
-        {t("bookingUrlPreview", { url: bookingHost })}
-      </p>
-      <BusinessOnboardingField name="owner.username" label="username" />
+      <BusinessOnboardingField
+        name="owner.username"
+        label="username"
+        onBlur={() => void onCheckUsername()}
+        availabilityError={contactError(usernameStatus, "username")}
+        availabilityHint={
+          usernameStatus === "checking" && !disabled
+            ? t("availability.checking")
+            : undefined
+        }
+      />
       <FormField
         htmlFor="owner-phone"
         label={t("phone")}
-        error={form.formState.errors.owner?.phone?.message}
+        error={
+          form.formState.errors.owner?.phone?.message ||
+          contactError(phoneStatus, "phone")
+        }
+        description={
+          phoneStatus === "checking" && !disabled
+            ? t("availability.checking")
+            : undefined
+        }
+        descriptionRole="status"
       >
         <Controller
           control={form.control}
@@ -131,11 +211,23 @@ export function BusinessInformationStep({
               {...field}
               id="owner-phone"
               key={phoneCountry}
-              invalid={Boolean(form.formState.errors.owner?.phone)}
+              invalid={
+                Boolean(form.formState.errors.owner?.phone) ||
+                phoneStatus === "unavailable" ||
+                phoneStatus === "invalid" ||
+                phoneStatus === "error"
+              }
               placeholder={t("placeholders.phone")}
               defaultCountry={phoneCountry}
               value={field.value || undefined}
-              onChange={field.onChange}
+              onChange={(value: string | undefined) => {
+                field.onChange(value);
+                form.clearErrors("owner.phone");
+              }}
+              onBlur={() => {
+                field.onBlur();
+                void onCheckPhone();
+              }}
             />
           )}
         />

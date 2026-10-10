@@ -110,7 +110,7 @@ test("business onboarding completes after the address step", () => {
   );
   assert.match(
     businessOnboardingFormSource,
-    /step === 1 \? "complete" : "continue"/,
+    /step === 1\s*\?\s*"complete"\s*:\s*"continue"/,
   );
 });
 

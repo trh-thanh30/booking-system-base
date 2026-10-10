@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { globalAddressSchema } from "./location.schema.ts";
+import { optionalInternationalPhoneSchema } from "./phone.schema.ts";
 
 export const registerOwnerAccountSchema = z
   .object({
@@ -40,12 +41,7 @@ export const completeOwnerBusinessSchema = z.object({
   locale: z.enum(["vi", "en"]),
   owner: z.object({
     username: z.string().trim().min(1).max(80),
-    phone: z
-      .string()
-      .trim()
-      .max(40)
-      .transform((value) => value || undefined)
-      .optional(),
+    phone: optionalInternationalPhoneSchema,
   }),
   business_profile: businessProfileSchema,
 });

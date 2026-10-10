@@ -202,6 +202,7 @@ export function BusinessesView() {
           description="Operational units"
           icon={Store}
           title="Businesses"
+          loading={businessesQuery.isPending}
           trend="Tenant scoped"
           value={String(businesses.length)}
         />
@@ -209,6 +210,7 @@ export function BusinessesView() {
           description="Ready for booking setup"
           icon={Building2}
           title="Active"
+          loading={businessesQuery.isPending}
           trend={`${activeBusinesses}/${businesses.length || 0}`}
           value={String(activeBusinesses)}
         />
@@ -216,6 +218,7 @@ export function BusinessesView() {
           description="Initial business for this tenant"
           icon={Store}
           title="Default"
+          loading={businessesQuery.isPending}
           trend={defaultBusiness?.slug ?? "-"}
           value={defaultBusiness?.name ?? "-"}
         />

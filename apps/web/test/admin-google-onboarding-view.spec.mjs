@@ -44,13 +44,20 @@ test("Google onboarding displays verified identity, read-only email and workspac
     html,
     /id="google-email"[^>]*readOnly=""[^>]*value="verified@example.com"/i,
   );
-  for (const name of ["owner.username", "owner.phone", "name", "timezone"]) {
+  for (const name of [
+    "owner.username",
+    "owner.phone",
+    "name",
+    "slug",
+    "timezone",
+  ]) {
     assert.ok(html.includes(`name="${name}"`));
   }
-  assert.ok(!html.includes('name="slug"'));
+  assert.match(html, /id="business-slug"/);
   assert.ok(!html.includes('name="locale"'));
   assert.match(html, /Business category/);
-  assert.match(html, /your-business\.bookingbase\.com/);
+  assert.match(html, /https:\/\//);
+  assert.match(html, /\.bookingbase\.com/);
   assert.doesNotMatch(
     html,
     /name="owner.email"|type="password"|name="password"/,
@@ -61,4 +68,10 @@ test("onboarding form locks inputs and submit while workspace creation is pendin
   const html = render(true);
   assert.match(html, /fieldset disabled=""/);
   assert.ok(html.includes(messages.AuthJourney.completing));
+  const submitButton = html.match(
+    /<button[^>]*type="submit"[^>]*>[\s\S]*?<\/button>/,
+  )?.[0];
+  assert.match(submitButton, /aria-busy="true"/);
+  assert.match(submitButton, /animate-spin/);
+  assert.match(submitButton, /motion-reduce:animate-none/);
 });

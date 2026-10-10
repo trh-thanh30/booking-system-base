@@ -9,13 +9,21 @@ import { useFormContext, type FieldPath } from "react-hook-form";
 export function BusinessOnboardingField({
   name,
   label,
+  labelText,
   type = "text",
   required = true,
+  availabilityError,
+  availabilityHint,
+  onBlur,
 }: {
   name: FieldPath<CompleteOwnerBusinessInput>;
   label: string;
+  labelText?: string;
   type?: HTMLInputTypeAttribute;
   required?: boolean;
+  availabilityError?: string;
+  availabilityHint?: string;
+  onBlur?: () => void;
 }) {
   const t = useTranslations("AuthJourney");
   const form = useFormContext<CompleteOwnerBusinessInput>();
@@ -28,8 +36,10 @@ export function BusinessOnboardingField({
   return (
     <FormField
       htmlFor={id}
-      label={t(label)}
-      error={error?.message}
+      label={labelText ?? t(label)}
+      error={error?.message || availabilityError}
+      description={availabilityHint}
+      descriptionRole="status"
       required={required}
     >
       <Input
@@ -37,6 +47,7 @@ export function BusinessOnboardingField({
         type={type}
         placeholder={t(`placeholders.${label}`)}
         {...form.register(name, {
+          onBlur,
           onChange: resetsFormattedAddress
             ? () =>
                 form.setValue("business_profile.address.formattedAddress", "", {

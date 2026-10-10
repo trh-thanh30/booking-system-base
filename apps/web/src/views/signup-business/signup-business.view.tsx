@@ -18,6 +18,7 @@ import {
 } from "@repo/shared";
 import { Button } from "@repo/ui";
 import { useMutation } from "@tanstack/react-query";
+import { LoaderCircle } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 
@@ -35,12 +36,11 @@ export function SignupBusinessView() {
     retry: false,
   });
   const password = form.watch("password");
+  const registering = registration.isPending || registration.isSuccess;
   const busy =
-    registration.isPending ||
-    form.formState.isSubmitting ||
-    google.isRedirecting;
+    registering || form.formState.isSubmitting || google.isRedirecting;
   async function submit(input: RegisterOwnerAccountInput) {
-    if (registration.isPending || google.isRedirecting) return;
+    if (registering || google.isRedirecting) return;
     form.clearErrors();
     const parsed = registerOwnerAccountSchema.safeParse(input);
     if (!parsed.success) {
@@ -53,7 +53,6 @@ export function SignupBusinessView() {
     try {
       const result = await registration.mutateAsync(parsed.data);
       toast.success(t("verificationSent"));
-      form.reset();
       router.replace(
         `/admin/verify-email?${new URLSearchParams({ sessionId: result.sessionId, onboarding: "1" })}`,
       );
@@ -75,12 +74,13 @@ export function SignupBusinessView() {
       <form
         className="space-y-5"
         onSubmit={form.handleSubmit(submit)}
+        aria-busy={registering}
         noValidate
       >
         <Button
           variant="outline"
           type="button"
-          className="min-h-11 w-full rounded-full"
+          className="min-h-13 w-full rounded-full text-base font-semibold"
           disabled={busy}
           onClick={google.startGoogleLogin}
         >
@@ -142,11 +142,17 @@ export function SignupBusinessView() {
             />
           </FormField>
           <Button
-            className="min-h-11 w-full rounded-full"
+            className="min-h-13 w-full rounded-full text-base font-semibold"
             type="submit"
             disabled={busy}
           >
-            {t(registration.isPending ? "registering" : "continueEmail")}
+            {registering && (
+              <LoaderCircle
+                aria-hidden="true"
+                className="size-4 animate-spin motion-reduce:animate-none"
+              />
+            )}
+            {t(registering ? "registering" : "continueEmail")}
           </Button>
         </fieldset>
         <p className="pt-3 text-center text-sm text-muted-foreground">

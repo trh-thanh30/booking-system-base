@@ -5,6 +5,7 @@ const dashboardRoutes = new Set([
   "bookings",
   "system",
   "settings",
+  "business-setup",
 ]);
 
 export function stripAuthLocale(pathname: string) {

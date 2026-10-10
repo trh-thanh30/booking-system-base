@@ -50,7 +50,7 @@ export function ForgotPasswordView() {
 
   return (
     <AuthShell description={t("forgot.description")} title={t("forgot.title")}>
-      <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
+      <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
         <FormField
           error={errors.email?.message}
           htmlFor="email"
@@ -69,7 +69,7 @@ export function ForgotPasswordView() {
           />
         </FormField>
         <Button
-          className="w-full"
+          className="w-full min-h-13 rounded-full text-base font-semibold"
           disabled={request.isPending || feedback.remaining > 0}
           type="submit"
         >
@@ -79,7 +79,11 @@ export function ForgotPasswordView() {
               ? t("emailFlow.retryIn", { seconds: feedback.remaining })
               : t("forgot.submit")}
         </Button>
-        <Button asChild className="w-full" variant="ghost">
+        <Button
+          asChild
+          className="w-full min-h-13 rounded-full text-base font-semibold"
+          variant="ghost"
+        >
           <Link href="/admin/login">{t("backToLogin")}</Link>
         </Button>
       </form>

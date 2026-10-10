@@ -58,7 +58,14 @@
 }
 
 .phone-number-input .PhoneInputInput {
-  @apply h-full min-w-0 flex-1 border-0 bg-transparent px-2 text-sm outline-none placeholder:text-muted-foreground;
+  @apply h-full min-w-0 flex-1 rounded-r-md border-0 bg-transparent px-2 text-sm outline-none placeholder:text-muted-foreground;
+}
+
+.phone-number-input .PhoneInputInput:autofill,
+.phone-number-input .PhoneInputInput:-webkit-autofill {
+  box-shadow: 0 0 0 1000px var(--color-card) inset;
+  -webkit-text-fill-color: var(--color-foreground);
+  caret-color: var(--color-foreground);
 }
 
 @utility duration-fast {

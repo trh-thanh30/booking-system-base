@@ -14,6 +14,7 @@ import {
   TabsTrigger,
   Textarea,
 } from "@repo/ui";
+import { SetupResumeCard } from "@/src/views/admin/business-setup/components/setup-resume-card";
 import { FormField } from "@/src/components/common/form-field";
 import {
   AdminPage,
@@ -39,6 +40,8 @@ export function SettingsView() {
         eyebrow="Configuration"
         title="Settings"
       />
+
+      <SetupResumeCard />
 
       <Tabs defaultValue="general">
         <TabsList className="w-full justify-start overflow-x-auto bg-surface shadow-xs sm:w-auto">

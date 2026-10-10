@@ -19,12 +19,22 @@ const input = {
   locale: 'vi',
   timezone: 'Asia/Ho_Chi_Minh',
   owner: {
-    phone: '0900000000',
+    phone: '+84912345678',
     username: 'owner',
   },
 };
 
 describe('CompleteGoogleOwnerOnboardingUseCase', () => {
+  it('rejects invalid phones for a new Google account before provisioning a workspace', async () => {
+    const dependencies = makeDependencies();
+    await expect(
+      createUseCase(dependencies).execute('ticket', {
+        ...input,
+        owner: { ...input.owner, phone: '+8412212121211212121212' },
+      }),
+    ).rejects.toThrow('Invalid international phone number');
+    expect(dependencies.workspace.execute).not.toHaveBeenCalled();
+  });
   it('attaches a callback-persisted Google Owner instead of creating a second user', async () => {
     const dependencies = makeDependencies();
     dependencies.sessions.get.mockResolvedValue({
@@ -103,7 +113,7 @@ describe('CompleteGoogleOwnerOnboardingUseCase', () => {
         },
         isVerified: true,
         password: null,
-        phone: '0900000000',
+        phone: '+84912345678',
         username: 'owner',
       },
     });

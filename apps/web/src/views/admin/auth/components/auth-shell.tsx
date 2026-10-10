@@ -1,10 +1,6 @@
-import type { ReactNode } from "react";
+import type { ComponentProps } from "react";
 import { AuthenticationLayout } from "@/src/components/layout";
 
-export function AuthShell(props: {
-  children: ReactNode;
-  description: string;
-  title: string;
-}) {
+export function AuthShell(props: ComponentProps<typeof AuthenticationLayout>) {
   return <AuthenticationLayout {...props} />;
 }

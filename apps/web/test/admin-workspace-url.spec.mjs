@@ -6,6 +6,35 @@ import {
   buildTenantAdminUrl,
   isTenantWorkspaceHostname,
 } from "../src/lib/admin/admin-workspace-url.ts";
+import { getPostAuthReturnTo } from "../src/lib/admin/auth-routing.ts";
+
+test("post-auth workspace handoff preserves setup entry and explicit destinations", () => {
+  for (const locale of ["vi", "en"]) {
+    for (const baseUrl of [
+      "http://localhost:3001",
+      "https://app.bookingbase.com",
+    ]) {
+      const origin = baseUrl.includes("localhost")
+        ? baseUrl
+        : "https://acme.app.bookingbase.com";
+      for (const [returnTo, path] of [
+        [undefined, "/admin/business-setup/entry"],
+        ["/admin/bookings?status=pending", "/admin/bookings?status=pending"],
+        ["https://evil.example/admin", "/admin/dashboard"],
+      ]) {
+        assert.equal(
+          buildTenantAdminUrl({
+            baseUrl,
+            locale,
+            tenantSlug: "acme",
+            returnTo: getPostAuthReturnTo(returnTo),
+          }),
+          `${origin}/${locale}${path}`,
+        );
+      }
+    }
+  }
+});
 
 test("development Admin URL stays on localhost and preserves locale and safe query", () => {
   assert.equal(

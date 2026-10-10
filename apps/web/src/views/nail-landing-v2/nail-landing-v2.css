@@ -1,0 +1,22 @@
+.nail-salon-v2,
+.nail-salon-v2
+  :is(
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    p,
+    span,
+    button,
+    input,
+    select,
+    textarea,
+    a,
+    .font-sans,
+    .font-serif
+  ) {
+  font-family:
+    var(--font-plus-jakarta-sans), ui-sans-serif, system-ui, sans-serif;
+}

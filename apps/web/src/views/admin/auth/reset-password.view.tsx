@@ -97,15 +97,18 @@ export function ResetPasswordView({
   const expired = !initialSessionId || feedback.expired;
   return (
     <AuthShell description={t("reset.description")} title={t("reset.title")}>
-      <div className="space-y-4">
+      <div className="space-y-5">
         {expired ? (
-          <Button asChild className="w-full">
+          <Button
+            asChild
+            className="w-full min-h-13 rounded-full text-base font-semibold"
+          >
             <Link href="/admin/forgot-password">
               {t("emailFlow.requestNewCode")}
             </Link>
           </Button>
         ) : (
-          <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
+          <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
             <FormField
               error={errors.code?.message}
               htmlFor="code"
@@ -165,7 +168,7 @@ export function ResetPasswordView({
               />
             </FormField>
             <Button
-              className="w-full"
+              className="w-full min-h-13 rounded-full text-base font-semibold"
               disabled={reset.isPending || feedback.remaining > 0}
               type="submit"
             >
@@ -175,14 +178,22 @@ export function ResetPasswordView({
                   ? t("emailFlow.retryIn", { seconds: feedback.remaining })
                   : t("reset.submit")}
             </Button>
-            <Button asChild className="w-full" variant="outline">
+            <Button
+              asChild
+              className="w-full min-h-13 rounded-full text-base font-semibold"
+              variant="outline"
+            >
               <Link href="/admin/forgot-password">
                 {t("emailFlow.requestNewCode")}
               </Link>
             </Button>
           </form>
         )}
-        <Button asChild className="w-full" variant="ghost">
+        <Button
+          asChild
+          className="w-full min-h-13 rounded-full text-base font-semibold"
+          variant="ghost"
+        >
           <Link href="/admin/login">{t("backToLogin")}</Link>
         </Button>
       </div>

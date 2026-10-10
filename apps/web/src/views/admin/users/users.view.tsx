@@ -250,6 +250,7 @@ export function UsersView() {
           description="Can access this tenant"
           icon={Users}
           title="Total users"
+          loading={usersQuery.isPending}
           trend="Live"
           value={String(users.length)}
         />
@@ -257,6 +258,7 @@ export function UsersView() {
           description="Currently enabled"
           icon={UserCheck}
           title="Active users"
+          loading={usersQuery.isPending}
           trend={`${activeUsers}/${users.length || 0}`}
           value={String(activeUsers)}
         />
@@ -264,6 +266,7 @@ export function UsersView() {
           description="Admin role"
           icon={ShieldCheck}
           title="Privileged users"
+          loading={usersQuery.isPending}
           trend="Guarded"
           value={String(privilegedUsers)}
         />
@@ -278,7 +281,7 @@ export function UsersView() {
             </CardDescription>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="min-w-0 overflow-x-auto">
           {usersQuery.isLoading ? (
             <div className="space-y-3">
               <Skeleton className="h-12 w-full" />

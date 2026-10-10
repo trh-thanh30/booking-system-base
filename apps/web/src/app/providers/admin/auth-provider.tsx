@@ -5,6 +5,8 @@ import type {
   LoginInput,
   CompleteGoogleOwnerOnboardingInput,
   GoogleOwnerOnboardingResult,
+  CompleteOwnerBusinessInput,
+  AuthSession,
 } from "@repo/shared";
 import { useQueryClient } from "@tanstack/react-query";
 import {
@@ -43,6 +45,9 @@ type AuthContextValue = {
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (input: LoginInput) => Promise<CurrentAuthUser>;
+  completeOwnerOnboarding: (
+    input: CompleteOwnerBusinessInput,
+  ) => Promise<AuthSession>;
   completeGoogleOnboarding: (
     input: CompleteGoogleOwnerOnboardingInput,
   ) => Promise<GoogleOwnerOnboardingResult>;
@@ -109,6 +114,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       ),
     [session],
   );
+  const completeOwnerOnboarding = useCallback(
+    (input: CompleteOwnerBusinessInput) =>
+      session.establishSession(() =>
+        authService.completeOwnerOnboarding(input),
+      ),
+    [session],
+  );
 
   const selectBusiness = useCallback(
     (id: string) => {
@@ -140,12 +152,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       isLoading,
       login: session.login,
       completeGoogleOnboarding,
+      completeOwnerOnboarding,
       logout: session.logout,
       refreshCurrentUser: session.refreshCurrentUser,
       selectBusiness,
       user,
     }),
-    [isLoading, session, selectBusiness, user, completeGoogleOnboarding],
+    [
+      isLoading,
+      session,
+      selectBusiness,
+      user,
+      completeGoogleOnboarding,
+      completeOwnerOnboarding,
+    ],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

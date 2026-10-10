@@ -13,6 +13,8 @@ import type {
   GoogleOnboardingProfile,
   GoogleOwnerOnboardingResult,
   BusinessSlugAvailability,
+  OwnerContactField,
+  OwnerContactAvailability,
 } from "@repo/shared";
 import { unwrapApiData } from "@repo/shared";
 import { apiClient, publicAuthClient } from "@/src/lib/admin/api-client";
@@ -54,6 +56,22 @@ export type CreatedInvitation = {
 };
 
 export const authService = {
+  async checkOwnerContact(
+    field: OwnerContactField,
+    value: string,
+    provider: "email" | "google",
+  ) {
+    const path =
+      provider === "google"
+        ? "/auth/admin/google/onboarding"
+        : "/auth/admin/onboarding";
+    return unwrapApiData(
+      await publicAuthClient.post<OwnerContactAvailability>(
+        `${path}/check-contact`,
+        { field, value },
+      ),
+    );
+  },
   async verifyOwnerAccount(input: VerifyEmailInput) {
     return unwrapApiData(
       await publicAuthClient.post<{ onboarding_required: boolean }>(
@@ -80,7 +98,9 @@ export const authService = {
     );
   },
   async completeOwnerOnboarding(input: CompleteOwnerBusinessInput) {
-    await publicAuthClient.post("/auth/admin/onboarding", input);
+    return unwrapApiData(
+      await publicAuthClient.post<AuthSession>("/auth/admin/onboarding", input),
+    );
   },
   getGoogleLoginUrl(locale: string, returnTo?: string) {
     return buildGoogleLoginUrl(apiConfig.baseUrl, locale, returnTo);

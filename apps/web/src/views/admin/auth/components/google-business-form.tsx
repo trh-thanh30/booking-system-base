@@ -26,6 +26,7 @@ export function GoogleBusinessForm({
       isPending={isPending}
       onSubmit={onSubmit}
       onDraftStateChange={onDraftStateChange}
+      availabilityProvider="google"
     />
   );
 }

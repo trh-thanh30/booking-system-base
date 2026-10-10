@@ -31,3 +31,12 @@
 - Do not use `Tenant` to mean a physical business location. Use `Business`
   for branches/brands/locations under the tenant account.
 - Business-scoped backend routes must resolve business context before use-case execution; controllers should receive `@Business()` rather than trusting a raw request body `business_id`.
+
+## Business Quick Setup
+
+- Post-auth quick setup is separate from Auth onboarding and is owned by `BusinessSettingsModule`.
+- Business working hours and selected booking template live in `Business.settings`. Timezone comes from Business. Hours contain seven local weekday entries, one interval per open day; Sunday is day 0. Closed days have null times and at least one day must open.
+- Setup completion is derived from valid saved hours, at least one active Service managed by `ServiceModule`, and a valid selected template. Only the skip/resume flag is persisted; completion flags are not duplicated.
+- Summary status precedence is COMPLETED, then SKIPPED, then IN_PROGRESS or NOT_STARTED. `next_step` is the first incomplete step, including while skipped; it is null when complete.
+- Owner alone may modify settings or skip/resume; Staff may read settings for an accessible Business. Scope comes from authenticated Tenant and Business contexts.
+- The built-in template IDs are `classic`, `modern`, and `minimal`. Shared contracts live in `packages/shared`; the endpoint contract is documented in `docs/superpowers/plans/2026-10-07-business-settings-api.md`.

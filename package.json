@@ -52,7 +52,7 @@
     "format": "prettier --write \"**/*.{ts,tsx,js,json,md,yml,yaml}\"",
     "test": "turbo run test",
     "test:all": "pnpm test",
-    "test:api": "pnpm --filter @repo/api test",
+    "test:api": "pnpm --filter @repo/api run test",
     "test:admin": "pnpm test:web",
     "test:web": "pnpm --filter @repo/shared build && pnpm --filter @repo/web test",
     "test:platform-admin": "pnpm --filter @repo/shared build && pnpm --filter @repo/platform-admin test",

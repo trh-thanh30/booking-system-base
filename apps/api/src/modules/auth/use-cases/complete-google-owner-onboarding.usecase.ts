@@ -37,7 +37,13 @@ export class CompleteGoogleOwnerOnboardingUseCase {
     if (session.userId && !completeOwnerBusinessSchema.safeParse(dto).success) {
       throw new BadRequestError('Complete business information and address');
     }
-    const phone = dto.owner.phone?.trim() || undefined;
+    const parsedPhone =
+      completeOwnerBusinessSchema.shape.owner.shape.phone.safeParse(
+        dto.owner.phone,
+      );
+    if (!parsedPhone.success)
+      throw new BadRequestError('Invalid international phone number');
+    const phone = parsedPhone.data;
     const profile = dto.business_profile
       ? businessProfileSchema.safeParse(dto.business_profile)
       : null;

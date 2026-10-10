@@ -23,9 +23,11 @@ import {
 export function LanguageSwitcher({
   className,
   variant = "default",
+  compactOnMobile = false,
 }: {
   className?: string;
   variant?: "default" | "landing";
+  compactOnMobile?: boolean;
 } = {}) {
   const locale = useLocale();
   const t = useTranslations("Navigation");
@@ -92,7 +94,12 @@ export function LanguageSwitcher({
               className="h-full w-full object-cover"
             />
           </span>
-          <span className="whitespace-nowrap font-bold text-foreground">
+          <span
+            className={cn(
+              "whitespace-nowrap font-bold text-foreground",
+              compactOnMobile && "sr-only sm:not-sr-only",
+            )}
+          >
             {currentLanguage?.label}
           </span>
         </div>

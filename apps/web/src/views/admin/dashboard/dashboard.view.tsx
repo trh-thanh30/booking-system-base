@@ -29,6 +29,8 @@ import {
 import { DashboardOverviewChart } from "@/src/views/admin/dashboard/components/dashboard-overview-chart";
 import { RecentSales } from "@/src/views/admin/dashboard/components/recent-sales";
 
+import { SetupResumeCard } from "@/src/views/admin/business-setup/components/setup-resume-card";
+
 const containerVariants = {
   hidden: { opacity: 0 },
   show: {
@@ -73,6 +75,8 @@ export function DashboardView() {
             title={t("title")}
           />
         </motion.div>
+
+        <SetupResumeCard />
 
         <motion.div variants={itemVariants}>
           <Tabs defaultValue="overview">

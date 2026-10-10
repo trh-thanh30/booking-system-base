@@ -39,6 +39,7 @@ function setup(user: unknown = owner) {
     findByEmailOrUsername: jest.fn().mockResolvedValue(user),
     findByUsername: jest.fn().mockResolvedValue(null),
     findByPhone: jest.fn().mockResolvedValue(null),
+    update: jest.fn().mockResolvedValue(owner),
   };
   const sessions = {
     get: jest.fn().mockResolvedValue('owner'),
@@ -50,11 +51,19 @@ function setup(user: unknown = owner) {
   const bcrypt = { comparePassword: jest.fn().mockResolvedValue(true) };
   const workspace = {
     execute: jest.fn().mockResolvedValue({
-      owner: { id: 'owner' },
+      owner: { ...owner, tenant_id: 'tenant', username: 'owner' },
       business: { id: 'business' },
     }),
   };
+  const tokens = {
+    generateTokenPair: jest.fn().mockReturnValue({
+      access_token: 'access',
+      refresh_token: 'refresh',
+    }),
+  };
+  const refresh = { hash: jest.fn().mockReturnValue('refresh-hash') };
   return {
+    tokens,
     users,
     sessions,
     verify,
@@ -67,10 +76,42 @@ function setup(user: unknown = owner) {
       verify as never,
       bcrypt as never,
       workspace as never,
+      tokens as never,
+      refresh as never,
     ),
   };
 }
 describe('OwnerBusinessOnboardingUseCase', () => {
+  it('rejects invalid international phones before checking uniqueness or creating a workspace', async () => {
+    const { useCase, users, workspace } = setup();
+    await expect(
+      useCase.execute('ticket', {
+        ...input,
+        owner: { ...input.owner, phone: '+8412212121211212121212' },
+      }),
+    ).rejects.toThrow('Invalid business information');
+    expect(users.findByPhone).not.toHaveBeenCalled();
+    expect(workspace.execute).not.toHaveBeenCalled();
+  });
+  it('establishes an Admin session for the newly provisioned verified Owner', async () => {
+    const { useCase, users, tokens } = setup();
+    const result = await useCase.execute('ticket', input);
+    expect(tokens.generateTokenPair).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: 'owner',
+        tenant_id: 'tenant',
+        role: 'OWNER',
+      }),
+      'admin',
+    );
+    expect(users.update).toHaveBeenCalledWith('owner', {
+      refresh_token_hash: 'refresh-hash',
+    });
+    expect(result).toMatchObject({
+      access_token: 'access',
+      refresh_token: 'refresh',
+    });
+  });
   it('attaches the verified persisted Owner and stores business-only setup', async () => {
     const { useCase, workspace, sessions } = setup();
     await useCase.execute('ticket', {

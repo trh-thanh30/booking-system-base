@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { businessProfileSchema } from "./owner-onboarding.schema.ts";
+import { optionalInternationalPhoneSchema } from "./phone.schema.ts";
 import {
   BUSINESS_STATUSES,
   TENANT_DOMAIN_TYPES,
@@ -58,7 +59,7 @@ export const completeGoogleOwnerOnboardingSchema = createTenantSchema
     business_profile: businessProfileSchema.optional(),
     owner: z.object({
       username: z.string().min(1).max(80),
-      phone: z.string().max(40).optional(),
+      phone: optionalInternationalPhoneSchema,
     }),
   });
 

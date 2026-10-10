@@ -1,10 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { ChevronDown, Menu, X } from "lucide-react";
 import {
-  Button,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -14,171 +13,271 @@ import {
   SheetTitle,
   SheetTrigger,
   SheetClose,
+  cn,
 } from "@repo/ui";
 import { Link } from "@/src/i18n/navigation";
 import { useScrollHeader } from "@/src/hooks/useScrollHeader";
-import {
-  LanguageSwitcher,
-  LandingContainer,
-  MarketingButton,
-} from "@/src/components/common";
+import { LanguageSwitcher } from "@/src/components/common/language-switcher";
+import { LandingContainer } from "@/src/components/common/landing-compositions";
 import type { SiteNavigationItem } from "@/src/types/site-navigation.types";
 
 export function SiteHeader({
   navigation = [],
+  loginLabel,
+  trialLabel,
 }: {
   navigation?: SiteNavigationItem[];
+  loginLabel?: string;
+  trialLabel?: string;
 }) {
   const t = useTranslations("Navigation");
   const locale = useLocale();
   const scrolled = useScrollHeader(12);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [openMenu, setOpenMenu] = useState<string | null>(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const loginUrl = `/${locale === "en" ? "en" : "vi"}/admin/login`;
+
+  const handleMouseEnter = (label: string) => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+    setOpenMenu(label);
+  };
+
+  const handleMouseLeave = () => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    timeoutRef.current = setTimeout(() => {
+      setOpenMenu(null);
+    }, 200);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, []);
+
   return (
     <header
-      className={`sticky top-0 z-50 w-full border-b transition-colors duration-normal ${scrolled ? "border-border bg-surface/95 shadow-sm backdrop-blur-md" : "border-transparent bg-surface"}`}
+      className={`sticky top-0 z-50 w-full border-b transition-all duration-300 ${
+        scrolled
+          ? "border-border/80 bg-surface/95 shadow-xs backdrop-blur-md"
+          : "border-border/40 bg-surface"
+      }`}
     >
-      <LandingContainer className="flex h-16 items-center justify-between gap-3">
+      <LandingContainer className="flex h-20 items-center justify-between gap-4">
+        {/* Brand Logo & Name */}
         <Link
           href="/"
-          className="flex shrink-0 items-center gap-2 font-bold text-label"
+          className="flex shrink-0 items-center gap-3 select-none group"
           aria-label="BookingBase"
         >
           <span
-            className="flex size-7 items-center justify-center rounded-md bg-primary text-primary-foreground shadow-sm"
+            className="flex size-10 sm:size-11 items-center justify-center rounded-xl bg-primary text-primary-foreground font-black text-xl shadow-xs group-hover:scale-105 transition-transform"
             aria-hidden="true"
           >
             B
           </span>
-          <span>
-            Booking<span className="text-primary">Base</span>
+          <span className="text-xl sm:text-2xl font-black tracking-tight text-foreground">
+            Booking<span className="text-primary font-extrabold">Base</span>
           </span>
         </Link>
-        {navigation.length > 0 ? (
+
+        {/* Center Navigation Links (Studio Style with Hover & Click Support) */}
+        {navigation.length > 0 && (
           <nav
-            className="hidden items-center gap-1 xl:flex"
+            className="hidden shrink-0 items-center gap-1 xl:flex 2xl:gap-1.5"
             aria-label={t("mainNavigation")}
           >
             {navigation.map((item) =>
               item.type === "link" ? (
                 <a
-                  key={item.label}
+                  key={item.id}
                   href={item.href}
-                  className="landing-nav-link"
+                  onMouseEnter={() => {
+                    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+                    setOpenMenu(null);
+                  }}
+                  className="whitespace-nowrap px-3 py-2.5 rounded-full text-sm 2xl:px-4 2xl:text-base font-bold text-foreground hover:text-foreground hover:bg-muted transition-all duration-150 select-none"
                 >
                   {item.label}
                 </a>
               ) : (
-                <DropdownMenu key={item.label}>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      className="min-h-11 gap-1 px-3 text-label"
-                    >
-                      {item.label}
-                      <ChevronDown className="size-4" aria-hidden="true" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent
-                    align="center"
-                    className="max-h-[70dvh] w-80 max-w-[calc(100vw-2rem)] overflow-y-auto p-2"
+                <div
+                  key={item.id}
+                  onMouseEnter={() => handleMouseEnter(item.id)}
+                  onMouseLeave={handleMouseLeave}
+                  className="relative inline-block"
+                >
+                  <DropdownMenu
+                    modal={false}
+                    open={openMenu === item.id}
+                    onOpenChange={(open) => {
+                      if (!open && openMenu === item.id) {
+                        setOpenMenu(null);
+                      } else if (open) {
+                        setOpenMenu(item.id);
+                      }
+                    }}
                   >
-                    {item.items?.map((sub) => (
-                      <DropdownMenuItem key={sub.label} asChild>
-                        <a
-                          href={sub.href}
-                          className="flex min-h-11 items-start gap-3 py-3"
+                    <DropdownMenuTrigger asChild>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setOpenMenu(openMenu === item.id ? null : item.id)
+                        }
+                        className={cn(
+                          "group inline-flex items-center gap-1.5 whitespace-nowrap px-3 py-2.5 rounded-full text-sm 2xl:px-4 2xl:text-base font-bold transition-all duration-150 select-none cursor-pointer focus-visible:outline-2 focus-visible:outline-ring",
+                          openMenu === item.id
+                            ? "bg-muted text-foreground"
+                            : "text-foreground hover:text-foreground hover:bg-muted",
+                        )}
+                      >
+                        <span>{item.label}</span>
+                        <ChevronDown
+                          className={cn(
+                            "w-4 h-4 shrink-0 transition-transform duration-200",
+                            openMenu === item.id
+                              ? "rotate-180 text-foreground"
+                              : "text-muted-foreground group-hover:text-foreground",
+                          )}
+                          aria-hidden="true"
+                        />
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                      align="center"
+                      sideOffset={8}
+                      onMouseEnter={() => handleMouseEnter(item.id)}
+                      onMouseLeave={handleMouseLeave}
+                      onCloseAutoFocus={(e: Event) => e.preventDefault()}
+                      className="max-h-[75dvh] w-88 max-w-[calc(100vw-2rem)] overflow-y-auto p-3 rounded-2xl border border-border bg-surface shadow-2xl before:absolute before:-top-3 before:left-0 before:right-0 before:h-3 before:content-['']"
+                    >
+                      {item.items?.map((sub) => (
+                        <DropdownMenuItem
+                          key={sub.id}
+                          asChild
+                          className="rounded-xl p-3 hover:bg-muted cursor-pointer"
+                          onClick={() => setOpenMenu(null)}
                         >
-                          <sub.icon
-                            className="mt-0.5 size-4 shrink-0 text-primary"
-                            aria-hidden="true"
-                          />
-                          <span>
-                            <span className="block font-semibold">
-                              {sub.label}
-                            </span>
-                            {"description" in sub && (
-                              <span className="mt-1 block text-caption text-muted-foreground">
-                                {sub.description}
+                          <a
+                            href={sub.href}
+                            className="flex items-start gap-3.5"
+                          >
+                            <div className="w-8 h-8 rounded-lg bg-muted border border-border/80 flex items-center justify-center shrink-0 mt-0.5">
+                              <sub.icon
+                                className="w-4 h-4 text-foreground"
+                                aria-hidden="true"
+                              />
+                            </div>
+                            <div>
+                              <span className="block font-bold text-sm sm:text-base text-foreground">
+                                {sub.label}
                               </span>
-                            )}
-                          </span>
-                        </a>
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                              {sub.description && (
+                                <span className="mt-0.5 block text-xs text-muted-foreground leading-snug">
+                                  {sub.description}
+                                </span>
+                              )}
+                            </div>
+                          </a>
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
               ),
             )}
           </nav>
-        ) : null}
-        {navigation.length ? (
-          <div className="flex items-center gap-2">
-            <div className="hidden items-center gap-2 xl:flex">
-              <LanguageSwitcher />
-              <MarketingButton asChild variant="ghost">
-                <a href={loginUrl}>{t("login")}</a>
-              </MarketingButton>
-              <MarketingButton asChild>
-                <Link href="/signup-business">{t("trial")}</Link>
-              </MarketingButton>
+        )}
+
+        {/* Right Action CTA Buttons */}
+        {navigation.length > 0 ? (
+          <div className="flex shrink-0 items-center gap-3">
+            <div className="hidden shrink-0 items-center gap-2 xl:flex 2xl:gap-3">
+              <LanguageSwitcher variant="landing" />
+              <a
+                href={loginUrl}
+                className="shrink-0 whitespace-nowrap px-4 py-2.5 h-12 inline-flex items-center justify-center rounded-full text-sm 2xl:px-5 2xl:text-base font-bold text-foreground hover:text-foreground hover:bg-muted transition-all duration-150 select-none cursor-pointer"
+              >
+                {loginLabel ?? t("login")}
+              </a>
+              <Link
+                href="/signup-business"
+                className="inline-flex shrink-0 items-center justify-center h-12 whitespace-nowrap px-5 2xl:px-7 rounded-full bg-primary hover:bg-primary-hover text-primary-foreground text-sm 2xl:text-base font-extrabold shadow-sm hover:shadow-md active:scale-[0.98] transition-all duration-200 cursor-pointer select-none"
+              >
+                {trialLabel ?? t("trial")}
+              </Link>
             </div>
+
+            {/* Mobile Navigation Sheet Trigger */}
             <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
               <SheetTrigger asChild>
-                <Button
-                  variant="ghost"
-                  className="size-11 xl:hidden"
+                <button
+                  type="button"
+                  className="w-12 h-12 rounded-full border border-input hover:border-primary hover:bg-muted flex items-center justify-center text-foreground xl:hidden transition-colors cursor-pointer shadow-xs"
                   aria-label={t("openMenu")}
                 >
-                  <Menu className="size-6" />
-                </Button>
+                  <Menu className="w-5 h-5" />
+                </button>
               </SheetTrigger>
               <SheetContent
                 aria-describedby={undefined}
-                className="w-[min(24rem,100vw)] overflow-y-auto p-6"
+                className="w-[min(26rem,100vw)] overflow-y-auto p-6 sm:p-8 rounded-l-3xl border-l border-border bg-surface shadow-2xl"
               >
-                <div className="mb-6 flex items-center justify-between">
-                  <SheetTitle className="text-heading-4 font-bold">
-                    BookingBase
-                  </SheetTitle>
+                <div className="mb-8 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <span className="flex size-9 items-center justify-center rounded-xl bg-primary text-primary-foreground font-black text-lg">
+                      B
+                    </span>
+                    <SheetTitle className="text-2xl font-black text-foreground tracking-tight">
+                      BookingBase
+                    </SheetTitle>
+                  </div>
                   <SheetClose asChild>
-                    <Button
-                      variant="ghost"
-                      className="size-11"
+                    <button
+                      type="button"
+                      className="w-10 h-10 rounded-full border border-input hover:bg-muted flex items-center justify-center text-foreground transition cursor-pointer"
                       aria-label={t("closeMenu")}
                     >
-                      <X className="size-5" />
-                    </Button>
+                      <X className="w-5 h-5" />
+                    </button>
                   </SheetClose>
                 </div>
-                <nav className="space-y-2" aria-label={t("mainNavigation")}>
+                <nav className="space-y-3" aria-label={t("mainNavigation")}>
                   {navigation.map((item) =>
                     item.type === "link" ? (
                       <a
-                        key={item.label}
+                        key={item.id}
                         href={item.href}
                         onClick={() => setMobileOpen(false)}
-                        className="landing-nav-link block"
+                        className="block py-3 rounded-2xl text-base font-bold text-foreground hover:bg-muted transition-colors"
                       >
                         {item.label}
                       </a>
                     ) : (
                       <details
-                        key={item.label}
-                        className="border-b border-border py-2"
+                        key={item.id}
+                        className="border-b border-border/80 py-3"
                       >
-                        <summary className="min-h-11 cursor-pointer py-3 text-label font-semibold">
-                          {item.label}
+                        <summary className="cursor-pointer py-2 text-base font-bold text-foreground flex items-center justify-between">
+                          <span>{item.label}</span>
+                          <ChevronDown className="w-4 h-4 text-muted-foreground" />
                         </summary>
-                        <div className="space-y-1 pl-3">
+                        <div className="space-y-1.5 pl-3 pt-2">
                           {item.items?.map((sub) => (
                             <a
-                              key={sub.label}
+                              key={sub.id}
                               href={sub.href}
-                              className="landing-nav-link flex items-center gap-3"
+                              className="flex items-center gap-3 py-2 px-3 rounded-xl text-sm font-semibold text-foreground hover:bg-muted hover:text-foreground transition-colors"
                               onClick={() => setMobileOpen(false)}
                             >
-                              <sub.icon className="size-4" aria-hidden="true" />
+                              <sub.icon
+                                className="w-4 h-4 text-foreground"
+                                aria-hidden="true"
+                              />
                               {sub.label}
                             </a>
                           ))}
@@ -187,20 +286,33 @@ export function SiteHeader({
                     ),
                   )}
                 </nav>
-                <div className="mt-6 flex flex-col gap-3">
-                  <LanguageSwitcher />
-                  <MarketingButton asChild variant="secondary">
-                    <a href={loginUrl}>{t("login")}</a>
-                  </MarketingButton>
-                  <MarketingButton asChild>
-                    <Link href="/signup-business">{t("trial")}</Link>
-                  </MarketingButton>
+                <div className="mt-8 flex flex-col gap-3.5 pt-4 border-t border-border/80">
+                  <LanguageSwitcher
+                    variant="landing"
+                    className="w-full justify-between"
+                  />
+                  <a
+                    href={loginUrl}
+                    className="w-full h-12 flex items-center justify-center rounded-full border border-input text-sm font-bold text-foreground hover:bg-muted transition-colors"
+                  >
+                    {loginLabel ?? t("login")}
+                  </a>
+                  <Link
+                    href="/signup-business"
+                    className="w-full h-12 flex items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-extrabold shadow-sm hover:bg-primary-hover transition-colors"
+                  >
+                    {trialLabel ?? t("trial")}
+                  </Link>
                 </div>
               </SheetContent>
             </Sheet>
           </div>
         ) : (
-          <LanguageSwitcher />
+          <LanguageSwitcher
+            variant="landing"
+            compactOnMobile
+            className="shrink-0 px-3 sm:px-4"
+          />
         )}
       </LandingContainer>
     </header>

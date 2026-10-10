@@ -11,6 +11,7 @@ import { LoginDto } from '../dto/login.dto';
 import { CompleteOwnerBusinessDto } from '../dto/complete-owner-business.dto';
 import { CheckBusinessSlugDto } from '../dto/check-business-slug.dto';
 import { CheckOwnerBusinessSlugUseCase } from '../use-cases/check-owner-business-slug.usecase';
+import { AuthProfileService } from '../services/auth-profile.service';
 
 @Public()
 @Controller('auth/admin/onboarding')
@@ -20,6 +21,7 @@ export class OwnerOnboardingController {
     private readonly registration: RegisterOwnerAccountUseCase,
     private readonly cookies: AuthCookieService,
     private readonly checkBusinessSlug: CheckOwnerBusinessSlugUseCase,
+    private readonly profiles: AuthProfileService,
   ) {}
 
   @Post('register')
@@ -65,7 +67,7 @@ export class OwnerOnboardingController {
   }
 
   @Post()
-  @ApiSuccess('Business onboarding complete. Please log in.')
+  @ApiSuccess('Business onboarding complete')
   async complete(
     @Body() input: CompleteOwnerBusinessDto,
     @Req() request: Request,
@@ -76,6 +78,10 @@ export class OwnerOnboardingController {
       input,
     );
     this.cookies.clearOwnerOnboardingCookie(response);
-    return result;
+    this.cookies.setRefreshCookies(response, 'admin', result.refresh_token);
+    return {
+      access_token: result.access_token,
+      user: await this.profiles.getByUserId(result.owner.id),
+    };
   }
 }
