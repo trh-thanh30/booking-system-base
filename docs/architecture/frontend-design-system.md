@@ -166,8 +166,12 @@ notification thống nhất và có thể thay provider tại shared package.
 
 ## Component Rules
 
+- Các field nhập liệu (`Input`, `Textarea`, `Select`, phone input và rich text
+  editor) dùng `bg-card` làm nền control. Ở light mode token này là trắng; ở
+  dark mode nó tự chuyển sang surface tối. Không dùng `bg-background` cho field
+  vì đó là token của app canvas và sẽ làm control chìm vào nền trang.
 - Các input trong luồng Auth/onboarding dùng `AuthInput` compose shared `Input`
-  với nền `bg-card`, không lấy nền trang `bg-background` làm nền field.
+  và giữ nguyên quy tắc nền field ở trên.
   Trường email dùng `EmailInput` chung với icon mail bên trái; login dùng cùng
   component với `type="text"` để vẫn nhận username. Disabled state giữ nguyên.
   Login có CTA đăng ký rõ ràng dẫn đến `/signup-business`, giữ locale hiện tại.
@@ -198,6 +202,49 @@ notification thống nhất và có thể thay provider tại shared package.
 - Text và control thông thường phải đạt WCAG AA. Cặp brand mặc định
   `primary-600`/white đạt tỷ lệ tương phản tối thiểu 4.5:1.
 - Không đưa business rule hoặc feature-specific variant vào `packages/ui`.
+
+### Rich Text Editor
+
+Nội dung có định dạng dùng `RichTextEditor` từ `@repo/ui/rich-text-editor`.
+Component lưu nội dung dưới dạng HTML và cung cấp các thao tác văn bản, heading,
+list, quote/code, căn lề, link, undo/redo, placeholder, disabled/invalid state và
+giới hạn ký tự. Toolbar dùng tooltip, trạng thái `aria-pressed`, touch target 44px
+và semantic token để hoạt động nhất quán ở light/dark mode.
+
+Ảnh, video và tài liệu được chọn từ toolbar khi consumer truyền `onUpload`:
+
+- `@repo/ui` sở hữu file picker, trạng thái upload/progress và việc chèn nội dung.
+- Ảnh/video được chèn vào document; tài liệu được chèn thành link có tên file.
+- App sở hữu HTTP client, quyền truy cập, folder/entity metadata, chunk/retry và
+  chuyển response API sang `RichTextUploadedAsset`.
+- Adapter báo tiến độ theo thang `0..100` qua `onProgress`; editor khóa chỉnh sửa
+  trong lúc upload để giữ đúng vị trí chèn đã chọn.
+- `onAssetsUploaded` dùng để feature lưu asset ID hoặc relation nếu nghiệp vụ cần.
+- Nếu một batch upload lỗi giữa chừng, các file đã upload thành công vẫn được
+  chèn và trả về consumer; lỗi của file hiện tại được hiển thị inline.
+
+```tsx
+<RichTextEditor
+  value={field.value}
+  onChange={field.onChange}
+  onUpload={async (file, { kind, onProgress }) => {
+    const asset = await uploadRichTextAsset(file, { kind, onProgress });
+
+    return {
+      id: asset.id,
+      kind,
+      mimeType: asset.mime_type,
+      name: asset.original_name,
+      url: asset.url,
+    };
+  }}
+/>
+```
+
+Không gọi API hoặc import service của Web/Platform Admin từ `packages/ui`.
+Nội dung HTML phải được sanitize ở backend trước khi lưu/publish và sanitize lại
+khi render ở public surface. Asset bị xóa khỏi HTML không đồng nghĩa xóa file vật
+lý; feature phải áp dụng cleanup policy theo relation/reference của chính nó.
 
 ## Migration Rule
 
