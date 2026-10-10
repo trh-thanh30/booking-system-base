@@ -1,6 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type MutableRefObject,
+} from "react";
 import {
   mergeAttributes,
   Node,
@@ -13,7 +20,13 @@ import Link from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
 import TextAlign from "@tiptap/extension-text-align";
 import Underline from "@tiptap/extension-underline";
-import { EditorContent, useEditor } from "@tiptap/react";
+import {
+  EditorContent,
+  NodeViewWrapper,
+  ReactNodeViewRenderer,
+  useEditor,
+  type NodeViewProps,
+} from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import {
   AlignCenter,
@@ -38,8 +51,10 @@ import {
   Undo2,
   Unlink,
   VideoIcon,
+  X,
 } from "lucide-react";
 import { Button } from "./button";
+import { ConfirmDialog } from "./confirm-dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -80,6 +95,13 @@ export type RichTextEditorLabels = {
   bulletList: string;
   clearFormatting: string;
   codeBlock: string;
+  deleteAsset: string;
+  deleteAssetCancel: string;
+  deleteAssetConfirm: string;
+  deleteAssetDescription: (name: string) => string;
+  deleteAssetFailed: (name: string) => string;
+  deleteAssetTitle: string;
+  deletingAsset: string;
   document: string;
   editor: string;
   heading2: string;
@@ -96,8 +118,8 @@ export type RichTextEditorLabels = {
   unlink: string;
   underline: string;
   undo: string;
-  uploadFailed: string;
-  uploading: string;
+  uploadFailed: (name: string) => string;
+  uploading: (name: string) => string;
   video: string;
 };
 
@@ -118,6 +140,7 @@ export type RichTextEditorProps = {
   onAssetsUploaded?: (assets: RichTextUploadedAsset[]) => void;
   onBlur?: () => void;
   onChange: (html: string) => void;
+  onDeleteAsset?: (asset: RichTextUploadedAsset) => Promise<void>;
   onUpload?: (
     file: File,
     context: RichTextUploadContext,
@@ -138,6 +161,14 @@ const DEFAULT_LABELS: RichTextEditorLabels = {
   bulletList: "Bullet list",
   clearFormatting: "Clear formatting",
   codeBlock: "Code block",
+  deleteAsset: "Delete asset",
+  deleteAssetCancel: "Cancel",
+  deleteAssetConfirm: "Delete permanently",
+  deleteAssetDescription: (name) =>
+    `${name} will be permanently removed from storage. This cannot be undone.`,
+  deleteAssetFailed: (name) => `Could not delete ${name}. Try again.`,
+  deleteAssetTitle: "Delete this asset?",
+  deletingAsset: "Deleting…",
   document: "Upload document",
   editor: "Rich text editor",
   heading2: "Heading 2",
@@ -154,8 +185,8 @@ const DEFAULT_LABELS: RichTextEditorLabels = {
   underline: "Underline",
   undo: "Undo",
   unlink: "Remove link",
-  uploadFailed: "Could not upload {name}. Try again.",
-  uploading: "Uploading {name}",
+  uploadFailed: (name) => `Could not upload ${name}. Try again.`,
+  uploading: (name) => `Uploading ${name}`,
   video: "Upload video",
 };
 
@@ -166,29 +197,251 @@ const ACCEPTED_FILES: Record<RichTextAssetKind, string> = {
   video: "video/*",
 };
 
-const Video = Node.create({
-  name: "video",
-  group: "block",
-  atom: true,
+type DeleteAssetHandler = RichTextEditorProps["onDeleteAsset"];
 
-  addAttributes() {
-    return {
-      controls: { default: true },
-      src: { default: null },
-    };
-  },
+type AssetNodeViewBindings = {
+  deleteAssetRef: MutableRefObject<DeleteAssetHandler>;
+  labelsRef: MutableRefObject<RichTextEditorLabels>;
+};
 
-  parseHTML() {
-    return [{ tag: "video[src]" }];
+const assetAttributes = {
+  assetId: {
+    default: null,
+    parseHTML: (element: HTMLElement) => element.getAttribute("data-asset-id"),
+    renderHTML: ({ assetId }: { assetId?: string | null }) =>
+      assetId ? { "data-asset-id": assetId } : {},
   },
+  assetName: {
+    default: null,
+    parseHTML: (element: HTMLElement) =>
+      element.getAttribute("data-asset-name"),
+    renderHTML: ({ assetName }: { assetName?: string | null }) =>
+      assetName ? { "data-asset-name": assetName } : {},
+  },
+  mimeType: {
+    default: null,
+    parseHTML: (element: HTMLElement) => element.getAttribute("data-mime-type"),
+    renderHTML: ({ mimeType }: { mimeType?: string | null }) =>
+      mimeType ? { "data-mime-type": mimeType } : {},
+  },
+};
 
-  renderHTML({ HTMLAttributes }) {
-    return [
-      "video",
-      mergeAttributes({ controls: true, preload: "metadata" }, HTMLAttributes),
-    ];
-  },
-});
+function createAssetImage(bindings: AssetNodeViewBindings) {
+  return Image.extend({
+    addAttributes() {
+      return {
+        ...this.parent?.(),
+        ...assetAttributes,
+      };
+    },
+    addNodeView() {
+      return ReactNodeViewRenderer((props) => (
+        <RichTextAssetNodeView {...props} bindings={bindings} kind="image" />
+      ));
+    },
+  }).configure({ allowBase64: false });
+}
+
+function createAssetVideo(bindings: AssetNodeViewBindings) {
+  return Node.create({
+    name: "video",
+    group: "block",
+    atom: true,
+
+    addAttributes() {
+      return {
+        ...assetAttributes,
+        controls: { default: true },
+        src: { default: null },
+      };
+    },
+
+    parseHTML() {
+      return [{ tag: "video[src]" }];
+    },
+
+    renderHTML({ HTMLAttributes }) {
+      return [
+        "video",
+        mergeAttributes(
+          { controls: true, preload: "metadata" },
+          HTMLAttributes,
+        ),
+      ];
+    },
+
+    addNodeView() {
+      return ReactNodeViewRenderer((props) => (
+        <RichTextAssetNodeView {...props} bindings={bindings} kind="video" />
+      ));
+    },
+  });
+}
+
+function createAssetDocument(bindings: AssetNodeViewBindings) {
+  return Node.create({
+    name: "documentAsset",
+    group: "block",
+    atom: true,
+
+    addAttributes() {
+      return {
+        ...assetAttributes,
+        href: { default: null },
+      };
+    },
+
+    parseHTML() {
+      return [{ tag: "a[data-rich-text-document][href]" }];
+    },
+
+    renderHTML({ HTMLAttributes, node }) {
+      return [
+        "a",
+        mergeAttributes(HTMLAttributes, {
+          "data-rich-text-document": "true",
+          href: node.attrs.href,
+          rel: "noopener noreferrer",
+          target: "_blank",
+        }),
+        node.attrs.assetName ?? node.attrs.href,
+      ];
+    },
+
+    addNodeView() {
+      return ReactNodeViewRenderer((props) => (
+        <RichTextAssetNodeView {...props} bindings={bindings} kind="document" />
+      ));
+    },
+  });
+}
+
+function RichTextAssetNodeView({
+  bindings,
+  deleteNode,
+  editor,
+  kind,
+  node,
+  selected,
+}: NodeViewProps & {
+  bindings: AssetNodeViewBindings;
+  kind: RichTextAssetKind;
+}) {
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [error, setError] = useState("");
+  const asset: RichTextUploadedAsset = {
+    id: (node.attrs.assetId as string | null) ?? undefined,
+    kind,
+    mimeType: (node.attrs.mimeType as string | null) ?? undefined,
+    name:
+      (node.attrs.assetName as string | null) ??
+      (node.attrs.alt as string | null) ??
+      "asset",
+    url:
+      ((kind === "document" ? node.attrs.href : node.attrs.src) as
+        | string
+        | null) ?? "",
+  };
+  const canDelete = Boolean(
+    asset.id && bindings.deleteAssetRef.current && editor.isEditable,
+  );
+  const labels = bindings.labelsRef.current;
+
+  async function deleteAsset() {
+    const handler = bindings.deleteAssetRef.current;
+    if (!handler || !asset.id) return;
+
+    setDeleting(true);
+    setError("");
+    try {
+      await handler(asset);
+      setConfirmOpen(false);
+      deleteNode();
+    } catch {
+      setDeleting(false);
+      setError(labels.deleteAssetFailed(asset.name));
+    }
+  }
+
+  return (
+    <NodeViewWrapper
+      className={cn(
+        "group relative my-4 overflow-hidden rounded-md border border-border bg-card",
+        selected && "ring-2 ring-ring/30",
+      )}
+      contentEditable={false}
+    >
+      {kind === "image" ? (
+        <img
+          alt={asset.name}
+          className="h-auto max-h-[32rem] w-full object-contain"
+          src={asset.url}
+        />
+      ) : kind === "video" ? (
+        <video
+          className="aspect-video w-full bg-muted"
+          controls
+          preload="metadata"
+          src={asset.url}
+        />
+      ) : (
+        <a
+          className="flex min-h-16 items-center gap-3 pr-14 pl-4 text-sm font-medium text-primary underline-offset-4 hover:underline"
+          href={asset.url}
+          rel="noopener noreferrer"
+          target="_blank"
+        >
+          <FileUp aria-hidden="true" className="size-5 shrink-0" />
+          <span className="min-w-0 truncate">{asset.name}</span>
+        </a>
+      )}
+
+      {canDelete ? (
+        <Button
+          aria-label={`${labels.deleteAsset}: ${asset.name}`}
+          className="absolute top-2 right-2 size-9 rounded-full shadow-sm"
+          disabled={deleting}
+          onClick={() => setConfirmOpen(true)}
+          onMouseDown={(event) => event.preventDefault()}
+          size="icon"
+          type="button"
+          variant="destructive"
+        >
+          {deleting ? (
+            <LoaderCircle aria-hidden="true" className="size-4 animate-spin" />
+          ) : (
+            <X aria-hidden="true" className="size-4" />
+          )}
+        </Button>
+      ) : null}
+
+      {error ? (
+        <p
+          className="border-t border-danger-border bg-danger-surface px-3 py-2 text-xs text-danger-surface-foreground"
+          role="alert"
+        >
+          {error}
+        </p>
+      ) : null}
+
+      <ConfirmDialog
+        cancelLabel={labels.deleteAssetCancel}
+        confirmDisabled={deleting}
+        confirmLabel={
+          deleting ? labels.deletingAsset : labels.deleteAssetConfirm
+        }
+        description={labels.deleteAssetDescription(asset.name)}
+        onConfirm={deleteAsset}
+        onOpenChange={(open) => {
+          if (!deleting) setConfirmOpen(open);
+        }}
+        open={confirmOpen}
+        title={labels.deleteAssetTitle}
+      />
+    </NodeViewWrapper>
+  );
+}
 
 type UploadState = {
   fileName: string;
@@ -199,10 +452,6 @@ type SelectionRange = {
   from: number;
   to: number;
 };
-
-function formatLabel(template: string, name: string) {
-  return template.replace("{name}", name);
-}
 
 function normalizeLinkUrl(value: string): string | null {
   const url = value.trim();
@@ -229,7 +478,14 @@ function createAssetContent(asset: RichTextUploadedAsset): JSONContent[] {
   if (asset.kind === "image") {
     return [
       {
-        attrs: { alt: asset.name, src: asset.url, title: asset.name },
+        attrs: {
+          alt: asset.name,
+          assetId: asset.id,
+          assetName: asset.name,
+          mimeType: asset.mimeType,
+          src: asset.url,
+          title: asset.name,
+        },
         type: "image",
       },
       { type: "paragraph" },
@@ -238,31 +494,30 @@ function createAssetContent(asset: RichTextUploadedAsset): JSONContent[] {
 
   if (asset.kind === "video") {
     return [
-      { attrs: { src: asset.url }, type: "video" },
+      {
+        attrs: {
+          assetId: asset.id,
+          assetName: asset.name,
+          mimeType: asset.mimeType,
+          src: asset.url,
+        },
+        type: "video",
+      },
       { type: "paragraph" },
     ];
   }
 
   return [
     {
-      content: [
-        {
-          marks: [
-            {
-              attrs: {
-                href: asset.url,
-                rel: "noopener noreferrer",
-                target: "_blank",
-              },
-              type: "link",
-            },
-          ],
-          text: asset.name,
-          type: "text",
-        },
-      ],
-      type: "paragraph",
+      attrs: {
+        assetId: asset.id,
+        assetName: asset.name,
+        href: asset.url,
+        mimeType: asset.mimeType,
+      },
+      type: "documentAsset",
     },
+    { type: "paragraph" },
   ];
 }
 
@@ -283,6 +538,7 @@ export function RichTextEditor({
   onAssetsUploaded,
   onBlur,
   onChange,
+  onDeleteAsset,
   onUpload,
   onUploadError,
   placeholder = "",
@@ -296,6 +552,20 @@ export function RichTextEditor({
   const videoInputRef = useRef<HTMLInputElement | null>(null);
   const documentInputRef = useRef<HTMLInputElement | null>(null);
   const uploadSelectionRef = useRef<SelectionRange | null>(null);
+  const deleteAssetRef = useRef<DeleteAssetHandler>(onDeleteAsset);
+  const labelsRef = useRef<RichTextEditorLabels>(labels);
+  const assetNodeViewBindings = useMemo<AssetNodeViewBindings>(
+    () => ({ deleteAssetRef, labelsRef }),
+    [],
+  );
+  const assetExtensions = useMemo(
+    () => [
+      createAssetImage(assetNodeViewBindings),
+      createAssetVideo(assetNodeViewBindings),
+      createAssetDocument(assetNodeViewBindings),
+    ],
+    [assetNodeViewBindings],
+  );
   const [linkOpen, setLinkOpen] = useState(false);
   const [linkValue, setLinkValue] = useState("");
   const [linkError, setLinkError] = useState("");
@@ -305,6 +575,11 @@ export function RichTextEditor({
   const resolvedAriaDescribedBy = ariaDescribedByProp ?? ariaDescribedBy;
   const resolvedAriaLabel = ariaLabelProp ?? ariaLabel ?? labels.editor;
   const resolvedInvalid = ariaInvalidProp ?? invalid;
+
+  useEffect(() => {
+    deleteAssetRef.current = onDeleteAsset;
+    labelsRef.current = labels;
+  }, [labels, onDeleteAsset]);
 
   const editor = useEditor({
     content: value,
@@ -326,12 +601,10 @@ export function RichTextEditor({
           "[&_code]:rounded-sm [&_code]:bg-muted [&_code]:px-1 [&_code]:py-0.5 [&_code]:font-mono [&_code]:text-[0.875em]",
           "[&_h2]:mb-2 [&_h2]:mt-4 [&_h2]:text-xl [&_h2]:font-semibold",
           "[&_h3]:mb-2 [&_h3]:mt-3 [&_h3]:text-lg [&_h3]:font-semibold",
-          "[&_img]:my-4 [&_img]:h-auto [&_img]:max-w-full [&_img]:rounded-md [&_img]:border [&_img]:border-border",
           "[&_ol]:my-3 [&_ol]:list-decimal [&_ol]:pl-6 [&_p]:my-2",
           "[&_pre]:my-4 [&_pre]:overflow-x-auto [&_pre]:rounded-md [&_pre]:bg-muted [&_pre]:p-4",
           "[&_pre_code]:bg-transparent [&_pre_code]:p-0",
           "[&_ul]:my-3 [&_ul]:list-disc [&_ul]:pl-6",
-          "[&_video]:my-4 [&_video]:aspect-video [&_video]:w-full [&_video]:rounded-md [&_video]:bg-muted",
         ),
         role: "textbox",
       },
@@ -347,8 +620,7 @@ export function RichTextEditor({
         defaultProtocol: "https",
         openOnClick: false,
       }),
-      Image.configure({ allowBase64: false }),
-      Video,
+      ...assetExtensions,
       TextAlign.configure({ types: ["heading", "paragraph"] }),
       Placeholder.configure({
         emptyEditorClass: "is-editor-empty",
@@ -426,9 +698,7 @@ export function RichTextEditor({
         }
       } catch (error) {
         const failedFile = currentFile ?? files[0];
-        setUploadError(
-          formatLabel(labels.uploadFailed, failedFile?.name ?? "file"),
-        );
+        setUploadError(labels.uploadFailed(failedFile?.name ?? "file"));
         if (failedFile) onUploadError?.(error, failedFile);
       } finally {
         if (uploaded.length) {
@@ -442,7 +712,7 @@ export function RichTextEditor({
         if (uploaded.length) onAssetsUploaded?.(uploaded);
       }
     },
-    [editor, labels.uploadFailed, onAssetsUploaded, onUpload, onUploadError],
+    [editor, labels, onAssetsUploaded, onUpload, onUploadError],
   );
 
   const applyLink = useCallback(() => {
@@ -833,7 +1103,7 @@ export function RichTextEditor({
                   className="size-3.5 shrink-0 animate-spin"
                 />
                 <span className="truncate">
-                  {formatLabel(labels.uploading, uploadState.fileName)} ·{" "}
+                  {labels.uploading(uploadState.fileName)} ·{" "}
                   {uploadState.progress}%
                 </span>
               </span>

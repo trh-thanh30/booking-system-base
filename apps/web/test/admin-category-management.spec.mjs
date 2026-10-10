@@ -18,6 +18,8 @@ test("category service uses the tenant-scoped management contracts", () => {
   assert.match(service, /"\/assets\/upload"/);
   assert.match(service, /FormData/);
   assert.match(service, /uploadCategoryDescriptionAsset/);
+  assert.match(service, /deleteCategoryDescriptionAsset/);
+  assert.match(service, /apiClient\.delete\(`\/assets\/\$\{id\}`\)/);
   assert.match(service, /folder: "category-descriptions"/);
   assert.match(service, /onUploadProgress/);
 });
@@ -106,6 +108,16 @@ test("category create and edit forms are deep-linkable route views", () => {
   assert.match(form, /RichTextEditor/);
   assert.match(form, /Controller/);
   assert.match(form, /onUploadDescriptionAsset/);
+  assert.match(form, /onDeleteDescriptionAsset/);
+  assert.match(form, /onDeleteAsset=\{onDeleteDescriptionAsset\}/);
+  assert.match(
+    form,
+    /uploadFailed:\s*\(name\)\s*=>\s*t\("form\.editor\.uploadFailed",\s*\{ name \}\)/,
+  );
+  assert.match(
+    form,
+    /uploading:\s*\(name\)\s*=>\s*t\("form\.editor\.uploading",\s*\{ name \}\)/,
+  );
   assert.doesNotMatch(form, /Textarea/);
   assert.doesNotMatch(form, /Dialog/);
 });

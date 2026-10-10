@@ -17,6 +17,7 @@ export type CategoryFormProps = {
   categories: CategorySummary[];
   category: CategorySummary | null;
   mode: CategoryFormMode;
+  onDeleteDescriptionAsset: NonNullable<RichTextEditorProps["onDeleteAsset"]>;
   onSubmit: (input: CategoryFormInput, assets: CategoryAssetDraft[]) => void;
   onUploadDescriptionAsset: NonNullable<RichTextEditorProps["onUpload"]>;
   pending: boolean;

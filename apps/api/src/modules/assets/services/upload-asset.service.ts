@@ -80,10 +80,12 @@ export class UploadAssetService {
   async delete(filePath: string): Promise<void> {
     try {
       await this.storage.delete(filePath);
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
       this.logger.warn(
-        `Failed to delete file on disk at ${filePath}: ${error?.message || 'Unknown error'}`,
+        `Failed to delete file on disk at ${filePath}: ${message}`,
       );
+      throw error;
     }
   }
 

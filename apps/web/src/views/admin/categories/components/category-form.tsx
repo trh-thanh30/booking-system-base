@@ -65,6 +65,7 @@ export function CategoryForm({
   categories,
   category,
   mode,
+  onDeleteDescriptionAsset,
   onSubmit,
   onUploadDescriptionAsset,
   pending,
@@ -201,6 +202,15 @@ export function CategoryForm({
                       bulletList: t("form.editor.bulletList"),
                       clearFormatting: t("form.editor.clearFormatting"),
                       codeBlock: t("form.editor.codeBlock"),
+                      deleteAsset: t("form.editor.deleteAsset"),
+                      deleteAssetCancel: t("form.editor.deleteAssetCancel"),
+                      deleteAssetConfirm: t("form.editor.deleteAssetConfirm"),
+                      deleteAssetDescription: (name) =>
+                        t("form.editor.deleteAssetDescription", { name }),
+                      deleteAssetFailed: (name) =>
+                        t("form.editor.deleteAssetFailed", { name }),
+                      deleteAssetTitle: t("form.editor.deleteAssetTitle"),
+                      deletingAsset: t("form.editor.deletingAsset"),
                       document: t("form.editor.document"),
                       editor: t("form.editor.editor"),
                       heading2: t("form.editor.heading2"),
@@ -217,13 +227,15 @@ export function CategoryForm({
                       underline: t("form.editor.underline"),
                       undo: t("form.editor.undo"),
                       unlink: t("form.editor.unlink"),
-                      uploadFailed: t("form.editor.uploadFailed"),
-                      uploading: t("form.editor.uploading"),
+                      uploadFailed: (name) =>
+                        t("form.editor.uploadFailed", { name }),
+                      uploading: (name) => t("form.editor.uploading", { name }),
                       video: t("form.editor.video"),
                     }}
                     maxLength={MAX_CATEGORY_DESCRIPTION_TEXT_LENGTH}
                     onBlur={field.onBlur}
                     onChange={field.onChange}
+                    onDeleteAsset={onDeleteDescriptionAsset}
                     onUpload={onUploadDescriptionAsset}
                     placeholder={t("form.descriptionPlaceholder")}
                     value={field.value}

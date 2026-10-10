@@ -203,6 +203,12 @@ export class AssetsService {
       throw new NotFoundException('Asset not found');
     }
 
+    if (asset.tenant_id !== user.tenant_id) {
+      throw new ForbiddenException(
+        'You do not have permission to delete this asset',
+      );
+    }
+
     if (asset.uploaded_by_id !== user.id && user.role !== 'OWNER') {
       throw new ForbiddenException(
         'You do not have permission to delete this asset',
@@ -211,9 +217,8 @@ export class AssetsService {
 
     await this.uploadAssetService.delete(asset.path);
 
-    await this.prisma.asset.update({
+    await this.prisma.asset.delete({
       where: { id },
-      data: { is_deleted: true },
     });
   }
 

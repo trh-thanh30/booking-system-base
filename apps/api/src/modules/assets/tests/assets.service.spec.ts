@@ -61,4 +61,74 @@ describe('AssetsService', () => {
       }),
     });
   });
+
+  it('hard-deletes an owned asset from storage and the database', async () => {
+    const asset = {
+      id: '10000000-0000-4000-8000-000000000001',
+      tenant_id: '30000000-0000-4000-8000-000000000001',
+      uploaded_by_id: '20000000-0000-4000-8000-000000000001',
+      path: 'public/category-descriptions/image.png',
+      is_deleted: false,
+    };
+    const prisma = {
+      asset: {
+        delete: jest.fn().mockResolvedValue(asset),
+        findUnique: jest.fn().mockResolvedValue(asset),
+        update: jest.fn(),
+      },
+    };
+    const uploadAssetService = {
+      delete: jest.fn().mockResolvedValue(undefined),
+    };
+    const service = new AssetsService(
+      prisma as never,
+      uploadAssetService as never,
+    );
+
+    await service.deleteAsset(asset.id, {
+      id: asset.uploaded_by_id,
+      tenant_id: asset.tenant_id,
+      role: 'OWNER',
+    } as never);
+
+    expect(uploadAssetService.delete).toHaveBeenCalledWith(asset.path);
+    expect(prisma.asset.delete).toHaveBeenCalledWith({
+      where: { id: asset.id },
+    });
+    expect(prisma.asset.update).not.toHaveBeenCalled();
+  });
+
+  it('does not allow an owner to delete an asset from another tenant', async () => {
+    const asset = {
+      id: '10000000-0000-4000-8000-000000000001',
+      tenant_id: '30000000-0000-4000-8000-000000000001',
+      uploaded_by_id: '20000000-0000-4000-8000-000000000001',
+      path: 'public/category-descriptions/image.png',
+      is_deleted: false,
+    };
+    const prisma = {
+      asset: {
+        delete: jest.fn(),
+        findUnique: jest.fn().mockResolvedValue(asset),
+      },
+    };
+    const uploadAssetService = {
+      delete: jest.fn(),
+    };
+    const service = new AssetsService(
+      prisma as never,
+      uploadAssetService as never,
+    );
+
+    await expect(
+      service.deleteAsset(asset.id, {
+        id: '20000000-0000-4000-8000-000000000002',
+        tenant_id: '30000000-0000-4000-8000-000000000002',
+        role: 'OWNER',
+      } as never),
+    ).rejects.toThrow('permission');
+
+    expect(uploadAssetService.delete).not.toHaveBeenCalled();
+    expect(prisma.asset.delete).not.toHaveBeenCalled();
+  });
 });

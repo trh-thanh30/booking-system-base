@@ -222,6 +222,9 @@ và semantic token để hoạt động nhất quán ở light/dark mode.
 - `onAssetsUploaded` dùng để feature lưu asset ID hoặc relation nếu nghiệp vụ cần.
 - Nếu một batch upload lỗi giữa chừng, các file đã upload thành công vẫn được
   chèn và trả về consumer; lỗi của file hiện tại được hiển thị inline.
+- Khi consumer truyền `onDeleteAsset`, media có `assetId` hiển thị nút xóa và
+  dialog xác nhận. Editor chỉ loại node khỏi HTML sau khi callback xóa storage
+  và metadata thành công; lỗi xóa được giữ lại inline để người dùng thử lại.
 
 ```tsx
 <RichTextEditor
@@ -238,13 +241,18 @@ và semantic token để hoạt động nhất quán ở light/dark mode.
       url: asset.url,
     };
   }}
+  onDeleteAsset={async (asset) => {
+    if (!asset.id) throw new Error("Asset ID is required");
+    await deleteAsset(asset.id);
+  }}
 />
 ```
 
 Không gọi API hoặc import service của Web/Platform Admin từ `packages/ui`.
 Nội dung HTML phải được sanitize ở backend trước khi lưu/publish và sanitize lại
-khi render ở public surface. Asset bị xóa khỏi HTML không đồng nghĩa xóa file vật
-lý; feature phải áp dụng cleanup policy theo relation/reference của chính nó.
+khi render ở public surface. Nếu không truyền `onDeleteAsset`, việc bỏ node khỏi
+HTML không được hiểu là đã xóa file vật lý; feature vẫn phải có cleanup policy
+theo relation/reference của chính nó.
 
 ## Migration Rule
 

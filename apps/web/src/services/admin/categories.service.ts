@@ -97,4 +97,8 @@ export const categoriesService = {
       }),
     );
   },
+
+  async deleteCategoryDescriptionAsset(id: string) {
+    await apiClient.delete(`/assets/${id}`);
+  },
 };

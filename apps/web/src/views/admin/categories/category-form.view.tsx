@@ -152,6 +152,12 @@ export function CategoryFormView({ categoryId, mode }: CategoryFormViewProps) {
           categories={categoriesQuery.data?.data ?? []}
           category={mode === "edit" ? (categoryQuery.data ?? null) : null}
           mode={mode}
+          onDeleteDescriptionAsset={async (asset) => {
+            if (!asset.id) {
+              throw new Error("Rich text asset ID is missing");
+            }
+            await categoriesService.deleteCategoryDescriptionAsset(asset.id);
+          }}
           onSubmit={(input, assets) => mutation.mutate({ assets, input })}
           onUploadDescriptionAsset={async (file, context) => {
             const asset =
