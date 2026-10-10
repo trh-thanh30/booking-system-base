@@ -1,5 +1,9 @@
 import { z } from "zod";
-import { CATEGORY_STATUSES, CATEGORY_TYPES } from "../constants/index.ts";
+import {
+  CATEGORY_STATUSES,
+  CATEGORY_TYPES,
+  MAX_CATEGORY_ASSETS,
+} from "../constants/index.ts";
 
 export const categoryTypeSchema = z.enum(CATEGORY_TYPES);
 
@@ -16,6 +20,7 @@ export const createCategorySchema = z.object({
   sort_order: z.number().int().min(0).optional(),
   parent_id: z.string().uuid().nullable().optional(),
   metadata: z.record(z.string(), z.unknown()).optional(),
+  asset_ids: z.array(z.string().uuid()).max(MAX_CATEGORY_ASSETS).optional(),
 });
 
 export type CreateCategoryInput = z.input<typeof createCategorySchema>;
@@ -28,9 +33,16 @@ export const updateCategorySchema = z.object({
   sort_order: z.number().int().min(0).optional(),
   parent_id: z.string().uuid().nullable().optional(),
   metadata: z.record(z.string(), z.unknown()).optional(),
+  asset_ids: z.array(z.string().uuid()).max(MAX_CATEGORY_ASSETS).optional(),
 });
 
 export type UpdateCategoryInput = z.input<typeof updateCategorySchema>;
+
+export const reorderCategoriesSchema = z.object({
+  category_ids: z.array(z.string().uuid()).min(1).max(100),
+});
+
+export type ReorderCategoriesInput = z.input<typeof reorderCategoriesSchema>;
 
 export const listCategoriesSchema = z.object({
   type: categoryTypeSchema.optional(),
