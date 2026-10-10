@@ -7,3 +7,6 @@ export const CATEGORY_TYPES = [
 ] as const;
 
 export const CATEGORY_STATUSES = ["ACTIVE", "INACTIVE", "ARCHIVED"] as const;
+
+export const MAX_CATEGORY_DESCRIPTION_TEXT_LENGTH = 1_000;
+export const MAX_CATEGORY_DESCRIPTION_HTML_LENGTH = 20_000;

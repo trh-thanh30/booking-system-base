@@ -1,4 +1,5 @@
 import type { CategorySummary, CreateCategoryInput } from "@repo/shared";
+import type { RichTextEditorProps } from "@repo/ui";
 
 export type CategoryFormMode = "create" | "edit";
 
@@ -17,5 +18,6 @@ export type CategoryFormProps = {
   category: CategorySummary | null;
   mode: CategoryFormMode;
   onSubmit: (input: CategoryFormInput, assets: CategoryAssetDraft[]) => void;
+  onUploadDescriptionAsset: NonNullable<RichTextEditorProps["onUpload"]>;
   pending: boolean;
 };

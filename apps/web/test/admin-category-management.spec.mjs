@@ -17,6 +17,9 @@ test("category service uses the tenant-scoped management contracts", () => {
   assert.match(service, /category_ids: categoryIds/);
   assert.match(service, /"\/assets\/upload"/);
   assert.match(service, /FormData/);
+  assert.match(service, /uploadCategoryDescriptionAsset/);
+  assert.match(service, /folder: "category-descriptions"/);
+  assert.match(service, /onUploadProgress/);
 });
 
 test("category management route stays thin and the view uses shared Admin compositions", () => {
@@ -100,5 +103,25 @@ test("category create and edit forms are deep-linkable route views", () => {
   assert.match(formView, /AdminFormPage/);
   assert.match(form, /parent_id/);
   assert.match(form, /CategoryAssetsField/);
+  assert.match(form, /RichTextEditor/);
+  assert.match(form, /Controller/);
+  assert.match(form, /onUploadDescriptionAsset/);
+  assert.doesNotMatch(form, /Textarea/);
   assert.doesNotMatch(form, /Dialog/);
+});
+
+test("category rich text description normalizes visual emptiness", async () => {
+  const { normalizeCategoryDescription } =
+    await import("../src/views/admin/categories/utils/category-description.utils.ts");
+
+  assert.equal(normalizeCategoryDescription(""), null);
+  assert.equal(normalizeCategoryDescription("<p>&nbsp;</p>"), null);
+  assert.equal(
+    normalizeCategoryDescription(" <p>Category details</p> "),
+    "<p>Category details</p>",
+  );
+  assert.equal(
+    normalizeCategoryDescription('<p><img src="/cover.jpg"></p>'),
+    '<p><img src="/cover.jpg"></p>',
+  );
 });

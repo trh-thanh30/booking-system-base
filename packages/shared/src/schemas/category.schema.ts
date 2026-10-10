@@ -2,6 +2,7 @@ import { z } from "zod";
 import {
   CATEGORY_STATUSES,
   CATEGORY_TYPES,
+  MAX_CATEGORY_DESCRIPTION_HTML_LENGTH,
   MAX_CATEGORY_ASSETS,
 } from "../constants/index.ts";
 
@@ -15,7 +16,11 @@ export const createCategorySchema = z.object({
   type: categoryTypeSchema,
   name: z.string().trim().min(1).max(120),
   slug: z.string().trim().min(1).max(140).optional(),
-  description: z.string().max(1000).nullable().optional(),
+  description: z
+    .string()
+    .max(MAX_CATEGORY_DESCRIPTION_HTML_LENGTH)
+    .nullable()
+    .optional(),
   status: mutableCategoryStatusSchema.optional(),
   sort_order: z.number().int().min(0).optional(),
   parent_id: z.string().uuid().nullable().optional(),
@@ -28,7 +33,11 @@ export type CreateCategoryInput = z.input<typeof createCategorySchema>;
 export const updateCategorySchema = z.object({
   name: z.string().trim().min(1).max(120).optional(),
   slug: z.string().trim().min(1).max(140).optional(),
-  description: z.string().max(1000).nullable().optional(),
+  description: z
+    .string()
+    .max(MAX_CATEGORY_DESCRIPTION_HTML_LENGTH)
+    .nullable()
+    .optional(),
   status: mutableCategoryStatusSchema.optional(),
   sort_order: z.number().int().min(0).optional(),
   parent_id: z.string().uuid().nullable().optional(),

@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { useTranslations } from "next-intl";
 import {
   createCategorySchema,
+  MAX_CATEGORY_DESCRIPTION_TEXT_LENGTH,
   updateCategorySchema,
   type CategorySummary,
 } from "@repo/shared";
@@ -16,7 +17,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-  Textarea,
+  RichTextEditor,
 } from "@repo/ui";
 import {
   AdminFormActions,
@@ -28,6 +29,7 @@ import type {
   CategoryAssetDraft,
   CategoryFormProps,
 } from "../types/category-form.types";
+import { normalizeCategoryDescription } from "../utils/category-description.utils";
 import { CategoryAssetsField } from "./category-assets-field";
 
 type CategoryFormValues = {
@@ -64,6 +66,7 @@ export function CategoryForm({
   category,
   mode,
   onSubmit,
+  onUploadDescriptionAsset,
   pending,
 }: CategoryFormProps) {
   const t = useTranslations("CategoryManagement");
@@ -71,6 +74,7 @@ export function CategoryForm({
     categoryAssets(category),
   );
   const {
+    control,
     formState: { errors },
     handleSubmit,
     register,
@@ -111,7 +115,7 @@ export function CategoryForm({
       className="space-y-6"
       onSubmit={handleSubmit((values) => {
         const candidate = {
-          description: values.description.trim() || null,
+          description: normalizeCategoryDescription(values.description),
           name: values.name,
           parent_id: values.parent_id,
           slug: values.slug.trim() || undefined,
@@ -176,20 +180,57 @@ export function CategoryForm({
             />
           </FormField>
           <div className="md:col-span-2">
-            <FormField
-              error={errors.description?.message}
-              htmlFor="category-description"
-              label={t("form.description")}
-            >
-              <Textarea
-                disabled={pending}
-                id="category-description"
-                maxLength={1000}
-                placeholder={t("form.descriptionPlaceholder")}
-                rows={5}
-                {...register("description")}
-              />
-            </FormField>
+            <Controller
+              control={control}
+              name="description"
+              render={({ field }) => (
+                <FormField
+                  error={errors.description?.message}
+                  htmlFor="category-description"
+                  label={t("form.description")}
+                >
+                  <RichTextEditor
+                    disabled={pending}
+                    id="category-description"
+                    labels={{
+                      alignCenter: t("form.editor.alignCenter"),
+                      alignLeft: t("form.editor.alignLeft"),
+                      alignRight: t("form.editor.alignRight"),
+                      blockquote: t("form.editor.blockquote"),
+                      bold: t("form.editor.bold"),
+                      bulletList: t("form.editor.bulletList"),
+                      clearFormatting: t("form.editor.clearFormatting"),
+                      codeBlock: t("form.editor.codeBlock"),
+                      document: t("form.editor.document"),
+                      editor: t("form.editor.editor"),
+                      heading2: t("form.editor.heading2"),
+                      heading3: t("form.editor.heading3"),
+                      image: t("form.editor.image"),
+                      invalidLink: t("form.editor.invalidLink"),
+                      italic: t("form.editor.italic"),
+                      link: t("form.editor.link"),
+                      linkPlaceholder: t("form.editor.linkPlaceholder"),
+                      orderedList: t("form.editor.orderedList"),
+                      paragraph: t("form.editor.paragraph"),
+                      redo: t("form.editor.redo"),
+                      strike: t("form.editor.strike"),
+                      underline: t("form.editor.underline"),
+                      undo: t("form.editor.undo"),
+                      unlink: t("form.editor.unlink"),
+                      uploadFailed: t("form.editor.uploadFailed"),
+                      uploading: t("form.editor.uploading"),
+                      video: t("form.editor.video"),
+                    }}
+                    maxLength={MAX_CATEGORY_DESCRIPTION_TEXT_LENGTH}
+                    onBlur={field.onBlur}
+                    onChange={field.onChange}
+                    onUpload={onUploadDescriptionAsset}
+                    placeholder={t("form.descriptionPlaceholder")}
+                    value={field.value}
+                  />
+                </FormField>
+              )}
+            />
           </div>
           <FormField htmlFor="category-status" label={t("form.status")}>
             <Select

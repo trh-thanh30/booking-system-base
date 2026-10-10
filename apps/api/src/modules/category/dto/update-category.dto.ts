@@ -14,7 +14,10 @@ import {
   Min,
   ValidateIf,
 } from 'class-validator';
-import { MAX_CATEGORY_ASSETS } from '@repo/shared';
+import {
+  MAX_CATEGORY_ASSETS,
+  MAX_CATEGORY_DESCRIPTION_HTML_LENGTH,
+} from '@repo/shared';
 
 export class UpdateCategoryDto implements UpdateCategoryInput {
   @IsOptional()
@@ -30,7 +33,7 @@ export class UpdateCategoryDto implements UpdateCategoryInput {
   @IsOptional()
   @ValidateIf((dto: UpdateCategoryDto) => dto.description !== null)
   @IsString()
-  @MaxLength(1000)
+  @MaxLength(MAX_CATEGORY_DESCRIPTION_HTML_LENGTH)
   description?: string | null;
 
   @IsOptional()

@@ -8,6 +8,14 @@ import type {
 import { unwrapApiData } from "@repo/shared";
 import { apiClient } from "@/src/lib/admin/api-client";
 
+type CategoryDescriptionAssetKind = "document" | "image" | "video";
+
+const descriptionAssetTypes = {
+  document: "DOCUMENT",
+  image: "IMAGE",
+  video: "VIDEO",
+} as const satisfies Record<CategoryDescriptionAssetKind, string>;
+
 export const categoriesService = {
   listCategories(): Promise<PaginatedApiResponse<CategorySummary>> {
     return apiClient.paginated<CategorySummary>({
@@ -63,6 +71,28 @@ export const categoriesService = {
           accessType: "PUBLIC",
           folder: "categories",
           type: "IMAGE",
+        },
+      }),
+    );
+  },
+
+  async uploadCategoryDescriptionAsset(
+    file: File,
+    kind: CategoryDescriptionAssetKind,
+    onProgress: (progress: number) => void,
+  ) {
+    const data = new FormData();
+    data.append("file", file);
+    return unwrapApiData(
+      await apiClient.post<AssetWithUrl>("/assets/upload", data, {
+        onUploadProgress: ({ loaded, total }) => {
+          if (!total) return;
+          onProgress(Math.min(100, Math.round((loaded / total) * 100)));
+        },
+        params: {
+          accessType: "PUBLIC",
+          folder: "category-descriptions",
+          type: descriptionAssetTypes[kind],
         },
       }),
     );

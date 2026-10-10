@@ -153,6 +153,22 @@ export function CategoryFormView({ categoryId, mode }: CategoryFormViewProps) {
           category={mode === "edit" ? (categoryQuery.data ?? null) : null}
           mode={mode}
           onSubmit={(input, assets) => mutation.mutate({ assets, input })}
+          onUploadDescriptionAsset={async (file, context) => {
+            const asset =
+              await categoriesService.uploadCategoryDescriptionAsset(
+                file,
+                context.kind,
+                context.onProgress,
+              );
+
+            return {
+              id: asset.id,
+              kind: context.kind,
+              mimeType: asset.mime_type,
+              name: asset.original_name,
+              url: asset.url,
+            };
+          }}
           pending={mutation.isPending}
         />
       )}
